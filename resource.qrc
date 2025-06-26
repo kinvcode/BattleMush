@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/">
+        <file>assets/qss/com.qss</file>
+        <file>assets/images/icons/home.svg</file>
+        <file>assets/images/icons/safe.svg</file>
+        <file>assets/images/icons/sata.svg</file>
+        <file>assets/images/icons/vip.svg</file>
+        <file>assets/images/icons/1.svg</file>
+        <file>assets/images/icons/2.svg</file>
+        <file>assets/images/icons/3.svg</file>
+        <file>assets/images/icons/4.svg</file>
+        <file>assets/images/icons/5.svg</file>
+        <file>assets/images/icons/6.svg</file>
+        <file>assets/images/icons/setting.svg</file>
+        <file>assets/images/icons/user.svg</file>
+        <file>assets/images/icons/abc.svg</file>
+        <file>assets/images/icons/abc.png</file>
+        <file>assets/images/icons/abc.ico</file>
+        <file>assets/images/icons/a.svg</file>
+        <file>assets/images/icons/b.svg</file>
+        <file>assets/images/icons/c.svg</file>
+    </qresource>
+</RCC>
