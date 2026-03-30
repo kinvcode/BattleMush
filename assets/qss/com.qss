@@ -10,7 +10,7 @@
     selection-background-color: #0078D4;
     selection-color: #FFFFFF;
     font-family: "Segoe UI", sans-serif;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 *:focus {
@@ -25,7 +25,6 @@ QWidget {
     color: #202020;
 }
 
-QGroupBox,
 QFrame {
   background-color: #FFFFFF;
   border: 1px solid #E1E1E1;
@@ -166,24 +165,7 @@ QTabBar::tab:hover {
 /*  ------------------------------------------------------------------------  */
 /*  QGroupBox  */
 
-QGroupBox {
-  background-color: #FFFFFF;
-  border: 1px solid #E1E1E1;
-  border-radius: 8px;
-  padding: 16px;
-  padding-top: 36px;
-  line-height: 13px;
-  text-transform: uppercase;
-  font-size: 13px;
-}
 
-QGroupBox::title {
-  color: #5D5D5D;
-  subcontrol-origin: margin;
-  subcontrol-position: top left;
-  padding: 0 8px;
-  background-color: transparent;
-}
 
 /*  ------------------------------------------------------------------------  */
 /*  QTableView  */
@@ -365,7 +347,7 @@ QCheckBox::indicator:checked {
   border: 1px solid #0078D4;
   background: #0078D4;
   border-radius: 4px;
-  /*image: url(:assets/svg/primary/checkbox_checked.svg);*/
+  image: url(:assets/images/widgets/checkbox_checked.svg);
 }
 
 QRadioButton::indicator:unchecked {
@@ -468,7 +450,7 @@ QListWidget.leftMenu {
 /* ===== 菜单项通用样式 ===== */
 QListWidget.leftMenu::item {
     height: 56px;             /* 增加菜单项高度 */
-    padding: 14 24px;          /* 增加左右内边距 */
+    padding: 20 0px;          /* 增加左右内边距 */
     border: none;             /* 无边框 */
     background-color: transparent;
     color: #202020;           /* 默认文字颜色 */
@@ -491,7 +473,7 @@ QListWidget.leftMenu::item:selected {
     font-weight: 600;          /* 选中状态加粗 */
 
     /* 左侧选中指示条 */
-    border-left: 4px solid #0078D4;
+    border-left: 2px solid #0078D4;
 }
 
 /* ===== 菜单项图标样式 ===== */
@@ -558,3 +540,35 @@ QListWidget.leftMenu::item[badge]::after {
 QListWidget.leftMenu::item:disabled {
     color: #A0A0A0;            /* 禁用状态文字颜色 */
 }
+
+/* ===== 日志框配色 ===== */
+QTextEdit.commonlog {
+    background-color: #2d2d2d;
+    font-size: 12px;
+    color: #8bc34a;
+}
+
+QTextEdit.commonlog QScrollBar::handle:vertical {
+    background: #5a5a5a;
+    border-radius: 6px;
+    min-height: 20px;
+}
+
+QTextEdit.commonlog QScrollBar::handle:vertical:hover {
+    background: #6a6a6a;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

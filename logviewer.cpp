@@ -4,10 +4,10 @@
 #include <QTextImageFormat>
 
 LogViewer::LogViewer(QTextEdit* textEdit) : m_textEdit(textEdit) {
-    m_colorMap[LogLevel::Info] = Qt::black;
-    m_colorMap[LogLevel::Warning] = QColor("#FFA500"); // orange
-    m_colorMap[LogLevel::Error] = Qt::red;
-    m_colorMap[LogLevel::Debug] = Qt::blue;
+    m_colorMap[LogLevel::Info] = QColor("#8bc34a");
+    m_colorMap[LogLevel::Warning] = QColor("#ff9800"); // orange
+    m_colorMap[LogLevel::Error] = QColor("#f44336");
+    m_colorMap[LogLevel::Debug] = QColor("#64b5f6");
 
     m_iconMap[LogLevel::Info] = QPixmap(":/assets/images/icons/a.svg");
     m_iconMap[LogLevel::Warning] = QPixmap(":/assets/images/icons/b.svg");

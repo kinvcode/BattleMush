@@ -24,11 +24,13 @@ private slots:
 
     void on_pushButton_clicked();
 
-    void on_pushButton_2_clicked();
-
 private:
     Ui::MainWindow *ui;
     LogViewer* logger = nullptr;
     void showFloatingNotice(const QString& message, NoticeWidget::NoticeType type);
+    void loadDriver();
+
+public slots:
+    void console(QString msg);
 };
 #endif // MAINWINDOW_H

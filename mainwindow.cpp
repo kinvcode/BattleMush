@@ -1,6 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QStringListModel>
+#include <QDateTime>
+#include <vmp/VMProtectSDK.h>
+#include "driver/msdriverpro.h"
+#include "driver/driverload.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -8,7 +12,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->pushButton_2->setProperty("class","danger");
+    loadDriver();
+    // ui->pushButton_2->setProperty("class","danger");
 
     // 表格
     ui->tableWidget->setColumnCount(11);
@@ -30,12 +35,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tabWidget->setCurrentIndex(0);
     ui->tabWidget->tabBar()->hide();
 
-    logger = new LogViewer(ui->textEdit);
-    // 示例日志
-    logger->log(LogLevel::Info, "变色龙驱动已安装");
-    logger->log(LogLevel::Warning, "变色龙保护盾已开启");
-    logger->log(LogLevel::Error, "进程伪装已完成");
-    logger->log(LogLevel::Debug, "读写功能已开启");
+    // 日志
+    ui->textEdit_log->setProperty("class","commonlog");
+    console("系统初始化完毕！");
 
     ui->comboBox->addItem("组包秒杀");
     ui->comboBox->addItem("搬砖");
@@ -80,15 +82,43 @@ void MainWindow::showFloatingNotice(const QString &message, NoticeWidget::Notice
     notice->show();
 }
 
-
-void MainWindow::on_pushButton_clicked()
+void MainWindow::loadDriver()
 {
-    showFloatingNotice("秒杀检测已被干掉！", NoticeWidget::Info);
+    if (!MSDriverPRO::isLoadDriver())
+    {
+        DriverLoad driver_loader;
+        bool driver_success = driver_loader.loadCommonDriver();
+        if(!driver_success)
+        {
+            qApp->quit();
+            return;
+        }
+    }
+    if (MSDriverPRO::isLoadDriver()){
+        console("变色龙安全驱动加载完毕~");
+    }
+}
+
+void MainWindow::console(QString msg)
+{
+    int cursor = ui->textEdit_log->textCursor().blockNumber();
+    if(cursor > 50000){
+        ui->textEdit_log->clear();
+    }
+    // 获取当前日期时间
+    QDateTime currentDateTime = QDateTime::currentDateTime();
+    // 格式化为字符串
+    QString formattedDateTime = currentDateTime.toString("HH:mm:ss ");
+    msg = formattedDateTime + msg;
+    ui->textEdit_log->append(msg);
+    ui->textEdit_log->moveCursor(QTextCursor::End);
 }
 
 
-void MainWindow::on_pushButton_2_clicked()
+void MainWindow::on_pushButton_clicked()
 {
-    showFloatingNotice("打金检测已被干掉！", NoticeWidget::Success);
+    VMProtectBegin("__FUNCTION__");
+    console("111111111111");
+    VMProtectEnd();
 }
 
