@@ -16,11 +16,9 @@ bool NativeEventFilter::nativeEventFilter(const QByteArray& eventType, void* mes
         qDebug() << "当前按键：" + QString::number(keycode);
         sendMsg("当前按键:" + QString::number(keycode));
             switch(keycode){
-        case VK_HOME:
-                qDebug() << "HOME";
+        case VK_F1:
+                qDebug() << "F1";
             break;
-        case VK_END:
-                qDebug() << "END";
             break;
         default:
             sendMsg("未知快捷键触发:" + QString::number(keycode));

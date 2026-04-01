@@ -22,8 +22,7 @@ int main(int argc, char *argv[])
     // 注册热键
     NativeEventFilter filter(&mainWindow);
     a.installNativeEventFilter(&filter);
-    RegisterHotKey(NULL, VK_HOME, NULL, VK_HOME);
-    RegisterHotKey(NULL, VK_END, NULL, VK_END);
+    RegisterHotKey(NULL, VK_F1, NULL, VK_F1);
 
     return a.exec();
 }

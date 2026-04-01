@@ -30,8 +30,8 @@ void GlobalConfig::loadFromJson()
     healthConfig["add_mp"] = config->getValue("auto_add_health/add_mp", healthConfig["add_mp"].toVariant()).toBool();
     healthConfig["hp_rate"] = config->getValue("auto_add_health/hp_rate", healthConfig["hp_rate"].toVariant()).toInt();
     healthConfig["mp_rate"] = config->getValue("auto_add_health/mp_rate", healthConfig["mp_rate"].toVariant()).toInt();
-    healthConfig["hp_key"] = config->getValue("auto_add_health/hp_key", healthConfig["hp_key"].toVariant()).toString();
-    healthConfig["mp_key"] = config->getValue("auto_add_health/mp_key", healthConfig["mp_key"].toVariant()).toString();
+    healthConfig["hp_key"] = config->getValue("auto_add_health/hp_key", healthConfig["hp_key"].toVariant()).toInt();
+    healthConfig["mp_key"] = config->getValue("auto_add_health/mp_key", healthConfig["mp_key"].toVariant()).toInt();
     data["auto_add_health"] = healthConfig;
 }
 
@@ -51,7 +51,7 @@ void GlobalConfig::setValue(const QString &keyPath, const QVariant& value)
 
     QJsonValue res_value = config->getValueHelper(keys, config->m_jsonObject);
     if(res_value.isUndefined() || res_value.isNull()){
-        qDebug() << "该配置项未定义";
+        qDebug() << "该配置项未定义" << keyPath;
         return;
     }
 

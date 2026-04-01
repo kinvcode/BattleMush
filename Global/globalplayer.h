@@ -14,7 +14,12 @@ public:
     }
 
     // 属性
-    int HP = 100;
+    int HP = 999999;
+    int MAX_HP = 999999;
+
+    int MP = 999999;
+    int MAX_MP = 999999;
+
 private:
 
 };

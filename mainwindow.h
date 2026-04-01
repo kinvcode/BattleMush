@@ -20,6 +20,7 @@ public:
     ~MainWindow();
 
 private slots:
+
     void on_listWidget_clicked(const QModelIndex &index);
 
     void on_pushButton_clicked();
@@ -35,6 +36,9 @@ private slots:
     void on_lineEdit_auto_add_hp_rate_textEdited(const QString &arg1);
 
     void on_lineEdit_auto_add_mp_rate_textEdited(const QString &arg1);
+
+private slots:
+    void onHotkeyChanged(int key);
 
 private:
     Ui::MainWindow *ui;

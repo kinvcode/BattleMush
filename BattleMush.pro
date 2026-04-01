@@ -34,9 +34,11 @@ SOURCES += \
     process/process.cpp \
     threads/healthmonitor.cpp \
     utils/config.cpp \
+    widgets/hotkeyedit.cpp \
     widgets/noticewidget.cpp
 
 HEADERS += \
+    driver/mskeycode.h \
     global/globalconfig.h \
     global/globalplayer.h \
     driver/driverload.h \
@@ -50,6 +52,7 @@ HEADERS += \
     threads/healthmonitor.h \
     utils/config.h \
     vmp/VMProtectSDK.h \
+    widgets/hotkeyedit.h \
     widgets/noticewidget.h
 
 FORMS += \

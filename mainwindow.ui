@@ -157,8 +157,8 @@
                  <property name="geometry">
                   <rect>
                    <x>10</x>
-                   <y>30</y>
-                   <width>301</width>
+                   <y>80</y>
+                   <width>351</width>
                    <height>31</height>
                   </rect>
                  </property>
@@ -188,7 +188,14 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QLineEdit" name="lineEdit_auto_add_mp_key"/>
+                   <widget class="HotkeyEdit" name="lineEdit_auto_add_mp_key">
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </widget>
@@ -196,8 +203,8 @@
                  <property name="geometry">
                   <rect>
                    <x>9</x>
-                   <y>70</y>
-                   <width>301</width>
+                   <y>30</y>
+                   <width>351</width>
                    <height>31</height>
                   </rect>
                  </property>
@@ -227,7 +234,14 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QLineEdit" name="lineEdit_auto_add_hp_key"/>
+                   <widget class="HotkeyEdit" name="lineEdit_auto_add_hp_key">
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </widget>
@@ -320,6 +334,13 @@
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>HotkeyEdit</class>
+   <extends>QLineEdit</extends>
+   <header>widgets/hotkeyedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -2,6 +2,7 @@
 #define GLOBALCONFIG_H
 
 #include "utils/config.h"
+#include "driver/mskeycode.h"
 
 class GlobalConfig : public QObject
 {
@@ -10,12 +11,12 @@ public:
     QJsonObject data =
 {
     {"auto_add_health",QJsonObject{
-        {"add_hp",true},
-        {"add_mp",true},
-        {"hp_rate",50},
-        {"mp_rate",50},
-        {"hp_key","1"},
-        {"mp_key","2"},
+        {"add_hp", true},
+        {"add_mp", true},
+        {"hp_rate", 50},
+        {"mp_rate", 50},
+        {"hp_key", MSKeyboard_1},
+        {"mp_key", MSKeyboard_2},
         }
     },
     {"model","uplevel"}

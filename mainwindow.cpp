@@ -12,7 +12,7 @@
 #include "driver/driverload.h"
 #include "global/globalconfig.h"
 #include "threads/healthmonitor.h"
-
+#include "widgets/hotkeyedit.h"
 
 // 测试头文件
 #include "global/globalplayer.h"
@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     loadDriver();
+    // MSDriverPRO::keyboardClick(0x45);
 
     // 初始化组件
     initCompomentUI();
@@ -89,6 +90,9 @@ void MainWindow::loadDriver()
     }
     if (MSDriverPRO::isLoadDriver()){
         console("变色龙安全驱动加载完毕~");
+
+        // 初始化键盘状态，打开小键盘
+        if ((GetKeyState(VK_NUMLOCK) & 1)) MSDriverPRO::keyboardClick(0x45);
     }
 }
 
@@ -131,23 +135,30 @@ void MainWindow::initConfig()
 {
     ui->checkBox_auto_add_hp->setChecked(Gconfig.getValue("auto_add_health/add_hp").toBool());
     ui->lineEdit_auto_add_hp_rate->setText(Gconfig.getValue("auto_add_health/hp_rate").toString());
-    ui->lineEdit_auto_add_hp_key->setText(Gconfig.getValue("auto_add_health/hp_key").toString());
+    ui->lineEdit_auto_add_hp_key->m_config_path = "auto_add_health/hp_key";
+    ui->lineEdit_auto_add_hp_key->m_currentKey = Gconfig.getValue("auto_add_health/hp_key").toInt();
+    ui->lineEdit_auto_add_hp_key->updateDisplay();
 
     ui->checkBox_auto_add_mp->setChecked(Gconfig.getValue("auto_add_health/add_mp").toBool());
     ui->lineEdit_auto_add_mp_rate->setText(Gconfig.getValue("auto_add_health/mp_rate").toString());
-    ui->lineEdit_auto_add_mp_key->setText(Gconfig.getValue("auto_add_health/mp_key").toString());
+    ui->lineEdit_auto_add_mp_key->m_config_path = "auto_add_health/mp_key";
+    ui->lineEdit_auto_add_mp_key->m_currentKey = Gconfig.getValue("auto_add_health/mp_key").toInt();
+    ui->lineEdit_auto_add_mp_key->updateDisplay();
 }
 
 void MainWindow::initSinalBind()
 {
     // 连接配置信号槽
     connect(this, &MainWindow::saveConfig, &Gconfig, &GlobalConfig::updateConfig);
+
+    // 自动加蓝快捷键
+    // connect(ui->lineEdit_auto_add_mp_key, &HotkeyEdit::hotkeyChanged, this, &MainWindow::onHotkeyChanged);
 }
 
 void MainWindow::initThreads()
 {
     HealthMonitor* t_heal_monitor = new HealthMonitor(this);
-    // t_heal_monitor->start();
+    t_heal_monitor->start();
     console("健康状态监控线程已启动");
 }
 
@@ -173,6 +184,8 @@ void MainWindow::on_pushButton_clicked()
     console(QString::number(Gplayer.HP));
 
     showNotice("123456");
+
+    Gplayer.HP = 50;
 
     VMProtectEnd();
 }
@@ -257,5 +270,10 @@ void MainWindow::on_lineEdit_auto_add_mp_rate_textEdited(const QString &arg1)
     if (!is_number || value < 1 || value > 100) {
         console("请输入1-100之间的数字");
     }
+}
+
+void MainWindow::onHotkeyChanged(int key)
+{
+    qDebug() << "快捷键已更改:" << key;
 }
 
