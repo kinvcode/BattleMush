@@ -2,9 +2,20 @@
 #include "ui_mainwindow.h"
 #include <QStringListModel>
 #include <QDateTime>
+#include <QScreen>
+#include <QGuiApplication>
+#include <QCursor>
+#include <QPoint>
+
 #include <vmp/VMProtectSDK.h>
 #include "driver/msdriverpro.h"
 #include "driver/driverload.h"
+#include "global/globalconfig.h"
+#include "threads/healthmonitor.h"
+
+
+// 测试头文件
+#include "global/globalplayer.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -13,37 +24,29 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     loadDriver();
-    // ui->pushButton_2->setProperty("class","danger");
 
-    // 表格
-    ui->tableWidget->setColumnCount(11);
-    ui->tableWidget->setHorizontalHeaderLabels({"怪物指针","怪物阵营", "怪物类型", "怪物代码","怪物名称","怪物血量","怪物坐标","宽度","高度","碰撞检测","建筑属性"});
+    // 初始化组件
+    initCompomentUI();
 
-    // 菜单
-    ui->listWidget->setProperty("class","leftMenu");
-    QListWidgetItem *item1 = new QListWidgetItem(QIcon(":/assets/images/icons/home.svg"), "启动");
-    ui->listWidget->addItem(item1);
-    QListWidgetItem *item2 = new QListWidgetItem(QIcon(":/assets/images/icons/vip.svg"), "定制");
-    ui->listWidget->addItem(item2);
-    QListWidgetItem *item3 = new QListWidgetItem(QIcon(":/assets/images/icons/safe.svg"), "配置");
-    ui->listWidget->addItem(item3);
-    QListWidgetItem *item4 = new QListWidgetItem(QIcon(":/assets/images/icons/sata.svg"), "功能");
-    ui->listWidget->addItem(item4);
-    ui->listWidget->setCurrentRow(0);
+    // 加载配置文件
+    Gconfig.loadFromJson();
 
-    // tab组件
-    ui->tabWidget->setCurrentIndex(0);
-    ui->tabWidget->tabBar()->hide();
+    // 设置配置组件
+    initConfig();
 
-    // 日志
-    ui->textEdit_log->setProperty("class","commonlog");
+    // 绑定信号
+    initSinalBind();
+
+    // 初始化线程
+    initThreads();
+
     console("系统初始化完毕！");
 
-    ui->comboBox->addItem("组包秒杀");
-    ui->comboBox->addItem("搬砖");
-    ui->comboBox->addItem("升级");
-
-    qApp->setStyleSheet(qApp->styleSheet()); // 重新设置样式表
+    // 线程操作
+    // 主线程:FPS限制，检测是否登录，自动登录，是否创建队伍、
+    // 键盘按键线程：buff\
+    // 开启一个血蓝检测线程
+    // 窗口截图线程
 }
 
 MainWindow::~MainWindow()
@@ -60,23 +63,13 @@ void MainWindow::on_listWidget_clicked(const QModelIndex &index)
     }
 }
 
-void MainWindow::showFloatingNotice(const QString &message, NoticeWidget::NoticeType type)
+void MainWindow::showNotice(const QString &message)
 {
-    auto* notice = new NoticeWidget(message, type, this);
-    notice->setAutoClose(3000);  // 自动关闭
-    notice->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint);
-    notice->setAttribute(Qt::WA_TranslucentBackground);
-    notice->setAttribute(Qt::WA_ShowWithoutActivating);
+    auto* notice = new NoticeWidget(message,this);
+    notice->setAutoClose(1500);  // 自动关闭
 
-    // 设置大小
-    QSize noticeSize = QSize(400, 50);
-    notice->resize(noticeSize);
-
-    // 确定主窗口右上角的位置（偏移量可调整）
-    const int margin = 20;
-    QPoint topRight = mapToGlobal(rect().topRight());
-    QPoint pos = QPoint(topRight.x() - noticeSize.width() - margin,
-                        topRight.y() + margin);
+    QPoint topLeft = mapToGlobal(rect().topLeft());  // 改为 topLeft
+    QPoint pos = QPoint(topLeft.x() + 200, topLeft.y() - 20);
 
     notice->move(pos);
     notice->show();
@@ -99,6 +92,65 @@ void MainWindow::loadDriver()
     }
 }
 
+void MainWindow::initCompomentUI()
+{
+    // ui->pushButton_2->setProperty("class","danger");
+
+    // 表格
+    ui->tableWidget->setColumnCount(11);
+    ui->tableWidget->setHorizontalHeaderLabels({"怪物指针","怪物阵营", "怪物类型", "怪物代码","怪物名称","怪物血量","怪物坐标","宽度","高度","碰撞检测","建筑属性"});
+
+    // 菜单
+    ui->listWidget->setProperty("class","leftMenu");
+    QListWidgetItem *item1 = new QListWidgetItem(QIcon(":/assets/images/icons/home.svg"), "启动");
+    ui->listWidget->addItem(item1);
+    QListWidgetItem *item2 = new QListWidgetItem(QIcon(":/assets/images/icons/setting.svg"), "配置");
+    ui->listWidget->addItem(item2);
+    QListWidgetItem *item3 = new QListWidgetItem(QIcon(":/assets/images/icons/vip.svg"), "VIP");
+    ui->listWidget->addItem(item3);
+    QListWidgetItem *item4 = new QListWidgetItem(QIcon(":/assets/images/icons/sata.svg"), "功能");
+    ui->listWidget->addItem(item4);
+    ui->listWidget->setCurrentRow(0);
+
+    // tab组件
+    ui->tabWidget->setCurrentIndex(0);
+    ui->tabWidget->tabBar()->hide();
+
+    // 日志
+    ui->textEdit_log->setProperty("class","commonlog");
+
+    ui->comboBox->addItem("组包秒杀");
+    ui->comboBox->addItem("搬砖");
+    ui->comboBox->addItem("升级");
+
+    // 重新设置样式表
+    qApp->setStyleSheet(qApp->styleSheet());
+}
+
+void MainWindow::initConfig()
+{
+    ui->checkBox_auto_add_hp->setChecked(Gconfig.getValue("auto_add_health/add_hp").toBool());
+    ui->lineEdit_auto_add_hp_rate->setText(Gconfig.getValue("auto_add_health/hp_rate").toString());
+    ui->lineEdit_auto_add_hp_key->setText(Gconfig.getValue("auto_add_health/hp_key").toString());
+
+    ui->checkBox_auto_add_mp->setChecked(Gconfig.getValue("auto_add_health/add_mp").toBool());
+    ui->lineEdit_auto_add_mp_rate->setText(Gconfig.getValue("auto_add_health/mp_rate").toString());
+    ui->lineEdit_auto_add_mp_key->setText(Gconfig.getValue("auto_add_health/mp_key").toString());
+}
+
+void MainWindow::initSinalBind()
+{
+    // 连接配置信号槽
+    connect(this, &MainWindow::saveConfig, &Gconfig, &GlobalConfig::updateConfig);
+}
+
+void MainWindow::initThreads()
+{
+    HealthMonitor* t_heal_monitor = new HealthMonitor(this);
+    t_heal_monitor->start();
+    console("健康状态监控线程已启动");
+}
+
 void MainWindow::console(QString msg)
 {
     int cursor = ui->textEdit_log->textCursor().blockNumber();
@@ -118,7 +170,92 @@ void MainWindow::console(QString msg)
 void MainWindow::on_pushButton_clicked()
 {
     VMProtectBegin("__FUNCTION__");
-    console("111111111111");
+    console(QString::number(Gplayer.HP));
+
+    showNotice("123456");
+
     VMProtectEnd();
+}
+
+
+void MainWindow::on_lineEdit_auto_add_mp_rate_editingFinished()
+{
+    QString text = ui->lineEdit_auto_add_mp_rate->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 100) {
+        // 校验通过
+        console("自动加蓝比例已保存");
+        Gconfig.setValue("auto_add_health/mp_rate", value);
+    } else {
+        showNotice("无效数值，请输入1-100之间的数字");
+        ui->lineEdit_auto_add_mp_rate->setText("");  // 清空内容
+    }
+}
+
+
+void MainWindow::on_lineEdit_auto_add_hp_rate_editingFinished()
+{
+    QString text = ui->lineEdit_auto_add_hp_rate->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 100) {
+        // 校验通过
+        console("自动加血比例已保存");
+        Gconfig.setValue("auto_add_health/hp_rate", value);
+    } else {
+        showNotice("无效数值，请输入1-100之间的数字");
+        ui->lineEdit_auto_add_hp_rate->setText("");  // 清空内容
+    }
+}
+
+
+void MainWindow::on_checkBox_auto_add_mp_stateChanged(int arg1)
+{
+    if(ui->checkBox_auto_add_mp->isChecked()){
+        console("自动加蓝已开启");
+        Gconfig.setValue("auto_add_health/add_mp", true);
+    }else{
+        console("自动加蓝已关闭");
+        Gconfig.setValue("auto_add_health/add_mp", false);
+    }
+}
+
+
+void MainWindow::on_checkBox_auto_add_hp_stateChanged(int arg1)
+{
+    if(ui->checkBox_auto_add_hp->isChecked()){
+        console("自动加血已开启");
+        Gconfig.setValue("auto_add_health/add_hp", true);
+    }else{
+        console("自动加血已关闭");
+        Gconfig.setValue("auto_add_health/add_hp", false);
+    }
+}
+
+
+void MainWindow::on_lineEdit_auto_add_hp_rate_textEdited(const QString &arg1)
+{
+    QString text = ui->lineEdit_auto_add_hp_rate->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (!is_number || value < 1 || value > 100) {
+        console("请输入1-100之间的数字");
+    }
+}
+
+
+void MainWindow::on_lineEdit_auto_add_mp_rate_textEdited(const QString &arg1)
+{
+    QString text = ui->lineEdit_auto_add_mp_rate->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (!is_number || value < 1 || value > 100) {
+        console("请输入1-100之间的数字");
+    }
 }
 

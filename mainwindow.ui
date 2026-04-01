@@ -56,7 +56,7 @@
            <rect>
             <x>10</x>
             <y>430</y>
-            <width>561</width>
+            <width>651</width>
             <height>121</height>
            </rect>
           </property>
@@ -66,7 +66,7 @@
            <rect>
             <x>10</x>
             <y>10</y>
-            <width>551</width>
+            <width>651</width>
             <height>331</height>
            </rect>
           </property>
@@ -83,8 +83,8 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-59</y>
-             <width>535</width>
+             <y>0</y>
+             <width>635</width>
              <height>388</height>
             </rect>
            </property>
@@ -212,7 +212,7 @@
                   <item>
                    <widget class="QLabel" name="label_6">
                     <property name="text">
-                     <string>当蓝量降到</string>
+                     <string>当血量降到</string>
                     </property>
                    </widget>
                   </item>
@@ -252,24 +252,9 @@
           </property>
          </widget>
         </widget>
-        <widget class="QWidget" name="tab_2">
-         <attribute name="title">
-          <string>2</string>
-         </attribute>
-         <widget class="QTableWidget" name="tableWidget">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>563</width>
-            <height>501</height>
-           </rect>
-          </property>
-         </widget>
-        </widget>
         <widget class="QWidget" name="tab_3">
          <attribute name="title">
-          <string>3</string>
+          <string>2</string>
          </attribute>
          <widget class="QComboBox" name="comboBox">
           <property name="geometry">
@@ -292,6 +277,21 @@
           </property>
           <property name="text">
            <string>刷图模式</string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="tab_2">
+         <attribute name="title">
+          <string>3</string>
+         </attribute>
+         <widget class="QTableWidget" name="tableWidget">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>563</width>
+            <height>501</height>
+           </rect>
           </property>
          </widget>
         </widget>

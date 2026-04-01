@@ -23,24 +23,32 @@ LIBS += -lSetupAPI
 LIBS += -lUser32 -lKernel32
 
 SOURCES += \
+    global/globalconfig.cpp \
+    global/globalplayer.cpp \
     driver/driverload.cpp \
     helper/rand.cpp \
     logviewer.cpp \
     main.cpp \
     mainwindow.cpp \
-    noticewidget.cpp \
-    process/process.cpp
+    process/process.cpp \
+    threads/healthmonitor.cpp \
+    utils/config.cpp \
+    widgets/noticewidget.cpp
 
 HEADERS += \
+    global/globalconfig.h \
+    global/globalplayer.h \
     driver/driverload.h \
     driver/msdriverpro.h \
     driver/msstruct.h \
     helper/rand.h \
     logviewer.h \
     mainwindow.h \
-    noticewidget.h \
     process/process.h \
-    vmp/VMProtectSDK.h
+    threads/healthmonitor.h \
+    utils/config.h \
+    vmp/VMProtectSDK.h \
+    widgets/noticewidget.h
 
 FORMS += \
     mainwindow.ui
