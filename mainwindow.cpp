@@ -147,7 +147,7 @@ void MainWindow::initSinalBind()
 void MainWindow::initThreads()
 {
     HealthMonitor* t_heal_monitor = new HealthMonitor(this);
-    t_heal_monitor->start();
+    // t_heal_monitor->start();
     console("健康状态监控线程已启动");
 }
 
