@@ -33,7 +33,11 @@ SOURCES += \
     mainwindow.cpp \
     process/process.cpp \
     threads/healthmonitor.cpp \
+    threads/iworker.cpp \
+    threads/threadmanager.cpp \
+    threads/updategamedata.cpp \
     utils/config.cpp \
+    utils/helper.cpp \
     widgets/hotkeyedit.cpp \
     widgets/noticewidget.cpp
 
@@ -50,7 +54,11 @@ HEADERS += \
     mainwindow.h \
     process/process.h \
     threads/healthmonitor.h \
+    threads/iworker.h \
+    threads/threadmanager.h \
+    threads/updategamedata.h \
     utils/config.h \
+    utils/helper.h \
     vmp/VMProtectSDK.h \
     widgets/hotkeyedit.h \
     widgets/noticewidget.h

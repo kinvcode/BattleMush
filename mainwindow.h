@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "logviewer.h"
 #include "widgets/noticewidget.h"
+#include "threads/threadmanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -18,7 +19,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
+    // 线程管理器
+    ThreadManager* m_threadManager;
 private slots:
 
     void on_listWidget_clicked(const QModelIndex &index);
@@ -40,9 +42,28 @@ private slots:
 private slots:
     void onHotkeyChanged(int key);
 
+// 线程信号
+private slots:
+    void onStartAll();
+    void onStopAll();
+    void onAddThread();
+    void onRemoveThread();
+    void onStartThread();
+    void onStopThread();
+    void onPauseThread();
+    void onResumeThread();
+    void onThreadProgress(int threadId, int value);
+    void onThreadFinished(int threadId);
+    void onThreadStarted(int threadId, const QString& workerType);
+    void onAllThreadsFinished();
 private:
     Ui::MainWindow *ui;
     LogViewer* logger = nullptr;
+    // 数据更新线程ID
+    const int m_UpdateGameData_tid = 1;
+    // 人物健康状态监控线程ID
+    const int m_HealthMonitor_tid = 2;
+
     // 提示框
     void showNotice(const QString& message);
     // 加载驱动

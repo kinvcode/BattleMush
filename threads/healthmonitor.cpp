@@ -4,14 +4,58 @@
 #include "global/globalplayer.h"
 #include "driver/msdriverpro.h"
 
-HealthMonitor::HealthMonitor(QObject* parent)
+HealthMonitor::HealthMonitor(int id, QObject *parent)
+    : IWorker(id, parent)
+    , m_running(false)
+    , m_paused(false)
+    , m_counter(0)
 {
-
+    qDebug() << "HealthMonitor" << m_id;
 }
 
-void HealthMonitor::run()
+HealthMonitor::~HealthMonitor()
 {
-    while(true){
+    qDebug() << "HealthMonitor" << m_id;
+}
+
+void HealthMonitor::start()
+{
+    qDebug() << "HealthMonitor" << m_id << "started in thread:" << QThread::currentThread();
+    m_running = true;
+    m_paused = false;
+    m_counter = 0;
+    process();
+}
+
+void HealthMonitor::stop()
+{
+    qDebug() << "HealthMonitor" << m_id << "stop requested";
+    m_running = false;
+    m_paused = false;
+}
+
+void HealthMonitor::pause()
+{
+    qDebug() << "HealthMonitor" << m_id << "paused";
+    m_paused = true;
+}
+
+void HealthMonitor::resume()
+{
+    qDebug() << "HealthMonitor" << m_id << "resumed";
+    m_paused = false;
+}
+
+void HealthMonitor::process()
+{
+    while (m_running) {
+        // 处理暂停状态
+        while (m_paused && m_running) {
+            QThread::msleep(10);  // 等待恢复
+        }
+
+        if (!m_running) break;
+
 
         qDebug() << "当前血量：" << Gplayer.HP;
         qDebug() << "当前蓝量：" << Gplayer.MP;
@@ -46,4 +90,6 @@ void HealthMonitor::run()
         ProcessHelper::programDelay(500);
         QApplication::processEvents();
     }
+
+    qDebug() << "HealthMonitor" << m_id << "finished";
 }

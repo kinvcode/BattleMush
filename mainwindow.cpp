@@ -12,7 +12,9 @@
 #include "driver/driverload.h"
 #include "global/globalconfig.h"
 #include "threads/healthmonitor.h"
+#include "threads/updategamedata.h"
 #include "widgets/hotkeyedit.h"
+#include "utils/helper.h"
 
 // 测试头文件
 #include "global/globalplayer.h"
@@ -20,6 +22,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_threadManager(new ThreadManager(this))
 {
     ui->setupUi(this);
 
@@ -157,9 +160,106 @@ void MainWindow::initSinalBind()
 
 void MainWindow::initThreads()
 {
-    HealthMonitor* t_heal_monitor = new HealthMonitor(this);
-    t_heal_monitor->start();
-    console("健康状态监控线程已启动");
+    // 连接信号
+    connect(m_threadManager, &ThreadManager::threadStarted,
+            this, &MainWindow::onThreadStarted);
+    connect(m_threadManager, &ThreadManager::threadProgress,
+            this, &MainWindow::onThreadProgress);
+    connect(m_threadManager, &ThreadManager::threadFinished,
+            this, &MainWindow::onThreadFinished);
+    connect(m_threadManager, &ThreadManager::allThreadsFinished,
+            this, &MainWindow::onAllThreadsFinished);
+
+    // 添加默认线程
+    m_threadManager->addThread(m_UpdateGameData_tid, "UpdateGameData");
+    m_threadManager->addThread(m_HealthMonitor_tid, "HealthMonitor");
+
+    m_threadManager->startAll();
+    console("启动所有线程");
+}
+
+void MainWindow::onStartAll()
+{
+    m_threadManager->startAll();
+    console("启动所有线程");
+}
+
+void MainWindow::onStopAll()
+{
+    m_threadManager->stopAll();
+    console("停止所有线程");
+}
+
+void MainWindow::onAddThread()
+{
+    // static int nextId = 100;
+    // QString workerType = m_workerTypeSelector->currentText();
+    // if (m_threadManager->addThread(nextId, workerType)) {
+    //     console(QString("添加线程 %1 (类型: %2)").arg(nextId).arg(workerType));
+    //     refreshThreadList();
+    //     nextId++;
+    // }
+}
+
+void MainWindow::onRemoveThread()
+{
+    // int threadId = m_threadSelector->currentText().split(" ").first().toInt();
+    // if (m_threadManager->removeThread(threadId)) {
+    //     console(QString("移除线程 %1").arg(threadId));
+    //     refreshThreadList();
+    // }
+}
+
+void MainWindow::onStartThread()
+{
+    // int threadId = m_threadSelector->currentText().split(" ").first().toInt();
+    // if (m_threadManager->startThread(threadId)) {
+    //     console(QString("启动线程 %1").arg(threadId));
+    // }
+}
+
+void MainWindow::onStopThread()
+{
+    // int threadId = m_threadSelector->currentText().split(" ").first().toInt();
+    // if (m_threadManager->stopThread(threadId)) {
+    //     console(QString("停止线程 %1").arg(threadId));
+    // }
+}
+
+void MainWindow::onPauseThread()
+{
+    // int threadId = m_threadSelector->currentText().split(" ").first().toInt();
+    // if (m_threadManager->pauseThread(threadId)) {
+    //     console(QString("暂停线程 %1").arg(threadId));
+    // }
+}
+
+void MainWindow::onResumeThread()
+{
+    // int threadId = m_threadSelector->currentText().split(" ").first().toInt();
+    // if (m_threadManager->resumeThread(threadId)) {
+    //     console(QString("恢复线程 %1").arg(threadId));
+    // }
+}
+
+void MainWindow::onThreadStarted(int threadId, const QString& workerType)
+{
+    DebugOutput::out(QString("线程 %1 (%2) 已启动").arg(threadId).arg(workerType));
+}
+
+void MainWindow::onThreadProgress(int threadId, int value)
+{
+    DebugOutput::out(QString("线程 %1 进度: %2%").arg(threadId).arg(value));
+}
+
+void MainWindow::onThreadFinished(int threadId)
+{
+    DebugOutput::out(QString("线程 %1 已完成").arg(threadId));
+}
+
+void MainWindow::onAllThreadsFinished()
+{
+    DebugOutput::out("所有线程已完成");
 }
 
 void MainWindow::console(QString msg)
