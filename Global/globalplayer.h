@@ -25,14 +25,32 @@ public:
     // 游戏上线文
     quint64 p_gamecontext = 0;
 
+    // 地图
+    quint64 p_mapsentity = 0;
+
+    // UI
+    quint64 p_uientity = 0;
+
+    // allServices
+    quint64 p_allServices = 0;
+
+    quint64 p_userservice = 0;
+
+    // localplayer
+    quint64 p_localplayer = 0;
+
+    // PlayerComponent
+
+    // TransformComponent
+
     // UI->LocalUserGroup->StatusPanel
     quint64 p_statuspanel = 0;
 
     // 角色昵称
-    quint64 p_nickname = 0;
+    QString p_nickname = 0;
 
     // 角色职业
-    quint64 p_user_job = 0;
+    QString p_user_job = 0;
 
     // 角色等级
     quint64 p_user_level = 0;
@@ -44,11 +62,11 @@ public:
     quint64 p_user_mp = 0;
 
     // 属性
-    int HP = 999999;
-    int MAX_HP = 999999;
+    int HP = 0;
+    int MAX_HP = 0;
 
-    int MP = 999999;
-    int MAX_MP = 999999;
+    int MP = 0;
+    int MAX_MP = 0;
 
 private:
 

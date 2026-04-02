@@ -57,19 +57,22 @@ void HealthMonitor::process()
         if (!m_running) break;
 
 
-        qDebug() << "当前血量：" << Gplayer.HP;
-        qDebug() << "当前蓝量：" << Gplayer.MP;
+
+        // qDebug() << "当前蓝量：" << Gplayer.MP;
 
         // 检测血量
         int hp_rate = Gconfig.getValue("auto_add_health/hp_rate").toInt();
         if(Gplayer.MAX_HP != 0 && Gplayer.HP < Gplayer.MAX_HP){
-            int cur_hp_rate = ( Gplayer.HP / Gplayer.MAX_HP) * 100;
+            int cur_hp_rate =Gplayer.HP * 100 / Gplayer.MAX_HP;
             if(cur_hp_rate <= hp_rate){
+                qDebug() << "当前血量：" << Gplayer.HP;
+                qDebug() << "当前最大血量：" << Gplayer.MAX_HP;
+                qDebug() << "触发阈值：" << hp_rate;
+                qDebug() << "当前比例" << cur_hp_rate;
+
                 qDebug() << "检测到血量低于安全值，自动加血";
                 int hp_key_code = Gconfig.getValue("auto_add_health/hp_key").toInt();
                 qDebug() << "驱动按键码:" << hp_key_code;
-
-                // MSDriverPRO::keyboardClick(0x49);
                 MSDriverPRO::keyboardClick(hp_key_code, 1);
             }
         }

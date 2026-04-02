@@ -23,6 +23,7 @@ LIBS += -lSetupAPI
 LIBS += -lUser32 -lKernel32
 
 SOURCES += \
+    driver/mem.cpp \
     global/globalconfig.cpp \
     global/globalplayer.cpp \
     driver/driverload.cpp \
@@ -42,6 +43,7 @@ SOURCES += \
     widgets/noticewidget.cpp
 
 HEADERS += \
+    driver/mem.h \
     driver/mskeycode.h \
     global/globalconfig.h \
     global/globalplayer.h \

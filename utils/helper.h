@@ -9,7 +9,15 @@
 class Helper
 {
 public:
-    Helper();
+    // 搜索Entity的子组件
+    static quint64 findChild(quint64 parent, QString name);
+
+    // 获取Entity的文本组件字符串
+    static QString getEntityTextComponentString(quint64 entity);
+
+    // 分割字符串
+    static bool parseHPString(const QString& Text, int& left, int& right);
+
 };
 
 class DebugOutput
