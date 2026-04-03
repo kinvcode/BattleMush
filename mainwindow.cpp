@@ -15,6 +15,7 @@
 #include "threads/updategamedata.h"
 #include "widgets/hotkeyedit.h"
 #include "utils/helper.h"
+#include "driver/mem.h"
 
 // 测试头文件
 #include "global/globalplayer.h"
@@ -174,7 +175,7 @@ void MainWindow::initThreads()
     m_threadManager->addThread(m_UpdateGameData_tid, "UpdateGameData");
     m_threadManager->addThread(m_HealthMonitor_tid, "HealthMonitor");
 
-    m_threadManager->startAll();
+    // m_threadManager->startAll();
     console("启动所有线程");
 }
 
@@ -281,11 +282,64 @@ void MainWindow::console(QString msg)
 void MainWindow::on_pushButton_clicked()
 {
     VMProtectBegin("__FUNCTION__");
-    console(QString::number(Gplayer.HP));
+    // console(QString::number(Gplayer.HP));
+    // showNotice("123456");
+    // Gplayer.HP = 50;
 
-    showNotice("123456");
 
-    Gplayer.HP = 50;
+    // 检测游戏是否存在
+    Gplayer.p_gamepid = MSDriverPRO::getPid("msw.exe");
+
+    if(Gplayer.p_gamepid == 0){
+        // qDebug << "";
+        DebugOutput::out("游戏进程不存在");
+        return;
+    }
+
+    DebugOutput::out("游戏进程:" + QString::number(Gplayer.p_gamepid));
+    Gplayer.p_assemblybase = MSDriverPRO::getModuleAddr(Gplayer.p_gamepid, "GameAssembly.dll");
+    DebugOutput::out("模块基址:" + QString::number(Gplayer.p_assemblybase, 16).toUpper());
+
+    Gplayer.p_entry = Mem::readPointer(Gplayer.p_assemblybase, 0x0A1E0AE0, 0xB8, 0x0, 0x10, 0x40);
+    DebugOutput::out("Entry:" + QString::number(Gplayer.p_entry, 16).toUpper());
+    // 检测是否已经进入游戏
+    if(Gplayer.p_entry == 0){
+        // 尚未进入游戏，
+        return;
+    }
+
+    // 如果已经进入游戏
+    Gplayer.p_gamecontext = Mem::readPointer(Gplayer.p_entry, 0x10, 0x18, 0x30);
+    DebugOutput::out("GameContext:" + QString::number(Gplayer.p_gamecontext, 16).toUpper());
+
+    Gplayer.p_mapsentity = Mem::readPointer(Gplayer.p_gamecontext, 0x148);
+    DebugOutput::out("mapsentity:" + QString::number(Gplayer.p_mapsentity, 16).toUpper());
+
+    Gplayer.p_allServices = Mem::readPointer(Gplayer.p_gamecontext, 0x298);
+    DebugOutput::out("allServices:" + QString::number(Gplayer.p_allServices, 16).toUpper());
+
+    // 获取当前地图
+    quint64 p_cur_map = Mem::readPointer(Gplayer.p_mapsentity,0x3A8,0x10,0x20);
+    DebugOutput::out("p_cur_map:" + QString::number(p_cur_map, 16).toUpper());
+
+    QString cur_map_name = Mem::readString(Mem::readLong(p_cur_map + 0x270) + 0x14, 100);
+    DebugOutput::out("地图名:" + cur_map_name);
+
+    QString cur_map_uuid = Mem::readString(Mem::readLong(p_cur_map + 0x2A0) + 0x14, 100);
+    DebugOutput::out("地图uuid:" + cur_map_uuid);
+
+    // 遍历当前地图瓦片（有TileMapComponent）
+    Helper::dumpTilemapList(p_cur_map);
+
+    // 搜索CollisionService
+    quint64 p_collisionservice = Helper::findService(Gplayer.p_allServices,"CollisionService");
+    DebugOutput::out("collisionservice:" + QString::number(p_collisionservice, 16).toUpper());
+
+
+    // 遍历当前地图攀爬物体列表(有ClimbableComponent)
+    Helper::dumpClimbList(p_cur_map, p_collisionservice);
+
+
 
     VMProtectEnd();
 }

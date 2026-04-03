@@ -25,6 +25,7 @@ private slots:
 
     void on_listWidget_clicked(const QModelIndex &index);
 
+    // 测试按钮
     void on_pushButton_clicked();
 
     void on_lineEdit_auto_add_mp_rate_editingFinished();

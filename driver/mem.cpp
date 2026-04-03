@@ -113,3 +113,40 @@ QString Mem::readString(ULONG64 address, int length)
     return text;
 }
 
+QString Mem::readAnsiString(ULONG64 address, int maxLength)
+{
+    QString result = "";
+    if(Gplayer.p_gamepid == 0 || Gplayer.p_assemblybase == 0) return result;
+
+    int count = 0;
+    char c_value = 0;
+    __int64 start_address = address;
+
+    while (true)
+    {
+        c_value = readByte(address);  // 读取单个字节
+
+        if (c_value == '\0')  // 遇到字符串结束符
+        {
+            break;
+        }
+
+        count++;
+        if (count >= maxLength)  // 限制最大长度
+        {
+            break;
+        }
+
+        address += 1;  // 每次移动1字节
+    }
+
+    // 分配缓冲区（包含结束符）
+    char* tempBuffer = new char[count + 1];
+    readMemory(start_address, (byte*)tempBuffer, count);
+    tempBuffer[count] = '\0';  // 手动添加结束符
+
+    QString text = QString::fromLocal8Bit(tempBuffer);  // 或 fromUtf8
+    delete[] tempBuffer;
+    return text;
+}
+

@@ -45,11 +45,13 @@ SOURCES += \
 HEADERS += \
     driver/mem.h \
     driver/mskeycode.h \
+    global/gameoffset.h \
     global/globalconfig.h \
     global/globalplayer.h \
     driver/driverload.h \
     driver/msdriverpro.h \
     driver/msstruct.h \
+    global/struct.h \
     helper/rand.h \
     keyboard/nativeeventfilter.h \
     logviewer.h \

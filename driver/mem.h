@@ -36,6 +36,8 @@ namespace Mem{
     std::vector<byte> readByteArray(ULONG64 address, int length);
 
     QString readString(ULONG64 address, int length);
+
+    QString readAnsiString(ULONG64 address, int maxLength);
 };
 
 #endif // MEM_H
