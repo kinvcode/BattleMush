@@ -305,6 +305,7 @@ void MainWindow::on_pushButton_clicked()
     // 检测是否已经进入游戏
     if(Gplayer.p_entry == 0){
         // 尚未进入游戏，
+        DebugOutput::out("尚未进入游戏~" );
         return;
     }
 
@@ -328,18 +329,39 @@ void MainWindow::on_pushButton_clicked()
     QString cur_map_uuid = Mem::readString(Mem::readLong(p_cur_map + 0x2A0) + 0x14, 100);
     DebugOutput::out("地图uuid:" + cur_map_uuid);
 
-    // 遍历当前地图瓦片（有TileMapComponent）
-    Helper::dumpTilemapList(p_cur_map);
+    // 遍历当前地图瓦片（有TileMapComponent）这个不用遍历，没啥用
+    std::vector<std::vector<COORDINATE>> tiles = Helper::dumpTilemapList(p_cur_map);
 
     // 搜索CollisionService
     quint64 p_collisionservice = Helper::findService(Gplayer.p_allServices,"CollisionService");
     DebugOutput::out("collisionservice:" + QString::number(p_collisionservice, 16).toUpper());
 
-
     // 遍历当前地图攀爬物体列表(有ClimbableComponent)
-    Helper::dumpClimbList(p_cur_map, p_collisionservice);
+    std::vector<ClimbRect> climbs = Helper::dumpClimbList(p_cur_map, p_collisionservice);
 
+    // 遍历地板
+    std::vector<FootholdRect> footholds = Helper::dumpFootholdList(p_cur_map);
 
+    // 遍历墙壁碰撞&边界碰撞
+
+    // for(auto item : tiles){
+    //     if(item.size() == 4){
+    //         // qDebug() << "====== 矩 形 数 据=======";
+    //         qDebug() << "矩形：" << item.at(0).x << "," << item.at(0).y << " " << item.at(1).x << "," << item.at(1).y << " " << item.at(2).x << "," << item.at(2).y << " " << item.at(3).x << "," << item.at(3).y;
+    //         // qDebug() << "=======================";
+    //     }
+    //     if(item.size() == 2){
+    //         qDebug() << "直线：" << item.at(0).x << "," << item.at(0).y << " " << item.at(1).x << "," << item.at(1).y;
+    //     }
+    // }
+
+    for(auto item: climbs){
+        qDebug () << "攀爬：" << item.x_left << "," << item.y_top << " " << item.x_right << "," << item.y_bottom;
+    }
+
+    for(auto item: footholds){
+        qDebug () << "地板：" << item.x_left << "," << item.y_left << " " << item.x_right << "," << item.y_right;
+    }
 
     VMProtectEnd();
 }

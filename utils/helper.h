@@ -26,10 +26,13 @@ public:
     // 获取Entity名称
 
     // 遍历攀爬物体
-    static void dumpClimbList(quint64 cur_map, quint64 collisionservice);
+    static std::vector<ClimbRect> dumpClimbList(quint64 cur_map, quint64 collisionservice);
 
-    // 遍历地板
-    static void dumpTilemapList(quint64 map);
+    // 遍历瓦片
+    static std::vector<std::vector<COORDINATE>> dumpTilemapList(quint64 map);
+
+    // 遍历地板2
+    static std::vector<FootholdRect> dumpFootholdList(quint64 cur_map);
 
     // 分割字符串
     static bool parseHPString(const QString& Text, int& left, int& right);

@@ -99,8 +99,10 @@ QString Helper::getEntityTextComponentString(quint64 entity)
     return name;
 }
 
-void Helper::dumpClimbList(quint64 cur_map, quint64 collisionservice)
+std::vector<ClimbRect> Helper::dumpClimbList(quint64 cur_map, quint64 collisionservice)
 {
+    std::vector<ClimbRect> climb_list;
+
     // 遍历地图，搜索所有的攀爬Entity
     std::unordered_set<quint64> climb_pointers = findClimbableComponentSet(cur_map);
 
@@ -126,17 +128,19 @@ void Helper::dumpClimbList(quint64 cur_map, quint64 collisionservice)
 
     for (const auto& pair : uniquePairs) {
         quint64 cur_address = rect_head + pair.first * 0x20 * 8 + pair.second * 8;
-        int node_count = readInt(readLong(cur_address) + 0x18);
+        int node_count = readInt(readLong(cur_address) + 0x1C);
         quint64 node_head = readLong(readLong(cur_address) + 0x10) + 0x20;
+
+        qDebug() << "--------------------------------------------------------";
         for(int node_i = 0; node_i < node_count; node_i++,node_head += 0x60){
             quint64 p_climbableComponent = readLong(node_head + 0x28);
             if(!p_climbableComponent) continue;
 
+            qDebug() << "p_climbableComponent：" << QString::number(p_climbableComponent,16).toUpper();
             // 如果不是当前地图的攀爬物体,则跳过
             if (climb_pointers.find(p_climbableComponent) == climb_pointers.end()) {
                 break;
             }
-
             ClimbOrigin cur_climb;
             cur_climb.left = readFloat(node_head + 0x30);
             cur_climb.top = readFloat(node_head + 0x34);
@@ -145,14 +149,19 @@ void Helper::dumpClimbList(quint64 cur_map, quint64 collisionservice)
             ClimbRect cur_rect;
             Math::ComputeClimbRect(&cur_climb, cur_rect);
 
-            qDebug() << cur_rect.x_left << cur_rect.y_top << cur_rect.x_right << cur_rect.y_bottom;
+            climb_list.push_back(cur_rect);
+
+            // qDebug() << cur_rect.x_left << cur_rect.y_top << cur_rect.x_right << cur_rect.y_bottom;
         }
     }
 
+    return climb_list;
 }
 
-void Helper::dumpTilemapList(quint64 map)
+std::vector<std::vector<COORDINATE>> Helper::dumpTilemapList(quint64 map)
 {
+    std::vector<std::vector<COORDINATE>> tile_list;
+
     int list_count = readInt(readLong(map + 0x3A8) + 0x18);
     quint64 list_head = readLong(readLong(map + 0x3A8) + 0x10) + 0x20;
 
@@ -164,7 +173,7 @@ void Helper::dumpTilemapList(quint64 map)
         quint64 tilemapcomponet = readLong(cur_entity + 0x88);
         if(tilemapcomponet == 0) continue;
         QString entity_name = readString(readLong(cur_entity + 0x270) + 0x14, 100);
-        qDebug() << "当前模块:" << entity_name;
+        qDebug() << "当前模块:" << entity_name << " 指针：" << QString::number(tilemapcomponet,16).toUpper();
 
         // 遍历TileContext
         quint64 tilecontext_list = readLong(tilemapcomponet + 0x120);
@@ -177,18 +186,43 @@ void Helper::dumpTilemapList(quint64 map)
             int convexPoints_count = readInt(convexPoints + 0x18);
             quint64 convexPoints_head = readLong(convexPoints + 0x10) + 0x20;
 
-            // int tileindex = readInt(convexPoints_head + 0x1C);
-            qDebug() << "===============";
+            std::vector<COORDINATE> cur_tile;
+            // qDebug() << "===============";
             // 遍历坐标
             for(int k = 0; k < convexPoints_count; k++,convexPoints_head += 0x8){
-                float cur_x = readFloat(convexPoints_head);
-                float cur_y = readFloat(convexPoints_head + 0x4);
-                qDebug() << cur_x << "," << cur_y;
+                float cur_x = Math::roundHalfAwayFromZero_bit(readFloat(convexPoints_head));
+                float cur_y = Math::roundHalfAwayFromZero_bit(readFloat(convexPoints_head + 0x4));
+                cur_tile.push_back({cur_x, cur_y});
+                // qDebug() << cur_x << "," << cur_y;
             }
+            tile_list.push_back(cur_tile);
         }
-
         // list_head += 0x8;
     }
+
+    return tile_list;
+}
+
+std::vector<FootholdRect> Helper::dumpFootholdList(quint64 cur_map)
+{
+    std::vector<FootholdRect> foothold_list;
+
+    quint64 p_footholds = readPointer(cur_map,0x70,0x108,0x120,0x20,0x10);
+    // qDebug() << "地板指针：" << QString::number(p_footholds,16).toUpper();
+    int max_count = readInt(p_footholds + 0x18);
+    quint64 foot_head = p_footholds + 0x20;
+
+    for(int i = 0;i < max_count; i++,foot_head+=8){
+        if(readLong(foot_head) == 0) break;
+        float x_left = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + 0x14));
+        float y_left = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + 0x18));
+        float x_right = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + 0x1C));
+        float y_right = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + 0x20));
+
+        foothold_list.push_back({x_left,y_left,x_right,y_right});
+    }
+
+    return foothold_list;
 }
 
 bool Helper::parseHPString(const QString &Text, int &left, int &right) {
