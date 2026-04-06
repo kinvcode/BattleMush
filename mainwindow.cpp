@@ -13,6 +13,7 @@
 #include "global/globalconfig.h"
 #include "threads/healthmonitor.h"
 #include "threads/updategamedata.h"
+#include "threads/monitortooltest.h"
 #include "widgets/hotkeyedit.h"
 #include "utils/helper.h"
 #include "driver/mem.h"
@@ -172,10 +173,13 @@ void MainWindow::initThreads()
             this, &MainWindow::onAllThreadsFinished);
 
     // 添加默认线程
-    m_threadManager->addThread(m_UpdateGameData_tid, "UpdateGameData");
-    m_threadManager->addThread(m_HealthMonitor_tid, "HealthMonitor");
+    // m_threadManager->addThread(m_UpdateGameData_tid, "UpdateGameData");
+    // m_threadManager->addThread(m_HealthMonitor_tid, "HealthMonitor");
 
-    // m_threadManager->startAll();
+    m_threadManager->addThread(m_MonitorToolTest_tid, "MonitorToolTest");
+    m_threadManager->startAll();
+
+
     console("启动所有线程");
 }
 
@@ -329,9 +333,6 @@ void MainWindow::on_pushButton_clicked()
     QString cur_map_uuid = Mem::readString(Mem::readLong(p_cur_map + 0x2A0) + 0x14, 100);
     DebugOutput::out("地图uuid:" + cur_map_uuid);
 
-    // 遍历当前地图瓦片（有TileMapComponent）这个不用遍历，没啥用
-    std::vector<std::vector<COORDINATE>> tiles = Helper::dumpTilemapList(p_cur_map);
-
     // 搜索CollisionService
     quint64 p_collisionservice = Helper::findService(Gplayer.p_allServices,"CollisionService");
     DebugOutput::out("collisionservice:" + QString::number(p_collisionservice, 16).toUpper());
@@ -342,26 +343,292 @@ void MainWindow::on_pushButton_clicked()
     // 遍历地板
     std::vector<FootholdRect> footholds = Helper::dumpFootholdList(p_cur_map);
 
-    // 遍历墙壁碰撞&边界碰撞
+    // 获取地图边界
+    quint64 p_MapComponent = Mem::readLong(p_cur_map + 0x70);
+    float map_x_left = Mem::readFloat(p_MapComponent + 0x120);
+    float map_y_bottom = Mem::readFloat(p_MapComponent + 0x124);
+    float map_x_right = Mem::readFloat(p_MapComponent + 0x128);
+    float map_y_top = Mem::readFloat(p_MapComponent + 0x12C);
+    qDebug() << "地图边界:" << map_x_left << "," << map_y_bottom << " " << map_x_right << "," << map_y_top;
 
-    // for(auto item : tiles){
-    //     if(item.size() == 4){
-    //         // qDebug() << "====== 矩 形 数 据=======";
-    //         qDebug() << "矩形：" << item.at(0).x << "," << item.at(0).y << " " << item.at(1).x << "," << item.at(1).y << " " << item.at(2).x << "," << item.at(2).y << " " << item.at(3).x << "," << item.at(3).y;
-    //         // qDebug() << "=======================";
-    //     }
-    //     if(item.size() == 2){
-    //         qDebug() << "直线：" << item.at(0).x << "," << item.at(0).y << " " << item.at(1).x << "," << item.at(1).y;
-    //     }
-    // }
 
     for(auto item: climbs){
         qDebug () << "攀爬：" << item.x_left << "," << item.y_top << " " << item.x_right << "," << item.y_bottom;
     }
 
     for(auto item: footholds){
-        qDebug () << "地板：" << item.x_left << "," << item.y_left << " " << item.x_right << "," << item.y_right;
+        qDebug () << "地板：" << item.id << " " << item.x_left << "," << item.y_left << " " << item.x_right << "," << item.y_right;
     }
+
+    // 坐标转换
+    int x_offset = 0,y_offset = 0;
+    if(map_x_left < 0){
+        x_offset = abs(map_x_left * 100);
+    }
+    if(map_y_bottom < 0){
+        y_offset = abs(map_y_bottom * 100);
+    }
+
+    // 地图宽度
+    uint map_width = map_x_right * 100 + x_offset;
+    uint map_height = map_y_top * 100 + y_offset; // 同时也是Y坐标转换的计算因子
+    qDebug() << "地图尺寸：" << map_width << "x" << map_height;
+
+    // 转换攀爬物体
+    struct climb_rect{
+        uint x_left;
+        uint y_top;
+        uint x_right;
+        uint y_bottom;
+    };
+    std::vector<climb_rect> climb_list;
+    for(auto item: climbs){
+        uint cur_x_left = item.x_left * 100 + x_offset;
+        uint cur_y_bottom = map_height - (item.y_bottom * 100 + y_offset);
+        uint cur_x_right = item.x_right * 100 + x_offset;
+        uint cur_y_top = map_height - (item.y_top * 100 + y_offset);
+        climb_list.push_back({cur_x_left,cur_y_top,cur_x_right,cur_y_bottom});
+    }
+
+    // 转换地板和空气墙
+    struct foothold_rect{
+        int ID;
+        uint x_left;
+        uint y_left;
+        uint x_right;
+        uint y_right;
+    };
+    std::vector<foothold_rect> foothold_list;
+    for(auto item: footholds){
+
+        item.x_left = clamp(item.x_left, map_x_left, map_x_right);
+        item.x_right = clamp(item.x_right, map_x_left, map_x_right);
+        item.y_left = clamp(item.y_left, map_y_bottom, map_y_top);
+        item.y_right = clamp(item.y_right, map_y_bottom, map_y_top);
+
+        uint cur_x_left = item.x_left * 100 + x_offset;
+        uint cur_y_left = map_height - (item.y_left * 100 + y_offset);
+        uint cur_x_right = item.x_right * 100 + x_offset;
+        uint cur_y_right = map_height - (item.y_right * 100 + y_offset);
+
+        if(cur_x_left > cur_x_right){
+            uint tmp_x = cur_x_left;
+            uint tmp_y = cur_y_left;
+            cur_x_left = cur_x_right;
+            cur_y_left = cur_y_right;
+            cur_x_right = tmp_x;
+            cur_y_right = tmp_y;
+        }
+
+        // 过滤掉不需要的墙体
+        if(cur_x_left == 230 && cur_x_right == 230){
+            continue;
+        }
+
+        if(cur_x_left == 1220 && cur_x_right == 1220){
+            continue;
+        }
+
+        qDebug() << "黑色:" << cur_x_left << "," << cur_y_left << " " << cur_x_right << "," << cur_y_right;
+        foothold_list.push_back({item.id,cur_x_left,cur_y_left,cur_x_right,cur_y_right});
+    }
+
+    struct Wall {
+        int foot_id;
+        int x;
+        int bottom;  // 较大的y值
+        int top;     // 较小的y值
+    };
+
+    struct LineChild {
+        int foot_id;
+        QPoint start;
+        QPoint end;
+        int length;
+    };
+
+    struct Line {
+        QPoint start;
+        QPoint end;
+        bool hasLeftWall = false;
+        bool hasRightWall = false;
+        std::vector<LineChild> line_child;
+    };
+
+    // 1. 将所有地板ID放入到容器 id_set里面
+    std::unordered_set<int> id_set;
+    for (const auto& item : foothold_list) {
+        id_set.insert(item.ID);
+    }
+
+    // 2. 创建容器：line_list
+    std::vector<Line> line_list;
+
+    // 3. 创建容器：wall_list
+    std::vector<Wall> wall_list;
+
+    // 对foothold_list进行遍历
+    for (auto item : foothold_list) {
+        // 如果元素x的id不存在于id_set中，则进入下一层循环
+        if (id_set.find(item.ID) == id_set.end()) {
+            continue;
+        }
+
+        // 处理墙体
+        // 如果item是一个墙体(x相同，y不同)
+        // item.y_left
+        if (item.x_left == item.x_right &&
+            item.y_left != item.y_right) {
+            Wall wall;
+            wall.foot_id = item.ID;
+            wall.x = item.x_left;
+            // 数值大的y是bottom,数值小的y是top
+            wall.bottom = std::max(item.y_left, item.y_right);
+            wall.top = std::min(item.y_left, item.y_right);
+            wall_list.push_back(wall);
+
+            // 将该item的id从id_set里面移除
+            id_set.erase(item.ID);
+            continue;  // 墙体处理完，继续下一个item
+        }
+    }
+
+    for(auto wall : wall_list){
+        qDebug() << "墙：" << wall.x << "," << wall.top << "," << wall.bottom;
+        id_set.erase(wall.foot_id);
+    }
+
+    for (auto item : foothold_list) {
+        // 如果元素x的id不存在于id_set中，则进入下一层循环
+        if (id_set.find(item.ID) == id_set.end()) {
+            continue;
+        }
+
+        // 将该item的id从id_set里面移除
+        id_set.erase(item.ID);
+
+        // 如果是直线（y相同）或者是斜线（x_left与x_right不同且y不同）
+        if (item.y_left == item.y_right ||
+            (item.x_left != item.x_right && item.y_left != item.y_right)) {
+
+
+            if(item.x_left > item.x_right){
+                qDebug() << "数据不正确，退出计算~";
+                return;
+            }
+
+            Line tmp_line;
+
+            // 创建第一个line_child
+            LineChild first_child;
+            first_child.foot_id = item.ID;
+            first_child.start = QPoint(item.x_left,item.y_left);
+            first_child.end = QPoint(item.x_right,item.y_right);
+            first_child.length = qAbs(item.x_right - item.x_left) + qAbs(item.y_right - item.y_left);
+
+            tmp_line.line_child.push_back(first_child);
+            tmp_line.start =  QPoint(item.x_left,item.y_left);
+            tmp_line.end = QPoint(item.x_right,item.y_right);
+
+            for (auto& other_item : foothold_list) {
+                if (id_set.find(other_item.ID) == id_set.end()) {
+                    continue;
+                }
+
+                if (QPoint(other_item.x_right,other_item.y_right) == tmp_line.start) {
+                    id_set.erase(other_item.ID);
+
+                    LineChild child;
+                    child.foot_id = other_item.ID;
+                    child.start = QPoint(other_item.x_left,other_item.y_left);
+                    child.end = QPoint(other_item.x_right,other_item.y_right);
+                    child.length = qAbs(other_item.x_right - other_item.x_left) + qAbs(other_item.y_right - other_item.y_left);
+
+                    // 将line_child插入到容器tmp_line.line_child前面
+                    tmp_line.line_child.insert(tmp_line.line_child.begin(), child);
+                    tmp_line.start = QPoint(other_item.x_left,other_item.y_left);
+                    continue;
+
+                }
+
+                if (QPoint(other_item.x_left,other_item.y_left) == tmp_line.end) {
+                    id_set.erase(other_item.ID);
+
+                    LineChild child;
+                    child.foot_id = other_item.ID;
+                    child.start = QPoint(other_item.x_left,other_item.y_left);
+                    child.end = QPoint(other_item.x_right,other_item.y_right);
+                    child.length = qAbs(other_item.x_right - other_item.x_left) + qAbs(other_item.y_right - other_item.y_left);
+
+                    // 将line_child插入到容器tmp_line.line_child后面
+                    tmp_line.line_child.push_back(child);
+                    tmp_line.end = QPoint(other_item.x_right,other_item.y_right);
+                    continue;
+                }
+            }
+
+            // 注意：需要确保start的x最小
+            if (tmp_line.start.x() > tmp_line.end.x()) {
+                qDebug() << "数据不正确2，退出计算~";
+                return;
+            }
+
+            line_list.push_back(tmp_line);
+        }
+    }
+
+    for(auto &item : line_list){
+        // 遍历wall_list
+        for (const auto& wall : wall_list) {
+            // 检查左墙
+            if (wall.x == item.start.x() &&
+                wall.bottom == item.start.y()) {
+                item.hasLeftWall = true;
+            }
+            // 检查右墙
+            if (wall.x == item.end.x() &&
+                wall.bottom == item.end.y()) {
+                item.hasRightWall = true;
+            }
+        }
+
+        qDebug() << "线:" << item.start << "," << item.end;
+    }
+
+    // 对地板进行分组
+    for(auto item : line_list){
+        // 找其与自己y轴相同，
+        // Line tmp_line = *item;
+        qDebug() << item.hasLeftWall << item.hasRightWall << item.start.x() << "," << item.start.y() << " " << item.end.x() << "," << item.end.y();
+    }
+
+    // 开始寻路
+    // 遍历线
+
+    // 创建地图文件
+    cv::Mat cur_room_map(map_height, map_width, CV_8UC3, cv::Scalar(255, 255, 255));
+
+    // 填充攀爬
+    for(auto item : climb_list){
+        int x_width = item.x_right - item.x_left;
+        int y_height = item.y_bottom - item.y_top;
+        cv::Rect rect(item.x_left, item.y_top, x_width, y_height);
+        cv::rectangle(cur_room_map, rect, cv::Scalar(0, 0xFF, 0), -1); // 用黄色填充矩形-攀爬
+    }
+
+    // 绘制地板
+    for(auto item : foothold_list){
+        // 用黑色绘制地板
+        cv::line(cur_room_map,cv::Point(item.x_left,item.y_left),cv::Point(item.x_right,item.y_right),cv::Scalar(0,0,0));
+    }
+
+
+
+
+
+    QString currentDir = QCoreApplication::applicationDirPath() + "/room_map.png";
+    qDebug() << "图片保存路径：" << currentDir;
+    ImageTool::saveMatImage(cur_room_map, currentDir);
 
     VMProtectEnd();
 }
@@ -451,5 +718,36 @@ void MainWindow::on_lineEdit_auto_add_mp_rate_textEdited(const QString &arg1)
 void MainWindow::onHotkeyChanged(int key)
 {
     qDebug() << "快捷键已更改:" << key;
+}
+
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    Gplayer.move_pos_list.clear();
+    Gplayer.move_pos_list.reserve(1000);
+    qDebug() << "运动轨迹已归零";
+}
+
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    if(Gplayer.move_pos_list.empty()){
+        qDebug() << "暂时没有运动轨迹";
+        return;
+    }
+
+
+    for(auto item : Gplayer.move_pos_list){
+        // quint64 x = abs(item.first)
+        uint x_offset = 777;
+        uint y_offset = 599;
+        uint map_height = 3137;
+        // uint map_width = 6234;
+        uint cur_x_left = Math::roundHalfAwayFromZero_bit(item.first) * 100 + x_offset;
+        uint cur_y_left = map_height - (Math::roundHalfAwayFromZero_bit(item.second) * 100 + y_offset);
+
+        qDebug() << item.first << "," << item.second << " " << cur_x_left << "," << cur_y_left;
+    }
+
 }
 

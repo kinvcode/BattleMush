@@ -3,6 +3,7 @@
 #include <set>
 #include <utility>  // for std::pair
 #include <unordered_set>
+#include "global/gameoffset.h"
 
 using namespace Mem;
 
@@ -107,7 +108,7 @@ std::vector<ClimbRect> Helper::dumpClimbList(quint64 cur_map, quint64 collisions
     std::unordered_set<quint64> climb_pointers = findClimbableComponentSet(cur_map);
 
     // 找碰撞数据
-    quint64 p_MultipleDynamicTreeBroadPhase = Mem::readPointer(collisionservice, 0x38, 0x18, 0x48, 0x30, 0x18);
+    quint64 p_MultipleDynamicTreeBroadPhase = Mem::readPointer(collisionservice, 0x38, 0x18, 0x30, 0x30, 0x18);
     DebugOutput::out("MultipleDynamicTreeBroadPhase:" + QString::number(p_MultipleDynamicTreeBroadPhase, 16).toUpper());
 
     // 遍历数组索引
@@ -207,19 +208,29 @@ std::vector<FootholdRect> Helper::dumpFootholdList(quint64 cur_map)
 {
     std::vector<FootholdRect> foothold_list;
 
-    quint64 p_footholds = readPointer(cur_map,0x70,0x108,0x120,0x20,0x10);
+    quint64 p_footholds = readPointer(cur_map,
+                                      BASE::MODEntity::MapComponent,
+                                      BASE::MapComponent::FootholdComponent,
+                                      BASE::FootholdComponent::FootholdImpl,
+                                      BASE::FootholdImpl::footHoldList,
+                                      BASE::List::InternalArray);
     // qDebug() << "地板指针：" << QString::number(p_footholds,16).toUpper();
-    int max_count = readInt(p_footholds + 0x18);
-    quint64 foot_head = p_footholds + 0x20;
+    int max_count = readInt(p_footholds + BASE::InternalArray::max_size);
+    quint64 foot_head = p_footholds + BASE::InternalArray::Head;
 
-    for(int i = 0;i < max_count; i++,foot_head+=8){
+    for(int i = 0; i < max_count; i++,foot_head +=8){
         if(readLong(foot_head) == 0) break;
-        float x_left = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + 0x14));
-        float y_left = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + 0x18));
-        float x_right = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + 0x1C));
-        float y_right = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + 0x20));
+        int group = Mem::readInt(readLong(foot_head) + BASE::Foothold::groupID);
+        qDebug() << "group:" << group;
+        int id = readInt(readLong(foot_head) + BASE::Foothold::ID);
+        float x_left = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + BASE::Foothold::StartPoint));
+        float y_left = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + BASE::Foothold::StartPoint + 4));
+        float x_right = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + BASE::Foothold::EndPoint));
+        float y_right = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + BASE::Foothold::EndPoint + 4));
+        qDebug() << x_left << "," << y_left << " " << x_right << "," << y_right;
+        qDebug() << "------------------------";
 
-        foothold_list.push_back({x_left,y_left,x_right,y_right});
+        foothold_list.push_back({id, x_left, y_left, x_right, y_right});
     }
 
     return foothold_list;
@@ -233,6 +244,32 @@ bool Helper::parseHPString(const QString &Text, int &left, int &right) {
         return true;
     }
     return false;
+}
+
+bool Helper::isSamePos(const std::pair<float,float>& a,
+               const std::pair<float,float>& b)
+{
+    const float eps = 0.001f;
+    return fabs(a.first - b.first) < eps &&
+           fabs(a.second - b.second) < eps;
+}
+
+void Helper::posExists(std::vector<std::pair<float, float> > &move_pos_list, std::pair<float, float> pos)
+{
+    // if(std::find(move_pos_list.begin(), move_pos_list.end(), pos) != move_pos_list.end()){
+    //     return;
+    // }
+
+    auto it = std::find_if(move_pos_list.begin(), move_pos_list.end(),
+                           [&](const std::pair<float,float>& p)
+                           {
+                               return isSamePos(p, pos);
+                           });
+
+    if (it != move_pos_list.end())
+        return;
+
+    move_pos_list.push_back(pos);
 }
 
 void Math::ComputeClimbRect(const ClimbOrigin *climb, ClimbRect &climb_rect)
@@ -279,17 +316,19 @@ float Math::roundHalfAwayFromZero_bit(float value, int decimalPlaces)
 }
 
 
+void ImageTool::saveMatImage(cv::Mat image, QString path)
+{
+    if (image.empty())
+    {
+        return;
+    }
 
+    std::string outputPath = path.toStdString();
 
+    // PNG格式的压缩参数，0表示无压缩，9表示最大压缩
+    std::vector<int> compression_params;
+    compression_params.push_back(cv::IMWRITE_PNG_COMPRESSION);
+    compression_params.push_back(0); // 无压缩
 
-
-
-
-
-
-
-
-
-
-
-
+    cv::imwrite(outputPath, image, compression_params);
+}

@@ -37,6 +37,10 @@ public:
     // 分割字符串
     static bool parseHPString(const QString& Text, int& left, int& right);
 
+    static bool isSamePos(const std::pair<float,float>& a,
+                                  const std::pair<float,float>& b);
+    // 判断是否有相同的坐标
+    static void posExists(std::vector<std::pair<float, float>> &move_pos_list,std::pair<float, float> pos);
 };
 
 class DebugOutput
@@ -53,6 +57,11 @@ public:
 
     // 保留2位小数点
     static float roundHalfAwayFromZero_bit(float value, int decimalPlaces = 2);
+};
+
+class ImageTool{
+public:
+    static void saveMatImage(cv::Mat image,QString path);
 };
 
 #endif // HELPER_H

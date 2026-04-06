@@ -262,7 +262,33 @@
            </rect>
           </property>
           <property name="text">
-           <string>发送日志</string>
+           <string>获取地形</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_2">
+          <property name="geometry">
+           <rect>
+            <x>240</x>
+            <y>370</y>
+            <width>91</width>
+            <height>41</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>轨迹清零</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_3">
+          <property name="geometry">
+           <rect>
+            <x>140</x>
+            <y>370</y>
+            <width>91</width>
+            <height>41</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>打印轨迹</string>
           </property>
          </widget>
         </widget>

@@ -1,6 +1,7 @@
 #ifndef GLOBALPLAYER_H
 #define GLOBALPLAYER_H
 #include <QObject>
+#include "global/struct.h"
 
 class GlobalPlayer : public QObject
 {
@@ -67,6 +68,11 @@ public:
 
     int MP = 0;
     int MAX_MP = 0;
+
+
+
+    // 一些测试数据
+    std::vector<std::pair<float, float>> move_pos_list;
 
 private:
 

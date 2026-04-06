@@ -52,6 +52,7 @@ SOURCES += \
     process/process.cpp \
     threads/healthmonitor.cpp \
     threads/iworker.cpp \
+    threads/monitortooltest.cpp \
     threads/threadmanager.cpp \
     threads/updategamedata.cpp \
     utils/config.cpp \
@@ -76,6 +77,7 @@ HEADERS += \
     process/process.h \
     threads/healthmonitor.h \
     threads/iworker.h \
+    threads/monitortooltest.h \
     threads/threadmanager.h \
     threads/updategamedata.h \
     utils/config.h \

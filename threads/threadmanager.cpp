@@ -3,6 +3,7 @@
 #include <QCoreApplication>
 #include "threads/healthmonitor.h"
 #include "threads/updategamedata.h"
+#include "threads/monitortooltest.h"
 
 ThreadManager::ThreadManager(QObject *parent)
     : QObject(parent)
@@ -85,6 +86,8 @@ IWorker* ThreadManager::createWorker(const QString& workerType, int id)
         return new HealthMonitor(id);
     } else if (workerType == "UpdateGameData") {
         return new UpdateGameData(id);
+    } else if(workerType == "MonitorToolTest"){
+        return new MonitorToolTest(id);
     }
     return nullptr;
 }

@@ -57,6 +57,11 @@ private slots:
     void onThreadFinished(int threadId);
     void onThreadStarted(int threadId, const QString& workerType);
     void onAllThreadsFinished();
+
+    void on_pushButton_2_clicked();
+
+    void on_pushButton_3_clicked();
+
 private:
     Ui::MainWindow *ui;
     LogViewer* logger = nullptr;
@@ -64,6 +69,8 @@ private:
     const int m_UpdateGameData_tid = 1;
     // 人物健康状态监控线程ID
     const int m_HealthMonitor_tid = 2;
+    // 测试工具
+    const int m_MonitorToolTest_tid = 3;
 
     // 提示框
     void showNotice(const QString& message);
