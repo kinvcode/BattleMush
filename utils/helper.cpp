@@ -332,3 +332,144 @@ void ImageTool::saveMatImage(cv::Mat image, QString path)
 
     cv::imwrite(outputPath, image, compression_params);
 }
+
+bool ImageTool::checkLineHasBlackPixel(const cv::Mat &img, const cv::Point &p1, const cv::Point &p2, cv::Point &p3)
+{
+    // 使用OpenCV的LineIterator遍历直线像素
+    cv::LineIterator it(img, p1, p2, 8); // 8邻域
+    for(int i = 0; i < it.count; i++, ++it)
+    {
+        cv::Vec3b color = img.at<cv::Vec3b>(it.pos());
+        if(color == cv::Vec3b(0,0,0))
+        {
+            p3 = it.pos();
+            return true;
+        }
+
+    }
+    return false; // 没有黑色像素
+}
+
+cv::Point2i ImageTool::worldToImage(int width, int height, float x, float y)
+{
+    int col = static_cast<int>(std::round(x));
+    int row = static_cast<int>(std::round(y));
+
+    col = std::clamp(col, 0, width - 1);
+    row = std::clamp(row, 0, height - 1);
+
+    return cv::Point2i(col, row);
+}
+
+cv::Point ImageTool::dropTrajectory(bool is_right, cv::Mat image, float x, float y)
+{
+    cv::Point start_pos = {static_cast<int>(std::round(x)),static_cast<int>(std::round(y))};
+    cv::Point black_pos = {-1,-1};
+    float vx;
+    if(is_right){
+        vx = 4.7f;
+    }else{
+        vx = -4.7f;
+    }
+
+    float vy = 0.0f;
+    float g  = 2.0f;
+
+    std::vector<cv::Point> drawPoints;
+    cv::Point last(-1, -1);
+
+    while (y < image.rows)
+    {
+        cv::Point p = worldToImage(image.cols, image.rows, x, y);
+
+        if (p != last)
+        {
+            drawPoints.push_back(p);
+            last = p;
+        }
+
+        x += vx;
+        y += vy;
+        vy += g;
+
+        if (x >= image.cols) break;
+    }
+
+    for (size_t i = 1; i < drawPoints.size(); i++)
+    {
+        if(checkLineHasBlackPixel(image, drawPoints[i-1], drawPoints[i], black_pos))
+        {
+            if(black_pos == start_pos){
+                continue;
+            }
+            return black_pos;
+            // cout << "直线 " << i-1 << "->" << i << " 遇到黑色像素！" << endl;
+        }
+    }
+
+    return black_pos;
+}
+
+bool ImageTool::isPointInWall(const cv::Point &p, const Wall &wall, int tolerance)
+{
+    // 判断 x 是否在墙附近（允许误差 tolerance）
+    if (abs(p.x - wall.x) > tolerance)
+        return false;
+
+    // 判断 y 是否在范围内
+    if (p.y < wall.top - tolerance || p.y > wall.bottom + tolerance)
+        return false;
+
+    return true;
+}
+
+bool ImageTool::isPointOnSegment(const cv::Point &p, const cv::Point &a, const cv::Point &b, int tolerance)
+{
+    // int dx1 = p.x - a.x;
+    // int dy1 = p.y - a.y;
+    // int dx2 = b.x - a.x;
+    // int dy2 = b.y - a.y;
+
+    // // ① 叉积（判断是否共线）
+    // int cross = dx1 * dy2 - dy1 * dx2;
+    // if (abs(cross) > tolerance)
+    //     return false;
+
+    // // ② 点积（判断是否在线段范围内）
+    // int dot = dx1 * dx2 + dy1 * dy2;
+    // if (dot < -tolerance)
+    //     return false;
+
+    // int lenSq = dx2 * dx2 + dy2 * dy2;
+    // if (dot > lenSq + tolerance)
+    //     return false;
+
+    // return true;
+
+    double dx1 = p.x - a.x;
+    double dy1 = p.y - a.y;
+    double dx2 = b.x - a.x;
+    double dy2 = b.y - a.y;
+
+    // ① 叉积（面积）
+    double cross = dx1 * dy2 - dy1 * dx2;
+
+    // ② 线段长度
+    double length = std::sqrt(dx2 * dx2 + dy2 * dy2);
+    if (length == 0) return false;
+
+    // ⭐ 关键：转成“点到直线距离”
+    double distance = std::abs(cross) / length;
+
+    if (distance > tolerance)
+        return false;
+
+    // ③ 投影判断（是否在线段范围内）
+    double dot = dx1 * dx2 + dy1 * dy2;
+    if (dot < 0) return false;
+
+    double lenSq = dx2 * dx2 + dy2 * dy2;
+    if (dot > lenSq) return false;
+
+    return true;
+}

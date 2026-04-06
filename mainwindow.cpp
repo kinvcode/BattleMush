@@ -176,8 +176,8 @@ void MainWindow::initThreads()
     // m_threadManager->addThread(m_UpdateGameData_tid, "UpdateGameData");
     // m_threadManager->addThread(m_HealthMonitor_tid, "HealthMonitor");
 
-    m_threadManager->addThread(m_MonitorToolTest_tid, "MonitorToolTest");
-    m_threadManager->startAll();
+    // m_threadManager->addThread(m_MonitorToolTest_tid, "MonitorToolTest");
+    // m_threadManager->startAll();
 
 
     console("启动所有线程");
@@ -433,27 +433,6 @@ void MainWindow::on_pushButton_clicked()
         foothold_list.push_back({item.id,cur_x_left,cur_y_left,cur_x_right,cur_y_right});
     }
 
-    struct Wall {
-        int foot_id;
-        int x;
-        int bottom;  // 较大的y值
-        int top;     // 较小的y值
-    };
-
-    struct LineChild {
-        int foot_id;
-        QPoint start;
-        QPoint end;
-        int length;
-    };
-
-    struct Line {
-        QPoint start;
-        QPoint end;
-        bool hasLeftWall = false;
-        bool hasRightWall = false;
-        std::vector<LineChild> line_child;
-    };
 
     // 1. 将所有地板ID放入到容器 id_set里面
     std::unordered_set<int> id_set;
@@ -498,6 +477,7 @@ void MainWindow::on_pushButton_clicked()
         id_set.erase(wall.foot_id);
     }
 
+    int line_id = 0;
     for (auto item : foothold_list) {
         // 如果元素x的id不存在于id_set中，则进入下一层循环
         if (id_set.find(item.ID) == id_set.end()) {
@@ -522,57 +502,59 @@ void MainWindow::on_pushButton_clicked()
             // 创建第一个line_child
             LineChild first_child;
             first_child.foot_id = item.ID;
-            first_child.start = QPoint(item.x_left,item.y_left);
-            first_child.end = QPoint(item.x_right,item.y_right);
+            first_child.start = cv::Point(item.x_left,item.y_left);
+            first_child.end = cv::Point(item.x_right,item.y_right);
             first_child.length = qAbs(item.x_right - item.x_left) + qAbs(item.y_right - item.y_left);
 
             tmp_line.line_child.push_back(first_child);
-            tmp_line.start =  QPoint(item.x_left,item.y_left);
-            tmp_line.end = QPoint(item.x_right,item.y_right);
+            tmp_line.start = cv::Point(item.x_left,item.y_left);
+            tmp_line.end = cv::Point(item.x_right,item.y_right);
 
             for (auto& other_item : foothold_list) {
                 if (id_set.find(other_item.ID) == id_set.end()) {
                     continue;
                 }
 
-                if (QPoint(other_item.x_right,other_item.y_right) == tmp_line.start) {
+                if (cv::Point(other_item.x_right,other_item.y_right) == tmp_line.start) {
                     id_set.erase(other_item.ID);
 
                     LineChild child;
                     child.foot_id = other_item.ID;
-                    child.start = QPoint(other_item.x_left,other_item.y_left);
-                    child.end = QPoint(other_item.x_right,other_item.y_right);
+                    child.start = cv::Point(other_item.x_left,other_item.y_left);
+                    child.end = cv::Point(other_item.x_right,other_item.y_right);
                     child.length = qAbs(other_item.x_right - other_item.x_left) + qAbs(other_item.y_right - other_item.y_left);
 
                     // 将line_child插入到容器tmp_line.line_child前面
                     tmp_line.line_child.insert(tmp_line.line_child.begin(), child);
-                    tmp_line.start = QPoint(other_item.x_left,other_item.y_left);
+                    tmp_line.start = cv::Point(other_item.x_left,other_item.y_left);
                     continue;
 
                 }
 
-                if (QPoint(other_item.x_left,other_item.y_left) == tmp_line.end) {
+                if (cv::Point(other_item.x_left,other_item.y_left) == tmp_line.end) {
                     id_set.erase(other_item.ID);
 
                     LineChild child;
                     child.foot_id = other_item.ID;
-                    child.start = QPoint(other_item.x_left,other_item.y_left);
-                    child.end = QPoint(other_item.x_right,other_item.y_right);
+                    child.start = cv::Point(other_item.x_left,other_item.y_left);
+                    child.end = cv::Point(other_item.x_right,other_item.y_right);
                     child.length = qAbs(other_item.x_right - other_item.x_left) + qAbs(other_item.y_right - other_item.y_left);
 
                     // 将line_child插入到容器tmp_line.line_child后面
                     tmp_line.line_child.push_back(child);
-                    tmp_line.end = QPoint(other_item.x_right,other_item.y_right);
+                    tmp_line.end = cv::Point(other_item.x_right,other_item.y_right);
                     continue;
                 }
             }
 
             // 注意：需要确保start的x最小
-            if (tmp_line.start.x() > tmp_line.end.x()) {
+            if (tmp_line.start.x > tmp_line.end.x) {
                 qDebug() << "数据不正确2，退出计算~";
                 return;
             }
 
+            tmp_line.lineid = line_id;
+            line_id++;
             line_list.push_back(tmp_line);
         }
     }
@@ -581,25 +563,29 @@ void MainWindow::on_pushButton_clicked()
         // 遍历wall_list
         for (const auto& wall : wall_list) {
             // 检查左墙
-            if (wall.x == item.start.x() &&
-                wall.bottom == item.start.y()) {
+            if (wall.x == item.start.x &&
+                wall.bottom == item.start.y) {
                 item.hasLeftWall = true;
+            }else{
+                item.hasLeftWall = false;
             }
             // 检查右墙
-            if (wall.x == item.end.x() &&
-                wall.bottom == item.end.y()) {
+            if (wall.x == item.end.x &&
+                wall.bottom == item.end.y) {
                 item.hasRightWall = true;
+            }else{
+                item.hasRightWall = false;
             }
         }
 
-        qDebug() << "线:" << item.start << "," << item.end;
+        // qDebug() << "线:" << item.start.x << "," << item.end;
     }
 
     // 对地板进行分组
     for(auto item : line_list){
         // 找其与自己y轴相同，
         // Line tmp_line = *item;
-        qDebug() << item.hasLeftWall << item.hasRightWall << item.start.x() << "," << item.start.y() << " " << item.end.x() << "," << item.end.y();
+        qDebug() << "线路:" << item.lineid << item.hasLeftWall << item.hasRightWall << item.start.x << "," << item.start.y << " " << item.end.x << "," << item.end.y;
     }
 
     // 开始寻路
@@ -618,11 +604,107 @@ void MainWindow::on_pushButton_clicked()
 
     // 绘制地板
     for(auto item : foothold_list){
-        // 用黑色绘制地板
-        cv::line(cur_room_map,cv::Point(item.x_left,item.y_left),cv::Point(item.x_right,item.y_right),cv::Scalar(0,0,0));
+        if(item.x_left == item.x_right){
+            // 用红色绘制墙壁
+            cv::line(cur_room_map,cv::Point(item.x_left,item.y_left),cv::Point(item.x_right,item.y_right),cv::Scalar(0xFF,0,0));
+        }else{
+            // 用黑色绘制地板
+            cv::line(cur_room_map,cv::Point(item.x_left,item.y_left),cv::Point(item.x_right,item.y_right),cv::Scalar(0,0,0));
+        }
+
     }
 
 
+    // 遍历线路
+    qDebug() << "向左走寻路";
+    for(auto item : line_list){
+        qDebug() << "搜索线路：" << item.lineid;
+
+        // 判断左边是否有墙
+        if(item.hasLeftWall){
+            qDebug() << "左边有墙，退出寻路";
+            continue;
+        }
+
+        if(item.start.x == 0){
+            qDebug() << "左边是边界，退出寻路";
+            continue;
+        }
+
+
+        cv::Point to_left_pos = ImageTool::dropTrajectory(false,cur_room_map,item.start.x,item.start.y);
+        if(to_left_pos.x != -1){
+            qDebug() << "经过位置：" << to_left_pos.x << "," << to_left_pos.y;
+        }
+
+        for(auto wall_item : wall_list){
+            if(ImageTool::isPointInWall(to_left_pos,wall_item)){
+                qDebug() << "该点位于墙体中，不可用";
+            }
+        }
+
+        bool searched_line_id = false;
+        for(auto it : line_list){
+            if(searched_line_id){
+                break;
+            }
+            for (const auto& child : it.line_child)
+            {
+                if (ImageTool::isPointOnSegment(to_left_pos, child.start, child.end))
+                {
+                    // return;
+                    qDebug() << "该点位于线路ID：" << it.lineid;
+                    searched_line_id = true;
+                    break;
+
+                }
+            }
+        }
+    }
+
+    qDebug() << "向右走寻路";
+    for(auto item : line_list){
+        qDebug() << "搜索线路：" << item.lineid;
+
+        // 判断右边是否有墙
+        if(item.hasRightWall){
+            qDebug() << "右边有墙，退出寻路";
+            continue;
+        }
+
+        if(item.end.x == map_width){
+            qDebug() << "右边是边界，退出寻路";
+            continue;
+        }
+
+        cv::Point to_right_pos = ImageTool::dropTrajectory(true,cur_room_map,item.end.x,item.end.y);
+        if(to_right_pos.x != -1){
+            qDebug() << "经过位置：" << to_right_pos.x << "," << to_right_pos.y;
+        }
+
+        for(auto item : wall_list){
+            if(ImageTool::isPointInWall(to_right_pos,item)){
+                qDebug() << "该点位于墙体中，不可用";
+            }
+        }
+
+        bool searched_line_id = false;
+        for(auto it : line_list){
+            if(searched_line_id){
+                break;
+            }
+            for (const auto& child : it.line_child)
+            {
+                if (ImageTool::isPointOnSegment(to_right_pos, child.start, child.end))
+                {
+                    // return;
+                    qDebug() << "该点位于线路ID：" << it.lineid;
+                    searched_line_id = true;
+                    break;
+                }
+            }
+        }
+    }
 
 
 

@@ -62,6 +62,16 @@ public:
 class ImageTool{
 public:
     static void saveMatImage(cv::Mat image,QString path);
+
+    static bool checkLineHasBlackPixel(const cv::Mat &img, const cv::Point &p1, const cv::Point &p2, cv::Point &p3);
+
+    static cv::Point2i worldToImage(int width, int height, float x, float y);
+
+    static cv::Point dropTrajectory(bool is_right, cv::Mat image, float x, float y);
+
+    static bool isPointInWall(const cv::Point& p, const Wall& wall, int tolerance = 0);
+
+    static bool isPointOnSegment(const cv::Point& p, const cv::Point& a, const cv::Point& b, int tolerance = 0);
 };
 
 #endif // HELPER_H

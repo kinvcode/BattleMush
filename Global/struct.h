@@ -2,11 +2,16 @@
 #define STRUCT_H
 
 #include <QCoreApplication>
+#include <QPoint>
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include <set>
 #include <utility>
+#include <cmath>
+#include <cstdio>
+#include <opencv2/opencv.hpp>
+#include <vector>
 
 typedef struct {
     float x;
@@ -35,6 +40,29 @@ typedef struct{
     float x_right;
     float y_right;
 }FootholdRect;
+
+typedef struct  {
+    int foot_id;
+    int x;
+    int bottom;  // 较大的y值
+    int top;     // 较小的y值
+}Wall;
+
+typedef struct  {
+    int foot_id;
+    cv::Point start;
+    cv::Point end;
+    int length;
+}LineChild;
+
+typedef struct{
+    int lineid;
+    cv::Point start;
+    cv::Point end;
+    bool hasLeftWall;
+    bool hasRightWall;
+    std::vector<LineChild> line_child;
+}Line;
 
 template<typename T>
 const T& clamp(const T& value, const T& low, const T& high) {
