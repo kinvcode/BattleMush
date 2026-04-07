@@ -17,22 +17,8 @@ public:
     // 搜索服务指针
     static quint64 findService(quint64 allservice, QString name);
 
-    // 获取地图内所有的攀爬组件
-    static std::unordered_set<quint64> findClimbableComponentSet(quint64 cur_map);
-
     // 获取Entity的文本组件字符串
     static QString getEntityTextComponentString(quint64 entity);
-
-    // 获取Entity名称
-
-    // 遍历攀爬物体
-    static std::vector<ClimbRect> dumpClimbList(quint64 cur_map, quint64 collisionservice);
-
-    // 遍历瓦片
-    static std::vector<std::vector<COORDINATE>> dumpTilemapList(quint64 map);
-
-    // 遍历地板2
-    static std::vector<FootholdRect> dumpFootholdList(quint64 cur_map);
 
     // 分割字符串
     static bool parseHPString(const QString& Text, int& left, int& right);
@@ -53,7 +39,7 @@ public:
 class Math{
 public:
     // 计算攀爬物体RECT
-    static void ComputeClimbRect(const ClimbOrigin* climb, ClimbRect& climb_rect);
+    static void ComputeClimbRect(const ClimbOrigin* climb, FloatRect& climb_rect);
 
     // 保留2位小数点
     static float roundHalfAwayFromZero_bit(float value, int decimalPlaces = 2);
@@ -73,5 +59,90 @@ public:
 
     static bool isPointOnSegment(const cv::Point& p, const cv::Point& a, const cv::Point& b, int tolerance = 0);
 };
+
+class RoomMap{
+public:
+    // 获取地图内所有的攀爬组件
+    static std::unordered_set<quint64> findClimbableComponentSet(quint64 cur_map);
+
+    // 获取地图边界
+    static MapBounding getMapBounding(quint64 cur_map);
+
+    // 转换地图坐标
+    static int toMapPosX(int x, int offset);
+    static int toMapPosY(int y, int offset,int height);
+
+    // 创建攀爬物体
+    static std::vector<ClimbRect> makeClimbList(quint64 cur_map, quint64 collisionservice, MapBounding map_bounding);
+
+    // 遍历瓦片
+    static std::vector<std::vector<COORDINATE>> dumpTilemapList(quint64 map);
+
+    // 创建footholds
+    static std::vector<FootholdRect> makeFootholdList(quint64 cur_map);
+
+    // 创建墙体列表
+    static std::vector<Wall> makeWallList(std::vector<FootholdRect> footholds, std::unordered_set<int> &id_set);
+
+    // 创建平台列表
+    static std::vector<Line> makeLineList(std::vector<FootholdRect> footholds, std::vector<Wall> wall_list, std::unordered_set<int> &id_set);
+
+    // 创建房间地图
+    static cv::Mat makeRoomMap(std::vector<ClimbRect> climb_list, std::vector<FootholdRect> foothold_list, MapBounding map_bounding);
+
+    // 创建寻路节点
+    static void makeNodes(std::vector<Line> line_list, std::vector<Wall> wall_list, cv::Mat cur_room_map, MapBounding map_bounding);
+
+
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif // HELPER_H

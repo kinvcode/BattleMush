@@ -177,6 +177,10 @@ void UpdateGameData::process()
             // 更新用户信息
             UpdateUserStatus(statuspanel);
 
+            // 更新怪物列表
+            UpdateMonsters();
+
+            // 更新掉落物品列表
 
             ProcessHelper::programDelay(500); // 0.5秒更新一次数据
             QApplication::processEvents();
@@ -192,6 +196,11 @@ void UpdateGameData::process()
 
 void UpdateGameData::HandleLogin()
 {
+    // 判断登录界面
+    // 是否存在Login entity
+    // 登录界面：WorldUIObjects->Main->Login
+    // 选择角色界面：WorldUIObjects->CharSelect->GameStart
+
     DebugOutput::out("自动登录中... ...");
     ProcessHelper::programDelay(3000);
     QApplication::processEvents();
@@ -227,11 +236,70 @@ void UpdateGameData::UpdateUserStatus(quint64 statuspanel)
 
 void UpdateGameData::UpdateRoomMap()
 {
+    MapBounding map_bounding = RoomMap::getMapBounding(Gplayer.p_curmapentity);
+
     // 遍历当前地图攀爬物体列表(有ClimbableComponent)
-    std::vector<ClimbRect> climbs = Helper::dumpClimbList(Gplayer.p_curmapentity, Gplayer.p_collisionservice);
+    std::vector<ClimbRect> climbs = RoomMap::makeClimbList(Gplayer.p_curmapentity, Gplayer.p_collisionservice, map_bounding);
 
     // 遍历地板
-    std::vector<FootholdRect> footholds = Helper::dumpFootholdList(Gplayer.p_curmapentity);
+    std::vector<FootholdRect> footholds = RoomMap::makeFootholdList(Gplayer.p_curmapentity);
+
+    // 1. 将所有地板ID放入到容器 id_set里面
+    std::unordered_set<int> id_set;
+    for (const auto& item : footholds) {
+        id_set.insert(item.id);
+    }
+
+    // 创建地图
+
+
+    // 第一步：拿到地形数据并绘制地图
+
+    // 创建墙体列表
+    std::vector<Wall> wall_list = RoomMap::makeWallList(footholds, id_set);
+
+    // 创建平台列表
+    std::vector<Line> line_list = RoomMap::makeLineList(footholds, wall_list, id_set);
+
+    // 绘制地图框架
+    cv::Mat cur_room_map = RoomMap::makeRoomMap(climbs, footholds, map_bounding);
+
+    // QString currentDir = QCoreApplication::applicationDirPath() + "/room_map.png";
+    // qDebug() << "图片保存路径：" << currentDir;
+    // ImageTool::saveMatImage(cur_room_map, currentDir);
+
+    // 第二步：算出寻路数据
+    /**
+     * 向左走寻路
+     * 向右走寻路
+    **/
+    RoomMap::makeNodes(line_list, wall_list, cur_room_map, map_bounding);
+
+    // 最终步骤：合并数据缓存到本地（如果本地存在地图缓存直接拿缓存数据）
+
+    // 地图更新完毕，退出
+}
+
+void UpdateGameData::UpdateMonsters()
+{
+    // 判断怪物
+    //     +F0 StateComponent
+    //         [+138]+10 状态 IDLE STAND MOVE
+    //     +11C StateUpdateSpace 0同步 1客户端 2服务端
+
+    //     MapleMonsterActionState Invalid = 0; // 0x0
+    // MapleMonsterActionState Stand = 1; // 0x0
+    // MapleMonsterActionState Move = 2; // 0x0
+    // MapleMonsterActionState Jump = 3; // 0x0
+    // MapleMonsterActionState Hit = 4; // 0x0
+    // MapleMonsterActionState Die = 5; // 0x0
+
+
+    // + 1D8 RigidbodyComponent
+    //     +A5 0死亡 1存活 可以判断怪物是否存在
+    //     +F8 当前所在地板 可以判断怪物是否存在
+    //     +118 行走{当前X坐标，X行走步长} 怪物没有
+    //     +120 airPos 怪物坐标
 }
 
 

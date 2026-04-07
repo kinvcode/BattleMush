@@ -83,6 +83,8 @@ namespace BASE {
 
     namespace MapComponent{
         static int FootholdComponent = 0x108;
+        static int MoveBoundingMin = 0x120;
+        static int MoveBoundingMax = 0x128;
     };
 
     namespace FootholdComponent{

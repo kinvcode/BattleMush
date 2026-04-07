@@ -24,6 +24,13 @@ typedef struct {
     float z;
 }COORDINATE;
 
+typedef struct{
+    float x_left;
+    float y_top;
+    float x_right;
+    float y_bottom;
+}FloatRect;
+
 typedef struct  {
     float left;
     float top;
@@ -32,18 +39,19 @@ typedef struct  {
 }ClimbOrigin;
 
 typedef struct {
-    float x_left;
-    float y_top;
-    float x_right;
-    float y_bottom;
+    int id;
+    int x_left;
+    int y_top;
+    int x_right;
+    int y_bottom;
 }ClimbRect;
 
 typedef struct{
     int id;
-    float x_left;
-    float y_left;
-    float x_right;
-    float y_right;
+    int x_left;
+    int y_left;
+    int x_right;
+    int y_right;
 }FootholdRect;
 
 typedef struct  {
@@ -68,6 +76,17 @@ typedef struct{
     bool hasRightWall;
     std::vector<LineChild> line_child;
 }Line;
+
+typedef struct{
+    int x_left;
+    int y_bottom;
+    int x_right;
+    int y_top;
+    int x_offset;
+    int y_offset;
+    int width;
+    int height;
+}MapBounding;
 
 typedef struct{
     QString id;

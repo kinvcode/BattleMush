@@ -29,6 +29,8 @@ private:
     void UpdateUserStatus(quint64 statuspanel);
     // 更新房间地图
     void UpdateRoomMap();
+    // 更新怪物
+    void UpdateMonsters();
 };
 
 #endif // UPDATEGAMEDATA_H
