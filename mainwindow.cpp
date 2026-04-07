@@ -11,6 +11,7 @@
 #include "driver/msdriverpro.h"
 #include "driver/driverload.h"
 #include "global/globalconfig.h"
+#include "global/gameoffset.h"
 #include "threads/healthmonitor.h"
 #include "threads/updategamedata.h"
 #include "threads/monitortooltest.h"
@@ -304,17 +305,14 @@ void MainWindow::on_pushButton_clicked()
     Gplayer.p_assemblybase = MSDriverPRO::getModuleAddr(Gplayer.p_gamepid, "GameAssembly.dll");
     DebugOutput::out("模块基址:" + QString::number(Gplayer.p_assemblybase, 16).toUpper());
 
-    Gplayer.p_entry = Mem::readPointer(Gplayer.p_assemblybase, 0x0A1E0AE0, 0xB8, 0x0, 0x10, 0x40);
-    DebugOutput::out("Entry:" + QString::number(Gplayer.p_entry, 16).toUpper());
-    // 检测是否已经进入游戏
-    if(Gplayer.p_entry == 0){
-        // 尚未进入游戏，
-        DebugOutput::out("尚未进入游戏~" );
-        return;
-    }
-
     // 如果已经进入游戏
-    Gplayer.p_gamecontext = Mem::readPointer(Gplayer.p_entry, 0x10, 0x18, 0x30);
+    Gplayer.p_gamecontext_entries = Mem::readPointer(Gplayer.p_assemblybase,
+                                                BASE::ClientCoreThreadManager_base,
+                                                BASE::ClientCoreThreadManager_offset_lv1,
+                                                BASE::ClientCoreThreadManager_offset_lv2,
+                                                BASE::ClientCoreThreadManager_GameDictionary,
+                                                BASE::Dictionary::InternalArray_entries);
+    Gplayer.p_gamecontext = Mem::readPointer(Gplayer.p_gamecontext_entries, BASE::InternalArray::Head + 0x10);
     DebugOutput::out("GameContext:" + QString::number(Gplayer.p_gamecontext, 16).toUpper());
 
     Gplayer.p_mapsentity = Mem::readPointer(Gplayer.p_gamecontext, 0x148);

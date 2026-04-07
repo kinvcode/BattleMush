@@ -56,6 +56,7 @@ SOURCES += \
     threads/threadmanager.cpp \
     threads/updategamedata.cpp \
     utils/config.cpp \
+    utils/gamestruct.cpp \
     utils/helper.cpp \
     widgets/hotkeyedit.cpp \
     widgets/noticewidget.cpp
@@ -81,6 +82,7 @@ HEADERS += \
     threads/threadmanager.h \
     threads/updategamedata.h \
     utils/config.h \
+    utils/gamestruct.h \
     utils/helper.h \
     vmp/VMProtectSDK.h \
     widgets/hotkeyedit.h \

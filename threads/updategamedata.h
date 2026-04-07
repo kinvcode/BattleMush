@@ -21,6 +21,14 @@ private:
     bool m_running;
     bool m_paused;
     int m_counter;
+
+private:
+    // 处理登录
+    void HandleLogin();
+    // 更新角色信息
+    void UpdateUserStatus(quint64 statuspanel);
+    // 更新房间地图
+    void UpdateRoomMap();
 };
 
 #endif // UPDATEGAMEDATA_H

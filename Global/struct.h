@@ -13,6 +13,11 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 
+template<typename T>
+const T& clamp(const T& value, const T& low, const T& high) {
+    return std::min(std::max(value, low), high);
+}
+
 typedef struct {
     float x;
     float y;
@@ -64,9 +69,9 @@ typedef struct{
     std::vector<LineChild> line_child;
 }Line;
 
-template<typename T>
-const T& clamp(const T& value, const T& low, const T& high) {
-    return std::min(std::max(value, low), high);
-}
+typedef struct{
+    QString id;
+    QString name;
+}MapInfo;
 
 #endif // STRUCT_H

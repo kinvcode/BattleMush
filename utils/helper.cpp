@@ -22,23 +22,23 @@ quint64 Helper::findChild(quint64 parent, QString name)
 {
     quint64 child_entity = 0;
 
-    quint64 list = Mem::readLong(parent + 0x3A8);
-    int list_num = Mem::readLong(list + 0x18);
+    quint64 list = Mem::readLong(parent + BASE::MODEntity::children);
+    int list_num = Mem::readLong(list + BASE::List::size);
     if(list_num == 0){
         qDebug() << "不存在子模块";
         return child_entity;
     }
 
-    quint64 list_head = Mem::readLong(list + 0x10);
-    int max = Mem::readInt(list_head + 0x18);
-    list_head = list_head + 0x20;
+    quint64 list_head = Mem::readLong(list + BASE::List::InternalArray);
+    int max = Mem::readInt(list_head + BASE::InternalArray::max_size);
+    list_head = list_head + BASE::InternalArray::Head;
     for(int i = 0; i < max; i++,list_head += 0x8){
         quint64 cur_entity = Mem::readLong(list_head);
         if(cur_entity == 0){
             break;
         }
 
-        QString entity_name = readString(readLong(cur_entity + 0x270) + 0x14, 100);
+        QString entity_name = readString(readLong(cur_entity + BASE::MODEntity::name) + BASE::String::text, 100);
         // qDebug() << "当前模块:" << entity_name;
         if(entity_name == name){
             return cur_entity;
@@ -52,8 +52,8 @@ quint64 Helper::findService(quint64 allservice, QString name)
 {
     quint64 service_pointer = 0;
 
-    int count = readInt(allservice + 0x18);
-    quint64 head = readLong(allservice + 0x10) + 0x20;
+    int count = readInt(allservice + BASE::List::size);
+    quint64 head = readLong(allservice + BASE::List::InternalArray) + BASE::InternalArray::Head;
     for(int i = 0; i < count; i++){
         quint64 cur_service = readLong(head);
         if(!cur_service) break;
@@ -73,18 +73,18 @@ std::unordered_set<quint64> Helper::findClimbableComponentSet(quint64 cur_map)
 {
     std::unordered_set<quint64> pointers;
 
-    QString map_uuid = readString(readLong(cur_map + 0x2A0)+0x14, 100);
-    qDebug() << "当前地图UUID：" << map_uuid;
+    // QString map_uuid = readString(readLong(cur_map + 0x2A0)+0x14, 100);
+    // qDebug() << "当前地图UUID：" << map_uuid;
 
-    int list_count = readInt(readLong(cur_map + 0x3A8) + 0x18);
-    quint64 list_p = readLong(readLong(cur_map + 0x3A8) + 0x10);
-    quint64 list_head = list_p + 0x20;
+    int list_count = readInt(readLong(cur_map + BASE::MODEntity::children) + BASE::List::size);
+    quint64 list_p = readLong(readLong(cur_map + BASE::MODEntity::children) + BASE::List::InternalArray);
+    quint64 list_head = list_p + BASE::InternalArray::Head;
 
     for(int i = 0; i < list_count; i++,list_head += 8){
         quint64 cur_p = readLong(list_head);
         if(!cur_p) continue;
 
-        quint64 ClimbableComponent = readLong(cur_p + 0xC8);
+        quint64 ClimbableComponent = readLong(cur_p + BASE::MODEntity::ClimbableComponent);
         if(!ClimbableComponent) continue;
 
         pointers.insert(ClimbableComponent);
@@ -96,7 +96,7 @@ std::unordered_set<quint64> Helper::findClimbableComponentSet(quint64 cur_map)
 QString Helper::getEntityTextComponentString(quint64 entity)
 {
     QString name = "";
-    name = readString(readLong(readLong(entity + 0x1F8) + 0xF0) + 0x14, 100);
+    name = readString(readLong(readLong(entity + BASE::MODEntity::TextComponent) + BASE::TextComponent::_text) + BASE::String::text, 100);
     return name;
 }
 
@@ -108,51 +108,58 @@ std::vector<ClimbRect> Helper::dumpClimbList(quint64 cur_map, quint64 collisions
     std::unordered_set<quint64> climb_pointers = findClimbableComponentSet(cur_map);
 
     // 找碰撞数据
-    quint64 p_MultipleDynamicTreeBroadPhase = Mem::readPointer(collisionservice, 0x38, 0x18, 0x30, 0x30, 0x18);
-    DebugOutput::out("MultipleDynamicTreeBroadPhase:" + QString::number(p_MultipleDynamicTreeBroadPhase, 16).toUpper());
+    quint64 p_MultipleDynamicTreeBroadPhase = Mem::readPointer(collisionservice,
+                                                                BASE::CollisionService::simulatorByMap,
+                                                                BASE::Dictionary::InternalArray_entries,
+                                                                BASE::InternalArray::Head + 0x10,
+                                                                BASE::CollisionSimulator::World,
+                                                                BASE::World::MultipleDynamicTreeBroadPhase);
+    // DebugOutput::out("MultipleDynamicTreeBroadPhase:" + QString::number(p_MultipleDynamicTreeBroadPhase, 16).toUpper());
 
     // 遍历数组索引
-    int index_count = readInt(readLong(p_MultipleDynamicTreeBroadPhase + 0x20) + 0x20);
-    quint64 index_head = readLong(readLong(p_MultipleDynamicTreeBroadPhase + 0x20) + 0x18) + 0x20;
+    int index_count = readInt(readLong(p_MultipleDynamicTreeBroadPhase + BASE::MultipleDynamicTreeBroadPhase::numbersByProxyId) + BASE::Dictionary::count);
+    quint64 index_head = readLong(readLong(p_MultipleDynamicTreeBroadPhase
+                                            + BASE::MultipleDynamicTreeBroadPhase::numbersByProxyId)
+                                            + BASE::Dictionary::InternalArray_entries)
+                                            + BASE::InternalArray::Head;
     std::set<std::pair<int, int>> uniquePairs;
-    for(int index_i = 0; index_i < index_count; index_i++,index_head += 3*8){
-        int index1 = readInt(index_head + 0xC);
-        int index2 = readInt(index_head + 0x10);
+    for(int index_i = 0; index_i < index_count; index_i++,index_head += 3 * 8 ){
+        int index1 = readInt(index_head + 0xC); // 数组索引
+        int index2 = readInt(index_head + 0x10); // 数组索引
         uniquePairs.insert({index1, index2});
     }
 
     // 遍历碰撞坐标原始数据
-    int rect_count = readInt(readLong(p_MultipleDynamicTreeBroadPhase + 0x10) + 0x18);
-    int rect_array_1_count = readInt(readLong(readLong(p_MultipleDynamicTreeBroadPhase + 0x10) + 0x10) + 0);
-    int rect_array_2_count = readInt(readLong(readLong(p_MultipleDynamicTreeBroadPhase + 0x10) + 0x10) + 10);
-    quint64 rect_head = readLong(p_MultipleDynamicTreeBroadPhase + 0x10) + 0x20;
+    // int rect_count = readInt(readLong(p_MultipleDynamicTreeBroadPhase + 0x10) + 0x18);
+    // int rect_array_1_count = readInt(readLong(readLong(p_MultipleDynamicTreeBroadPhase + 0x10) + 0x10) + 0);
+    int rect_array_2_count = readInt(readLong(readLong(p_MultipleDynamicTreeBroadPhase + BASE::MultipleDynamicTreeBroadPhase::trees) + 0x10) + 0x10);
+    quint64 rect_head = readLong(p_MultipleDynamicTreeBroadPhase + BASE::MultipleDynamicTreeBroadPhase::trees) + BASE::InternalArray::Head;
 
+    // int array_lv2_count =
     for (const auto& pair : uniquePairs) {
-        quint64 cur_address = rect_head + pair.first * 0x20 * 8 + pair.second * 8;
-        int node_count = readInt(readLong(cur_address) + 0x1C);
-        quint64 node_head = readLong(readLong(cur_address) + 0x10) + 0x20;
+        quint64 cur_address = rect_head + pair.first * rect_array_2_count * 8 + pair.second * 8;
+        int node_count = readInt(readLong(cur_address) + BASE::DynamicTree::_nodeCount);
+        quint64 node_head = readLong(readLong(cur_address) + BASE::DynamicTree::_nodes) + BASE::InternalArray::Head;
 
-        qDebug() << "--------------------------------------------------------";
-        for(int node_i = 0; node_i < node_count; node_i++,node_head += 0x60){
-            quint64 p_climbableComponent = readLong(node_head + 0x28);
+        // qDebug() << "--------------------------------------------------------";
+        for(int node_i = 0; node_i < node_count; node_i++,node_head += 0x60){ // 0x60碰撞信息大小，暂时无法找到基址
+            quint64 p_climbableComponent = readLong(node_head + 0x28); // 攀爬信息偏移，暂时无法找到基址
             if(!p_climbableComponent) continue;
 
-            qDebug() << "p_climbableComponent：" << QString::number(p_climbableComponent,16).toUpper();
+            // qDebug() << "p_climbableComponent：" << QString::number(p_climbableComponent,16).toUpper();
             // 如果不是当前地图的攀爬物体,则跳过
             if (climb_pointers.find(p_climbableComponent) == climb_pointers.end()) {
                 break;
             }
             ClimbOrigin cur_climb;
-            cur_climb.left = readFloat(node_head + 0x30);
-            cur_climb.top = readFloat(node_head + 0x34);
-            cur_climb.factor1 = readFloat(node_head + 0x48);
-            cur_climb.factor2 = readFloat(node_head + 0x4C);
+            cur_climb.left = readFloat(node_head + 0x30); // 攀爬信息
+            cur_climb.top = readFloat(node_head + 0x34); // 攀爬信息
+            cur_climb.factor1 = readFloat(node_head + 0x48); // 攀爬信息
+            cur_climb.factor2 = readFloat(node_head + 0x4C); // 攀爬信息
             ClimbRect cur_rect;
             Math::ComputeClimbRect(&cur_climb, cur_rect);
 
             climb_list.push_back(cur_rect);
-
-            // qDebug() << cur_rect.x_left << cur_rect.y_top << cur_rect.x_right << cur_rect.y_bottom;
         }
     }
 
@@ -163,29 +170,29 @@ std::vector<std::vector<COORDINATE>> Helper::dumpTilemapList(quint64 map)
 {
     std::vector<std::vector<COORDINATE>> tile_list;
 
-    int list_count = readInt(readLong(map + 0x3A8) + 0x18);
-    quint64 list_head = readLong(readLong(map + 0x3A8) + 0x10) + 0x20;
+    int list_count = readInt(readLong(map + BASE::MODEntity::children) + BASE::List::size);
+    quint64 list_head = readLong(readLong(map + BASE::MODEntity::children) + BASE::List::InternalArray) + BASE::InternalArray::Head;
 
     for(int i = 0; i < list_count; i++,list_head += 0x8){
         quint64 cur_entity = Mem::readLong(list_head);
         if(cur_entity == 0) break;
 
         // 判断是否有TileMapComponent
-        quint64 tilemapcomponet = readLong(cur_entity + 0x88);
+        quint64 tilemapcomponet = readLong(cur_entity + BASE::MODEntity::TileMapComponent);
         if(tilemapcomponet == 0) continue;
-        QString entity_name = readString(readLong(cur_entity + 0x270) + 0x14, 100);
+        QString entity_name = readString(readLong(cur_entity + BASE::MODEntity::name) + BASE::String::text, 100);
         qDebug() << "当前模块:" << entity_name << " 指针：" << QString::number(tilemapcomponet,16).toUpper();
 
         // 遍历TileContext
-        quint64 tilecontext_list = readLong(tilemapcomponet + 0x120);
-        int tilecontext_list_count = readInt(tilecontext_list + 0x18);
-        quint64 tilecontext_list_head = readLong(tilecontext_list + 0x10) + 0x20;
+        quint64 tilecontext_list = readLong(tilemapcomponet + BASE::TileMapComponent::TileContextList);
+        int tilecontext_list_count = readInt(tilecontext_list + BASE::List::size);
+        quint64 tilecontext_list_head = readLong(tilecontext_list + BASE::List::InternalArray) + BASE::InternalArray::Head;
 
         // 遍历tilecontext_list
         for(int j = 0; j < tilecontext_list_count; j++,tilecontext_list_head += 0x8){
-            quint64 convexPoints = readLong(readLong(tilecontext_list_head) + 0x20);
-            int convexPoints_count = readInt(convexPoints + 0x18);
-            quint64 convexPoints_head = readLong(convexPoints + 0x10) + 0x20;
+            quint64 convexPoints = readLong(readLong(tilecontext_list_head) + BASE::TileContext::convexPoints);
+            int convexPoints_count = readInt(convexPoints + BASE::List::size);
+            quint64 convexPoints_head = readLong(convexPoints + BASE::List::InternalArray) + BASE::InternalArray::Head;
 
             std::vector<COORDINATE> cur_tile;
             // qDebug() << "===============";

@@ -20,8 +20,8 @@ public:
     // assembly.dll基址
     quint64 p_assemblybase = 0;
 
-    // 游戏入口指针
-    quint64 p_entry = 0;
+    // 游戏入口
+    quint64 p_gamecontext_entries = 0;
 
     // 游戏上线文
     quint64 p_gamecontext = 0;
@@ -29,13 +29,24 @@ public:
     // 地图
     quint64 p_mapsentity = 0;
 
+    quint64 p_curmapentity = 0;
+
+    // 最后一次所在地图
+    MapInfo last_mapinfo;
+    // 当前地图信息
+    MapInfo curmapinfo;
+
     // UI
     quint64 p_uientity = 0;
 
     // allServices
     quint64 p_allServices = 0;
 
+    // 用户服务
     quint64 p_userservice = 0;
+
+    // 碰撞服务
+    quint64 p_collisionservice = 0;
 
     // localplayer
     quint64 p_localplayer = 0;
