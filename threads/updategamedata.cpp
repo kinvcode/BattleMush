@@ -117,9 +117,9 @@ void UpdateGameData::process()
 
 
         // 判断当前是登录界面还是游戏中
-        Gplayer.curmapinfo.id = GameStruct::readEntityID(Gplayer.p_mapsentity);
-        Gplayer.curmapinfo.name = GameStruct::readEntityName(Gplayer.p_mapsentity);
-        Gplayer.last_mapinfo = Gplayer.curmapinfo;
+        Gplayer.curmapinfo.id = GameStruct::readEntityID(Gplayer.p_curmapentity);
+        Gplayer.curmapinfo.name = GameStruct::readEntityName(Gplayer.p_curmapentity);
+        Gplayer.last_mapentity = Gplayer.p_curmapentity;
         if(Gplayer.curmapinfo.id == "e5a83e46-390a-4ecf-a069-4e786ccf22c4"){
             DebugOutput::out("处理登录...");
             HandleLogin();
@@ -143,6 +143,8 @@ void UpdateGameData::process()
 
         //
         while(Gplayer.p_gamecontext){
+            if (!m_running) break;
+
             Gplayer.p_gamecontext = readPointer(Gplayer.p_gamecontext_entries, BASE::InternalArray::Head + 0x10);
             if(Gplayer.p_gamecontext == 0){
                 DebugOutput::out("游戏已退出...");
@@ -151,16 +153,21 @@ void UpdateGameData::process()
                 break;
             }
 
-            Gplayer.curmapinfo.id = GameStruct::readEntityID(Gplayer.p_mapsentity);
-            Gplayer.curmapinfo.name = GameStruct::readEntityName(Gplayer.p_mapsentity);
+            Gplayer.p_curmapentity = readPointer(Gplayer.p_mapsentity,
+                                                 BASE::MODEntity::children,
+                                                 BASE::List::InternalArray,
+                                                 BASE::InternalArray::Head + 0 * 8);
+
+            Gplayer.curmapinfo.id = GameStruct::readEntityID(Gplayer.p_curmapentity);
+            Gplayer.curmapinfo.name = GameStruct::readEntityName(Gplayer.p_curmapentity);
             if(Gplayer.curmapinfo.id == "e5a83e46-390a-4ecf-a069-4e786ccf22c4"){
                 DebugOutput::out("切换到了登录界面");
                 break;
             }
 
-            if(Gplayer.curmapinfo.id != Gplayer.last_mapinfo.id){
+            if(Gplayer.p_curmapentity != Gplayer.last_mapentity){
                 DebugOutput::out("切换了地图");
-
+                Gplayer.last_mapentity = Gplayer.p_curmapentity;
                 // 更新地图信息
                 UpdateRoomMap();
                 continue;

@@ -76,18 +76,11 @@ void MonitorToolTest::process()
 
         // 找到人物指针
         quint64 user_transform = readPointer(p_userservice,BASE::UserService::localPlayer, BASE::MODEntity::TransformComponent);
-        // qDebug() << "指针：" << QString::number(user_transform,16).toUpper();
-        // user_transform = readLong(user_transform + 0x158);
-        // qDebug() << "指针：" << QString::number(user_transform,16).toUpper();
-
-        // 几率
-        // std::set<std::pair<float, float>> user_pos_list;
 
         Gplayer.move_pos_list.reserve(1000);
 
         readUserData:
-        // uint user_x = Math::roundHalfAwayFromZero_bit(readFloat(user_transform + 0x190)) * 100;
-        // uint user_y = Math::roundHalfAwayFromZero_bit(readFloat(user_transform + 0x194)) * 100;
+        if (!m_running) break;
 
         float user_x = Math::roundHalfAwayFromZero_bit(readFloat(user_transform + BASE::TransformComponent::PositionX));
         float user_y = Math::roundHalfAwayFromZero_bit(readFloat(user_transform + BASE::TransformComponent::PositionY));

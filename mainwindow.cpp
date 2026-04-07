@@ -174,11 +174,11 @@ void MainWindow::initThreads()
             this, &MainWindow::onAllThreadsFinished);
 
     // 添加默认线程
-    // m_threadManager->addThread(m_UpdateGameData_tid, "UpdateGameData");
+    m_threadManager->addThread(m_UpdateGameData_tid, "UpdateGameData");
     // m_threadManager->addThread(m_HealthMonitor_tid, "HealthMonitor");
 
     // m_threadManager->addThread(m_MonitorToolTest_tid, "MonitorToolTest");
-    // m_threadManager->startAll();
+    m_threadManager->startAll();
 
 
     console("启动所有线程");
@@ -283,6 +283,12 @@ void MainWindow::console(QString msg)
     ui->textEdit_log->moveCursor(QTextCursor::End);
 }
 
+void MainWindow::onApplicationQuit()
+{
+    DebugOutput::out("安全关闭程序中... ...");
+    ProcessHelper::programDelay(3000);
+    QApplication::processEvents();
+}
 
 void MainWindow::on_pushButton_clicked()
 {

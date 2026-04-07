@@ -56,8 +56,6 @@ void HealthMonitor::process()
 
         if (!m_running) break;
 
-
-
         // qDebug() << "当前蓝量：" << Gplayer.MP;
 
         // 检测血量

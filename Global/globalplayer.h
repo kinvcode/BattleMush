@@ -32,7 +32,8 @@ public:
     quint64 p_curmapentity = 0;
 
     // 最后一次所在地图
-    MapInfo last_mapinfo;
+    quint64 last_mapentity = 0;
+
     // 当前地图信息
     MapInfo curmapinfo;
 

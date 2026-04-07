@@ -181,7 +181,7 @@ std::vector<std::vector<COORDINATE>> Helper::dumpTilemapList(quint64 map)
         quint64 tilemapcomponet = readLong(cur_entity + BASE::MODEntity::TileMapComponent);
         if(tilemapcomponet == 0) continue;
         QString entity_name = readString(readLong(cur_entity + BASE::MODEntity::name) + BASE::String::text, 100);
-        qDebug() << "当前模块:" << entity_name << " 指针：" << QString::number(tilemapcomponet,16).toUpper();
+        // qDebug() << "当前模块:" << entity_name << " 指针：" << QString::number(tilemapcomponet,16).toUpper();
 
         // 遍历TileContext
         quint64 tilecontext_list = readLong(tilemapcomponet + BASE::TileMapComponent::TileContextList);
@@ -227,15 +227,15 @@ std::vector<FootholdRect> Helper::dumpFootholdList(quint64 cur_map)
 
     for(int i = 0; i < max_count; i++,foot_head +=8){
         if(readLong(foot_head) == 0) break;
-        int group = Mem::readInt(readLong(foot_head) + BASE::Foothold::groupID);
-        qDebug() << "group:" << group;
+        // int group = Mem::readInt(readLong(foot_head) + BASE::Foothold::groupID);
+        // qDebug() << "group:" << group;
         int id = readInt(readLong(foot_head) + BASE::Foothold::ID);
         float x_left = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + BASE::Foothold::StartPoint));
         float y_left = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + BASE::Foothold::StartPoint + 4));
         float x_right = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + BASE::Foothold::EndPoint));
         float y_right = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + BASE::Foothold::EndPoint + 4));
-        qDebug() << x_left << "," << y_left << " " << x_right << "," << y_right;
-        qDebug() << "------------------------";
+        // qDebug() << x_left << "," << y_left << " " << x_right << "," << y_right;
+        // qDebug() << "------------------------";
 
         foothold_list.push_back({id, x_left, y_left, x_right, y_right});
     }

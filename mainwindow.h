@@ -21,6 +21,27 @@ public:
     ~MainWindow();
     // 线程管理器
     ThreadManager* m_threadManager;
+
+private:
+    Ui::MainWindow *ui;
+    LogViewer* logger = nullptr;
+    // 数据更新线程ID
+    const int m_UpdateGameData_tid = 1;
+    // 人物健康状态监控线程ID
+    const int m_HealthMonitor_tid = 2;
+    // 测试工具
+    const int m_MonitorToolTest_tid = 3;
+
+    // 提示框
+    void showNotice(const QString& message);
+    // 加载驱动
+    void loadDriver();
+    // initCompoment();
+    void initCompomentUI();
+    void initConfig();
+    void initSinalBind();
+    void initThreads();
+
 private slots:
 
     void on_listWidget_clicked(const QModelIndex &index);
@@ -62,28 +83,9 @@ private slots:
 
     void on_pushButton_3_clicked();
 
-private:
-    Ui::MainWindow *ui;
-    LogViewer* logger = nullptr;
-    // 数据更新线程ID
-    const int m_UpdateGameData_tid = 1;
-    // 人物健康状态监控线程ID
-    const int m_HealthMonitor_tid = 2;
-    // 测试工具
-    const int m_MonitorToolTest_tid = 3;
-
-    // 提示框
-    void showNotice(const QString& message);
-    // 加载驱动
-    void loadDriver();
-    // initCompoment();
-    void initCompomentUI();
-    void initConfig();
-    void initSinalBind();
-    void initThreads();
-
 public slots:
     void console(QString msg);
+    void onApplicationQuit();
 
 signals:
     void saveConfig();
