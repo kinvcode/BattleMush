@@ -150,7 +150,7 @@ int RoomMap::toMapPosY(int y, int offset, int height)
     return height - (y * 100 + offset);
 }
 
-QString RoomMap::getEntityTextComponentString(quint64 entity)
+QString Helper::getEntityTextComponentString(quint64 entity)
 {
     QString name = "";
     name = readString(readLong(readLong(entity + BASE::MODEntity::TextComponent) + BASE::TextComponent::_text) + BASE::String::text, 100);
@@ -562,7 +562,7 @@ void RoomMap::makeNodes(std::vector<Line> line_list, std::vector<Wall> wall_list
             continue;
         }
 
-        if(item.end.x == map_width){
+        if(item.end.x == map_bounding.width){
             qDebug() << "右边是边界，退出寻路";
             continue;
         }

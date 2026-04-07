@@ -79,7 +79,7 @@ public:
     static std::vector<std::vector<COORDINATE>> dumpTilemapList(quint64 map);
 
     // 创建footholds
-    static std::vector<FootholdRect> makeFootholdList(quint64 cur_map);
+    static std::vector<FootholdRect> makeFootholdList(quint64 cur_map, MapBounding map_bounding);
 
     // 创建墙体列表
     static std::vector<Wall> makeWallList(std::vector<FootholdRect> footholds, std::unordered_set<int> &id_set);

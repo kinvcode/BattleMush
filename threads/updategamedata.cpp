@@ -242,7 +242,7 @@ void UpdateGameData::UpdateRoomMap()
     std::vector<ClimbRect> climbs = RoomMap::makeClimbList(Gplayer.p_curmapentity, Gplayer.p_collisionservice, map_bounding);
 
     // 遍历地板
-    std::vector<FootholdRect> footholds = RoomMap::makeFootholdList(Gplayer.p_curmapentity);
+    std::vector<FootholdRect> footholds = RoomMap::makeFootholdList(Gplayer.p_curmapentity, map_bounding);
 
     // 1. 将所有地板ID放入到容器 id_set里面
     std::unordered_set<int> id_set;
@@ -251,7 +251,6 @@ void UpdateGameData::UpdateRoomMap()
     }
 
     // 创建地图
-
 
     // 第一步：拿到地形数据并绘制地图
 
