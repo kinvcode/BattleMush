@@ -193,6 +193,9 @@ void KillMonster::process()
             qDebug() << "寻怪失败~";
         }
 
+        // 搜索一遍物品列表
+        findDropItem(start_index);
+
         KillMonsterEnd:
         DebugOutput::out("击杀怪物暂时没有任务执行，等待中...");
         ProcessHelper::programDelay(500);
@@ -200,4 +203,31 @@ void KillMonster::process()
     }
 
     qDebug() << "KillMonster" << m_id << "finished";
+}
+
+void KillMonster::findDropItem(int start_index)
+{
+    quint64 map_entity_count = readInt(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
+    quint64 entity_head = readLong(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::InternalArray) + BASE::InternalArray::Head;
+
+    for(int i = start_index; i < map_entity_count; i++){
+        // 节省遍历时间
+
+        quint64 cur_entity_address = entity_head + i * 8;
+        quint64 entity = readLong(cur_entity_address);
+
+        QString name = GameStruct::readEntityName(entity);
+
+        if(name != "PoolObject"){
+            continue;
+        }
+
+        float item_x = readFloat(readLong(entity + BASE::MODEntity::TransformComponent)+BASE::TransformComponent::PositionX);
+        float item_y = readFloat(readLong(entity + BASE::MODEntity::TransformComponent)+BASE::TransformComponent::PositionY);
+
+        int x = RoomMap::toMapPosX(item_x, Gplayer.curmapinfo.map_bounding.x_offset);
+        int y = RoomMap::toMapPosY(item_y, Gplayer.curmapinfo.map_bounding.y_offset,Gplayer.curmapinfo.map_bounding.height);
+
+        qDebug() << "找到物品坐标：" << x << "," << y;
+    }
 }

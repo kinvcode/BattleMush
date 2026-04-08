@@ -168,7 +168,7 @@ std::vector<ClimbRect> RoomMap::makeClimbList(quint64 cur_map, quint64 collision
     quint64 p_MultipleDynamicTreeBroadPhase = Mem::readPointer(collisionservice,
                                                                 BASE::CollisionService::simulatorByMap,
                                                                 BASE::Dictionary::InternalArray_entries,
-                                                                BASE::InternalArray::Head + 0x10,
+                                                                BASE::InternalArray::Head + 0x28, // 注意这个会变化
                                                                 BASE::CollisionSimulator::World,
                                                                 BASE::World::MultipleDynamicTreeBroadPhase);
     // DebugOutput::out("MultipleDynamicTreeBroadPhase:" + QString::number(p_MultipleDynamicTreeBroadPhase, 16).toUpper());

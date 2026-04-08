@@ -318,6 +318,37 @@ void MainWindow::on_pushButton_clicked()
 {
     VMProtectBegin("__FUNCTION__");
 
+    quint64 head = 0x1AF85A1E020;
+    // quint64 test = Mem::readLong(0x2280AF9D878);
+    // qDebug() << test;
+    for(int i = 0; i < 0xA0; i++,head+=8){
+        quint64 pointer = Mem::readLong(head);
+        if(pointer == 0) continue;
+
+        quint64 entrie = Mem::readLong(pointer + 0x10);
+        int count = Mem::readLong(pointer + 0x20);
+        qDebug() << "指针：" << QString::number(pointer,16).toUpper();
+        quint64 col_head = entrie + 0x20;
+        for(int j = 0; j < count; j++,col_head += 0x60)
+        {
+            quint64 com_p = Mem::readLong(col_head + 0x28);
+            if(com_p == 0) continue;
+            qDebug() << "com指针:" << QString::number(com_p,16).toUpper();
+            QString com_name = Mem::readAnsiString(Mem::readLong(Mem::readLong(com_p) + 0x10),100);
+            qDebug() << "com_name：" << com_name;
+            ClimbOrigin cur_climb;
+            cur_climb.left = Mem::readFloat(col_head + 0x30); // 攀爬信息
+            cur_climb.top = Mem::readFloat(col_head + 0x34); // 攀爬信息
+            cur_climb.factor1 = Mem::readFloat(col_head + 0x48); // 攀爬信息
+            cur_climb.factor2 = Mem::readFloat(col_head + 0x4C); // 攀爬信息
+
+            FloatRect float_rect;
+            Math::ComputeClimbRect(&cur_climb, float_rect);
+
+            qDebug() << "坐标：" <<  float_rect.x_left << "," << float_rect.y_bottom << " " << float_rect.x_right << "," << float_rect.y_top;
+        }
+    }
+
     VMProtectEnd();
 }
 

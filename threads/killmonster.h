@@ -26,6 +26,8 @@ private:
     int m_bindkey_skill_atk1;
     int m_bindkey_jump;
     int m_bindkey_gohome;
+
+    void findDropItem(int start_index);
 };
 
 #endif // KILLMONSTER_H
