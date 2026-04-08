@@ -91,6 +91,18 @@ typedef struct{
 typedef struct{
     QString id;
     QString name;
+    MapBounding map_bounding;
+    std::vector<ClimbRect> climbs;
+    std::vector<FootholdRect> footholds;
+    std::vector<Wall> wall_list;
+    std::vector<Line> line_list;
 }MapInfo;
+
+typedef struct{
+    quint64 entity;
+    int foothold_id;
+    int line_id;
+    cv::Point pos;
+}Monster;
 
 #endif // STRUCT_H

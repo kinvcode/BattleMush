@@ -180,6 +180,7 @@ void MainWindow::initThreads()
     // 自动加血蓝线程
     // m_threadManager->addThread(m_HealthMonitor_tid, "HealthMonitor");
     // 自动线程（寻路，攻击怪物）
+    m_threadManager->addThread(m_KillMonster_tid, "KillMonster");
 
     // m_threadManager->addThread(m_MonitorToolTest_tid, "MonitorToolTest");
     m_threadManager->startAll();

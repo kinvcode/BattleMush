@@ -43,6 +43,9 @@ public:
 
     // 保留2位小数点
     static float roundHalfAwayFromZero_bit(float value, int decimalPlaces = 2);
+
+    // 找到最小差值
+    static Monster getNearMonster(std::vector<Monster> monsters,int x);
 };
 
 class ImageTool{
@@ -69,8 +72,8 @@ public:
     static MapBounding getMapBounding(quint64 cur_map);
 
     // 转换地图坐标
-    static int toMapPosX(int x, int offset);
-    static int toMapPosY(int y, int offset,int height);
+    static int toMapPosX(float x, int offset);
+    static int toMapPosY(float y, int offset,int height);
 
     // 创建攀爬物体
     static std::vector<ClimbRect> makeClimbList(quint64 cur_map, quint64 collisionservice, MapBounding map_bounding);
@@ -93,8 +96,11 @@ public:
     // 创建寻路节点
     static void makeNodes(std::vector<Line> line_list, std::vector<Wall> wall_list, cv::Mat cur_room_map, MapBounding map_bounding);
 
+    // 获取地板所在平台
+    static int getPlatformByFoothold(int foothold_id, std::vector<Line> line_list);
 
-
+    // 获取攀爬物ID
+    static int getClimbID(cv::Point position, std::vector<ClimbRect> climb_list);
 };
 
 

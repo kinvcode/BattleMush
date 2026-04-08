@@ -31,6 +31,8 @@ private:
     const int m_HealthMonitor_tid = 2;
     // 测试工具
     const int m_MonitorToolTest_tid = 3;
+    // 击杀怪物线程
+    const int m_KillMonster_tid = 4;
 
     // 提示框
     void showNotice(const QString& message);

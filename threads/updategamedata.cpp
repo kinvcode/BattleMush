@@ -103,6 +103,10 @@ void UpdateGameData::process()
         Gplayer.p_collisionservice = Helper::findService(Gplayer.p_allServices,"CollisionService");
         DebugOutput::out("collisionservice:" + QString::number(Gplayer.p_collisionservice, 16).toUpper());
 
+        // 角色服务
+        Gplayer.p_userservice = Helper::findService(Gplayer.p_allServices, "UserService");
+        DebugOutput::out("UserService:" + QString::number(Gplayer.p_collisionservice, 16).toUpper());
+
         // 游戏重要的两个模块：地图和UI
         Gplayer.p_mapsentity = readPointer(Gplayer.p_gamecontext, BASE::GameContext::MapsEntity);
         DebugOutput::out("mapsentity:" + QString::number(Gplayer.p_mapsentity, 16).toUpper());
@@ -119,7 +123,7 @@ void UpdateGameData::process()
         // 判断当前是登录界面还是游戏中
         Gplayer.curmapinfo.id = GameStruct::readEntityID(Gplayer.p_curmapentity);
         Gplayer.curmapinfo.name = GameStruct::readEntityName(Gplayer.p_curmapentity);
-        Gplayer.last_mapentity = Gplayer.p_curmapentity;
+        // Gplayer.last_mapentity = Gplayer.p_curmapentity;
         if(Gplayer.curmapinfo.id == "e5a83e46-390a-4ecf-a069-4e786ccf22c4"){
             DebugOutput::out("处理登录...");
             HandleLogin();
@@ -140,6 +144,12 @@ void UpdateGameData::process()
                 continue;
             }
         }
+
+        // 首次更新地图
+        // UpdateRoomMap();
+
+        // 找到localPlayer
+        Gplayer.p_localplayer = readLong(Gplayer.p_userservice + BASE::UserService::localPlayer);
 
         //
         while(Gplayer.p_gamecontext){
@@ -236,6 +246,8 @@ void UpdateGameData::UpdateUserStatus(quint64 statuspanel)
 
 void UpdateGameData::UpdateRoomMap()
 {
+    QString map_id = GameStruct::readEntityID(Gplayer.p_curmapentity);
+
     MapBounding map_bounding = RoomMap::getMapBounding(Gplayer.p_curmapentity);
 
     // 遍历当前地图攀爬物体列表(有ClimbableComponent)
@@ -260,6 +272,14 @@ void UpdateGameData::UpdateRoomMap()
     // 创建平台列表
     std::vector<Line> line_list = RoomMap::makeLineList(footholds, wall_list, id_set);
 
+    Gplayer.curmapinfo.line_list = line_list;
+    Gplayer.curmapinfo.wall_list = wall_list;
+    Gplayer.curmapinfo.climbs = climbs;
+    Gplayer.curmapinfo.footholds = footholds;
+    Gplayer.curmapinfo.id = map_id;
+    Gplayer.curmapinfo.name = "";
+    Gplayer.curmapinfo.map_bounding = map_bounding;
+
     // 绘制地图框架
     cv::Mat cur_room_map = RoomMap::makeRoomMap(climbs, footholds, map_bounding);
 
@@ -272,7 +292,7 @@ void UpdateGameData::UpdateRoomMap()
      * 向左走寻路
      * 向右走寻路
     **/
-    RoomMap::makeNodes(line_list, wall_list, cur_room_map, map_bounding);
+    // RoomMap::makeNodes(line_list, wall_list, cur_room_map, map_bounding);
 
     // 最终步骤：合并数据缓存到本地（如果本地存在地图缓存直接拿缓存数据）
 

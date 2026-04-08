@@ -73,6 +73,7 @@ namespace BASE {
         static int TransformComponent = 0x158;
         static int PlayerControllerComponent = 0x170;
         static int PlayerComponent = 0x198;
+        static int RigidbodyComponent = 0x1D8;
         static int TextComponent = 0x1F8;
         static int FootholdComponent = 0x1E0;
         static int MODModel = 0x268;
@@ -106,6 +107,12 @@ namespace BASE {
     namespace TransformComponent{
         static int PositionX = 0x190;
         static int PositionY = 0x194;
+    };
+
+    namespace RigidbodyComponent{
+        static int exists = 0xA5;
+        static int currentFoothold = 0xF8;
+        static int airPos = 0x120;
     };
 
     namespace FootholdImpl{

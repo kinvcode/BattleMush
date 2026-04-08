@@ -119,8 +119,8 @@ MapBounding RoomMap::getMapBounding(quint64 cur_map)
     }
 
     // 地图宽度
-    uint map_width = map_x_right * 100 + x_offset;
-    uint map_height = map_y_top * 100 + y_offset; // 同时也是Y坐标转换的计算因子
+    uint map_width = map_x_right * 100 + x_offset + 1; // 加1是因为坐标从0开始计算的。+1才是真实长度
+    uint map_height = map_y_top * 100 + y_offset + 1; // 同时也是Y坐标转换的计算因子
 
     int x_left = toMapPosX(map_x_left,x_offset);
     int x_right = toMapPosX(map_x_right,x_offset);
@@ -140,12 +140,12 @@ MapBounding RoomMap::getMapBounding(quint64 cur_map)
     return map_bounding;
 }
 
-int RoomMap::toMapPosX(int x, int offset)
+int RoomMap::toMapPosX(float x, int offset)
 {
     return x * 100 + offset;
 }
 
-int RoomMap::toMapPosY(int y, int offset, int height)
+int RoomMap::toMapPosY(float y, int offset, int height)
 {
     return height - (y * 100 + offset);
 }
@@ -297,12 +297,13 @@ std::vector<FootholdRect> RoomMap::makeFootholdList(quint64 cur_map, MapBounding
         if(readLong(foot_head) == 0) break;
         // int group = Mem::readInt(readLong(foot_head) + BASE::Foothold::groupID);
         // qDebug() << "group:" << group;
+
         int id = readInt(readLong(foot_head) + BASE::Foothold::ID);
         float x_left = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + BASE::Foothold::StartPoint));
         float y_left = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + BASE::Foothold::StartPoint + 4));
         float x_right = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + BASE::Foothold::EndPoint));
         float y_right = Math::roundHalfAwayFromZero_bit(readFloat(readLong(foot_head) + BASE::Foothold::EndPoint + 4));
-        // qDebug() << x_left << "," << y_left << " " << x_right << "," << y_right;
+        // qDebug() << "Float数据__footid:" << id << " " << x_left << "," << y_left << " " << x_right << "," << y_right;
         // qDebug() << "------------------------";
 
         int cur_x_left = toMapPosX(x_left,map_bounding.x_offset);
@@ -310,10 +311,30 @@ std::vector<FootholdRect> RoomMap::makeFootholdList(quint64 cur_map, MapBounding
         int cur_x_right = toMapPosX(x_right,map_bounding.x_offset);
         int cur_y_right = toMapPosY(y_right,map_bounding.y_offset,map_bounding.height);
 
-        cur_x_left = clamp(cur_x_left, map_bounding.x_left, map_bounding.x_right);
-        cur_x_right = clamp(cur_x_right, map_bounding.x_left, map_bounding.x_right);
-        cur_y_left = clamp(cur_y_left, map_bounding.y_bottom, map_bounding.y_top);
-        cur_y_right = clamp(cur_y_right, map_bounding.y_bottom, map_bounding.y_top);
+        if(cur_x_left < map_bounding.x_left){
+            cur_x_left = map_bounding.x_left;
+        }
+        if(cur_x_left > map_bounding.x_right){
+            cur_x_left = map_bounding.x_right;
+        }
+        if(cur_x_right < map_bounding.x_left){
+            cur_x_right = map_bounding.x_left;
+        }
+        if(cur_x_right > map_bounding.x_right){
+            cur_x_right = map_bounding.x_right;
+        }
+        if(cur_y_left < map_bounding.y_top){
+            cur_y_left = map_bounding.y_top;
+        }
+        if(cur_y_left > map_bounding.y_bottom){
+            cur_y_left = map_bounding.y_bottom;
+        }
+        if(cur_y_right < map_bounding.y_top){
+            cur_y_right = map_bounding.y_top;
+        }
+        if(cur_y_right > map_bounding.y_bottom){
+            cur_y_right = map_bounding.y_bottom;
+        }
 
         if(cur_x_left > cur_x_right){
             uint tmp_x = cur_x_left;
@@ -332,7 +353,7 @@ std::vector<FootholdRect> RoomMap::makeFootholdList(quint64 cur_map, MapBounding
         // if(cur_x_left == 1220 && cur_x_right == 1220){
         //     continue;
         // }
-
+        // qDebug() << "Int数据__footid:" << id << " " << cur_x_left << "," << cur_y_left << " " << cur_x_right << "," << cur_y_right;
         // qDebug() << "黑色:" << cur_x_left << "," << cur_y_left << " " << cur_x_right << "," << cur_y_right;
         foothold_list.push_back({id,cur_x_left,cur_y_left,cur_x_right,cur_y_right});
     }
@@ -597,6 +618,31 @@ void RoomMap::makeNodes(std::vector<Line> line_list, std::vector<Wall> wall_list
     }
 }
 
+int RoomMap::getPlatformByFoothold(int foothold_id, std::vector<Line> line_list)
+{
+    for(auto item : line_list){
+        for(auto foot : item.line_child){
+            if(foot.foot_id == foothold_id){
+                return item.lineid;
+            }
+        }
+    }
+    return -1;
+}
+
+int RoomMap::getClimbID(cv::Point position, std::vector<ClimbRect> climb_list)
+{
+    for(auto item : climb_list){
+        if(position.x >= item.x_left &&
+            position.x <= item.x_right &&
+            position.y >= item.y_top &&
+            position.y <= item.y_bottom){
+            return item.id;
+        }
+    }
+    return -1;
+}
+
 bool Helper::parseHPString(const QString &Text, int &left, int &right) {
     QStringList parts = Text.split("/");
     if (parts.size() == 2) {
@@ -674,6 +720,22 @@ float Math::roundHalfAwayFromZero_bit(float value, int decimalPlaces)
 
     float result = negative ? -intPart : intPart;
     return result / multiplier;
+}
+
+Monster Math::getNearMonster(std::vector<Monster> monsters, int x)
+{
+    Monster monster;
+
+    int diff = 9999;
+    for(auto item : monsters){
+        int distance = abs(item.pos.x - x);
+        if( distance < diff){
+            diff = distance;
+            monster = item;
+        }
+    }
+
+    return monster;
 }
 
 

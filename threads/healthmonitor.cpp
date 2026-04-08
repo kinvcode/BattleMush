@@ -3,6 +3,11 @@
 #include "global/globalconfig.h"
 #include "global/globalplayer.h"
 #include "driver/msdriverpro.h"
+#include "utils/helper.h"
+#include "global/gameoffset.h"
+#include "driver/mem.h"
+
+using namespace Mem;
 
 HealthMonitor::HealthMonitor(int id, QObject *parent)
     : IWorker(id, parent)
@@ -56,7 +61,14 @@ void HealthMonitor::process()
 
         if (!m_running) break;
 
-        // qDebug() << "当前蓝量：" << Gplayer.MP;
+        Gplayer.p_gamecontext = readPointer(Gplayer.p_gamecontext_entries, BASE::InternalArray::Head + 0x10);
+        if(Gplayer.p_gamecontext == 0){
+            // 尚未进入游戏，
+            DebugOutput::out("等待进入游戏中...");
+            ProcessHelper::programDelay(1000);
+            QApplication::processEvents();
+            continue;
+        }
 
         // 检测血量
         int hp_rate = Gconfig.getValue("auto_add_health/hp_rate").toInt();

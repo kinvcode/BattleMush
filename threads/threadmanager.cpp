@@ -4,6 +4,7 @@
 #include "threads/healthmonitor.h"
 #include "threads/updategamedata.h"
 #include "threads/monitortooltest.h"
+#include "threads/killmonster.h"
 
 ThreadManager::ThreadManager(QObject *parent)
     : QObject(parent)
@@ -88,6 +89,8 @@ IWorker* ThreadManager::createWorker(const QString& workerType, int id)
         return new UpdateGameData(id);
     } else if(workerType == "MonitorToolTest"){
         return new MonitorToolTest(id);
+    } else if(workerType == "KillMonster"){
+        return new KillMonster(id);
     }
     return nullptr;
 }
