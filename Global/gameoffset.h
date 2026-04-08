@@ -69,6 +69,7 @@ namespace BASE {
         static int MapComponent = 0x70;
         static int TileMapComponent = 0x88;
         static int ClimbableComponent = 0xC8;
+        static int StateComponent = 0xF0;
         static int ButtonComponent = 0x140;
         static int TransformComponent = 0x158;
         static int PlayerControllerComponent = 0x170;
@@ -113,6 +114,11 @@ namespace BASE {
         static int exists = 0xA5;
         static int currentFoothold = 0xF8;
         static int airPos = 0x120;
+    };
+
+    namespace StateComponent{
+        static int attacking = 0xEC;
+        static int _CurrentStateName = 0x138;
     };
 
     namespace FootholdImpl{

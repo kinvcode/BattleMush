@@ -139,12 +139,31 @@ void MainWindow::initCompomentUI()
 
 void MainWindow::initConfig()
 {
+    // 按键绑定
+    ui->lineEdit_bindkey_general_atk->m_config_path = "bindkey/general_atk";
+    ui->lineEdit_bindkey_general_atk->m_currentKey = Gconfig.getValue("bindkey/general_atk").toInt();
+    ui->lineEdit_bindkey_general_atk->updateDisplay();
+
+    ui->lineEdit_bindkey_skill_atk1->m_config_path = "bindkey/skill_atk1";
+    ui->lineEdit_bindkey_skill_atk1->m_currentKey = Gconfig.getValue("bindkey/skill_atk1").toInt();
+    ui->lineEdit_bindkey_skill_atk1->updateDisplay();
+
+    ui->lineEdit_bindkey_jump->m_config_path = "bindkey/jump";
+    ui->lineEdit_bindkey_jump->m_currentKey = Gconfig.getValue("bindkey/jump").toInt();
+    ui->lineEdit_bindkey_jump->updateDisplay();
+
+    ui->lineEdit_bindkey_gohome->m_config_path = "bindkey/gohome";
+    ui->lineEdit_bindkey_gohome->m_currentKey = Gconfig.getValue("bindkey/gohome").toInt();
+    ui->lineEdit_bindkey_gohome->updateDisplay();
+
+    // 自动加血
     ui->checkBox_auto_add_hp->setChecked(Gconfig.getValue("auto_add_health/add_hp").toBool());
     ui->lineEdit_auto_add_hp_rate->setText(Gconfig.getValue("auto_add_health/hp_rate").toString());
     ui->lineEdit_auto_add_hp_key->m_config_path = "auto_add_health/hp_key";
     ui->lineEdit_auto_add_hp_key->m_currentKey = Gconfig.getValue("auto_add_health/hp_key").toInt();
     ui->lineEdit_auto_add_hp_key->updateDisplay();
 
+    // 自动加蓝
     ui->checkBox_auto_add_mp->setChecked(Gconfig.getValue("auto_add_health/add_mp").toBool());
     ui->lineEdit_auto_add_mp_rate->setText(Gconfig.getValue("auto_add_health/mp_rate").toString());
     ui->lineEdit_auto_add_mp_key->m_config_path = "auto_add_health/mp_key";
@@ -178,7 +197,7 @@ void MainWindow::initThreads()
     // 数据更新线程
     m_threadManager->addThread(m_UpdateGameData_tid, "UpdateGameData");
     // 自动加血蓝线程
-    // m_threadManager->addThread(m_HealthMonitor_tid, "HealthMonitor");
+    m_threadManager->addThread(m_HealthMonitor_tid, "HealthMonitor");
     // 自动线程（寻路，攻击怪物）
     m_threadManager->addThread(m_KillMonster_tid, "KillMonster");
 

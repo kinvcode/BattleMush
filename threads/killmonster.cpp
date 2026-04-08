@@ -6,6 +6,9 @@
 #include "global/gameoffset.h"
 #include "driver/mem.h"
 #include "utils/gamestruct.h"
+#include "pathfinding/walkbase.h"
+#include "driver/mskeycode.h"
+#include "global/globalconfig.h"
 
 using namespace Mem;
 
@@ -27,7 +30,7 @@ void KillMonster::start()
 {
     qDebug() << "KillMonster" << m_id << "started in thread:" << QThread::currentThread();
     m_running = true;
-    m_paused = false;
+    m_paused = true;
     m_counter = 0;
     process();
 }
@@ -48,11 +51,20 @@ void KillMonster::pause()
 void KillMonster::resume()
 {
     qDebug() << "KillMonster" << m_id << "resumed";
+    m_bindkey_general_atk = Gconfig.getValue("bindkey/general_atk").toInt();
+    m_bindkey_skill_atk1  = Gconfig.getValue("bindkey/skill_atk1").toInt();
+    m_bindkey_jump        = Gconfig.getValue("bindkey/jump").toInt();
+    m_bindkey_gohome      = Gconfig.getValue("bindkey/gohome").toInt();
     m_paused = false;
 }
 
 void KillMonster::process()
 {
+    m_bindkey_general_atk = Gconfig.getValue("bindkey/general_atk").toInt();
+    m_bindkey_skill_atk1  = Gconfig.getValue("bindkey/skill_atk1").toInt();
+    m_bindkey_jump        = Gconfig.getValue("bindkey/jump").toInt();
+    m_bindkey_gohome      = Gconfig.getValue("bindkey/gohome").toInt();
+
     int start_index = 0;
     while (m_running) {
         // 处理暂停状态
@@ -127,7 +139,7 @@ void KillMonster::process()
         for(auto item : monster_list){
             // 读取怪物坐标
             if(item.line_id == user_in_lineid){
-                quint64 pos_p = readLong(readLong(item.entity) + BASE::MODEntity::RigidbodyComponent);
+                quint64 pos_p = readLong(item.entity + BASE::MODEntity::RigidbodyComponent);
                 float float_x = readFloat(pos_p + BASE::RigidbodyComponent::airPos);
                 float float_y = readFloat(pos_p + BASE::RigidbodyComponent::airPos + 4);
                 int monster_x = RoomMap::toMapPosX(float_x, Gplayer.curmapinfo.map_bounding.x_offset);
@@ -146,14 +158,44 @@ void KillMonster::process()
 
         // 找到离自己最近的怪物
         // 获取人物坐标
-        float user_x = readFloat(readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent) + BASE::TransformComponent::PositionX);
+        int user_x = RoomMap::toMapPosX(readFloat(readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent) + BASE::TransformComponent::PositionX),
+                                          Gplayer.curmapinfo.map_bounding.x_offset);
+        qDebug() << "人物坐标：" << user_x;
         Monster target_monster = Math::getNearMonster(handle_monsters, user_x);
         qDebug() << "目标怪物：" << target_monster.line_id << "->" << QString::number(target_monster.entity,16).toUpper() << ":" << target_monster.pos.x << "," << target_monster.pos.y;
 
         qDebug() << "开始寻路";
+        WalkBase walk_to_monster(target_monster.pos.x);
+        if(walk_to_monster.run()){
+            qDebug() << "已到达怪物位置";
+            bool allow_attack = readByte(readLong(Gplayer.p_localplayer + BASE::MODEntity::StateComponent) + BASE::StateComponent::attacking);
+            if(!allow_attack){
+                qDebug() << "处于攻击动作中,不允许攻击";
+                goto KillMonsterEnd;
+            }
 
+            // 再次判断怪物是否存在
+            bool exists = readByte(readLong(target_monster.entity + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::exists);
+            if(!exists){
+                qDebug() << "怪物已消失~,取消攻击";
+                goto KillMonsterEnd;
+            }
+
+            QString status = readString(readLong(readLong(target_monster.entity + BASE::MODEntity::StateComponent) + BASE::StateComponent::_CurrentStateName) + BASE::String::text, 10);
+            // qDebug() << "怪物状态：" << status;
+            if(status == "DEAD"){
+                qDebug() << "怪物已死亡~,取消攻击";
+                goto KillMonsterEnd;
+            }
+
+            MSDriverPRO::keyboardClick(m_bindkey_general_atk,1);
+        }else{
+            qDebug() << "寻怪失败~";
+        }
+
+        KillMonsterEnd:
         DebugOutput::out("击杀怪物暂时没有任务执行，等待中...");
-        ProcessHelper::programDelay(3000);
+        ProcessHelper::programDelay(500);
         QApplication::processEvents();
     }
 

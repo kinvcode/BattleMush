@@ -24,7 +24,7 @@ void MonitorToolTest::start()
 {
     qDebug() << "MonitorToolTest" << m_id << "started in thread:" << QThread::currentThread();
     m_running = true;
-    m_paused = false;
+    m_paused = true;
     m_counter = 0;
     process();
 }

@@ -22,6 +22,9 @@ private:
     bool m_running;
     bool m_paused;
     int m_counter;
+
+    int m_hp_key_code;
+    int m_mp_key_code;
 };
 
 #endif // HEALTHMONITOR_H

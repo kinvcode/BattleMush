@@ -21,6 +21,11 @@ private:
     bool m_running;
     bool m_paused;
     int m_counter;
+
+    int m_bindkey_general_atk;
+    int m_bindkey_skill_atk1;
+    int m_bindkey_jump;
+    int m_bindkey_gohome;
 };
 
 #endif // KILLMONSTER_H

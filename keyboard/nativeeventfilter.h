@@ -16,7 +16,7 @@ class NativeEventFilter: public QObject,public QAbstractNativeEventFilter
 private:
     MainWindow* main_win;
     // 脚本是否暂停
-    bool m_is_stop = false;
+    bool m_is_stop = true;
 public:
     explicit NativeEventFilter(MainWindow* window);
     bool nativeEventFilter(const QByteArray& eventType, void* message, long long* result);

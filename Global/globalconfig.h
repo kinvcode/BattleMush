@@ -19,6 +19,13 @@ public:
         {"mp_key", MSKeyboard_2},
         }
     },
+    {"bindkey",QJsonObject{
+        {"general_atk",MSKeyboard_x},
+        {"skill_atk1",MSKeyboard_LeftControl},
+        {"jump",MSKeyboard_c},
+        {"gohome",MSKeyboard_LeftControl}
+        }
+    },
     {"model","uplevel"}
 };
 

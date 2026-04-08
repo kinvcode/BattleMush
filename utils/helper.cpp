@@ -725,13 +725,16 @@ float Math::roundHalfAwayFromZero_bit(float value, int decimalPlaces)
 Monster Math::getNearMonster(std::vector<Monster> monsters, int x)
 {
     Monster monster;
-
+    // qDebug() << "对比人物坐标：" << x;
     int diff = 9999;
     for(auto item : monsters){
+        // qDebug() << "当前怪物坐标:" << item.pos.x;
         int distance = abs(item.pos.x - x);
+        // qDebug() << "距离怪物:" << distance;
         if( distance < diff){
             diff = distance;
             monster = item;
+            // qDebug() << "当前选择怪物：" << QString::number(monster.entity,16).toUpper();
         }
     }
 

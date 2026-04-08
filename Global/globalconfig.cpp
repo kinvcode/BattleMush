@@ -33,6 +33,13 @@ void GlobalConfig::loadFromJson()
     healthConfig["hp_key"] = config->getValue("auto_add_health/hp_key", healthConfig["hp_key"].toVariant()).toInt();
     healthConfig["mp_key"] = config->getValue("auto_add_health/mp_key", healthConfig["mp_key"].toVariant()).toInt();
     data["auto_add_health"] = healthConfig;
+
+    QJsonObject bindkeyConfig = data["bindkey"].toObject();
+    bindkeyConfig["general_atk"] = config->getValue("bindkey/general_atk", bindkeyConfig["general_atk"].toVariant()).toInt();
+    bindkeyConfig["skill_atk1"] = config->getValue("bindkey/skill_atk1", bindkeyConfig["skill_atk1"].toVariant()).toInt();
+    bindkeyConfig["jump"] = config->getValue("bindkey/jump", bindkeyConfig["jump"].toVariant()).toInt();
+    bindkeyConfig["gohome"] = config->getValue("bindkey/gohome", bindkeyConfig["gohome"].toVariant()).toInt();
+    data["bindkey"] = bindkeyConfig;
 }
 
 QVariant GlobalConfig::getValue(const QString &keyPath, const QVariant& defaultValue) const
