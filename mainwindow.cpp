@@ -318,37 +318,13 @@ void MainWindow::on_pushButton_clicked()
 {
     VMProtectBegin("__FUNCTION__");
 
-    quint64 head = 0x1AF85A1E020;
-    // quint64 test = Mem::readLong(0x2280AF9D878);
-    // qDebug() << test;
-    for(int i = 0; i < 0xA0; i++,head+=8){
-        quint64 pointer = Mem::readLong(head);
-        if(pointer == 0) continue;
-
-        quint64 entrie = Mem::readLong(pointer + 0x10);
-        int count = Mem::readLong(pointer + 0x20);
-        qDebug() << "指针：" << QString::number(pointer,16).toUpper();
-        quint64 col_head = entrie + 0x20;
-        for(int j = 0; j < count; j++,col_head += 0x60)
-        {
-            quint64 com_p = Mem::readLong(col_head + 0x28);
-            if(com_p == 0) continue;
-            qDebug() << "com指针:" << QString::number(com_p,16).toUpper();
-            QString com_name = Mem::readAnsiString(Mem::readLong(Mem::readLong(com_p) + 0x10),100);
-            qDebug() << "com_name：" << com_name;
-            ClimbOrigin cur_climb;
-            cur_climb.left = Mem::readFloat(col_head + 0x30); // 攀爬信息
-            cur_climb.top = Mem::readFloat(col_head + 0x34); // 攀爬信息
-            cur_climb.factor1 = Mem::readFloat(col_head + 0x48); // 攀爬信息
-            cur_climb.factor2 = Mem::readFloat(col_head + 0x4C); // 攀爬信息
-
-            FloatRect float_rect;
-            Math::ComputeClimbRect(&cur_climb, float_rect);
-
-            qDebug() << "坐标：" <<  float_rect.x_left << "," << float_rect.y_bottom << " " << float_rect.x_right << "," << float_rect.y_top;
-        }
-    }
-
+    cv::Mat image = cv::imread("D:\\data\\maps\\03.png");
+    cv::Point pos = {273,1811};
+    pos = {273,1810};
+    cv::Point start = {244,1830};
+    cv::Point end = {424,1710};
+    bool res = ImageTool::isPointOnLine(image, pos, start, end);
+    qDebug() << res;
     VMProtectEnd();
 }
 
@@ -377,8 +353,7 @@ void MainWindow::on_lineEdit_auto_add_hp_rate_editingFinished()
     int value = text.toInt(&is_number);
 
     if (is_number && value >= 1 && value <= 100) {
-        // 校验通过
-        console("自动加血比例已保存");
+        // 校验通过        console("自动加血比例已保存");
         Gconfig.setValue("auto_add_health/hp_rate", value);
     } else {
         showNotice("无效数值，请输入1-100之间的数字");
@@ -455,7 +430,6 @@ void MainWindow::on_pushButton_3_clicked()
         return;
     }
 
-
     for(auto item : Gplayer.move_pos_list){
         // quint64 x = abs(item.first)
         uint x_offset = 777;
@@ -467,6 +441,5 @@ void MainWindow::on_pushButton_3_clicked()
 
         qDebug() << item.first << "," << item.second << " " << cur_x_left << "," << cur_y_left;
     }
-
 }
 

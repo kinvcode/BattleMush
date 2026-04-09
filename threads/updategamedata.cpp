@@ -187,11 +187,6 @@ void UpdateGameData::process()
             // 更新用户信息
             UpdateUserStatus(statuspanel);
 
-            // 更新怪物列表
-            UpdateMonsters();
-
-            // 更新掉落物品列表
-
             ProcessHelper::programDelay(500); // 0.5秒更新一次数据
             QApplication::processEvents();
         }
@@ -262,8 +257,6 @@ void UpdateGameData::UpdateRoomMap()
         id_set.insert(item.id);
     }
 
-    // 创建地图
-
     // 第一步：拿到地形数据并绘制地图
 
     // 创建墙体列表
@@ -272,6 +265,9 @@ void UpdateGameData::UpdateRoomMap()
     // 创建平台列表
     std::vector<Line> line_list = RoomMap::makeLineList(footholds, wall_list, id_set);
 
+    // 绘制地图框架
+    cv::Mat cur_room_map = RoomMap::makeRoomMap(climbs, footholds, map_bounding);
+
     Gplayer.curmapinfo.line_list = line_list;
     Gplayer.curmapinfo.wall_list = wall_list;
     Gplayer.curmapinfo.climbs = climbs;
@@ -279,9 +275,8 @@ void UpdateGameData::UpdateRoomMap()
     Gplayer.curmapinfo.id = map_id;
     Gplayer.curmapinfo.name = "";
     Gplayer.curmapinfo.map_bounding = map_bounding;
+    Gplayer.curmapinfo.map_mat = cur_room_map;
 
-    // 绘制地图框架
-    cv::Mat cur_room_map = RoomMap::makeRoomMap(climbs, footholds, map_bounding);
 
     // QString currentDir = QCoreApplication::applicationDirPath() + "/room_map.png";
     // qDebug() << "图片保存路径：" << currentDir;
@@ -292,7 +287,7 @@ void UpdateGameData::UpdateRoomMap()
      * 向左走寻路
      * 向右走寻路
     **/
-    // RoomMap::makeNodes(line_list, wall_list, cur_room_map, map_bounding);
+    RoomMap::makeNodes(line_list, wall_list, climbs, cur_room_map, map_bounding);
 
     // 最终步骤：合并数据缓存到本地（如果本地存在地图缓存直接拿缓存数据）
 

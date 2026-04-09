@@ -54,13 +54,25 @@ public:
 
     static bool checkLineHasBlackPixel(const cv::Mat &img, const cv::Point &p1, const cv::Point &p2, cv::Point &p3);
 
+    static bool checkLineHasColorPixel(const cv::Mat &img, const cv::Point &p1, const cv::Point &p2, cv::Vec3b color, cv::Point &target);
+
     static cv::Point2i worldToImage(int width, int height, float x, float y);
 
-    static cv::Point dropTrajectory(bool is_right, cv::Mat image, float x, float y);
+    static cv::Point dropTrajectory(bool is_right, const cv::Mat &image, float x, float y);
+
+    static std::pair<cv::Point,cv::Point> jumpTrajectory(bool is_right,
+                            const cv::Mat &image,
+                            const std::vector<ClimbRect> &climb_list,
+                            const std::vector<Wall> &wall_list,
+                            float x, float y);
 
     static bool isPointInWall(const cv::Point& p, const Wall& wall, int tolerance = 0);
 
     static bool isPointOnSegment(const cv::Point& p, const cv::Point& a, const cv::Point& b, int tolerance = 0);
+
+    static bool isPointOnFoot(const cv::Point& pos);
+
+    static bool isPointOnLine(const cv::Mat &map, const cv::Point &pos, const cv::Point &start, const cv::Point &end);
 };
 
 class RoomMap{
@@ -94,13 +106,60 @@ public:
     static cv::Mat makeRoomMap(std::vector<ClimbRect> climb_list, std::vector<FootholdRect> foothold_list, MapBounding map_bounding);
 
     // 创建寻路节点
-    static void makeNodes(std::vector<Line> line_list, std::vector<Wall> wall_list, cv::Mat cur_room_map, MapBounding map_bounding);
+    static void makeNodes(
+        const std::vector<Line> &line_list,
+        const std::vector<Wall> &wall_list,
+        const std::vector<ClimbRect> climb_list,
+        const cv::Mat &cur_room_map,
+        const MapBounding &map_bounding
+    );
 
     // 获取地板所在平台
     static int getPlatformByFoothold(int foothold_id, std::vector<Line> line_list);
 
     // 获取攀爬物ID
     static int getClimbID(cv::Point position, std::vector<ClimbRect> climb_list);
+
+    // 计算物品所在平台坐标
+    static cv::Point getItemLinePos(cv::Mat map, cv::Point pos);
+
+    // 计算坐标所在平台
+    static int getPosLine(cv::Point pos, const std::vector<Line> &line_list, const cv::Mat &room_map);
+
+    // 计算坐标所在攀爬
+    static int getPosClimb(cv::Point pos, const std::vector<ClimbRect> &climb_list, const cv::Mat &room_map);
+};
+
+class PathAlgo{
+public:
+    static void walkToLeft(
+        const std::vector<Line> &line_list,
+        const std::vector<Wall> &wall_list,
+        const cv::Mat &cur_room_map,
+        std::vector<PathNode> &path_nodes);
+
+    static void walkToRight(
+        const std::vector<Line> &line_list,
+        const std::vector<Wall> &wall_list,
+        const cv::Mat &cur_room_map,
+        const MapBounding &map_bounding,
+        std::vector<PathNode> &path_nodes);
+
+    static void jumpLeft(
+        const std::vector<Line> &line_list,
+        const std::vector<Wall> &wall_list,
+        const std::vector<ClimbRect> &climb_list,
+        const cv::Mat &room_map
+    );
+
+    static void jumpRight();
+
+    static void jump_up();
+    static void jump_down();
+    static void up();
+    static void down();
+    static void teleport();
+    static void skill();
 };
 
 

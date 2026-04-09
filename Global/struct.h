@@ -96,6 +96,7 @@ typedef struct{
     std::vector<FootholdRect> footholds;
     std::vector<Wall> wall_list;
     std::vector<Line> line_list;
+    cv::Mat map_mat;
 }MapInfo;
 
 typedef struct{
@@ -104,5 +105,55 @@ typedef struct{
     int line_id;
     cv::Point pos;
 }Monster;
+
+typedef struct{
+    quint64 entity;
+    int line_id;
+    cv::Point pos;
+}Item;
+
+
+enum PATH_TYPE{
+    walk_left = 0,
+    walk_right = 1,
+    jump_left = 3,
+    jump_right = 4,
+    jump_up = 5,
+    jump_down = 6,
+    up = 7,
+    down = 8,
+    teleport = 9,
+    skill = 10
+};
+
+typedef struct{
+    int line_id;
+    PATH_TYPE path_type;
+}NodeLink;
+
+typedef struct{
+    int line_id;
+    std::vector<NodeLink> targets;
+}PathNode;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif // STRUCT_H

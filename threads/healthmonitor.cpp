@@ -66,8 +66,9 @@ void HealthMonitor::process()
 
         if (!m_running) break;
 
-        Gplayer.p_gamecontext = readPointer(Gplayer.p_gamecontext_entries, BASE::InternalArray::Head + 0x10);
-        if(Gplayer.p_gamecontext == 0){
+        // gamecontext统一由数据更新线程维护
+        quint64 gamecontext = readPointer(Gplayer.p_gamecontext_entries, BASE::InternalArray::Head + 0x10);
+        if(gamecontext == 0){
             // 尚未进入游戏，
             DebugOutput::out("等待进入游戏中...");
             ProcessHelper::programDelay(1000);

@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include "global/gameoffset.h"
 #include "global/globalplayer.h"
+#include <QElapsedTimer>
 
 using namespace Mem;
 
@@ -499,123 +500,53 @@ std::vector<Line> RoomMap::makeLineList(std::vector<FootholdRect> footholds, std
 cv::Mat RoomMap::makeRoomMap(std::vector<ClimbRect> climb_list, std::vector<FootholdRect> foothold_list, MapBounding map_bounding)
 {
     // 创建地图文件
-    cv::Mat cur_room_map(map_bounding.height, map_bounding.width, CV_8UC3, cv::Scalar(255, 255, 255));
+    cv::Mat cur_room_map(map_bounding.height, map_bounding.width, CV_8UC3, cv::Vec3b(0xFF, 0xFF, 0xFF));
 
     // 填充攀爬
     for(auto item : climb_list){
         int x_width = item.x_right - item.x_left;
         int y_height = item.y_bottom - item.y_top;
         cv::Rect rect(item.x_left, item.y_top, x_width, y_height);
-        cv::rectangle(cur_room_map, rect, cv::Scalar(0, 0xFF, 0), -1); // 用黄色填充矩形-攀爬
+        cv::rectangle(cur_room_map, rect, cv::Vec3b(0, 0xFF, 0), -1); // 用黄色填充矩形-攀爬
     }
 
     // 绘制地板
     for(auto item : foothold_list){
         if(item.x_left == item.x_right){
             // 用红色绘制墙壁
-            cv::line(cur_room_map,cv::Point(item.x_left,item.y_left),cv::Point(item.x_right,item.y_right),cv::Scalar(0xFF,0,0));
+            cv::line(cur_room_map,cv::Point(item.x_left,item.y_left),cv::Point(item.x_right,item.y_right),cv::Vec3b(0xFF,0,0));
         }else{
             // 用黑色绘制地板
-            cv::line(cur_room_map,cv::Point(item.x_left,item.y_left),cv::Point(item.x_right,item.y_right),cv::Scalar(0,0,0));
+            cv::line(cur_room_map,cv::Point(item.x_left,item.y_left),cv::Point(item.x_right,item.y_right),cv::Vec3b(0,0,0));
         }
-
     }
 
     return cur_room_map;
 }
 
-void RoomMap::makeNodes(std::vector<Line> line_list, std::vector<Wall> wall_list, cv::Mat cur_room_map, MapBounding map_bounding)
+void RoomMap::makeNodes(
+    const std::vector<Line> &line_list,
+    const std::vector<Wall> &wall_list,
+    const std::vector<ClimbRect> climb_list,
+    const cv::Mat &cur_room_map,
+    const MapBounding &map_bounding
+)
 {
-    // 遍历线路
-    qDebug() << "向左走寻路";
-    for(auto item : line_list){
-        qDebug() << "搜索线路：" << item.lineid;
+    // 算法开始时间
+    QElapsedTimer begin_time;
+    begin_time.start();
 
-        // 判断左边是否有墙
-        if(item.hasLeftWall){
-            qDebug() << "左边有墙，退出寻路";
-            continue;
-        }
+    std::vector<PathNode> path_nodes;
+    path_nodes.resize(line_list.size());
 
-        if(item.start.x == 0){
-            qDebug() << "左边是边界，退出寻路";
-            continue;
-        }
+    PathAlgo::walkToLeft(line_list, wall_list, cur_room_map, path_nodes);
 
+    PathAlgo::walkToRight(line_list, wall_list, cur_room_map, map_bounding, path_nodes);
 
-        cv::Point to_left_pos = ImageTool::dropTrajectory(false,cur_room_map,item.start.x,item.start.y);
-        if(to_left_pos.x != -1){
-            qDebug() << "经过位置：" << to_left_pos.x << "," << to_left_pos.y;
-        }
+    PathAlgo::jumpLeft(line_list, wall_list, climb_list, cur_room_map);
 
-        for(auto wall_item : wall_list){
-            if(ImageTool::isPointInWall(to_left_pos,wall_item)){
-                qDebug() << "该点位于墙体中，不可用";
-            }
-        }
-
-        bool searched_line_id = false;
-        for(auto it : line_list){
-            if(searched_line_id){
-                break;
-            }
-            for (const auto& child : it.line_child)
-            {
-                if (ImageTool::isPointOnSegment(to_left_pos, child.start, child.end))
-                {
-                    // return;
-                    qDebug() << "该点位于线路ID：" << it.lineid;
-                    searched_line_id = true;
-                    break;
-
-                }
-            }
-        }
-    }
-
-    qDebug() << "向右走寻路";
-    for(auto item : line_list){
-        qDebug() << "搜索线路：" << item.lineid;
-
-        // 判断右边是否有墙
-        if(item.hasRightWall){
-            qDebug() << "右边有墙，退出寻路";
-            continue;
-        }
-
-        if(item.end.x == map_bounding.width){
-            qDebug() << "右边是边界，退出寻路";
-            continue;
-        }
-
-        cv::Point to_right_pos = ImageTool::dropTrajectory(true,cur_room_map,item.end.x,item.end.y);
-        if(to_right_pos.x != -1){
-            qDebug() << "经过位置：" << to_right_pos.x << "," << to_right_pos.y;
-        }
-
-        for(auto item : wall_list){
-            if(ImageTool::isPointInWall(to_right_pos,item)){
-                qDebug() << "该点位于墙体中，不可用";
-            }
-        }
-
-        bool searched_line_id = false;
-        for(auto it : line_list){
-            if(searched_line_id){
-                break;
-            }
-            for (const auto& child : it.line_child)
-            {
-                if (ImageTool::isPointOnSegment(to_right_pos, child.start, child.end))
-                {
-                    // return;
-                    qDebug() << "该点位于线路ID：" << it.lineid;
-                    searched_line_id = true;
-                    break;
-                }
-            }
-        }
-    }
+    quint64 total_time = begin_time.elapsed();
+    qDebug() << "寻路算法用时:" << total_time;
 }
 
 int RoomMap::getPlatformByFoothold(int foothold_id, std::vector<Line> line_list)
@@ -771,9 +702,23 @@ bool ImageTool::checkLineHasBlackPixel(const cv::Mat &img, const cv::Point &p1, 
             p3 = it.pos();
             return true;
         }
-
     }
     return false; // 没有黑色像素
+}
+
+bool ImageTool::checkLineHasColorPixel(const cv::Mat &img, const cv::Point &p1, const cv::Point &p2, cv::Vec3b color, cv::Point &target)
+{
+    cv::LineIterator it(img, p1, p2, 8); // 8邻域
+    for(int i = 0; i < it.count; i++, ++it)
+    {
+        cv::Vec3b cur_color = img.at<cv::Vec3b>(it.pos());
+        if(cur_color == color)
+        {
+            target = it.pos();
+            return true;
+        }
+    }
+    return false;
 }
 
 cv::Point2i ImageTool::worldToImage(int width, int height, float x, float y)
@@ -787,7 +732,7 @@ cv::Point2i ImageTool::worldToImage(int width, int height, float x, float y)
     return cv::Point2i(col, row);
 }
 
-cv::Point ImageTool::dropTrajectory(bool is_right, cv::Mat image, float x, float y)
+cv::Point ImageTool::dropTrajectory(bool is_right, const cv::Mat &image, float x, float y)
 {
     cv::Point start_pos = {static_cast<int>(std::round(x)),static_cast<int>(std::round(y))};
     cv::Point black_pos = {-1,-1};
@@ -825,15 +770,88 @@ cv::Point ImageTool::dropTrajectory(bool is_right, cv::Mat image, float x, float
     {
         if(checkLineHasBlackPixel(image, drawPoints[i-1], drawPoints[i], black_pos))
         {
-            if(black_pos == start_pos){
+            if(black_pos == start_pos || black_pos.x == -1){
                 continue;
             }
             return black_pos;
-            // cout << "直线 " << i-1 << "->" << i << " 遇到黑色像素！" << endl;
         }
     }
 
     return black_pos;
+}
+
+std::pair<cv::Point,cv::Point> ImageTool::jumpTrajectory(
+    bool is_right,
+    const cv::Mat &image,
+    const std::vector<ClimbRect> &climb_list,
+    const std::vector<Wall> &wall_list,
+    float x,
+    float y)
+{
+    // Mat img(ROWS, COLS, CV_8UC3, Scalar(0,0,0));
+    cv::Point start_pos = {static_cast<int>(std::round(x)),static_cast<int>(std::round(y))};
+    // start_pos.y += 2; // 给个高度试试
+
+    cv::Point target_pos = {-1,-1};
+    float vx; // 水平移动快 → 落点越远
+    if(is_right){
+        vx = 3.1f;
+    }else{
+        vx = -3.1f;
+    }
+
+    // ==== 参数（通过数据拟合） ====
+    float g  = 0.8f;  //0.5        // 越大 → 下落快 → 空中停留时间短 → 跳得更近
+    float vy = -10.9f; //-15.0      // 越大 → 跳得更高，空中停留时间越长 → 跳得更远
+
+    std::vector<cv::Point> drawPoints;
+    cv::Point last(-1,-1);
+
+    std::pair<cv::Point,cv::Point> result = {target_pos, target_pos};
+
+    cv::Vec3b wall_color(0xFF, 0, 0);
+    cv::Vec3b climb_color(0, 0xFF, 0);
+    cv::Vec3b line_color(0, 0, 0);
+
+    while(y <= image.rows)
+    {
+        cv::Point p = worldToImage(image.cols, image.rows, x, y);
+        if(p != last){
+            drawPoints.push_back(p);
+            last = p;
+        }
+
+        x += vx;
+        y += vy;
+        vy += g;
+
+        if(x >= image.cols) break;
+    }
+
+    for (size_t i = 1; i < drawPoints.size(); i++)
+    {
+        // 检测到墙壁
+        if(checkLineHasColorPixel(image, drawPoints[i-1], drawPoints[i], wall_color,target_pos))
+        {
+            target_pos = {-1,-1};
+            break;
+        }
+
+        // 检测攀爬物
+        if(checkLineHasColorPixel(image, drawPoints[i-1], drawPoints[i], climb_color,target_pos))
+        {
+            result.first = target_pos;
+            target_pos = {-1,-1};
+        }
+        // 检测到地面（可以跳跃到上层）
+        if(checkLineHasColorPixel(image, drawPoints[i-1], drawPoints[i], line_color,target_pos) && i != 1)
+        {
+            result.second = target_pos;
+            break;
+        }
+    }
+
+    return result;
 }
 
 bool ImageTool::isPointInWall(const cv::Point &p, const Wall &wall, int tolerance)
@@ -900,4 +918,278 @@ bool ImageTool::isPointOnSegment(const cv::Point &p, const cv::Point &a, const c
     if (dot > lenSq) return false;
 
     return true;
+}
+
+bool ImageTool::isPointOnFoot(const cv::Point &pos)
+{
+
+    return false;
+}
+
+bool ImageTool::isPointOnLine(const cv::Mat &map, const cv::Point &pos, const cv::Point &start, const cv::Point &end)
+{
+    cv::LineIterator it(map, start, end, 8);  // 8连通线段
+
+    for (int i = 0; i < it.count; i++, ++it) {
+        if (it.pos() == pos) {
+            return true;
+        }
+    }
+    return false;
+}
+
+cv::Point RoomMap::getItemLinePos(cv::Mat map, cv::Point pos)
+{
+    if (map.empty() || map.channels() != 3) {
+        return cv::Point(-1, -1);
+    }
+
+    int start_cols = std::max(0, pos.x - 20);
+    int end_cols = std::min(map.cols, pos.x + 20);
+    int start_rows = std::max(0, pos.y);
+    int end_rows = std::min(map.rows, pos.y + 20);
+
+    if (start_rows >= end_rows || start_cols >= end_cols) {
+        return cv::Point(-1, -1);
+    }
+
+    cv::Point target_pos = {-1,-1};
+    if (map.isContinuous()) {
+        for (int i = start_rows; i < end_rows; i++) {
+            cv::Vec3b* rowPtr = map.ptr<cv::Vec3b>(i);
+            for (int j = start_cols; j < end_cols; j++) {
+                if (rowPtr[j][0] == 0 && rowPtr[j][1] == 0 && rowPtr[j][2] == 0) {
+                    return cv::Point(j, i);
+                }
+            }
+        }
+    }
+
+    // 找到
+
+    return target_pos;
+}
+
+int RoomMap::getPosLine(cv::Point pos, const std::vector<Line> &line_list, const cv::Mat &room_map)
+{
+    // 遍历平台
+    for(auto line_item : line_list){
+        // 缩小X轴范围
+        if(line_item.start.x > pos.x || line_item.end.x < pos.x){
+            continue;
+        }
+
+        for(auto foot : line_item.line_child){
+            // 缩小X轴范围
+            if(foot.start.x > pos.x || foot.end.x < pos.x){
+                continue;
+            }
+
+            if(foot.start.x == foot.end.x){
+                continue;
+            }
+
+            // 处理直线
+            if(foot.start.y == foot.end.y && foot.start.y == pos.y){
+                if(pos.x >= foot.start.x && pos.x <= foot.end.x){
+                    return line_item.lineid;
+                }
+            }
+
+            // 处理斜线
+            if(foot.start.y != foot.end.y){
+                // 上坡
+                bool exists;
+                if(foot.start.y > foot.end.y){
+                    exists = ImageTool::isPointOnLine(room_map, pos, foot.start, foot.end);
+                }
+                // 下坡
+                if(foot.start.y < foot.end.y){
+                    exists = ImageTool::isPointOnLine(room_map, pos, foot.start, foot.end);
+                }
+                if(exists){
+                    return line_item.lineid;
+                }
+            }
+        }
+    }
+
+    return -1;
+}
+
+int RoomMap::getPosClimb(cv::Point pos, const std::vector<ClimbRect> &climb_list, const cv::Mat &room_map)
+{
+    // 遍历平台
+    for(auto climb_item : climb_list){
+        if(pos.x >= climb_item.x_left && pos.x <= climb_item.x_right &&
+            pos.y >= climb_item.y_top && pos.y <= climb_item.y_bottom){
+            return climb_item.id;
+        }
+    }
+
+    return -1;
+}
+
+void PathAlgo::walkToLeft(
+    const std::vector<Line> &line_list,
+    const std::vector<Wall> &wall_list,
+    const cv::Mat &cur_room_map,
+    std::vector<PathNode> &path_nodes
+)
+{
+    // 遍历线路
+    qDebug() << "----------向左走寻路----------";
+    for(auto item : line_list){
+        qDebug() << "搜索线路：" << item.lineid;
+
+        // 判断左边是否有墙
+        if(item.hasLeftWall){
+            qDebug() << "左边有墙，退出寻路";
+            continue;
+        }
+
+        if(item.start.x == 0){
+            qDebug() << "左边是边界，退出寻路";
+            continue;
+        }
+
+        cv::Point to_left_pos = ImageTool::dropTrajectory(false,cur_room_map,item.start.x,item.start.y);
+        if(to_left_pos.x != -1){
+            qDebug() << "经过位置：" << to_left_pos.x << "," << to_left_pos.y;
+        }
+
+        // 这个应该没必要
+        for(auto wall_item : wall_list){
+            if(ImageTool::isPointInWall(to_left_pos,wall_item)){
+                qDebug() << "该点位于墙体中，不可用";
+            }
+        }
+
+        int line_id = RoomMap::getPosLine(to_left_pos, line_list, cur_room_map);
+        if(line_id == -1){
+            // 未找到线路
+            continue;
+        }
+
+        // 找到线路之后，存放节点信息
+        qDebug() << "连接到目标路线:" << line_id;
+        NodeLink link = {line_id, PATH_TYPE::walk_left};
+        path_nodes.at(item.lineid).targets.push_back(link);
+    }
+}
+
+void PathAlgo::walkToRight(
+    const std::vector<Line> &line_list,
+    const std::vector<Wall> &wall_list,
+    const cv::Mat &cur_room_map,
+    const MapBounding &map_bounding,
+    std::vector<PathNode> &path_nodes
+    )
+{
+    qDebug() << "----------向右走寻路----------";
+    for(auto item : line_list){
+        qDebug() << "搜索线路：" << item.lineid;
+
+        // 判断右边是否有墙
+        if(item.hasRightWall){
+            qDebug() << "右边有墙，退出寻路";
+            continue;
+        }
+
+        if(item.end.x == map_bounding.width){
+            qDebug() << "右边是边界，退出寻路";
+            continue;
+        }
+
+        cv::Point to_right_pos = ImageTool::dropTrajectory(true,cur_room_map,item.end.x,item.end.y);
+        if(to_right_pos.x != -1){
+            qDebug() << "经过位置：" << to_right_pos.x << "," << to_right_pos.y;
+        }
+
+        for(auto item : wall_list){
+            if(ImageTool::isPointInWall(to_right_pos,item)){
+                qDebug() << "该点位于墙体中，不可用";
+            }
+        }
+
+        int line_id = RoomMap::getPosLine(to_right_pos, line_list, cur_room_map);
+        if(line_id == -1){
+            // 未找到线路
+            continue;
+        }
+        qDebug() << "连接到目标路线:" << line_id;
+        NodeLink link = {line_id, PATH_TYPE::walk_left};
+        path_nodes.at(item.lineid).targets.push_back(link);
+    }
+}
+
+void PathAlgo::jumpLeft(
+    const std::vector<Line> &line_list,
+    const std::vector<Wall> &wall_list,
+    const std::vector<ClimbRect> &climb_list,
+    const cv::Mat &room_map
+)
+{
+    for (auto line : line_list) {
+        qDebug() << "线路：" << line.lineid << " " << line.start.x << "," << line.end.x;
+    }
+
+    // std::vector<pointset> allpoints;
+    struct line_node{
+        int id;
+        std::vector<std::pair<cv::Point, cv::Point>> child;
+    };
+
+ /**
+    {
+    id: 1,
+    target_line:{
+    [
+        target_id:1,
+        pos:[]
+    ]},
+    target_climb:{
+    [
+        target_id:1,
+        pos:[]
+    ]}
+    }
+**/
+    // 遍历线路
+    qDebug() << "----------跳跃左边寻路----------";
+    for(auto item : line_list){
+
+        if(item.lineid != 4) continue; // 调试语句，用完就删
+
+        qDebug() << "搜索线路：" << item.lineid;
+
+        // 需要遍历所有的地板
+        for(auto foot : item.line_child){
+            // 是直线还是斜线地板
+            cv::LineIterator iterator(room_map, foot.start, foot.end, 8);  // 8连通线段
+            for (int i = 0; i < iterator.count; i++, ++iterator) {
+                std::pair<cv::Point, cv::Point> target = ImageTool::jumpTrajectory(false, room_map, climb_list, wall_list, iterator.pos().x, iterator.pos().y);
+                if(target.first.x == -1 && target.second.x == -1){
+                    continue;
+                }
+                if(target.first.x != -1){
+                    int climb_id = RoomMap::getPosClimb(target.first, climb_list, room_map);
+                }
+                if(target.second.x != -1){
+                    int line_id = RoomMap::getPosLine(target.second, line_list, room_map);
+                }
+                // allpoints.push_back(target);
+            }
+        }
+        break;// 调试语句，用完就删
+    }
+
+    // int count = allpoints.size();
+
+    qDebug() << "跳跃左边寻路完毕~";
+}
+
+void PathAlgo::jumpRight()
+{
+
 }

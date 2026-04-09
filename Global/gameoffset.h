@@ -114,6 +114,7 @@ namespace BASE {
         static int exists = 0xA5;
         static int currentFoothold = 0xF8;
         static int airPos = 0x120;
+        static int _Position = 0x1A4;
     };
 
     namespace StateComponent{
