@@ -113,6 +113,7 @@ namespace BASE {
     namespace RigidbodyComponent{
         static int exists = 0xA5;
         static int currentFoothold = 0xF8;
+        static int attachEntity = 0x110;
         static int airPos = 0x120;
         static int _Position = 0x1A4;
     };

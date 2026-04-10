@@ -37,6 +37,9 @@ public:
     // 当前地图信息
     MapInfo curmapinfo;
 
+    // 地图是否加载完毕
+    bool m_map_loaded = false;
+
     // UI
     quint64 p_uientity = 0;
 

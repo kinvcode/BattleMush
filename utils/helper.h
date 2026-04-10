@@ -27,6 +27,12 @@ public:
                                   const std::pair<float,float>& b);
     // 判断是否有相同的坐标
     static void posExists(std::vector<std::pair<float, float>> &move_pos_list,std::pair<float, float> pos);
+
+    // 合并node节点(到达平台)
+    static std::vector<LineSegment> mergeFootPoint(const std::vector<TargetPoints> &target_list);
+
+    // 合并node节点(到达攀爬)
+    static std::vector<LineSegment> mergeClimbPoint(const std::vector<TargetPoints>& target_list);
 };
 
 class DebugOutput
@@ -54,17 +60,20 @@ public:
 
     static bool checkLineHasBlackPixel(const cv::Mat &img, const cv::Point &p1, const cv::Point &p2, cv::Point &p3);
 
+    static bool checkLineHasPlatformPixel(const cv::Mat &img, const cv::Point &p1, const cv::Point &p2, cv::Point &p3);
+
     static bool checkLineHasColorPixel(const cv::Mat &img, const cv::Point &p1, const cv::Point &p2, cv::Vec3b color, cv::Point &target);
 
     static cv::Point2i worldToImage(int width, int height, float x, float y);
 
     static cv::Point dropTrajectory(bool is_right, const cv::Mat &image, float x, float y);
 
-    static std::pair<cv::Point,cv::Point> jumpTrajectory(bool is_right,
-                            const cv::Mat &image,
-                            const std::vector<ClimbRect> &climb_list,
-                            const std::vector<Wall> &wall_list,
-                            float x, float y);
+    static std::pair<cv::Point,cv::Point> jumpTrajectory(bool is_right, const cv::Mat &image, float x, float y);
+
+    static std::pair<cv::Point,cv::Point> climbJumpTrajectory(bool is_right,
+                                                        const cv::Mat &image,
+                                                        ClimbRect climb_rect,
+                                                        float x, float y);
 
     static bool isPointInWall(const cv::Point& p, const Wall& wall, int tolerance = 0);
 
@@ -97,59 +106,56 @@ public:
     static std::vector<FootholdRect> makeFootholdList(quint64 cur_map, MapBounding map_bounding);
 
     // 创建墙体列表
-    static std::vector<Wall> makeWallList(std::vector<FootholdRect> footholds, std::unordered_set<int> &id_set);
+    static std::vector<Wall> makeWallList(const std::vector<FootholdRect> &footholds, std::unordered_set<int> &id_set);
 
     // 创建平台列表
-    static std::vector<Line> makeLineList(std::vector<FootholdRect> footholds, std::vector<Wall> wall_list, std::unordered_set<int> &id_set);
+    static std::vector<Platform> makePlatformList(const std::vector<FootholdRect> &footholds,
+                                                const std::vector<Wall> &wall_list,
+                                                const std::vector<ClimbRect> &climb_list,
+                                                MapBounding map_bounding,
+                                                std::unordered_set<int> &id_set);
 
     // 创建房间地图
     static cv::Mat makeRoomMap(std::vector<ClimbRect> climb_list, std::vector<FootholdRect> foothold_list, MapBounding map_bounding);
 
     // 创建寻路节点
     static void makeNodes(
-        const std::vector<Line> &line_list,
+        const std::vector<Platform> &platform_list,
         const std::vector<Wall> &wall_list,
-        const std::vector<ClimbRect> climb_list,
         const cv::Mat &cur_room_map,
         const MapBounding &map_bounding
     );
-
-    // 获取地板所在平台
-    static int getPlatformByFoothold(int foothold_id, std::vector<Line> line_list);
-
-    // 获取攀爬物ID
-    static int getClimbID(cv::Point position, std::vector<ClimbRect> climb_list);
 
     // 计算物品所在平台坐标
     static cv::Point getItemLinePos(cv::Mat map, cv::Point pos);
 
     // 计算坐标所在平台
-    static int getPosLine(cv::Point pos, const std::vector<Line> &line_list, const cv::Mat &room_map);
+    static int getPosPlatform(cv::Point pos, const std::vector<Platform> &platform_list, const cv::Mat &room_map);
 
-    // 计算坐标所在攀爬
-    static int getPosClimb(cv::Point pos, const std::vector<ClimbRect> &climb_list, const cv::Mat &room_map);
+    // 获取平台的类型
+    static int getPlatformType(int platform_id, const std::vector<Platform> &platform_list);
 };
 
 class PathAlgo{
 public:
     static void walkToLeft(
-        const std::vector<Line> &line_list,
+        const std::vector<Platform> &platform_list,
         const std::vector<Wall> &wall_list,
         const cv::Mat &cur_room_map,
         std::vector<PathNode> &path_nodes);
 
     static void walkToRight(
-        const std::vector<Line> &line_list,
+        const std::vector<Platform> &platform_list,
         const std::vector<Wall> &wall_list,
         const cv::Mat &cur_room_map,
         const MapBounding &map_bounding,
         std::vector<PathNode> &path_nodes);
 
     static void jumpLeft(
-        const std::vector<Line> &line_list,
+        const std::vector<Platform> &platform_list,
         const std::vector<Wall> &wall_list,
-        const std::vector<ClimbRect> &climb_list,
-        const cv::Mat &room_map
+        const cv::Mat &room_map,
+        std::vector<PathNode> &path_nodes
     );
 
     static void jumpRight();

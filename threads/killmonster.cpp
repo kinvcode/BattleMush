@@ -99,15 +99,41 @@ void KillMonster::process()
             continue;
         }
 
+        // 如果地图没有加载完毕，
+        if(!Gplayer.m_map_loaded){
+            m_map_start = 0;
+            m_currentmap = 0;
+            m_allmonster.clear();
+            DebugOutput::out("地图加载中... ...");
+            ProcessHelper::programDelay(1000);
+            QApplication::processEvents();
+            continue;
+        }
+
         // 更新全图怪物
         updateAllMonsters();
 
         // 获取人物所在地板
-        int user_foothold_id = readInt(readLong(readLong(Gplayer.p_localplayer +
-                                                        BASE::MODEntity::RigidbodyComponent) +
-                                                        BASE::RigidbodyComponent::currentFoothold) +
-                                                        BASE::Foothold::ID);
-        int user_in_lineid = RoomMap::getPlatformByFoothold(user_foothold_id, Gplayer.curmapinfo.line_list);
+        quint64 user_foothold_p = readLong(readLong(Gplayer.p_localplayer + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::currentFoothold);
+        quint64 user_attach_p = readLong(readLong(Gplayer.p_localplayer + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::attachEntity);
+        int user_foothold_id = 0;
+        int user_climb_id = 0;
+        int user_in_lineid = -1;
+        if(user_foothold_p){
+            user_foothold_id = readInt(user_foothold_p + BASE::Foothold::ID);
+            // user_in_lineid = RoomMap::getPlatformByFoothold(user_foothold_id, Gplayer.curmapinfo.line_list);
+        }
+
+        // int user_x = RoomMap::toMapPosX(readFloat(readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent) + BASE::TransformComponent::PositionX),
+        //                                 Gplayer.curmapinfo.map_bounding.x_offset);
+        // qDebug() << "人物坐标：" << user_x;
+
+        if(user_in_lineid == -1){
+            DebugOutput::out("暂不支持当前位置寻怪，人物可能在攀爬");
+            ProcessHelper::programDelay(1000);
+            QApplication::processEvents();
+            continue;
+        }
 
         // 待处理的怪物列表
         std::vector<Monster> handle_monsters = getLineMonsters(user_in_lineid);
@@ -205,7 +231,8 @@ void KillMonster::updateAllMonsters()
         int foothold_id = readInt(readLong(readLong(entity + BASE::MODEntity::RigidbodyComponent)
                                            + BASE::RigidbodyComponent::currentFoothold)
                                   + BASE::Foothold::ID);
-        int line_id = RoomMap::getPlatformByFoothold(foothold_id, Gplayer.curmapinfo.line_list);
+        // int line_id = RoomMap::getPlatformByFoothold(foothold_id, Gplayer.curmapinfo.line_list);
+        int line_id = -1;
         if(line_id == -1){
             continue;
         }

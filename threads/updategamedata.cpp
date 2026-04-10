@@ -145,9 +145,6 @@ void UpdateGameData::process()
             }
         }
 
-        // 首次更新地图
-        // UpdateRoomMap();
-
         // 找到localPlayer
         Gplayer.p_localplayer = readLong(Gplayer.p_userservice + BASE::UserService::localPlayer);
 
@@ -177,9 +174,11 @@ void UpdateGameData::process()
 
             if(Gplayer.p_curmapentity != Gplayer.last_mapentity){
                 DebugOutput::out("切换了地图");
+                Gplayer.m_map_loaded = false;
                 Gplayer.last_mapentity = Gplayer.p_curmapentity;
                 // 更新地图信息
                 UpdateRoomMap();
+                Gplayer.m_map_loaded = true;
                 continue;
             }
 
@@ -251,24 +250,25 @@ void UpdateGameData::UpdateRoomMap()
     // 遍历地板
     std::vector<FootholdRect> footholds = RoomMap::makeFootholdList(Gplayer.p_curmapentity, map_bounding);
 
-    // 1. 将所有地板ID放入到容器 id_set里面
-    std::unordered_set<int> id_set;
+    // 1. 将所有地板ID放入到容器 footid_set里面
+    std::unordered_set<int> footid_set;
     for (const auto& item : footholds) {
-        id_set.insert(item.id);
+        footid_set.insert(item.id);
     }
 
     // 第一步：拿到地形数据并绘制地图
 
     // 创建墙体列表
-    std::vector<Wall> wall_list = RoomMap::makeWallList(footholds, id_set);
+    std::vector<Wall> wall_list = RoomMap::makeWallList(footholds, footid_set);
 
     // 创建平台列表
-    std::vector<Line> line_list = RoomMap::makeLineList(footholds, wall_list, id_set);
+    std::vector<Platform> platform_list = RoomMap::makePlatformList(footholds, wall_list, climbs, map_bounding, footid_set);
 
     // 绘制地图框架
     cv::Mat cur_room_map = RoomMap::makeRoomMap(climbs, footholds, map_bounding);
 
-    Gplayer.curmapinfo.line_list = line_list;
+    // Gplayer.curmapinfo.line_list = line_list;
+    Gplayer.curmapinfo.platform_list = platform_list;
     Gplayer.curmapinfo.wall_list = wall_list;
     Gplayer.curmapinfo.climbs = climbs;
     Gplayer.curmapinfo.footholds = footholds;
@@ -278,16 +278,16 @@ void UpdateGameData::UpdateRoomMap()
     Gplayer.curmapinfo.map_mat = cur_room_map;
 
 
-    // QString currentDir = QCoreApplication::applicationDirPath() + "/room_map.png";
-    // qDebug() << "图片保存路径：" << currentDir;
-    // ImageTool::saveMatImage(cur_room_map, currentDir);
+    QString currentDir = QCoreApplication::applicationDirPath() + "/room_map.png";
+    qDebug() << "图片保存路径：" << currentDir;
+    ImageTool::saveMatImage(cur_room_map, currentDir);
 
     // 第二步：算出寻路数据
     /**
      * 向左走寻路
      * 向右走寻路
     **/
-    RoomMap::makeNodes(line_list, wall_list, climbs, cur_room_map, map_bounding);
+    RoomMap::makeNodes(platform_list, wall_list, cur_room_map, map_bounding);
 
     // 最终步骤：合并数据缓存到本地（如果本地存在地图缓存直接拿缓存数据）
 
