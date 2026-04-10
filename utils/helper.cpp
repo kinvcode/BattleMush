@@ -626,11 +626,22 @@ void RoomMap::makeNodes(
         }
     }
 
-    PathAlgo::walkToLeft(platform_list, wall_list, cur_room_map, path_nodes);
+    PathAlgo::walkToLeft(platform_list, cur_room_map, path_nodes);
 
-    PathAlgo::walkToRight(platform_list, wall_list, cur_room_map, map_bounding, path_nodes);
+    PathAlgo::walkToRight(platform_list, cur_room_map, map_bounding, path_nodes);
 
-    PathAlgo::jumpLeft(platform_list, wall_list, cur_room_map, path_nodes);
+    PathAlgo::jumpLeft(platform_list, cur_room_map, path_nodes);
+
+    PathAlgo::jumpRight(platform_list, cur_room_map, path_nodes);
+
+    PathAlgo::jump_up(platform_list, cur_room_map, path_nodes);
+
+    PathAlgo::jump_down(platform_list, cur_room_map, map_bounding, path_nodes);
+
+    PathAlgo::up(platform_list, cur_room_map, path_nodes);
+
+    PathAlgo::down(platform_list, cur_room_map, map_bounding, path_nodes);
+
 
     quint64 total_time = begin_time.elapsed();
     qDebug() << "寻路算法用时:" << total_time;
@@ -730,7 +741,7 @@ std::vector<LineSegment> Helper::mergeClimbPoint(const std::vector<TargetPoints>
 
     for(int climb_id = 0; climb_id < climb_count; climb_id++) {
 
-        qDebug() << "到达攀爬ID：" << climb_id;
+        // qDebug() << "到达攀爬ID：" << climb_id;
 
         TargetPoints points = target_list.at(climb_id);
         if (points.empty()) {
@@ -1274,13 +1285,12 @@ int RoomMap::getPlatformType(int platform_id, const std::vector<Platform> &platf
 
 void PathAlgo::walkToLeft(
     const std::vector<Platform> &platform_list,
-    const std::vector<Wall> &wall_list,
     const cv::Mat &cur_room_map,
     std::vector<PathNode> &path_nodes
 )
 {
     // 遍历线路
-    qDebug() << "----------向左走寻路----------";
+    // qDebug() << "----------向左走寻路----------";
     for(auto item : platform_list){
         // qDebug() << "搜索线路：" << item.id;
 
@@ -1332,7 +1342,6 @@ void PathAlgo::walkToLeft(
 
 void PathAlgo::walkToRight(
     const std::vector<Platform> &platform_list,
-    const std::vector<Wall> &wall_list,
     const cv::Mat &cur_room_map,
     const MapBounding &map_bounding,
     std::vector<PathNode> &path_nodes
@@ -1382,7 +1391,6 @@ void PathAlgo::walkToRight(
 
 void PathAlgo::jumpLeft(
     const std::vector<Platform> &platform_list,
-    const std::vector<Wall> &wall_list,
     const cv::Mat &room_map,
     std::vector<PathNode> &path_nodes
 )
@@ -1501,7 +1509,464 @@ void PathAlgo::jumpLeft(
     // qDebug() << "跳跃左边寻路完毕~";
 }
 
-void PathAlgo::jumpRight()
+void PathAlgo::jumpRight(
+    const std::vector<Platform> &platform_list,
+    const cv::Mat &room_map,
+    std::vector<PathNode> &path_nodes
+)
 {
+    // 遍历线路
+    // qDebug() << "----------跳跃右边寻路----------";
 
+    for(const auto &platform : platform_list){
+
+        // qDebug() << "搜索平台（地板）：" << platform.id;
+
+        if(platform.type == 0){  // 如果是线类型
+            std::vector<TargetPoints> targets;
+            targets.resize(platform_list.size());
+
+            // 需要遍历所有的地板(从地板开始跳跃)
+            for(auto foot : platform.line_child){
+                // 是直线还是斜线地板
+                cv::LineIterator iterator(room_map, foot.start, foot.end, 8);  // 8连通线段
+                for (int i = 0; i < iterator.count; i++, ++iterator) {
+                    std::pair<cv::Point, cv::Point> target = ImageTool::jumpTrajectory(true, room_map, iterator.pos().x, iterator.pos().y);
+                    if(target.first.x == -1 && target.second.x == -1){
+                        continue;
+                    }
+                    if(target.first.x != -1){
+                        int climb_platform = RoomMap::getPosPlatform(target.first, platform_list, room_map);
+                        // tmp_node.target_climb.at(climb_id).push_back(iterator.pos());
+                        if(climb_platform != -1){
+                            targets.at(climb_platform).push_back(iterator.pos());
+                        }
+                    }
+                    if(target.second.x != -1) {
+                        // 如果目标地点是本平台，则直接忽略
+                        int line_platform = RoomMap::getPosPlatform(target.second, platform_list, room_map);
+                        if(line_platform == platform.id || line_platform == -1){
+                            continue;
+                        }
+                        targets.at(line_platform).push_back(iterator.pos());
+                    }
+                }
+            }
+
+            // qDebug() << "准备合并线路：" << platform.id;
+            std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+
+            for(auto &target_node : path_nodes.at(platform.id).targets){
+                for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+                    if(target_node.id != target_id){
+                        continue;
+                    }
+                    if(foot_segment.at(target_id).empty()){
+                        continue;
+                    }
+                    NodeVisit node_visit;
+                    node_visit.visit_type = VISIT_TYPE::JUMP_RIGHT;
+                    node_visit.area = foot_segment.at(target_id);
+                    target_node.visit_list.push_back(node_visit);
+                }
+            }
+        }
+
+        if(platform.type == 1){ // 如果是攀爬体类型
+            // qDebug() << "搜索平台(攀爬)：" << platform.id;
+
+            std::vector<TargetPoints> targets;
+            targets.resize(platform_list.size());
+
+            cv::Point climb_start(platform.start.x + 25, platform.start.y);
+            cv::Point climb_end(platform.start.x + 25, platform.end.y);
+            cv::LineIterator iterator(room_map, climb_start, climb_end, 8);  // 8连通线段
+
+            ClimbRect cur_climb_rect;
+            cur_climb_rect.x_left = platform.start.x;
+            cur_climb_rect.y_top = platform.start.y;
+            cur_climb_rect.x_right = platform.end.x;
+            cur_climb_rect.y_bottom = platform.end.y;
+
+            for (int i = 0; i < iterator.count; i++, ++iterator) {
+                std::pair<cv::Point, cv::Point> target = ImageTool::climbJumpTrajectory(true, room_map, cur_climb_rect, iterator.pos().x, iterator.pos().y);
+                if(target.first.x == -1 && target.second.x == -1){
+                    continue;
+                }
+                if(target.first.x != -1){
+                    int climb_platform = RoomMap::getPosPlatform(target.first, platform_list, room_map);
+                    if(climb_platform != -1){
+                        targets.at(climb_platform).push_back(iterator.pos());
+                    }
+                }
+                if(target.second.x != -1){
+                    // 如果目标地点是本平台，则直接忽略
+                    int line_platform = RoomMap::getPosPlatform(target.second, platform_list, room_map);
+                    if(line_platform == platform.id || line_platform == -1){
+                        continue;
+                    }
+                    targets.at(line_platform).push_back(iterator.pos());
+                }
+            }
+
+            // qDebug() << "准备合并线路：" << platform.id;
+            std::vector<LineSegment> climb_segment = Helper::mergeClimbPoint(targets);
+
+            for(auto &target_node : path_nodes.at(platform.id).targets){
+                for(int target_id = 0; target_id < climb_segment.size(); target_id++){
+                    if( target_id == target_node.id){
+                        NodeVisit node_visit;
+                        node_visit.visit_type = VISIT_TYPE::JUMP_RIGHT;
+                        node_visit.area = climb_segment.at(target_id);
+                        target_node.visit_list.push_back(node_visit);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }
+
+void PathAlgo::jump_up(
+    const std::vector<Platform> &platform_list,
+    const cv::Mat &room_map,
+    std::vector<PathNode> &path_nodes
+)
+{
+    for(const auto &platform : platform_list){
+        if(platform.type == 1){
+            continue;
+        }
+
+        std::vector<TargetPoints> targets;
+        targets.resize(platform_list.size());
+
+        for(auto foot : platform.line_child){
+
+            cv::LineIterator iterator(room_map, foot.start, foot.end, 8);
+            for (int i = 0; i < iterator.count; i++, ++iterator) {
+
+                // 从下向上跳跃80像素
+                cv::Point start = iterator.pos();
+                // start.y -= 1;
+                cv::Point end = start;
+                end.y -= 80;
+
+                // 检测攀爬物
+                cv::Point target_pos = {-1, -1};
+                cv::LineIterator jump_iterator(room_map, start, end, 8);
+                for(int j = 0; j < jump_iterator.count; j++, ++jump_iterator)
+                {
+                    cv::Point cur_pos = jump_iterator.pos();
+                    cv::Vec3b cur_color = room_map.at<cv::Vec3b>(jump_iterator.pos());
+                    if(cur_color == COLOR_CLIMB)
+                    {
+                        // qDebug() << cur_pos.x << "," << cur_pos.y;
+                        if(start.y - cur_pos.y > 2){
+                            int climb_platform = RoomMap::getPosPlatform(cur_pos, platform_list, room_map);
+                            if(climb_platform != -1){
+                                targets.at(climb_platform).push_back(iterator.pos());
+                            }
+                        }
+                    }
+                    if(cur_color == COLOR_LINE)
+                    {
+                        // qDebug() << cur_pos.x << "," << cur_pos.y;
+                        if(start.y - cur_pos.y > 1){
+                            // 如果目标地点是本平台，则直接忽略
+                            int line_platform = RoomMap::getPosPlatform(cur_pos, platform_list, room_map);
+                            if(line_platform == platform.id || line_platform == -1){
+                                continue;
+                            }
+                            targets.at(line_platform).push_back(iterator.pos());
+                        }
+                    }
+                }
+            }
+        }
+
+        std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+
+        for(auto &target_node : path_nodes.at(platform.id).targets){
+            for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+                if(target_node.id != target_id){
+                    continue;
+                }
+                if(foot_segment.at(target_id).empty()){
+                    continue;
+                }
+                NodeVisit node_visit;
+                node_visit.visit_type = VISIT_TYPE::JUMP_UP;
+                node_visit.area = foot_segment.at(target_id);
+                target_node.visit_list.push_back(node_visit);
+            }
+        }
+    }
+}
+
+void PathAlgo::jump_down(const std::vector<Platform> &platform_list,
+                        const cv::Mat &room_map,
+                        const MapBounding &map_bounding,
+                        std::vector<PathNode> &path_nodes)
+{
+    for(const auto &platform : platform_list){
+        if(platform.type == 1){
+            continue;
+        }
+
+        std::vector<TargetPoints> targets;
+        targets.resize(platform_list.size());
+
+        for(auto foot : platform.line_child){
+
+            cv::LineIterator iterator(room_map, foot.start, foot.end, 8);
+            for (int i = 0; i < iterator.count; i++, ++iterator) {
+
+                // 跳跃到下一层
+                cv::Point start = iterator.pos();
+                cv::Point end = start;
+                end.y = map_bounding.y_bottom;
+
+                // 检测攀爬物
+                cv::Point target_pos = {-1, -1};
+                cv::LineIterator jump_iterator(room_map, start, end, 8);
+                for(int j = 0; j < jump_iterator.count; j++, ++jump_iterator)
+                {
+                    cv::Point cur_pos = jump_iterator.pos();
+                    cv::Vec3b cur_color = room_map.at<cv::Vec3b>(jump_iterator.pos());
+
+                    // 下跳时不找攀爬物体
+
+                    if(cur_color == COLOR_LINE)
+                    {
+                        // qDebug() << cur_pos.x << "," << cur_pos.y;
+                        if(cur_pos.y - start.y > 4){ // 其实大于2就行
+                            // 如果目标地点是本平台，则直接忽略
+                            int line_platform = RoomMap::getPosPlatform(cur_pos, platform_list, room_map);
+                            if(line_platform == platform.id || line_platform == -1){
+                                continue;
+                            }
+                            targets.at(line_platform).push_back(iterator.pos());
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+
+        for(auto &target_node : path_nodes.at(platform.id).targets){
+            for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+                if(target_node.id != target_id){
+                    continue;
+                }
+                if(foot_segment.at(target_id).empty()){
+                    continue;
+                }
+                NodeVisit node_visit;
+                node_visit.visit_type = VISIT_TYPE::JUMP_DOWN;
+                node_visit.area = foot_segment.at(target_id);
+                target_node.visit_list.push_back(node_visit);
+            }
+        }
+    }
+}
+
+void PathAlgo::up(const std::vector<Platform> &platform_list,
+                const cv::Mat &room_map,
+                std::vector<PathNode> &path_nodes)
+{
+    for(const auto &platform : platform_list){
+
+        // 人物碰撞范围内是否有梯子
+        if(platform.type == 0){
+            std::vector<TargetPoints> targets;
+            targets.resize(platform_list.size());
+
+            for(auto foot : platform.line_child){
+
+                cv::LineIterator iterator(room_map, foot.start, foot.end, 8);
+                for (int i = 0; i < iterator.count; i++, ++iterator) {
+
+                    // 向上找攀爬物体
+                    cv::Point start = iterator.pos();
+                    start.y -= 1;
+                    cv::Point end = start;
+                    end.y -= 22; // 目前发现最大值是23
+
+                    // 直接判断这个位置的像素是否是攀爬
+                    cv::Vec3b cur_color = room_map.at<cv::Vec3b>(end);
+                    if(cur_color == COLOR_CLIMB)
+                    {
+                        int climb_platform = RoomMap::getPosPlatform(end, platform_list, room_map);
+                        if(climb_platform != -1){
+                            targets.at(climb_platform).push_back(iterator.pos());
+                        }
+                    }
+                }
+            }
+
+            std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+
+            for(auto &target_node : path_nodes.at(platform.id).targets){
+                for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+                    if(target_node.id != target_id){
+                        continue;
+                    }
+                    if(foot_segment.at(target_id).empty()){
+                        continue;
+                    }
+                    NodeVisit node_visit;
+                    node_visit.visit_type = VISIT_TYPE::UP;
+                    node_visit.area = foot_segment.at(target_id);
+                    target_node.visit_list.push_back(node_visit);
+                }
+            }
+        }
+
+        // 向上找地板
+        if(platform.type == 1){
+            // 直接定位攀爬的最上面那个像素
+            int climb_x = platform.start.x + 25;
+            cv::Point start(climb_x, platform.end.y); // 从下面的像素开始
+
+            cv::Point end = start;
+            end.y = platform.start.y;
+
+            cv::Point target_pos = {-1, -1};
+            cv::LineIterator iterator(room_map, start, end, 8);
+            for(int j = 0; j < iterator.count; j++, ++iterator)
+            {
+                cv::Point cur_pos = iterator.pos();
+                cv::Vec3b cur_color = room_map.at<cv::Vec3b>(iterator.pos());
+
+                // 找到地板就退出
+                if(cur_color == COLOR_LINE)
+                {
+                    // 如果目标地点是本平台，则直接忽略
+                    int line_platform = RoomMap::getPosPlatform(cur_pos, platform_list, room_map);
+                    if( line_platform == -1){
+                        continue;
+                    }
+
+                    LineSegment line_segment;
+                    line_segment.push_back(std::pair(start.x, start.x));
+
+                    NodeVisit node_visit;
+                    node_visit.visit_type = VISIT_TYPE::UP;
+                    node_visit.area = line_segment;
+
+                    for(auto &target_node : path_nodes.at(platform.id).targets){
+                        if(line_platform == target_node.id){
+                            target_node.visit_list.push_back(node_visit);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void PathAlgo::down(const std::vector<Platform> &platform_list,
+    const cv::Mat &room_map,
+    const MapBounding &map_bounding,
+    std::vector<PathNode> &path_nodes)
+{
+    for(const auto &platform : platform_list){
+
+        // 先处理从地板向下攀爬
+        if(platform.type == 0){
+            std::vector<TargetPoints> targets;
+            targets.resize(platform_list.size());
+
+            for(auto foot : platform.line_child){
+
+                cv::LineIterator iterator(room_map, foot.start, foot.end, 8);
+                for (int i = 0; i < iterator.count; i++, ++iterator) {
+
+                    // 向下攀爬
+                    cv::Point start = iterator.pos();
+                    // start.y -= 1;
+                    cv::Point end = start;
+                    end.y += 5; // 其实1~2就够了
+
+                    // 直接判断这个位置的像素是否是攀爬
+                    cv::Vec3b cur_color = room_map.at<cv::Vec3b>(end);
+                    if(cur_color == COLOR_CLIMB)
+                    {
+                        int climb_platform = RoomMap::getPosPlatform(end, platform_list, room_map);
+                        if(climb_platform != -1){
+                            targets.at(climb_platform).push_back(iterator.pos());
+                        }
+                    }
+                }
+            }
+
+            std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+
+            for(auto &target_node : path_nodes.at(platform.id).targets){
+                for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+                    if(target_node.id != target_id){
+                        continue;
+                    }
+                    if(foot_segment.at(target_id).empty()){
+                        continue;
+                    }
+                    NodeVisit node_visit;
+                    node_visit.visit_type = VISIT_TYPE::DOWN;
+                    node_visit.area = foot_segment.at(target_id);
+                    target_node.visit_list.push_back(node_visit);
+                }
+            }
+        }
+
+        // 如果是从攀爬物体向下爬
+        if(platform.type == 1){ // 如果是攀爬体类型
+
+            // 直接定位攀爬的最下面那个像素
+            int climb_x = platform.start.x + 25;
+            cv::Point start(climb_x, platform.end.y + 1); // 从下面的像素开始
+
+            cv::Point end = start;
+            end.y = map_bounding.y_bottom;
+
+            cv::Point target_pos = {-1, -1};
+            cv::LineIterator jump_iterator(room_map, start, end, 8);
+            for(int j = 0; j < jump_iterator.count; j++, ++jump_iterator)
+            {
+                cv::Point cur_pos = jump_iterator.pos();
+                cv::Vec3b cur_color = room_map.at<cv::Vec3b>(jump_iterator.pos());
+
+                // 找到下面的地板
+                if(cur_color == COLOR_LINE)
+                {
+                    // 如果目标地点是本平台，则直接忽略
+                    int line_platform = RoomMap::getPosPlatform(cur_pos, platform_list, room_map);
+                    if( line_platform == -1){
+                        continue;
+                    }
+
+                    LineSegment line_segment;
+                    line_segment.push_back(std::pair(start.x, start.x));
+
+                    NodeVisit node_visit;
+                    node_visit.visit_type = VISIT_TYPE::DOWN;
+                    node_visit.area = line_segment;
+
+                    for(auto &target_node : path_nodes.at(platform.id).targets){
+                        if(line_platform == target_node.id){
+                            target_node.visit_list.push_back(node_visit);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+}
+
+

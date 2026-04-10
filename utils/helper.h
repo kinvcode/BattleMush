@@ -140,31 +140,51 @@ class PathAlgo{
 public:
     static void walkToLeft(
         const std::vector<Platform> &platform_list,
-        const std::vector<Wall> &wall_list,
         const cv::Mat &cur_room_map,
         std::vector<PathNode> &path_nodes);
 
     static void walkToRight(
         const std::vector<Platform> &platform_list,
-        const std::vector<Wall> &wall_list,
         const cv::Mat &cur_room_map,
         const MapBounding &map_bounding,
         std::vector<PathNode> &path_nodes);
 
     static void jumpLeft(
         const std::vector<Platform> &platform_list,
-        const std::vector<Wall> &wall_list,
         const cv::Mat &room_map,
         std::vector<PathNode> &path_nodes
     );
 
-    static void jumpRight();
+    static void jumpRight(
+        const std::vector<Platform> &platform_list,
+        const cv::Mat &room_map,
+        std::vector<PathNode> &path_nodes
+    );
 
-    static void jump_up();
-    static void jump_down();
-    static void up();
-    static void down();
+    static void jump_up(const std::vector<Platform> &platform_list,
+                        const cv::Mat &room_map,
+                        std::vector<PathNode> &path_nodes);
+
+    static void jump_down(const std::vector<Platform> &platform_list,
+                    const cv::Mat &room_map,
+                    const MapBounding &map_bounding,
+                    std::vector<PathNode> &path_nodes);
+
+    static void up(
+        const std::vector<Platform> &platform_list,
+        const cv::Mat &room_map,
+        std::vector<PathNode> &path_nodes
+    );
+
+    static void down(
+        const std::vector<Platform> &platform_list,
+        const cv::Mat &room_map,
+        const MapBounding &map_bounding,
+        std::vector<PathNode> &path_nodes
+    );
+
     static void teleport();
+
     static void skill();
 };
 
