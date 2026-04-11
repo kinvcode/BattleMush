@@ -12,6 +12,7 @@ WalkBase::WalkBase(int target_x)
 {
     m_transform = 0;
     m_deviation = 50;
+    m_walk_timeout = 3000;
     m_target_x = target_x;
 }
 
@@ -53,7 +54,7 @@ bool WalkBase::run()
 
     while(true){
 
-        if (begin_timer.elapsed() > 3000) {
+        if (begin_timer.elapsed() > m_walk_timeout) {
             DebugOutput::out("寻路超时~");
             clearXkey();
             return false;

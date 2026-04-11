@@ -5,23 +5,32 @@
 class MovePlatform
 {
 public:
-    static void toPlatform(const PathNode& plat, int target);
+    static bool toPlatform(const PathNode& plat, int target);
 
-    static void walkLeft(LineSegment area);
+    static bool walkLeft(LineSegment area, int platform);
 
-    static void walkRight(LineSegment area);
+    static bool walkRight(LineSegment area, int platform);
 
-    static void jumpLeft(LineSegment area);
+    static bool jumpLeft(LineSegment area, int platform, bool is_climb = false);
 
-    static void jumpRight(LineSegment area);
+    static bool jumpRight(LineSegment area, int platform, bool is_climb = false);
 
-    static void jumpUP(LineSegment area);
+    static bool jumpUP(LineSegment area, int platform, bool is_climb = false);
 
-    static void jumpDown(LineSegment area);
+    static bool jumpDown(LineSegment area, int platform);
 
-    static void up(LineSegment area);
+    static bool up(LineSegment area, int platform);
 
-    static void down(LineSegment area);
+    static bool down(LineSegment area);
+
+private :
+    static quint64 getUserFootholdP();
+
+    static quint64 getUserClimbP();
+
+    static int getUserLine();
+
+    static int getUserX(quint64 transform);
 };
 
 #endif // MOVEPLATFORM_H

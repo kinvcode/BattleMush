@@ -8,6 +8,7 @@
 #include "global/gameoffset.h"
 #include "utils/gamestruct.h"
 #include "utils/mapserializer.h"
+#include "driver/msdriverpro.h"
 
 using namespace Mem;
 
@@ -139,7 +140,8 @@ void UpdateGameData::process()
         if( statuspanel == 0){
             statuspanel = Helper::findChild(localuseroffgroup,"StatusPanel");
             if( statuspanel == 0){
-                DebugOutput::out("找不到statuspanel模块");
+                DebugOutput::out("找不到statuspanel模块，确保打开过能力值面板。即将尝试打开能力值面板");
+                MSDriverPRO::keyboardClick(MSKeyboard_s);
                 ProcessHelper::programDelay(3000);
                 QApplication::processEvents();
                 continue;
@@ -243,6 +245,13 @@ void UpdateGameData::UpdateRoomMap()
     QString map_id = GameStruct::readEntityID(Gplayer.p_curmapentity);
 
     RoomMap::loadLocalMap(map_id);
+
+    if(!Gplayer.curmapinfo.path_nodes.empty() && !Gplayer.curmapinfo.map_mat.empty())
+    {
+        DebugOutput::out("地图数据加载成功~");
+        Gplayer.m_map_loaded = true;
+        return;
+    }
 
     if(Gplayer.curmapinfo.map_bounding.width == 0){
         Gplayer.curmapinfo.map_bounding = RoomMap::getMapBounding(Gplayer.p_curmapentity);

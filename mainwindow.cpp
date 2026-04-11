@@ -325,7 +325,8 @@ void MainWindow::console(QString msg)
 void MainWindow::onApplicationQuit()
 {
     DebugOutput::out("安全关闭程序中... ...");
-    ProcessHelper::programDelay(3000);
+    if(!GetKeyState(VK_NUMLOCK)) MSDriverPRO::keyboardClick(0x45); // 打开小键盘
+    // ProcessHelper::programDelay(3000);
     QApplication::processEvents();
 }
 
@@ -333,13 +334,18 @@ void MainWindow::on_pushButton_clicked()
 {
     VMProtectBegin("__FUNCTION__");
 
-    cv::Mat image = cv::imread("D:\\data\\maps\\03.png");
-    cv::Point pos = {273,1811};
-    pos = {273,1810};
-    cv::Point start = {244,1830};
-    cv::Point end = {424,1710};
-    bool res = ImageTool::isPointOnLine(image, pos, start, end);
-    qDebug() << res;
+    // cv::Mat image = cv::imread("D:\\data\\maps\\03.png");
+    // cv::Point pos = {273,1811};
+    // pos = {273,1810};
+    // cv::Point start = {244,1830};
+    // cv::Point end = {424,1710};
+    // bool res = ImageTool::isPointOnLine(image, pos, start, end);
+    // qDebug() << res;
+
+    // if(!GetKeyState(VK_NUMLOCK)) MSDriverPRO::keyboardClick(0x45);
+
+    // qDebug() << "打开小键盘";
+
     VMProtectEnd();
 }
 

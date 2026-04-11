@@ -635,101 +635,116 @@ void Helper::posExists(std::vector<std::pair<float, float> > &move_pos_list, std
     move_pos_list.push_back(pos);
 }
 
-std::vector<LineSegment> Helper::mergeFootPoint(const std::vector<TargetPoints> &target_list)
+// std::vector<LineSegment> Helper::mergeFootPoint(const std::vector<TargetPoints> &target_list)
+std::unordered_map<int, std::vector<LineSegment>> Helper::mergeFootPoint(
+    const std::unordered_map<int, std::vector<TargetPoints>> &target_list
+)
 {
-    std::vector<LineSegment> line_set;
-    int platform_count = target_list.size();
-    line_set.reserve(platform_count);
+    // std::vector<LineSegment> line_set;
+    std::unordered_map<int, std::vector<LineSegment>> line_set;
+    for(const auto &target : target_list){
+        int platform_count = target.second.size();
+        line_set[target.first].reserve(platform_count);
 
-    for(int platform_id = 0; platform_id < platform_count; platform_id++) {
+        for(int platform_id = 0; platform_id < platform_count; platform_id++) {
 
-        // qDebug() << "到达线路：" << platform_id;
+            // qDebug() << "到达线路：" << platform_id;
 
-        TargetPoints points = target_list.at(platform_id);
-        if (points.empty()) {
-            line_set.emplace_back(); // 添加空段
-            continue;
-        }
-
-        // 提取并排序所有x坐标
-        std::vector<int> x_coords;
-        x_coords.reserve(points.size());
-        for (const auto& pt : points) {
-            x_coords.push_back(pt.x);
-        }
-        std::sort(x_coords.begin(), x_coords.end());
-
-        // 合并相邻的x坐标（差值 <= 1）
-        LineSegment segments;
-        int start_x = x_coords[0];
-        int end_x = x_coords[0];
-
-        for (size_t i = 1; i < x_coords.size(); ++i) {
-            if (x_coords[i] - x_coords[i-1] <= 3) {
-                // 相邻，扩展当前段
-                end_x = x_coords[i];
-            } else {
-                // 不连续，保存当前段，开始新段
-                segments.emplace_back(start_x, end_x);
-                start_x = x_coords[i];
-                end_x = x_coords[i];
+            TargetPoints points = target.second.at(platform_id);
+            if (points.empty()) {
+                line_set[target.first].emplace_back(); // 添加空段
+                continue;
             }
+
+            // 提取并排序所有x坐标
+            std::vector<int> x_coords;
+            x_coords.reserve(points.size());
+            for (const auto& pt : points) {
+                x_coords.push_back(pt.x);
+            }
+            std::sort(x_coords.begin(), x_coords.end());
+
+            // 合并相邻的x坐标（差值 <= 1）
+            LineSegment segments;
+            int start_x = x_coords[0];
+            int end_x = x_coords[0];
+
+            for (size_t i = 1; i < x_coords.size(); ++i) {
+                if (x_coords[i] - x_coords[i-1] <= 3) {
+                    // 相邻，扩展当前段
+                    end_x = x_coords[i];
+                } else {
+                    // 不连续，保存当前段，开始新段
+                    segments.emplace_back(start_x, end_x);
+                    start_x = x_coords[i];
+                    end_x = x_coords[i];
+                }
+            }
+
+            // 保存最后一个段
+            segments.emplace_back(start_x, end_x);
+
+            line_set[target.first].push_back(std::move(segments));
         }
-
-        // 保存最后一个段
-        segments.emplace_back(start_x, end_x);
-
-        line_set.push_back(std::move(segments));
     }
 
     return line_set;
 }
 
-std::vector<LineSegment> Helper::mergeClimbPoint(const std::vector<TargetPoints> &target_list)
+// std::vector<LineSegment> Helper::mergeClimbPoint(const std::vector<TargetPoints> &target_list)
+std::unordered_map<int, std::vector<LineSegment>> Helper::mergeClimbPoint(
+    const std::unordered_map<int, std::vector<TargetPoints>> &target_list
+    )
 {
-    std::vector<LineSegment> line_set;
-    int climb_count = target_list.size();
-    line_set.reserve(climb_count);
+    // std::vector<LineSegment> line_set;
+    // int climb_count = target_list.size();
+    // line_set.reserve(climb_count);
 
-    for(int climb_id = 0; climb_id < climb_count; climb_id++) {
+    std::unordered_map<int, std::vector<LineSegment>> line_set;
+    for(const auto &target : target_list){
+        int climb_count = target.second.size();
+        line_set[target.first].reserve(climb_count);
 
-        // qDebug() << "到达攀爬ID：" << climb_id;
+        for(int climb_id = 0; climb_id < climb_count; climb_id++) {
 
-        TargetPoints points = target_list.at(climb_id);
-        if (points.empty()) {
-            line_set.emplace_back(); // 添加空段
-            continue;
-        }
+            // qDebug() << "到达攀爬ID：" << climb_id;
 
-        // 提取并排序所有x坐标
-        std::vector<int> y_coords;
-        y_coords.reserve(points.size());
-        for (const auto& pt : points) {
-            y_coords.push_back(pt.y);
-        }
-        std::sort(y_coords.begin(), y_coords.end());
-
-        // 合并相邻的x坐标（差值 <= 1）
-        LineSegment segments;
-        int start_y = y_coords[0];
-        int end_y = y_coords[0];
-
-        for (size_t i = 1; i < y_coords.size(); ++i) {
-            if (y_coords[i] - y_coords[i-1] <= 3) {
-                // 相邻，扩展当前段
-                end_y = y_coords[i];
-            } else {
-                // 不连续，保存当前段，开始新段
-                segments.emplace_back(start_y, end_y);
-                start_y = y_coords[i];
-                end_y = y_coords[i];
+            TargetPoints points = target.second.at(climb_id);
+            if (points.empty()) {
+                line_set[target.first].emplace_back(); // 添加空段
+                continue;
             }
+
+            // 提取并排序所有x坐标
+            std::vector<int> y_coords;
+            y_coords.reserve(points.size());
+            for (const auto& pt : points) {
+                y_coords.push_back(pt.y);
+            }
+            std::sort(y_coords.begin(), y_coords.end());
+
+            // 合并相邻的x坐标（差值 <= 1）
+            LineSegment segments;
+            int start_y = y_coords[0];
+            int end_y = y_coords[0];
+
+            for (size_t i = 1; i < y_coords.size(); ++i) {
+                if (y_coords[i] - y_coords[i-1] <= 3) {
+                    // 相邻，扩展当前段
+                    end_y = y_coords[i];
+                } else {
+                    // 不连续，保存当前段，开始新段
+                    segments.emplace_back(start_y, end_y);
+                    start_y = y_coords[i];
+                    end_y = y_coords[i];
+                }
+            }
+
+            // 保存最后一个段
+            segments.emplace_back(start_y, end_y);
+
+            line_set[target.first].push_back(std::move(segments));
         }
-
-        // 保存最后一个段
-        segments.emplace_back(start_y, end_y);
-
-        line_set.push_back(std::move(segments));
     }
 
     return line_set;
@@ -1267,15 +1282,15 @@ void RoomMap::loadLocalMap(const QString map_id)
     if(!MapSerializer::isValidSaveFile(filePath)) return;
 
     qDebug() << "加载地图文件:" << filePath;
-    MapInfo mapInfo = MapSerializer::loadFromFile(filePath);
+    Gplayer.curmapinfo = MapSerializer::loadFromFile(filePath);
 
-    Gplayer.curmapinfo.map_bounding  = mapInfo.map_bounding;
-    Gplayer.curmapinfo.climbs        = mapInfo.climbs;
-    Gplayer.curmapinfo.footholds     = mapInfo.footholds;
-    Gplayer.curmapinfo.wall_list     = mapInfo.wall_list;
-    Gplayer.curmapinfo.platform_list = mapInfo.platform_list;
-    Gplayer.curmapinfo.path_nodes    = mapInfo.path_nodes;
-    Gplayer.curmapinfo.map_mat       = mapInfo.map_mat;
+    // Gplayer.curmapinfo.map_bounding  = mapInfo.map_bounding;
+    // Gplayer.curmapinfo.climbs        = mapInfo.climbs;
+    // Gplayer.curmapinfo.footholds     = mapInfo.footholds;
+    // Gplayer.curmapinfo.wall_list     = mapInfo.wall_list;
+    // Gplayer.curmapinfo.platform_list = mapInfo.platform_list;
+    // Gplayer.curmapinfo.path_nodes    = mapInfo.path_nodes;
+    // Gplayer.curmapinfo.map_mat       = mapInfo.map_mat;
 
 }
 
@@ -1420,7 +1435,7 @@ void PathAlgo::walkToRight(
         // qDebug() << "连接到目标路线:" << target_platform_id;
 
         LineSegment line_segment;
-        line_segment.push_back(std::pair(item.start.x, item.start.x));
+        line_segment.push_back(std::pair(item.end.x, item.end.x));
 
         NodeVisit node_visit;
         node_visit.visit_type = VISIT_TYPE::WALK_RIGHT;
@@ -1441,13 +1456,15 @@ void PathAlgo::jumpLeft(
     // 遍历线路
     // qDebug() << "----------跳跃左边寻路----------";
 
-    for(auto platform : platform_list){
+    for(const auto &platform : platform_list){
 
         // qDebug() << "搜索平台（地板）：" << platform.id;
 
         if(platform.type == 0){  // 如果是线类型
-            std::vector<TargetPoints> targets;
-            targets.resize(platform_list.size());
+            // std::vector<TargetPoints> targets;
+            std::unordered_map<int, std::vector<TargetPoints>> targets;
+            targets[0].resize(platform_list.size());
+            targets[1].resize(platform_list.size());
 
             // 需要遍历所有的地板(从地板开始跳跃)
             for(auto foot : platform.line_child){
@@ -1462,7 +1479,7 @@ void PathAlgo::jumpLeft(
                         int climb_platform = RoomMap::getPosPlatform(target.first, platform_list, room_map);
                         // tmp_node.target_climb.at(climb_id).push_back(iterator.pos());
                         if(climb_platform != -1){
-                            targets.at(climb_platform).push_back(iterator.pos());
+                            targets[1].at(climb_platform).push_back(iterator.pos());
                         }
                     }
                     if(target.second.x != -1) {
@@ -1471,31 +1488,54 @@ void PathAlgo::jumpLeft(
                         if(line_platform == platform.id || line_platform == -1){
                             continue;
                         }
-                        targets.at(line_platform).push_back(iterator.pos());
+                        targets[0].at(line_platform).push_back(iterator.pos());
                     }
                 }
             }
 
             // qDebug() << "准备合并线路：" << platform.id;
-            std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+            // std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+            std::unordered_map<int, std::vector<LineSegment>> foot_segment = Helper::mergeFootPoint(targets);
 
-            for(int target_id = 0; target_id < foot_segment.size(); target_id++){
-                if(foot_segment.at(target_id).empty()){
-                    continue;
+            // for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+            //     if(foot_segment.at(target_id).empty()){
+            //         continue;
+            //     }
+            //     NodeVisit node_visit;
+            //     node_visit.visit_type = VISIT_TYPE::JUMP_LEFT;
+            //     node_visit.area = foot_segment.at(target_id);
+            //     // path_node.second.targets[target_id].visit_list.push_back(node_visit);
+            //     path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
+            // }
+            for(const auto &segment : foot_segment){
+                for(int target_id = 0; target_id < segment.second.size(); target_id++){
+                    if(segment.second.at(target_id).empty()){
+                        continue;
+                    }
+                    NodeVisit node_visit;
+                    node_visit.visit_type = VISIT_TYPE::JUMP_LEFT;
+                    node_visit.area = foot_segment[segment.first].at(target_id);
+                    path_nodes[platform.id].targets[target_id].id = target_id;
+                    path_nodes[platform.id].targets[target_id].type = path_nodes[target_id].type;
+                    path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
                 }
-                NodeVisit node_visit;
-                node_visit.visit_type = VISIT_TYPE::JUMP_LEFT;
-                node_visit.area = foot_segment.at(target_id);
-                // path_node.second.targets[target_id].visit_list.push_back(node_visit);
-                path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
             }
+
+            // for(int target_id = 0; target_id < foot_segment[1].size(); target_id++){
+            //     if(foot_segment[1].at(target_id).empty()){
+            //         continue;
+            //     }
+            // }
         }
 
         if(platform.type == 1){ // 如果是攀爬体类型
             // qDebug() << "搜索平台(攀爬)：" << platform.id;
 
-            std::vector<TargetPoints> targets;
-            targets.resize(platform_list.size());
+            // std::vector<TargetPoints> targets;
+            // targets.resize(platform_list.size());
+            std::unordered_map<int, std::vector<TargetPoints>> targets;
+            targets[0].resize(platform_list.size());
+            targets[1].resize(platform_list.size());
 
             cv::Point climb_start(platform.start.x + 25, platform.start.y);
             cv::Point climb_end(platform.start.x + 25, platform.end.y);
@@ -1515,7 +1555,7 @@ void PathAlgo::jumpLeft(
                 if(target.first.x != -1){
                     int climb_platform = RoomMap::getPosPlatform(target.first, platform_list, room_map);
                     if(climb_platform != -1){
-                        targets.at(climb_platform).push_back(iterator.pos());
+                        targets[1].at(climb_platform).push_back(iterator.pos());
                     }
                 }
                 if(target.second.x != -1){
@@ -1524,22 +1564,36 @@ void PathAlgo::jumpLeft(
                     if(line_platform == platform.id || line_platform == -1){
                         continue;
                     }
-                    targets.at(line_platform).push_back(iterator.pos());
+                    targets[0].at(line_platform).push_back(iterator.pos());
                 }
             }
 
             // qDebug() << "准备合并线路：" << platform.id;
-            std::vector<LineSegment> climb_segment = Helper::mergeClimbPoint(targets);
+            // std::vector<LineSegment> climb_segment = Helper::mergeClimbPoint(targets);
+            std::unordered_map<int, std::vector<LineSegment>> climb_segment = Helper::mergeClimbPoint(targets);
 
-            for(int target_id = 0; target_id < climb_segment.size(); target_id++){
-                if(climb_segment.at(target_id).empty()){
-                    continue;
+            // for(int target_id = 0; target_id < climb_segment.size(); target_id++){
+            //     if(climb_segment.at(target_id).empty()){
+            //         continue;
+            //     }
+            //     NodeVisit node_visit;
+            //     node_visit.visit_type = VISIT_TYPE::JUMP_LEFT;
+            //     node_visit.area = climb_segment.at(target_id);
+            //     path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
+            //     break;
+            // }
+            for(const auto &segment : climb_segment){
+                for(int target_id = 0; target_id < segment.second.size(); target_id++){
+                    if(segment.second.at(target_id).empty()){
+                        continue;
+                    }
+                    NodeVisit node_visit;
+                    node_visit.visit_type = VISIT_TYPE::JUMP_LEFT;
+                    node_visit.area = climb_segment[segment.first].at(target_id);
+                    path_nodes[platform.id].targets[target_id].id = target_id;
+                    path_nodes[platform.id].targets[target_id].type = path_nodes[target_id].type;
+                    path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
                 }
-                NodeVisit node_visit;
-                node_visit.visit_type = VISIT_TYPE::JUMP_LEFT;
-                node_visit.area = climb_segment.at(target_id);
-                path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
-                break;
             }
         }
     }
@@ -1561,8 +1615,11 @@ void PathAlgo::jumpRight(
         // qDebug() << "搜索平台（地板）：" << platform.id;
 
         if(platform.type == 0){  // 如果是线类型
-            std::vector<TargetPoints> targets;
-            targets.resize(platform_list.size());
+            // std::vector<TargetPoints> targets;
+            // targets.resize(platform_list.size());
+            std::unordered_map<int, std::vector<TargetPoints>> targets;
+            targets[0].resize(platform_list.size());
+            targets[1].resize(platform_list.size());
 
             // 需要遍历所有的地板(从地板开始跳跃)
             for(auto foot : platform.line_child){
@@ -1577,7 +1634,7 @@ void PathAlgo::jumpRight(
                         int climb_platform = RoomMap::getPosPlatform(target.first, platform_list, room_map);
                         // tmp_node.target_climb.at(climb_id).push_back(iterator.pos());
                         if(climb_platform != -1){
-                            targets.at(climb_platform).push_back(iterator.pos());
+                            targets[1].at(climb_platform).push_back(iterator.pos());
                         }
                     }
                     if(target.second.x != -1) {
@@ -1586,30 +1643,47 @@ void PathAlgo::jumpRight(
                         if(line_platform == platform.id || line_platform == -1){
                             continue;
                         }
-                        targets.at(line_platform).push_back(iterator.pos());
+                        targets[0].at(line_platform).push_back(iterator.pos());
                     }
                 }
             }
 
             // qDebug() << "准备合并线路：" << platform.id;
-            std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+            // std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+            std::unordered_map<int, std::vector<LineSegment>> foot_segment = Helper::mergeFootPoint(targets);
 
-            for(int target_id = 0; target_id < foot_segment.size(); target_id++){
-                if(foot_segment.at(target_id).empty()){
-                    continue;
+            // for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+            //     if(foot_segment.at(target_id).empty()){
+            //         continue;
+            //     }
+            //     NodeVisit node_visit;
+            //     node_visit.visit_type = VISIT_TYPE::JUMP_RIGHT;
+            //     node_visit.area = foot_segment.at(target_id);
+            //     path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
+            // }
+            for(const auto &segment : foot_segment){
+                for(int target_id = 0; target_id < segment.second.size(); target_id++){
+                    if(segment.second.at(target_id).empty()){
+                        continue;
+                    }
+                    NodeVisit node_visit;
+                    node_visit.visit_type = VISIT_TYPE::JUMP_RIGHT;
+                    node_visit.area = foot_segment[segment.first].at(target_id);
+                    path_nodes[platform.id].targets[target_id].id = target_id;
+                    path_nodes[platform.id].targets[target_id].type = path_nodes[target_id].type;
+                    path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
                 }
-                NodeVisit node_visit;
-                node_visit.visit_type = VISIT_TYPE::JUMP_RIGHT;
-                node_visit.area = foot_segment.at(target_id);
-                path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
             }
         }
 
         if(platform.type == 1){ // 如果是攀爬体类型
             // qDebug() << "搜索平台(攀爬)：" << platform.id;
 
-            std::vector<TargetPoints> targets;
-            targets.resize(platform_list.size());
+            // std::vector<TargetPoints> targets;
+            // targets.resize(platform_list.size());
+            std::unordered_map<int, std::vector<TargetPoints>> targets;
+            targets[0].resize(platform_list.size());
+            targets[1].resize(platform_list.size());
 
             cv::Point climb_start(platform.start.x + 25, platform.start.y);
             cv::Point climb_end(platform.start.x + 25, platform.end.y);
@@ -1629,7 +1703,7 @@ void PathAlgo::jumpRight(
                 if(target.first.x != -1){
                     int climb_platform = RoomMap::getPosPlatform(target.first, platform_list, room_map);
                     if(climb_platform != -1){
-                        targets.at(climb_platform).push_back(iterator.pos());
+                        targets[1].at(climb_platform).push_back(iterator.pos());
                     }
                 }
                 if(target.second.x != -1){
@@ -1638,22 +1712,36 @@ void PathAlgo::jumpRight(
                     if(line_platform == platform.id || line_platform == -1){
                         continue;
                     }
-                    targets.at(line_platform).push_back(iterator.pos());
+                    targets[0].at(line_platform).push_back(iterator.pos());
                 }
             }
 
             // qDebug() << "准备合并线路：" << platform.id;
-            std::vector<LineSegment> climb_segment = Helper::mergeClimbPoint(targets);
+            // std::vector<LineSegment> climb_segment = Helper::mergeClimbPoint(targets);
+            std::unordered_map<int, std::vector<LineSegment>> climb_segment = Helper::mergeClimbPoint(targets);
 
-            for(int target_id = 0; target_id < climb_segment.size(); target_id++){
-                if(climb_segment.at(target_id).empty()){
-                    continue;
+            // for(int target_id = 0; target_id < climb_segment.size(); target_id++){
+            //     if(climb_segment.at(target_id).empty()){
+            //         continue;
+            //     }
+            //     NodeVisit node_visit;
+            //     node_visit.visit_type = VISIT_TYPE::JUMP_RIGHT;
+            //     node_visit.area = climb_segment.at(target_id);
+            //     path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
+            //     break;
+            // }
+            for(const auto &segment : climb_segment){
+                for(int target_id = 0; target_id < segment.second.size(); target_id++){
+                    if(segment.second.at(target_id).empty()){
+                        continue;
+                    }
+                    NodeVisit node_visit;
+                    node_visit.visit_type = VISIT_TYPE::JUMP_RIGHT;
+                    node_visit.area = climb_segment[segment.first].at(target_id);
+                    path_nodes[platform.id].targets[target_id].id = target_id;
+                    path_nodes[platform.id].targets[target_id].type = path_nodes[target_id].type;
+                    path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
                 }
-                NodeVisit node_visit;
-                node_visit.visit_type = VISIT_TYPE::JUMP_RIGHT;
-                node_visit.area = climb_segment.at(target_id);
-                path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
-                break;
             }
         }
     }
@@ -1670,8 +1758,11 @@ void PathAlgo::jump_up(
             continue;
         }
 
-        std::vector<TargetPoints> targets;
-        targets.resize(platform_list.size());
+        // std::vector<TargetPoints> targets;
+        // targets.resize(platform_list.size());
+        std::unordered_map<int, std::vector<TargetPoints>> targets;
+        targets[0].resize(platform_list.size());
+        targets[1].resize(platform_list.size());
 
         for(auto foot : platform.line_child){
 
@@ -1697,7 +1788,7 @@ void PathAlgo::jump_up(
                         if(start.y - cur_pos.y > 2){
                             int climb_platform = RoomMap::getPosPlatform(cur_pos, platform_list, room_map);
                             if(climb_platform != -1){
-                                targets.at(climb_platform).push_back(iterator.pos());
+                                targets[1].at(climb_platform).push_back(iterator.pos());
                             }
                         }
                     }
@@ -1710,23 +1801,37 @@ void PathAlgo::jump_up(
                             if(line_platform == platform.id || line_platform == -1){
                                 continue;
                             }
-                            targets.at(line_platform).push_back(iterator.pos());
+                            targets[0].at(line_platform).push_back(iterator.pos());
                         }
                     }
                 }
             }
         }
 
-        std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+        // std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+        std::unordered_map<int, std::vector<LineSegment>> foot_segment = Helper::mergeFootPoint(targets);
 
-        for(int target_id = 0; target_id < foot_segment.size(); target_id++){
-            if(foot_segment.at(target_id).empty()){
-                continue;
+        // for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+        //     if(foot_segment.at(target_id).empty()){
+        //         continue;
+        //     }
+        //     NodeVisit node_visit;
+        //     node_visit.visit_type = VISIT_TYPE::JUMP_UP;
+        //     node_visit.area = foot_segment.at(target_id);
+        //     path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
+        // }
+        for(const auto &segment : foot_segment){
+            for(int target_id = 0; target_id < segment.second.size(); target_id++){
+                if(segment.second.at(target_id).empty()){
+                    continue;
+                }
+                NodeVisit node_visit;
+                node_visit.visit_type = VISIT_TYPE::JUMP_UP;
+                node_visit.area = foot_segment[segment.first].at(target_id);
+                path_nodes[platform.id].targets[target_id].id = target_id;
+                path_nodes[platform.id].targets[target_id].type = path_nodes[target_id].type;
+                path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
             }
-            NodeVisit node_visit;
-            node_visit.visit_type = VISIT_TYPE::JUMP_UP;
-            node_visit.area = foot_segment.at(target_id);
-            path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
         }
     }
 }
@@ -1742,8 +1847,11 @@ void PathAlgo::jump_down(
             continue;
         }
 
-        std::vector<TargetPoints> targets;
-        targets.resize(platform_list.size());
+        // std::vector<TargetPoints> targets;
+        // targets.resize(platform_list.size());
+        std::unordered_map<int, std::vector<TargetPoints>> targets;
+        targets[0].resize(platform_list.size());
+        targets[1].resize(platform_list.size());
 
         for(auto foot : platform.line_child){
 
@@ -1774,7 +1882,7 @@ void PathAlgo::jump_down(
                             if(line_platform == platform.id || line_platform == -1){
                                 continue;
                             }
-                            targets.at(line_platform).push_back(iterator.pos());
+                            targets[0].at(line_platform).push_back(iterator.pos());
                             break;
                         }
                     }
@@ -1782,16 +1890,31 @@ void PathAlgo::jump_down(
             }
         }
 
-        std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+        // std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+        std::unordered_map<int, std::vector<LineSegment>> foot_segment = Helper::mergeFootPoint(targets);
 
-        for(int target_id = 0; target_id < foot_segment.size(); target_id++){
-            if(foot_segment.at(target_id).empty()){
-                continue;
+        // for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+        //     if(foot_segment.at(target_id).empty()){
+        //         continue;
+        //     }
+        //     NodeVisit node_visit;
+        //     node_visit.visit_type = VISIT_TYPE::JUMP_DOWN;
+        //     node_visit.area = foot_segment.at(target_id);
+        //     path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
+        // }
+
+        for(const auto &segment : foot_segment){
+            for(int target_id = 0; target_id < segment.second.size(); target_id++){
+                if(segment.second.at(target_id).empty()){
+                    continue;
+                }
+                NodeVisit node_visit;
+                node_visit.visit_type = VISIT_TYPE::JUMP_DOWN;
+                node_visit.area = foot_segment[segment.first].at(target_id);
+                path_nodes[platform.id].targets[target_id].id = target_id;
+                path_nodes[platform.id].targets[target_id].type = path_nodes[target_id].type;
+                path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
             }
-            NodeVisit node_visit;
-            node_visit.visit_type = VISIT_TYPE::JUMP_DOWN;
-            node_visit.area = foot_segment.at(target_id);
-            path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
         }
     }
 }
@@ -1806,8 +1929,11 @@ void PathAlgo::up(
 
         // 人物碰撞范围内是否有梯子
         if(platform.type == 0){
-            std::vector<TargetPoints> targets;
-            targets.resize(platform_list.size());
+            // std::vector<TargetPoints> targets;
+            // targets.resize(platform_list.size());
+            std::unordered_map<int, std::vector<TargetPoints>> targets;
+            targets[0].resize(platform_list.size());
+            targets[1].resize(platform_list.size());
 
             for(auto foot : platform.line_child){
 
@@ -1826,22 +1952,36 @@ void PathAlgo::up(
                     {
                         int climb_platform = RoomMap::getPosPlatform(end, platform_list, room_map);
                         if(climb_platform != -1){
-                            targets.at(climb_platform).push_back(iterator.pos());
+                            targets[1].at(climb_platform).push_back(iterator.pos());
                         }
                     }
                 }
             }
 
-            std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+            // std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+            std::unordered_map<int, std::vector<LineSegment>> foot_segment = Helper::mergeFootPoint(targets);
 
-            for(int target_id = 0; target_id < foot_segment.size(); target_id++){
-                if(foot_segment.at(target_id).empty()){
-                    continue;
+            // for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+            //     if(foot_segment.at(target_id).empty()){
+            //         continue;
+            //     }
+            //     NodeVisit node_visit;
+            //     node_visit.visit_type = VISIT_TYPE::UP;
+            //     node_visit.area = foot_segment.at(target_id);
+            //     path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
+            // }
+            for(const auto &segment : foot_segment){
+                for(int target_id = 0; target_id < segment.second.size(); target_id++){
+                    if(segment.second.at(target_id).empty()){
+                        continue;
+                    }
+                    NodeVisit node_visit;
+                    node_visit.visit_type = VISIT_TYPE::UP;
+                    node_visit.area = foot_segment[segment.first].at(target_id);
+                    path_nodes[platform.id].targets[target_id].id = target_id;
+                    path_nodes[platform.id].targets[target_id].type = path_nodes[target_id].type;
+                    path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
                 }
-                NodeVisit node_visit;
-                node_visit.visit_type = VISIT_TYPE::UP;
-                node_visit.area = foot_segment.at(target_id);
-                path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
             }
         }
 
@@ -1896,8 +2036,11 @@ void PathAlgo::down(const std::vector<Platform> &platform_list,
 
         // 先处理从地板向下攀爬
         if(platform.type == 0){
-            std::vector<TargetPoints> targets;
-            targets.resize(platform_list.size());
+            // std::vector<TargetPoints> targets;
+            // targets.resize(platform_list.size());
+            std::unordered_map<int, std::vector<TargetPoints>> targets;
+            targets[0].resize(platform_list.size());
+            targets[1].resize(platform_list.size());
 
             for(auto foot : platform.line_child){
 
@@ -1916,22 +2059,37 @@ void PathAlgo::down(const std::vector<Platform> &platform_list,
                     {
                         int climb_platform = RoomMap::getPosPlatform(end, platform_list, room_map);
                         if(climb_platform != -1){
-                            targets.at(climb_platform).push_back(iterator.pos());
+                            targets[1].at(climb_platform).push_back(iterator.pos());
                         }
                     }
                 }
             }
 
-            std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+            // std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
+            std::unordered_map<int, std::vector<LineSegment>> foot_segment = Helper::mergeFootPoint(targets);
 
-            for(int target_id = 0; target_id < foot_segment.size(); target_id++){
-                if(foot_segment.at(target_id).empty()){
-                    continue;
+            // for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+            //     if(foot_segment.at(target_id).empty()){
+            //         continue;
+            //     }
+            //     NodeVisit node_visit;
+            //     node_visit.visit_type = VISIT_TYPE::DOWN;
+            //     node_visit.area = foot_segment.at(target_id);
+            //     path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
+            // }
+
+            for(const auto &segment : foot_segment){
+                for(int target_id = 0; target_id < segment.second.size(); target_id++){
+                    if(segment.second.at(target_id).empty()){
+                        continue;
+                    }
+                    NodeVisit node_visit;
+                    node_visit.visit_type = VISIT_TYPE::JUMP_DOWN;
+                    node_visit.area = foot_segment[segment.first].at(target_id);
+                    path_nodes[platform.id].targets[target_id].id = target_id;
+                    path_nodes[platform.id].targets[target_id].type = path_nodes[target_id].type;
+                    path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
                 }
-                NodeVisit node_visit;
-                node_visit.visit_type = VISIT_TYPE::DOWN;
-                node_visit.area = foot_segment.at(target_id);
-                path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
             }
         }
 

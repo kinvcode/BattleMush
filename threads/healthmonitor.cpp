@@ -79,7 +79,7 @@ void HealthMonitor::process()
         // 检测血量
         int hp_rate = Gconfig.getValue("auto_add_health/hp_rate").toInt();
         if(Gplayer.MAX_HP != 0 && Gplayer.HP < Gplayer.MAX_HP){
-            int cur_hp_rate =Gplayer.HP * 100 / Gplayer.MAX_HP;
+            int cur_hp_rate = Gplayer.HP * 100 / Gplayer.MAX_HP;
             if(cur_hp_rate <= hp_rate){
                 qDebug() << "当前血量：" << Gplayer.HP;
                 qDebug() << "当前最大血量：" << Gplayer.MAX_HP;
@@ -96,7 +96,7 @@ void HealthMonitor::process()
 
         int mp_rate = Gconfig.getValue("auto_add_health/mp_rate").toInt();
         if(Gplayer.MAX_MP != 0 && Gplayer.MP < Gplayer.MAX_MP){
-            int cur_mp_rate = ( Gplayer.MP / Gplayer.MAX_MP) * 100;
+            int cur_mp_rate = Gplayer.MP * 100 / Gplayer.MAX_MP;
             if(cur_mp_rate <= mp_rate){
                 qDebug() << "当前蓝量：" << Gplayer.MP;
                 qDebug() << "当前最大蓝量：" << Gplayer.MAX_MP;

@@ -7,6 +7,7 @@
 #include <QRandomGenerator>
 #include <windows.h>
 #include "driver/msstruct.h"
+#include "driver/mskeycode.h"
 
 class MSDriverPRO
 {

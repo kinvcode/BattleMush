@@ -10,6 +10,8 @@ public:
 
     int m_deviation;
 
+    int m_walk_timeout;
+
     quint64 m_transform;
 
     WalkBase(int target_x);

@@ -124,15 +124,19 @@ MapInfo MapSerializer::deserializeMapInfo(const QJsonObject& json, const QString
     }
 
     // 反序列化地图图片
-    if (json.contains("map_mat")) {
-        QString img_file = filePath + ".png";
-        cv::Mat loaded_image = cv::imread(img_file.toStdString(), cv::IMREAD_COLOR);
-        if (loaded_image.empty()) {
-            mapInfo.map_mat = cv::Mat();
-        }else{
-            mapInfo.map_mat = loaded_image;
-        }
+    QString img_file = filePath + ".png";
+    cv::Mat loaded_image = cv::imread(img_file.toStdString(), cv::IMREAD_COLOR);
+    if (loaded_image.empty()) {
+        mapInfo.map_mat = cv::Mat();
+    }else{
+        mapInfo.map_mat = loaded_image;
     }
+    if(loaded_image.empty()){
+        qDebug() << "图片为空";
+    }else{
+        qDebug() << "已加载地图地形图片";
+    }
+
 
     return mapInfo;
 }
