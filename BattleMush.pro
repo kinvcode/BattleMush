@@ -49,6 +49,7 @@ SOURCES += \
     logviewer.cpp \
     main.cpp \
     mainwindow.cpp \
+    pathfinding/moveplatform.cpp \
     pathfinding/walkbase.cpp \
     process/process.cpp \
     threads/healthmonitor.cpp \
@@ -78,6 +79,7 @@ HEADERS += \
     keyboard/nativeeventfilter.h \
     logviewer.h \
     mainwindow.h \
+    pathfinding/moveplatform.h \
     pathfinding/walkbase.h \
     process/process.h \
     threads/healthmonitor.h \

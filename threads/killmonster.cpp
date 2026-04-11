@@ -9,6 +9,7 @@
 #include "pathfinding/walkbase.h"
 #include "driver/mskeycode.h"
 #include "global/globalconfig.h"
+#include "pathfinding/moveplatform.h"
 
 using namespace Mem;
 
@@ -139,9 +140,49 @@ void KillMonster::process()
 
         // 待处理的怪物列表
         std::vector<Monster> handle_monsters = getLineMonsters(user_in_lineid);
+        // std::vector<Monster> handle_monsters;
+
+        PathNode node = Gplayer.curmapinfo.path_nodes[2];
+        qDebug() << "准备前往平台:" << 3;
+        MovePlatform::toPlatform(node, 3);
+        ProcessHelper::programDelay(1000);
+        QApplication::processEvents();
+        continue;
 
         if(handle_monsters.empty()){
             DebugOutput::out("当前平台不存在怪物");
+
+            // 寻找其他平台的怪物，可以先随便找个怪物。然后生成A星路径，在路径图中如果存在怪物就击杀
+            if(m_allmonster.empty()){
+                DebugOutput::out("全图未存在怪物~");
+                ProcessHelper::programDelay(1000);
+                QApplication::processEvents();
+                continue;
+            }
+
+            for(const auto &monster : m_allmonster){
+                int monster_platform = RoomMap::getFootPlatform(monster.foothold_id, Gplayer.curmapinfo.platform_list);
+                if(monster_platform == -1){
+                    qDebug() << "怪物所在平台找不到";
+                    continue;
+                }
+
+                std::vector<int> paths = PathAlgo::findAStarPath(user_in_lineid, monster_platform, Gplayer.curmapinfo.path_nodes);
+                if(paths.empty()){
+                    qDebug() << "无法找到前往该怪物平台的路径";
+                    continue;
+                }
+
+                for(auto plat : paths){
+                    PathNode node = Gplayer.curmapinfo.path_nodes[plat];
+                    qDebug() << "准备前往平台:" << plat;
+                    MovePlatform::toPlatform(node, plat);
+                    // std::vector<Monster> handle_monsters = getLineMonsters(user_in_lineid);
+                    // 前往该平台
+                    // moveTo
+                }
+            }
+
             ProcessHelper::programDelay(1000);
             QApplication::processEvents();
             continue;
