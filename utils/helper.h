@@ -124,6 +124,7 @@ public:
     static cv::Mat makeRoomMap(
         const std::vector<ClimbRect> &climb_list,
         const std::vector<FootholdRect> &foothold_list,
+        const std::vector<Wall> &wall_list,
         const MapBounding &map_bounding
     );
 
@@ -143,6 +144,9 @@ public:
 
     // 计算坐标所在平台
     static int getPosPlatform(cv::Point pos, const std::vector<Platform> &platform_list, const cv::Mat &room_map);
+
+    // 计算坐标所在攀爬平台
+    static int getClimbPlatform(cv::Point pos, const std::vector<Platform> &platform_list, const cv::Mat &room_map);
 
     // 获取平台的类型
     static int getPlatformType(int platform_id, const std::vector<Platform> &platform_list);

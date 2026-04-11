@@ -119,17 +119,25 @@ void KillMonster::process()
         quint64 user_foothold_p = readLong(readLong(Gplayer.p_localplayer + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::currentFoothold);
         quint64 user_attach_p = readLong(readLong(Gplayer.p_localplayer + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::attachEntity);
         int user_foothold_id = 0;
-        int user_climb_id = 0;
         int user_in_lineid = -1;
+
+        // int user_x = RoomMap::toMapPosX(readFloat(readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent) + BASE::TransformComponent::PositionX),
+                                        // Gplayer.curmapinfo.map_bounding.x_offset);
+        // qDebug() << "人物坐标：" << user_x;
 
         if(user_foothold_p){
             user_foothold_id = readInt(user_foothold_p + BASE::Foothold::ID);
             user_in_lineid = RoomMap::getFootPlatform(user_foothold_id, Gplayer.curmapinfo.platform_list);
         }
-
-        int user_x = RoomMap::toMapPosX(readFloat(readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent) + BASE::TransformComponent::PositionX),
-                                        Gplayer.curmapinfo.map_bounding.x_offset);
-        qDebug() << "人物坐标：" << user_x;
+        if(user_attach_p){
+            cv::Point pos = {-1,-1};
+            quint64 transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+            float user_x = readFloat(transform + BASE::TransformComponent::PositionX);
+            float user_y = readFloat(transform + BASE::TransformComponent::PositionY);
+            pos.x = RoomMap::toMapPosX(user_x,Gplayer.curmapinfo.map_bounding.x_offset);
+            pos.y = RoomMap::toMapPosY(user_y,Gplayer.curmapinfo.map_bounding.y_offset, Gplayer.curmapinfo.map_bounding.height);
+            user_in_lineid = RoomMap::getClimbPlatform(pos, Gplayer.curmapinfo.platform_list, Gplayer.curmapinfo.map_mat);
+        }
 
         if(user_in_lineid == -1){
             DebugOutput::out("暂不支持当前位置寻怪，人物可能在攀爬");
@@ -141,9 +149,9 @@ void KillMonster::process()
         // 待处理的怪物列表
         std::vector<Monster> handle_monsters = getLineMonsters(user_in_lineid);
 
-        PathNode node = Gplayer.curmapinfo.path_nodes[7];
-        qDebug() << "准备前往平台:" << 11;
-        MovePlatform::toPlatform(node, 11);
+        PathNode node = Gplayer.curmapinfo.path_nodes[11];
+        qDebug() << "准备前往平台:" << 7;
+        MovePlatform::toPlatform(node, 7);
         ProcessHelper::programDelay(1000);
         QApplication::processEvents();
         continue;

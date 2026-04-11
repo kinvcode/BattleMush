@@ -11,9 +11,9 @@ public:
 
     static bool walkRight(LineSegment area, int platform);
 
-    static bool jumpLeft(LineSegment area, int platform, bool is_climb = false);
+    static bool jumpLeft(LineSegment area, int platform, bool is_climb = false, bool self_climb = false);
 
-    static bool jumpRight(LineSegment area, int platform, bool is_climb = false);
+    static bool jumpRight(LineSegment area, int platform, bool is_climb = false, bool self_climb = false);
 
     static bool jumpUP(LineSegment area, int platform, bool is_climb = false);
 
@@ -28,9 +28,13 @@ private :
 
     static quint64 getUserClimbP();
 
-    static int getUserLine();
+    static int getUserPlatform(bool is_climb = false);
 
     static int getUserX(quint64 transform);
+
+    static int getUserY(quint64 transform);
+
+    static cv::Point getUserPos(quint64 transform);
 };
 
 #endif // MOVEPLATFORM_H

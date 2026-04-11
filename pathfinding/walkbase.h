@@ -8,6 +8,8 @@ class WalkBase
 public:
     int m_target_x;
 
+    int m_target_y;
+
     int m_deviation;
 
     int m_walk_timeout;
@@ -18,10 +20,16 @@ public:
 
     bool run();
 
+    bool runY();
+
 private:
     int getUserX();
 
+    int getUserY();
+
     void clearXkey();
+
+    void clearYkey();
 };
 
 #endif // WALKBASE_H

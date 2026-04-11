@@ -14,6 +14,7 @@ WalkBase::WalkBase(int target_x)
     m_deviation = 50;
     m_walk_timeout = 3000;
     m_target_x = target_x;
+    m_target_y = target_x;
 }
 
 bool WalkBase::run()
@@ -77,6 +78,71 @@ bool WalkBase::run()
     return false;
 }
 
+bool WalkBase::runY()
+{
+    if(m_target_y == 0){
+        return false;
+    }
+
+    m_transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+
+    int user_y = getUserY();
+
+    if(user_y == m_target_y)
+    {
+        return true;
+    }
+
+    // 清空一下按键
+    clearYkey();
+
+    // 跑动按键判断
+    int direction_y;
+    if (m_target_y > user_y) {
+        // 向下
+        direction_y = MSKeyboard_DownArrow;
+    } else {
+        // 向上
+        direction_y = MSKeyboard_UpArrow;
+    }
+
+    // 是否到达
+    bool arrived = false;
+
+    QElapsedTimer begin_timer;
+    begin_timer.restart();
+
+    QElapsedTimer run_status_time;
+    run_status_time.start();
+
+    // 开始移动
+    MSDriverPRO::keyboardDown(direction_y);
+
+    while(true){
+
+        if (begin_timer.elapsed() > m_walk_timeout) {
+            DebugOutput::out("寻路超时~");
+            clearYkey();
+            return false;
+        }
+
+        // 到达
+        if (arrived) {
+            clearYkey();
+            return true;
+        }
+
+        user_y = getUserY();
+
+        if (abs(m_target_y - user_y) <= m_deviation) {
+            arrived = true;
+        }
+    }
+
+    clearYkey();
+    return false;
+}
+
 int WalkBase::getUserX()
 {
     if(!m_transform){
@@ -88,8 +154,25 @@ int WalkBase::getUserX()
     return RoomMap::toMapPosX(user_x,Gplayer.curmapinfo.map_bounding.x_offset);
 }
 
+int WalkBase::getUserY()
+{
+    if(!m_transform){
+        return -1;
+    }
+
+    float user_y = readFloat(m_transform + BASE::TransformComponent::PositionY);
+
+    return RoomMap::toMapPosY(user_y,Gplayer.curmapinfo.map_bounding.y_offset,Gplayer.curmapinfo.map_bounding.height);
+}
+
 void WalkBase::clearXkey()
 {
     MSDriverPRO::keyboardUp(MSKeyboard_RightArrow);
     MSDriverPRO::keyboardUp(MSKeyboard_LeftArrow);
+}
+
+void WalkBase::clearYkey()
+{
+    MSDriverPRO::keyboardUp(MSKeyboard_UpArrow);
+    MSDriverPRO::keyboardUp(MSKeyboard_DownArrow);
 }

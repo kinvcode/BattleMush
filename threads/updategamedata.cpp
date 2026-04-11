@@ -295,6 +295,7 @@ void UpdateGameData::UpdateRoomMap()
         Gplayer.curmapinfo.map_mat = RoomMap::makeRoomMap(
             Gplayer.curmapinfo.climbs,
             Gplayer.curmapinfo.footholds,
+            Gplayer.curmapinfo.wall_list,
             Gplayer.curmapinfo.map_bounding
         );
     }

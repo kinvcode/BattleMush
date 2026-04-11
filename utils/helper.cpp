@@ -349,12 +349,19 @@ std::vector<Wall> RoomMap::makeWallList(const std::vector<FootholdRect> &foothol
 
         // 如果item是一个墙体(x相同，y不同)
         if (item.x_left == item.x_right && item.y_left != item.y_right) {
+
+            // 调试 过虑墙体
+            // if(item.x_left == 231 || item.x_left == 1221 || item.x_left == 1446){
+            //     continue;
+            // }
+
             Wall wall;
             wall.foot_id = item.id;
             wall.x = item.x_left;
             wall.bottom = std::max(item.y_left, item.y_right);
             wall.top = std::min(item.y_left, item.y_right);
             wall_list.push_back(wall);
+            // qDebug() << wall.foot_id << wall.x << wall.top << wall.bottom;
             id_set.erase(item.id);
             continue;
         }
@@ -526,6 +533,7 @@ std::vector<Platform> RoomMap::makePlatformList(
 cv::Mat RoomMap::makeRoomMap(
     const std::vector<ClimbRect> &climb_list,
     const std::vector<FootholdRect> &foothold_list,
+    const std::vector<Wall> &wall_list,
     const MapBounding &map_bounding)
 {
     // 创建地图文件
@@ -543,7 +551,8 @@ cv::Mat RoomMap::makeRoomMap(
     for(auto item : foothold_list){
         if(item.x_left == item.x_right){
             // 用蓝色绘制墙壁
-            cv::line(cur_room_map,cv::Point(item.x_left,item.y_left),cv::Point(item.x_right,item.y_right),COLOR_WALL);
+            continue;
+            // cv::line(cur_room_map,cv::Point(item.x_left,item.y_left),cv::Point(item.x_right,item.y_right),COLOR_WALL);
         }else{
             // 用黑色绘制地板
             //如果是斜线需要加粗
@@ -552,8 +561,13 @@ cv::Mat RoomMap::makeRoomMap(
             }else{
                 cv::line(cur_room_map,cv::Point(item.x_left,item.y_left),cv::Point(item.x_right,item.y_right),COLOR_LINE);
             }
-
         }
+    }
+
+    for(auto item : wall_list){
+        // cv::line(cur_room_map,cv::Point(item.x_left,item.y_left),cv::Point(item.x_right,item.y_right),COLOR_WALL);
+
+        cv::line(cur_room_map,cv::Point(item.x,item.top),cv::Point(item.x,item.bottom),COLOR_WALL);
     }
 
     return cur_room_map;
@@ -703,6 +717,7 @@ std::unordered_map<int, std::vector<LineSegment>> Helper::mergeClimbPoint(
     std::unordered_map<int, std::vector<LineSegment>> line_set;
     for(const auto &target : target_list){
         int climb_count = target.second.size();
+        // int platform_count =
         line_set[target.first].reserve(climb_count);
 
         for(int climb_id = 0; climb_id < climb_count; climb_id++) {
@@ -1086,10 +1101,11 @@ std::pair<cv::Point,cv::Point> ImageTool::climbJumpTrajectory(
         }
 
         // 检测到地面（可以跳跃到上层）
-        if(checkLineHasColorPixel(image, drawPoints[i-1], drawPoints[i], line_color,target_pos) && i != 1)
+        if(checkLineHasColorPixel(image, drawPoints[i-1], drawPoints[i], cv::Vec3b(0,0,0),target_pos) && i != 1)
         {
             result.second = target_pos;
             break;
+
         }
     }
 
@@ -1227,7 +1243,7 @@ int RoomMap::getFootPlatform(int foothold_id, const std::vector<Platform>& platf
 int RoomMap::getPosPlatform(cv::Point pos, const std::vector<Platform> &platform_list, const cv::Mat &room_map)
 {
     // 遍历平台
-    for(auto platform : platform_list){
+    for(const auto &platform : platform_list){
         if(platform.type == 1){
             if(pos.x >= platform.start.x
                 && pos.x <= platform.end.x
@@ -1254,9 +1270,27 @@ int RoomMap::getPosPlatform(cv::Point pos, const std::vector<Platform> &platform
     return -1;
 }
 
+int RoomMap::getClimbPlatform(cv::Point pos, const std::vector<Platform> &platform_list, const cv::Mat &room_map)
+{
+    // 遍历平台
+    for(const auto &platform : platform_list){
+        if(platform.type == 1){
+            if(pos.x >= platform.start.x
+                && pos.x <= platform.end.x
+                && pos.y >= (platform.start.y - 40)
+                && pos.y <= (platform.end.y + 40)
+                ){
+                return platform.id;
+            }
+        }
+    }
+
+    return -1;
+}
+
 int RoomMap::getPlatformType(int platform_id, const std::vector<Platform> &platform_list)
 {
-    for(auto item : platform_list){
+    for(const auto &item : platform_list){
         if(item.id == platform_id){
             return item.type;
         }
@@ -1537,7 +1571,7 @@ void PathAlgo::jumpLeft(
             targets[0].resize(platform_list.size());
             targets[1].resize(platform_list.size());
 
-            cv::Point climb_start(platform.start.x + 25, platform.start.y);
+            cv::Point climb_start(platform.start.x + 25, platform.start.y + 3);
             cv::Point climb_end(platform.start.x + 25, platform.end.y);
             cv::LineIterator iterator(room_map, climb_start, climb_end, 8);  // 8连通线段
 
@@ -1685,7 +1719,7 @@ void PathAlgo::jumpRight(
             targets[0].resize(platform_list.size());
             targets[1].resize(platform_list.size());
 
-            cv::Point climb_start(platform.start.x + 25, platform.start.y);
+            cv::Point climb_start(platform.start.x + 25, platform.start.y + 3);
             cv::Point climb_end(platform.start.x + 25, platform.end.y);
             cv::LineIterator iterator(room_map, climb_start, climb_end, 8);  // 8连通线段
 
@@ -1696,6 +1730,9 @@ void PathAlgo::jumpRight(
             cur_climb_rect.y_bottom = platform.end.y;
 
             for (int i = 0; i < iterator.count; i++, ++iterator) {
+                if(i == 60){
+                    qDebug() << ""; // 调试
+                }
                 std::pair<cv::Point, cv::Point> target = ImageTool::climbJumpTrajectory(true, room_map, cur_climb_rect, iterator.pos().x, iterator.pos().y);
                 if(target.first.x == -1 && target.second.x == -1){
                     continue;
