@@ -32,7 +32,7 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform)
                 qDebug() << "目标平台为地平线";
                 for(const auto &visit : target.second.visit_list){
 
-                    if(visit.visit_type != VISIT_TYPE::JUMP_LEFT) continue; // 调试语句，用完就删
+                    if(visit.visit_type != VISIT_TYPE::JUMP_DOWN) continue; // 调试语句，用完就删
 
                     switch (visit.visit_type) {
                     case VISIT_TYPE::WALK_LEFT:
@@ -72,7 +72,10 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform)
                         break;
                     case VISIT_TYPE::JUMP_DOWN:
                         qDebug() << "向下跳跃可以到达目标平台";
-
+                        if(jumpDown(visit.area, platform)){
+                            return true;
+                        }
+                        qDebug() << "向下跳跃未到目的平台，即将尝试其他方式";
                         break;
                     default:
                         break;
@@ -81,7 +84,7 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform)
             }else{
                 for(const auto &visit : target.second.visit_list){
 
-                    if(visit.visit_type != VISIT_TYPE::JUMP_UP) continue; // 调试语句，用完就删
+                    if(visit.visit_type != VISIT_TYPE::DOWN) continue; // 调试语句，用完就删
 
                     switch (visit.visit_type) {
                     case VISIT_TYPE::JUMP_LEFT:
@@ -106,10 +109,18 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform)
                         qDebug() << "向上跳跃未到攀爬体，即将尝试其他方式";
                         break;
                     case VISIT_TYPE::UP:
-
+                        qDebug() << "向上攀爬可以到达目标攀爬体";
+                        if(up(visit.area, platform)){
+                            return true;
+                        }
+                        qDebug() << "向上未到攀爬体，即将尝试其他方式";
                         break;
                     case VISIT_TYPE::DOWN:
-
+                        qDebug() << "向下可以到达目标攀爬体";
+                        if(down(visit.area, platform, true)){
+                            return true;
+                        }
+                        qDebug() << "向下未到目标攀爬体，即将尝试其他方式";
                         break;
                     default:
                         break;
@@ -131,7 +142,7 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform)
                 qDebug() << "目标平台为地平线";
                 for(const auto &visit : target.second.visit_list){
 
-                    if(visit.visit_type != VISIT_TYPE::JUMP_RIGHT) continue; // 调试语句，用完就删
+                    if(visit.visit_type != VISIT_TYPE::DOWN) continue; // 调试语句，用完就删
 
                     switch (visit.visit_type) {
                     case VISIT_TYPE::JUMP_LEFT:
@@ -149,10 +160,18 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform)
                         qDebug() << "向右跳跃未到目的平台，即将尝试其他方式";
                         break;
                     case VISIT_TYPE::UP:
-
+                        qDebug() << "向上攀爬可以到达目标平台";
+                        if(up(visit.area, platform, true)){
+                            return true;
+                        }
+                        qDebug() << "向上未到攀爬体，即将尝试其他方式";
                         break;
                     case VISIT_TYPE::DOWN:
-
+                        qDebug() << "向下可以到达目标平台";
+                        if(down(visit.area, platform)){
+                            return true;
+                        }
+                        qDebug() << "向下未到目标平台，即将尝试其他方式";
                         break;
                     default:
                         break;
@@ -481,7 +500,7 @@ bool MovePlatform::jumpUP(LineSegment area, int platform, bool is_climb)
         }else{
             // 到达地点之后进行跳跃操作
             MSDriverPRO::keyboardClick(jump_key);
-            MSDriverPRO::keyboardDown(MSKeyboard_UpArrow);
+            // MSDriverPRO::keyboardDown(MSKeyboard_UpArrow);
 
             quint64 foothold_p = getUserFootholdP();
             while(foothold_p == 0){
@@ -490,10 +509,174 @@ bool MovePlatform::jumpUP(LineSegment area, int platform, bool is_climb)
                 foothold_p = getUserFootholdP();
             }
 
+            // MSDriverPRO::keyboardUp(MSKeyboard_UpArrow);
+
             if(platform == getUserPlatform()){
                 qDebug() << "向上跳跃已到达指定平台";
                 return true;
             }
+        }
+    }
+
+    return false;
+}
+
+bool MovePlatform::jumpDown(LineSegment area, int platform)
+{
+    int jump_key = Gconfig.getValue("bindkey/jump").toInt();
+    quint64 transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+
+    for(const auto &seg : area){
+        int target = seg.first + (seg.second - seg.first) / 2;
+
+        // 预估步行时间(100毫秒走14)
+        int user_x = getUserX(transform);
+        int timeout = abs(target - user_x) / 14 * 100;
+        qDebug() << "预估用时:" << timeout;
+        qDebug() << "开始时角色坐标:" << user_x;
+
+        WalkBase walk_to_platform(target);
+        walk_to_platform.m_deviation = 10;
+        walk_to_platform.m_walk_timeout = timeout + 3000;
+        walk_to_platform.run();
+
+        // 到达地点之后进行跳跃操作
+        MSDriverPRO::keyboardDown(MSKeyboard_DownArrow);
+        MSDriverPRO::keyboardClick(jump_key);
+        MSDriverPRO::keyboardUp(MSKeyboard_DownArrow);
+
+
+        quint64 foothold_p = getUserFootholdP();
+        while(foothold_p == 0){
+            ProcessHelper::programDelay(50);
+            QApplication::processEvents();
+            foothold_p = getUserFootholdP();
+        }
+
+        if(platform == getUserPlatform()){
+            qDebug() << "向下跳跃已到达指定平台";
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool MovePlatform::up(LineSegment area, int platform, bool self_climb)
+{
+    // int jump_key = Gconfig.getValue("bindkey/jump").toInt();
+    quint64 transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+
+    for(const auto &seg : area){
+        int target = seg.first + (seg.second - seg.first) / 2;
+
+        // 预估步行时间(100毫秒走14)
+        int user_x = getUserX(transform);
+        int timeout = abs(target - user_x) / 14 * 100;
+        qDebug() << "预估用时:" << timeout;
+        qDebug() << "开始时角色坐标:" << user_x;
+
+        if(self_climb){
+            int user_y = getUserX(transform);
+            timeout = abs(target - user_y) / 7 * 100;
+
+            WalkBase walk_to_platform(target);
+            walk_to_platform.m_deviation = 1;
+            walk_to_platform.m_walk_timeout = timeout + 3000;
+            walk_to_platform.runY();
+
+            ProcessHelper::programDelay(100);
+            if(platform == getUserPlatform()){
+                qDebug() << "向上攀爬已到达指定平台";
+                return true;
+            }
+
+        }else{
+            WalkBase walk_to_platform(target);
+            walk_to_platform.m_deviation = 10;
+            walk_to_platform.m_walk_timeout = timeout + 3000;
+            walk_to_platform.run();
+
+            // 到达地点之后进行跳跃操作
+            MSDriverPRO::keyboardClick(MSKeyboard_UpArrow);
+
+            ProcessHelper::programDelay(100);
+            quint64 climb_p = getUserClimbP();
+            if(climb_p == 0){
+                qDebug() << "向上未能攀爬到攀爬体";
+                return false;
+            }
+
+            if(platform == getUserPlatform(true)){
+                qDebug() << "向上已到达指定攀爬物";
+                return true;
+            }
+        }
+
+
+        if(platform == getUserPlatform()){
+            qDebug() << "向上已到达指定平台";
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool MovePlatform::down(LineSegment area, int platform, bool is_climb)
+{
+    quint64 transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+
+    for(const auto &seg : area){
+        int target = seg.first + (seg.second - seg.first) / 2;
+
+        // 预估步行时间(100毫秒走14)
+        int user_x = getUserX(transform);
+        int timeout = abs(target - user_x) / 14 * 100;
+        qDebug() << "预估用时:" << timeout;
+        qDebug() << "开始时角色坐标:" << user_x;
+
+        if(is_climb){
+            WalkBase walk_to_platform(target);
+            walk_to_platform.m_deviation = 10;
+            walk_to_platform.m_walk_timeout = timeout + 3000;
+            walk_to_platform.run();
+
+            // 到达地点之后进行跳跃操作
+            MSDriverPRO::keyboardClick(MSKeyboard_DownArrow);
+
+            ProcessHelper::programDelay(100);
+            quint64 climb_p = getUserClimbP();
+            if(climb_p == 0){
+                qDebug() << "向下未能攀爬到攀爬体";
+                return false;
+            }
+
+            if(platform == getUserPlatform(true)){
+                qDebug() << "向下已到达指定攀爬物";
+                return true;
+            }
+
+        }else{
+            int user_y = getUserY(transform);
+            timeout = abs(target - user_y) / 7 * 100;
+
+            WalkBase walk_to_platform(target);
+            walk_to_platform.m_deviation = 1;
+            walk_to_platform.m_walk_timeout = timeout + 3000;
+            walk_to_platform.runY();
+
+            ProcessHelper::programDelay(100);
+            if(platform == getUserPlatform()){
+                qDebug() << "向下攀爬已到达指定平台";
+                return true;
+            }
+        }
+
+
+        if(platform == getUserPlatform()){
+            qDebug() << "向下已到达指定平台";
+            return true;
         }
     }
 

@@ -149,9 +149,9 @@ void KillMonster::process()
         // 待处理的怪物列表
         std::vector<Monster> handle_monsters = getLineMonsters(user_in_lineid);
 
-        PathNode node = Gplayer.curmapinfo.path_nodes[11];
-        qDebug() << "准备前往平台:" << 7;
-        MovePlatform::toPlatform(node, 7);
+        PathNode node = Gplayer.curmapinfo.path_nodes[2];
+        qDebug() << "准备前往平台:" << 11;
+        MovePlatform::toPlatform(node, 11);
         ProcessHelper::programDelay(1000);
         QApplication::processEvents();
         continue;

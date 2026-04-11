@@ -19,9 +19,9 @@ public:
 
     static bool jumpDown(LineSegment area, int platform);
 
-    static bool up(LineSegment area, int platform);
+    static bool up(LineSegment area, int platform,bool self_climb = false);
 
-    static bool down(LineSegment area);
+    static bool down(LineSegment area, int platform, bool is_climb = false);
 
 private :
     static quint64 getUserFootholdP();

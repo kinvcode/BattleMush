@@ -136,15 +136,15 @@ void UpdateGameData::process()
         quint64 localusergroup = Helper::findChild(Gplayer.p_uientity,"LocalUserGroup");
         quint64 localuseroffgroup = Helper::findChild(Gplayer.p_uientity,"LocalUserOffGroup");
         // 寻找StatusPanel
-        quint64 statuspanel = Helper::findChild(localusergroup,"StatusPanel");
+        quint64 statuspanel = Helper::findChild(localuseroffgroup,"StatusPanel");
         if( statuspanel == 0){
-            statuspanel = Helper::findChild(localuseroffgroup,"StatusPanel");
+            statuspanel = Helper::findChild(localusergroup,"StatusPanel");
             if( statuspanel == 0){
                 DebugOutput::out("找不到statuspanel模块，确保打开过能力值面板。即将尝试打开能力值面板");
                 MSDriverPRO::keyboardClick(MSKeyboard_s);
                 ProcessHelper::programDelay(3000);
                 QApplication::processEvents();
-                continue;
+                // continue; // 调试
             }
         }
 

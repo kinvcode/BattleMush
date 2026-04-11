@@ -26,7 +26,7 @@ quint64 Helper::findChild(quint64 parent, QString name)
     quint64 list = Mem::readLong(parent + BASE::MODEntity::children);
     int list_num = Mem::readLong(list + BASE::List::size);
     if(list_num == 0){
-        qDebug() << "不存在子模块";
+        qDebug() << "不存在子模块" << name;
         return child_entity;
     }
 
@@ -351,9 +351,9 @@ std::vector<Wall> RoomMap::makeWallList(const std::vector<FootholdRect> &foothol
         if (item.x_left == item.x_right && item.y_left != item.y_right) {
 
             // 调试 过虑墙体
-            // if(item.x_left == 231 || item.x_left == 1221 || item.x_left == 1446){
-            //     continue;
-            // }
+            if(item.x_left == 231 || item.x_left == 1221 || item.x_left == 1446){
+                continue;
+            }
 
             Wall wall;
             wall.foot_id = item.id;
@@ -1730,9 +1730,6 @@ void PathAlgo::jumpRight(
             cur_climb_rect.y_bottom = platform.end.y;
 
             for (int i = 0; i < iterator.count; i++, ++iterator) {
-                if(i == 60){
-                    qDebug() << ""; // 调试
-                }
                 std::pair<cv::Point, cv::Point> target = ImageTool::climbJumpTrajectory(true, room_map, cur_climb_rect, iterator.pos().x, iterator.pos().y);
                 if(target.first.x == -1 && target.second.x == -1){
                     continue;
@@ -2048,7 +2045,7 @@ void PathAlgo::up(
                     }
 
                     LineSegment line_segment;
-                    line_segment.push_back(std::pair(start.x, start.x));
+                    line_segment.push_back(std::pair(cur_pos.y, cur_pos.y));
 
                     NodeVisit node_visit;
                     node_visit.visit_type = VISIT_TYPE::UP;
@@ -2121,7 +2118,7 @@ void PathAlgo::down(const std::vector<Platform> &platform_list,
                         continue;
                     }
                     NodeVisit node_visit;
-                    node_visit.visit_type = VISIT_TYPE::JUMP_DOWN;
+                    node_visit.visit_type = VISIT_TYPE::DOWN;
                     node_visit.area = foot_segment[segment.first].at(target_id);
                     path_nodes[platform.id].targets[target_id].id = target_id;
                     path_nodes[platform.id].targets[target_id].type = path_nodes[target_id].type;
@@ -2157,7 +2154,7 @@ void PathAlgo::down(const std::vector<Platform> &platform_list,
                     }
 
                     LineSegment line_segment;
-                    line_segment.push_back(std::pair(start.x, start.x));
+                    line_segment.push_back(std::pair(cur_pos.y, cur_pos.y));
 
                     NodeVisit node_visit;
                     node_visit.visit_type = VISIT_TYPE::DOWN;

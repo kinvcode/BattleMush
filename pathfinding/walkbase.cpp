@@ -122,6 +122,8 @@ bool WalkBase::runY()
 
         if (begin_timer.elapsed() > m_walk_timeout) {
             DebugOutput::out("寻路超时~");
+            user_y = getUserY();
+            qDebug() << m_target_y << user_y;
             clearYkey();
             return false;
         }
