@@ -32,8 +32,6 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform)
                 qDebug() << "目标平台为地平线";
                 for(const auto &visit : target.second.visit_list){
 
-                    if(visit.visit_type != VISIT_TYPE::JUMP_DOWN) continue; // 调试语句，用完就删
-
                     switch (visit.visit_type) {
                     case VISIT_TYPE::WALK_LEFT:
                         qDebug() << "步行到左边可以到达目标平台";
@@ -83,8 +81,6 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform)
                 }
             }else{
                 for(const auto &visit : target.second.visit_list){
-
-                    if(visit.visit_type != VISIT_TYPE::DOWN) continue; // 调试语句，用完就删
 
                     switch (visit.visit_type) {
                     case VISIT_TYPE::JUMP_LEFT:
@@ -141,8 +137,6 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform)
             if(target.second.type == 0){
                 qDebug() << "目标平台为地平线";
                 for(const auto &visit : target.second.visit_list){
-
-                    if(visit.visit_type != VISIT_TYPE::DOWN) continue; // 调试语句，用完就删
 
                     switch (visit.visit_type) {
                     case VISIT_TYPE::JUMP_LEFT:

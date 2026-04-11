@@ -144,7 +144,7 @@ void UpdateGameData::process()
                 MSDriverPRO::keyboardClick(MSKeyboard_s);
                 ProcessHelper::programDelay(3000);
                 QApplication::processEvents();
-                // continue; // 调试
+                continue;
             }
         }
 

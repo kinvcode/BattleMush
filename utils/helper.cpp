@@ -350,10 +350,10 @@ std::vector<Wall> RoomMap::makeWallList(const std::vector<FootholdRect> &foothol
         // 如果item是一个墙体(x相同，y不同)
         if (item.x_left == item.x_right && item.y_left != item.y_right) {
 
-            // 调试 过虑墙体
-            if(item.x_left == 231 || item.x_left == 1221 || item.x_left == 1446){
-                continue;
-            }
+            // // 调试 过虑墙体
+            // if(item.x_left == 231 || item.x_left == 1221 || item.x_left == 1446){
+            //     continue;
+            // }
 
             Wall wall;
             wall.foot_id = item.id;

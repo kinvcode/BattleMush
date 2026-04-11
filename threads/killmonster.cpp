@@ -149,12 +149,12 @@ void KillMonster::process()
         // 待处理的怪物列表
         std::vector<Monster> handle_monsters = getLineMonsters(user_in_lineid);
 
-        PathNode node = Gplayer.curmapinfo.path_nodes[2];
-        qDebug() << "准备前往平台:" << 11;
-        MovePlatform::toPlatform(node, 11);
-        ProcessHelper::programDelay(1000);
-        QApplication::processEvents();
-        continue;
+        // PathNode node = Gplayer.curmapinfo.path_nodes[2];
+        // qDebug() << "准备前往平台:" << 11;
+        // MovePlatform::toPlatform(node, 11);
+        // ProcessHelper::programDelay(1000);
+        // QApplication::processEvents();
+        // continue;
 
         if(handle_monsters.empty()){
             DebugOutput::out("当前平台不存在怪物");
@@ -181,12 +181,21 @@ void KillMonster::process()
                 }
 
                 for(auto plat : paths){
-                    PathNode node = Gplayer.curmapinfo.path_nodes[plat];
+
+
+                    user_foothold_p = readLong(readLong(Gplayer.p_localplayer + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::currentFoothold);
+                    user_foothold_id = readInt(user_foothold_p + BASE::Foothold::ID);
+                    user_in_lineid = RoomMap::getFootPlatform(user_foothold_id, Gplayer.curmapinfo.platform_list);
+
+                    PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
                     qDebug() << "准备前往平台:" << plat;
                     MovePlatform::toPlatform(node, plat);
-                    // std::vector<Monster> handle_monsters = getLineMonsters(user_in_lineid);
-                    // 前往该平台
-                    // moveTo
+
+                    handle_monsters = getLineMonsters(user_in_lineid);
+
+                    if(!handle_monsters.empty()){
+                        break;
+                    }
                 }
             }
 
