@@ -613,17 +613,17 @@ void RoomMap::makeNodes(
     QElapsedTimer begin_time;
     begin_time.start();
 
-    std::vector<PathNode> path_nodes;
-    path_nodes.resize(platform_list.size());
+    std::unordered_map<int, PathNode> path_nodes;
+    path_nodes.reserve(platform_list.size());
     for(const auto &platform : platform_list){
-        path_nodes.at(platform.id).id = platform.id;
-        path_nodes.at(platform.id).type = platform.type;
-        path_nodes.at(platform.id).targets.resize(platform_list.size());
+        path_nodes[platform.id].id = platform.id;
+        path_nodes[platform.id].type = platform.type;
 
-        for(const auto &plat : platform_list){
-            path_nodes.at(platform.id).targets.at(plat.id).id = plat.id;
-            path_nodes.at(platform.id).targets.at(plat.id).type = plat.type;
-        }
+        // path_nodes[platform.id].targets.reserve(platform_list.size());
+        // for(const auto &plat : platform_list){
+        //     path_nodes[platform.id].targets[plat.id].id = plat.id;
+        //     path_nodes[platform.id].targets[plat.id].type = plat.type;
+        // }
     }
 
     PathAlgo::walkToLeft(platform_list, cur_room_map, path_nodes);
@@ -1036,8 +1036,10 @@ std::pair<cv::Point,cv::Point> ImageTool::jumpTrajectory(
         // 检测攀爬物
         if(checkLineHasColorPixel(image, drawPoints[i-1], drawPoints[i], climb_color,target_pos))
         {
-            result.first = target_pos;
-            target_pos = {-1,-1};
+            if(start_pos.y - target_pos.y > 2){
+                result.first = target_pos;
+                target_pos = {-1,-1};
+            }
         }
 
         // 检测到地面（可以跳跃到上层）
@@ -1283,17 +1285,76 @@ int RoomMap::getPlatformType(int platform_id, const std::vector<Platform> &platf
     return -1;
 }
 
+void PathAlgo::findAStarPath(int platformA, int platformB, const std::unordered_map<int, PathNode> path_nodes)
+{
+    // 开启列表(最小堆)
+    // std::priority_queue<PathNode, std::vector<PathNode>, std::greater<PathNode>> open_list;
+    std::priority_queue<int, std::vector<int>, std::greater<int>> open_list;
+
+    // 平台map
+    std::unordered_map<int, PathNode> came_from;
+
+    // 用于记录已经访问过的节点
+    std::unordered_set<int> closed_list;
+
+    // 初始化起始平台
+    // PathNode start_node = path_nodes[platformA];
+    // start_node.cost = 0; //从起点到当前节点的实际代价（已经走过的路径）。只计算这个就行，因为没法计算启发式代价
+    // start_node.heuristic_cost = heuristic(start_node, platform_map[platformB]);// 启发式代价（当前节点到目标节点的估计代价）
+    // start_node.total_cost = start_node.cost + start_node.heuristic_cost; // 总代价 = g_cost + h_cost
+
+    // open_list.push(start_node);
+
+
+    // while (!open_list.empty()) {
+    //     PathNode current = open_list.top(); // 获取第一个节点
+    //     open_list.pop(); // 从堆中删除
+
+    //     // 如果找到目标平台，生成路径
+    //     if (current.id == platformB) {
+
+    //         return path; // 可以返回路径信息了
+    //     }
+
+    //     // 记录当前节点（如果没到终点，把当前节点放入到关闭列表中）
+    //     closed_list.insert(current.id);
+
+    //     // 遍历当前节点的所有目标平台
+    //     for (const auto& target : current.targets) {
+    //         if (closed_list.find(target.id) != closed_list.end()) {
+    //             continue;  // 如果目标已在关闭列表中，跳过
+    //         }
+
+    //         // int tentative_cost = current.cost + 1;  // 固定加1就行。暂时不需要计算最近距离。平台之间能连接到就行
+    //         // int tentative_cost = 1 + 1;
+
+    //         // 如果目标平台不在开启列表中，加入
+    //         if (came_from.find(target.id) == came_from.end()) {
+    //             // target.cost = tentative_cost; // 已经花费的代价
+    //             // target.heuristic_cost = heuristic(target, platform_map[platformB]);
+    //             // target.total_cost = target.cost + target.heuristic_cost;
+
+    //             open_list.push(target);
+    //             came_from[target.id] = current;
+    //         }
+    //     }
+    // }
+
+}
+
 void PathAlgo::walkToLeft(
     const std::vector<Platform> &platform_list,
     const cv::Mat &cur_room_map,
-    std::vector<PathNode> &path_nodes
+    std::unordered_map<int, PathNode> &path_nodes
 )
 {
     // 遍历线路
     // qDebug() << "----------向左走寻路----------";
     for(auto item : platform_list){
         // qDebug() << "搜索线路：" << item.id;
-
+        if(item.type == 1){
+            continue;
+        }
         // 判断左边是否有墙
         if(item.hasLeftWall){
             // qDebug() << "左边有墙，退出寻路";
@@ -1326,17 +1387,9 @@ void PathAlgo::walkToLeft(
         node_visit.visit_type = VISIT_TYPE::WALK_LEFT;
         node_visit.area = line_segment;
 
-        for(auto &path_node : path_nodes){
-            if(path_node.id != item.id){
-                continue;
-            }
-            for(auto &target_node : path_node.targets){
-                if(target_platform_id == target_node.id){
-                    target_node.visit_list.push_back(node_visit);
-                    break;
-                }
-            }
-        }
+        path_nodes[item.id].targets[target_platform_id].id = target_platform_id;
+        path_nodes[item.id].targets[target_platform_id].type = path_nodes[target_platform_id].type;
+        path_nodes[item.id].targets[target_platform_id].visit_list.push_back(node_visit);
     }
 }
 
@@ -1344,13 +1397,15 @@ void PathAlgo::walkToRight(
     const std::vector<Platform> &platform_list,
     const cv::Mat &cur_room_map,
     const MapBounding &map_bounding,
-    std::vector<PathNode> &path_nodes
+    std::unordered_map<int, PathNode> &path_nodes
     )
 {
     // qDebug() << "----------向右走寻路----------";
     for(auto item : platform_list){
         // qDebug() << "搜索线路：" << item.id;
-
+        if(item.type == 1){
+            continue;
+        }
         // 判断右边是否有墙
         if(item.hasRightWall){
             continue;
@@ -1380,19 +1435,16 @@ void PathAlgo::walkToRight(
         node_visit.visit_type = VISIT_TYPE::WALK_RIGHT;
         node_visit.area = line_segment;
 
-        for(auto &target_node : path_nodes.at(item.id).targets){
-            if(target_platform_id == target_node.id){
-                target_node.visit_list.push_back(node_visit);
-                break;
-            }
-        }
+        path_nodes[item.id].targets[target_platform_id].id = target_platform_id;
+        path_nodes[item.id].targets[target_platform_id].type = path_nodes[target_platform_id].type;
+        path_nodes[item.id].targets[target_platform_id].visit_list.push_back(node_visit);
     }
 }
 
 void PathAlgo::jumpLeft(
     const std::vector<Platform> &platform_list,
     const cv::Mat &room_map,
-    std::vector<PathNode> &path_nodes
+    std::unordered_map<int, PathNode> &path_nodes
 )
 {
     // 遍历线路
@@ -1436,19 +1488,15 @@ void PathAlgo::jumpLeft(
             // qDebug() << "准备合并线路：" << platform.id;
             std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
 
-            for(auto &target_node : path_nodes.at(platform.id).targets){
-                for(int target_id = 0; target_id < foot_segment.size(); target_id++){
-                    if(target_node.id != target_id){
-                        continue;
-                    }
-                    if(foot_segment.at(target_id).empty()){
-                        continue;
-                    }
-                    NodeVisit node_visit;
-                    node_visit.visit_type = VISIT_TYPE::JUMP_LEFT;
-                    node_visit.area = foot_segment.at(target_id);
-                    target_node.visit_list.push_back(node_visit);
+            for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+                if(foot_segment.at(target_id).empty()){
+                    continue;
                 }
+                NodeVisit node_visit;
+                node_visit.visit_type = VISIT_TYPE::JUMP_LEFT;
+                node_visit.area = foot_segment.at(target_id);
+                // path_node.second.targets[target_id].visit_list.push_back(node_visit);
+                path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
             }
         }
 
@@ -1492,16 +1540,15 @@ void PathAlgo::jumpLeft(
             // qDebug() << "准备合并线路：" << platform.id;
             std::vector<LineSegment> climb_segment = Helper::mergeClimbPoint(targets);
 
-            for(auto &target_node : path_nodes.at(platform.id).targets){
-                for(int target_id = 0; target_id < climb_segment.size(); target_id++){
-                    if( target_id == target_node.id){
-                        NodeVisit node_visit;
-                        node_visit.visit_type = VISIT_TYPE::JUMP_LEFT;
-                        node_visit.area = climb_segment.at(target_id);
-                        target_node.visit_list.push_back(node_visit);
-                        break;
-                    }
+            for(int target_id = 0; target_id < climb_segment.size(); target_id++){
+                if(climb_segment.at(target_id).empty()){
+                    continue;
                 }
+                NodeVisit node_visit;
+                node_visit.visit_type = VISIT_TYPE::JUMP_LEFT;
+                node_visit.area = climb_segment.at(target_id);
+                path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
+                break;
             }
         }
     }
@@ -1512,7 +1559,7 @@ void PathAlgo::jumpLeft(
 void PathAlgo::jumpRight(
     const std::vector<Platform> &platform_list,
     const cv::Mat &room_map,
-    std::vector<PathNode> &path_nodes
+    std::unordered_map<int, PathNode> &path_nodes
 )
 {
     // 遍历线路
@@ -1556,19 +1603,14 @@ void PathAlgo::jumpRight(
             // qDebug() << "准备合并线路：" << platform.id;
             std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
 
-            for(auto &target_node : path_nodes.at(platform.id).targets){
-                for(int target_id = 0; target_id < foot_segment.size(); target_id++){
-                    if(target_node.id != target_id){
-                        continue;
-                    }
-                    if(foot_segment.at(target_id).empty()){
-                        continue;
-                    }
-                    NodeVisit node_visit;
-                    node_visit.visit_type = VISIT_TYPE::JUMP_RIGHT;
-                    node_visit.area = foot_segment.at(target_id);
-                    target_node.visit_list.push_back(node_visit);
+            for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+                if(foot_segment.at(target_id).empty()){
+                    continue;
                 }
+                NodeVisit node_visit;
+                node_visit.visit_type = VISIT_TYPE::JUMP_RIGHT;
+                node_visit.area = foot_segment.at(target_id);
+                path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
             }
         }
 
@@ -1612,16 +1654,15 @@ void PathAlgo::jumpRight(
             // qDebug() << "准备合并线路：" << platform.id;
             std::vector<LineSegment> climb_segment = Helper::mergeClimbPoint(targets);
 
-            for(auto &target_node : path_nodes.at(platform.id).targets){
-                for(int target_id = 0; target_id < climb_segment.size(); target_id++){
-                    if( target_id == target_node.id){
-                        NodeVisit node_visit;
-                        node_visit.visit_type = VISIT_TYPE::JUMP_RIGHT;
-                        node_visit.area = climb_segment.at(target_id);
-                        target_node.visit_list.push_back(node_visit);
-                        break;
-                    }
+            for(int target_id = 0; target_id < climb_segment.size(); target_id++){
+                if(climb_segment.at(target_id).empty()){
+                    continue;
                 }
+                NodeVisit node_visit;
+                node_visit.visit_type = VISIT_TYPE::JUMP_RIGHT;
+                node_visit.area = climb_segment.at(target_id);
+                path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
+                break;
             }
         }
     }
@@ -1630,7 +1671,7 @@ void PathAlgo::jumpRight(
 void PathAlgo::jump_up(
     const std::vector<Platform> &platform_list,
     const cv::Mat &room_map,
-    std::vector<PathNode> &path_nodes
+    std::unordered_map<int, PathNode> &path_nodes
 )
 {
     for(const auto &platform : platform_list){
@@ -1687,27 +1728,23 @@ void PathAlgo::jump_up(
 
         std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
 
-        for(auto &target_node : path_nodes.at(platform.id).targets){
-            for(int target_id = 0; target_id < foot_segment.size(); target_id++){
-                if(target_node.id != target_id){
-                    continue;
-                }
-                if(foot_segment.at(target_id).empty()){
-                    continue;
-                }
-                NodeVisit node_visit;
-                node_visit.visit_type = VISIT_TYPE::JUMP_UP;
-                node_visit.area = foot_segment.at(target_id);
-                target_node.visit_list.push_back(node_visit);
+        for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+            if(foot_segment.at(target_id).empty()){
+                continue;
             }
+            NodeVisit node_visit;
+            node_visit.visit_type = VISIT_TYPE::JUMP_UP;
+            node_visit.area = foot_segment.at(target_id);
+            path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
         }
     }
 }
 
-void PathAlgo::jump_down(const std::vector<Platform> &platform_list,
-                        const cv::Mat &room_map,
-                        const MapBounding &map_bounding,
-                        std::vector<PathNode> &path_nodes)
+void PathAlgo::jump_down(
+    const std::vector<Platform> &platform_list,
+    const cv::Mat &room_map,
+    const MapBounding &map_bounding,
+    std::unordered_map<int, PathNode> &path_nodes)
 {
     for(const auto &platform : platform_list){
         if(platform.type == 1){
@@ -1756,26 +1793,23 @@ void PathAlgo::jump_down(const std::vector<Platform> &platform_list,
 
         std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
 
-        for(auto &target_node : path_nodes.at(platform.id).targets){
-            for(int target_id = 0; target_id < foot_segment.size(); target_id++){
-                if(target_node.id != target_id){
-                    continue;
-                }
-                if(foot_segment.at(target_id).empty()){
-                    continue;
-                }
-                NodeVisit node_visit;
-                node_visit.visit_type = VISIT_TYPE::JUMP_DOWN;
-                node_visit.area = foot_segment.at(target_id);
-                target_node.visit_list.push_back(node_visit);
+        for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+            if(foot_segment.at(target_id).empty()){
+                continue;
             }
+            NodeVisit node_visit;
+            node_visit.visit_type = VISIT_TYPE::JUMP_DOWN;
+            node_visit.area = foot_segment.at(target_id);
+            path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
         }
     }
 }
 
-void PathAlgo::up(const std::vector<Platform> &platform_list,
-                const cv::Mat &room_map,
-                std::vector<PathNode> &path_nodes)
+void PathAlgo::up(
+    const std::vector<Platform> &platform_list,
+    const cv::Mat &room_map,
+    std::unordered_map<int, PathNode> &path_nodes
+    )
 {
     for(const auto &platform : platform_list){
 
@@ -1809,19 +1843,14 @@ void PathAlgo::up(const std::vector<Platform> &platform_list,
 
             std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
 
-            for(auto &target_node : path_nodes.at(platform.id).targets){
-                for(int target_id = 0; target_id < foot_segment.size(); target_id++){
-                    if(target_node.id != target_id){
-                        continue;
-                    }
-                    if(foot_segment.at(target_id).empty()){
-                        continue;
-                    }
-                    NodeVisit node_visit;
-                    node_visit.visit_type = VISIT_TYPE::UP;
-                    node_visit.area = foot_segment.at(target_id);
-                    target_node.visit_list.push_back(node_visit);
+            for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+                if(foot_segment.at(target_id).empty()){
+                    continue;
                 }
+                NodeVisit node_visit;
+                node_visit.visit_type = VISIT_TYPE::UP;
+                node_visit.area = foot_segment.at(target_id);
+                path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
             }
         }
 
@@ -1857,12 +1886,9 @@ void PathAlgo::up(const std::vector<Platform> &platform_list,
                     node_visit.visit_type = VISIT_TYPE::UP;
                     node_visit.area = line_segment;
 
-                    for(auto &target_node : path_nodes.at(platform.id).targets){
-                        if(line_platform == target_node.id){
-                            target_node.visit_list.push_back(node_visit);
-                            break;
-                        }
-                    }
+                    path_nodes[platform.id].targets[line_platform].id = line_platform;
+                    path_nodes[platform.id].targets[line_platform].type = path_nodes[line_platform].type;
+                    path_nodes[platform.id].targets[line_platform].visit_list.push_back(node_visit);
                     break;
                 }
             }
@@ -1873,7 +1899,7 @@ void PathAlgo::up(const std::vector<Platform> &platform_list,
 void PathAlgo::down(const std::vector<Platform> &platform_list,
     const cv::Mat &room_map,
     const MapBounding &map_bounding,
-    std::vector<PathNode> &path_nodes)
+    std::unordered_map<int, PathNode> &path_nodes)
 {
     for(const auto &platform : platform_list){
 
@@ -1907,19 +1933,14 @@ void PathAlgo::down(const std::vector<Platform> &platform_list,
 
             std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
 
-            for(auto &target_node : path_nodes.at(platform.id).targets){
-                for(int target_id = 0; target_id < foot_segment.size(); target_id++){
-                    if(target_node.id != target_id){
-                        continue;
-                    }
-                    if(foot_segment.at(target_id).empty()){
-                        continue;
-                    }
-                    NodeVisit node_visit;
-                    node_visit.visit_type = VISIT_TYPE::DOWN;
-                    node_visit.area = foot_segment.at(target_id);
-                    target_node.visit_list.push_back(node_visit);
+            for(int target_id = 0; target_id < foot_segment.size(); target_id++){
+                if(foot_segment.at(target_id).empty()){
+                    continue;
                 }
+                NodeVisit node_visit;
+                node_visit.visit_type = VISIT_TYPE::DOWN;
+                node_visit.area = foot_segment.at(target_id);
+                path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
             }
         }
 
@@ -1956,12 +1977,9 @@ void PathAlgo::down(const std::vector<Platform> &platform_list,
                     node_visit.visit_type = VISIT_TYPE::DOWN;
                     node_visit.area = line_segment;
 
-                    for(auto &target_node : path_nodes.at(platform.id).targets){
-                        if(line_platform == target_node.id){
-                            target_node.visit_list.push_back(node_visit);
-                            break;
-                        }
-                    }
+                    path_nodes[platform.id].targets[line_platform].id = line_platform;
+                    path_nodes[platform.id].targets[line_platform].type = path_nodes[line_platform].type;
+                    path_nodes[platform.id].targets[line_platform].visit_list.push_back(node_visit);
                     break;
                 }
             }
