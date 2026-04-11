@@ -41,6 +41,7 @@ private:
     // initCompoment();
     void initCompomentUI();
     void initConfig();
+    void initDir();
     void initSinalBind();
     void initThreads();
 

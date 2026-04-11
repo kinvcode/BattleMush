@@ -60,6 +60,7 @@ SOURCES += \
     utils/config.cpp \
     utils/gamestruct.cpp \
     utils/helper.cpp \
+    utils/mapserializer.cpp \
     widgets/hotkeyedit.cpp \
     widgets/noticewidget.cpp
 
@@ -88,6 +89,7 @@ HEADERS += \
     utils/config.h \
     utils/gamestruct.h \
     utils/helper.h \
+    utils/mapserializer.h \
     vmp/VMProtectSDK.h \
     widgets/hotkeyedit.h \
     widgets/noticewidget.h

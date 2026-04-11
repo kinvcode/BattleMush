@@ -169,7 +169,6 @@ typedef struct{
     std::vector<FootholdRect> footholds; // 原子数据
     std::vector<Wall> wall_list; // 原子数据
     std::vector<Platform> platform_list; // 平台列表
-    // std::vector<PathNode> path_nodes; // 节点信息
     std::unordered_map<int, PathNode> path_nodes;
     cv::Mat map_mat; // 二次处理数据
 }MapInfo;

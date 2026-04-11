@@ -6,6 +6,7 @@
 #include "global/gameoffset.h"
 #include "global/globalplayer.h"
 #include <QElapsedTimer>
+#include "utils/mapserializer.h"
 
 using namespace Mem;
 
@@ -17,8 +18,6 @@ void DebugOutput::out(const QString& message){
     // 输出到 DebugView
     OutputDebugStringW(output.toStdWString().c_str());
 }
-
-
 
 quint64 Helper::findChild(quint64 parent, QString name)
 {
@@ -125,8 +124,8 @@ MapBounding RoomMap::getMapBounding(quint64 cur_map)
 
     int x_left = toMapPosX(map_x_left,x_offset);
     int x_right = toMapPosX(map_x_right,x_offset);
-    int y_top = toMapPosY(map_y_top,y_offset,map_height);
-    int y_bottom = toMapPosY(map_y_bottom,y_offset,map_height);
+    int y_top = toMapPosY(map_y_top, y_offset, map_height - 1);
+    int y_bottom = toMapPosY(map_y_bottom, y_offset, map_height - 1);
 
     MapBounding map_bounding;
     map_bounding.x_offset = x_offset;
@@ -148,7 +147,7 @@ int RoomMap::toMapPosX(float x, int offset)
 
 int RoomMap::toMapPosY(float y, int offset, int height)
 {
-    return height - (y * 100 + offset);
+    return height - (y * 100 + offset) - 1;
 }
 
 QString Helper::getEntityTextComponentString(quint64 entity)
@@ -256,51 +255,6 @@ std::vector<ClimbRect> RoomMap::makeClimbList(quint64 cur_map, quint64 collision
     }
 
     return climb_list;
-}
-
-std::vector<std::vector<COORDINATE>> RoomMap::dumpTilemapList(quint64 map)
-{
-    std::vector<std::vector<COORDINATE>> tile_list;
-
-    int list_count = readInt(readLong(map + BASE::MODEntity::children) + BASE::List::size);
-    quint64 list_head = readLong(readLong(map + BASE::MODEntity::children) + BASE::List::InternalArray) + BASE::InternalArray::Head;
-
-    for(int i = 0; i < list_count; i++,list_head += 0x8){
-        quint64 cur_entity = Mem::readLong(list_head);
-        if(cur_entity == 0) break;
-
-        // 判断是否有TileMapComponent
-        quint64 tilemapcomponet = readLong(cur_entity + BASE::MODEntity::TileMapComponent);
-        if(tilemapcomponet == 0) continue;
-        QString entity_name = readString(readLong(cur_entity + BASE::MODEntity::name) + BASE::String::text, 100);
-        // qDebug() << "当前模块:" << entity_name << " 指针：" << QString::number(tilemapcomponet,16).toUpper();
-
-        // 遍历TileContext
-        quint64 tilecontext_list = readLong(tilemapcomponet + BASE::TileMapComponent::TileContextList);
-        int tilecontext_list_count = readInt(tilecontext_list + BASE::List::size);
-        quint64 tilecontext_list_head = readLong(tilecontext_list + BASE::List::InternalArray) + BASE::InternalArray::Head;
-
-        // 遍历tilecontext_list
-        for(int j = 0; j < tilecontext_list_count; j++,tilecontext_list_head += 0x8){
-            quint64 convexPoints = readLong(readLong(tilecontext_list_head) + BASE::TileContext::convexPoints);
-            int convexPoints_count = readInt(convexPoints + BASE::List::size);
-            quint64 convexPoints_head = readLong(convexPoints + BASE::List::InternalArray) + BASE::InternalArray::Head;
-
-            std::vector<COORDINATE> cur_tile;
-            // qDebug() << "===============";
-            // 遍历坐标
-            for(int k = 0; k < convexPoints_count; k++,convexPoints_head += 0x8){
-                float cur_x = Math::roundHalfAwayFromZero_bit(readFloat(convexPoints_head));
-                float cur_y = Math::roundHalfAwayFromZero_bit(readFloat(convexPoints_head + 0x4));
-                cur_tile.push_back({cur_x, cur_y});
-                // qDebug() << cur_x << "," << cur_y;
-            }
-            tile_list.push_back(cur_tile);
-        }
-        // list_head += 0x8;
-    }
-
-    return tile_list;
 }
 
 std::vector<FootholdRect> RoomMap::makeFootholdList(quint64 cur_map, MapBounding map_bounding)
@@ -569,7 +523,10 @@ std::vector<Platform> RoomMap::makePlatformList(
     return platform_list;
 }
 
-cv::Mat RoomMap::makeRoomMap(std::vector<ClimbRect> climb_list, std::vector<FootholdRect> foothold_list, MapBounding map_bounding)
+cv::Mat RoomMap::makeRoomMap(
+    const std::vector<ClimbRect> &climb_list,
+    const std::vector<FootholdRect> &foothold_list,
+    const MapBounding &map_bounding)
 {
     // 创建地图文件
     cv::Mat cur_room_map(map_bounding.height, map_bounding.width, CV_8UC3, COLOR_AIR);
@@ -602,7 +559,7 @@ cv::Mat RoomMap::makeRoomMap(std::vector<ClimbRect> climb_list, std::vector<Foot
     return cur_room_map;
 }
 
-void RoomMap::makeNodes(
+std::unordered_map<int, PathNode> RoomMap::makeNodes(
     const std::vector<Platform> &platform_list,
     const std::vector<Wall> &wall_list,
     const cv::Mat &cur_room_map,
@@ -639,17 +596,7 @@ void RoomMap::makeNodes(
     quint64 total_time = begin_time.elapsed();
     qDebug() << "平台寻路算法用时:" << total_time;
 
-    QElapsedTimer astart_time;
-    astart_time.start();
-
-    std::vector<int> paths = PathAlgo::findAStarPath(0, 7, path_nodes);
-    for(const auto plat : paths){
-        qDebug() << "前往平台：" << plat;
-    }
-
-    quint64 astar_times = astart_time.elapsed();
-    qDebug() << "AStar算法用时:" << astar_times;
-
+    return path_nodes;
 }
 
 bool Helper::parseHPString(const QString &Text, int &left, int &right) {
@@ -1250,6 +1197,18 @@ cv::Point RoomMap::getItemLinePos(cv::Mat map, cv::Point pos)
     return target_pos;
 }
 
+int RoomMap::getFootPlatform(int foothold_id, const std::vector<Platform>& platform_list)
+{
+    for(const auto &item : platform_list){
+        for(const auto &foot : item.line_child){
+            if(foot.foot_id == foothold_id){
+                return item.id;
+            }
+        }
+    }
+    return -1;
+}
+
 int RoomMap::getPosPlatform(cv::Point pos, const std::vector<Platform> &platform_list, const cv::Mat &room_map)
 {
     // 遍历平台
@@ -1288,6 +1247,36 @@ int RoomMap::getPlatformType(int platform_id, const std::vector<Platform> &platf
         }
     }
     return -1;
+}
+
+void RoomMap::loadLocalMap(const QString map_id)
+{
+    Gplayer.curmapinfo.id = map_id;
+    Gplayer.curmapinfo.name = "xxoo";
+    Gplayer.curmapinfo.map_bounding = {};
+    std::vector<ClimbRect>().swap(Gplayer.curmapinfo.climbs);
+    std::vector<FootholdRect>().swap(Gplayer.curmapinfo.footholds);
+    std::vector<Wall>().swap(Gplayer.curmapinfo.wall_list);
+    std::vector<Platform>().swap(Gplayer.curmapinfo.platform_list);
+    std::unordered_map<int, PathNode>().swap(Gplayer.curmapinfo.path_nodes);
+    Gplayer.curmapinfo.map_mat = cv::Mat();
+
+
+    QString filePath = QCoreApplication::applicationDirPath() + "/maps/map_" + map_id;
+
+    if(!MapSerializer::isValidSaveFile(filePath)) return;
+
+    qDebug() << "加载地图文件:" << filePath;
+    MapInfo mapInfo = MapSerializer::loadFromFile(filePath);
+
+    Gplayer.curmapinfo.map_bounding  = mapInfo.map_bounding;
+    Gplayer.curmapinfo.climbs        = mapInfo.climbs;
+    Gplayer.curmapinfo.footholds     = mapInfo.footholds;
+    Gplayer.curmapinfo.wall_list     = mapInfo.wall_list;
+    Gplayer.curmapinfo.platform_list = mapInfo.platform_list;
+    Gplayer.curmapinfo.path_nodes    = mapInfo.path_nodes;
+    Gplayer.curmapinfo.map_mat       = mapInfo.map_mat;
+
 }
 
 std::vector<int> PathAlgo::findAStarPath(int platformA, int platformB, std::unordered_map<int, PathNode> &path_nodes)

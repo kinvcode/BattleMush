@@ -98,6 +98,10 @@ void HealthMonitor::process()
         if(Gplayer.MAX_MP != 0 && Gplayer.MP < Gplayer.MAX_MP){
             int cur_mp_rate = ( Gplayer.MP / Gplayer.MAX_MP) * 100;
             if(cur_mp_rate <= mp_rate){
+                qDebug() << "当前蓝量：" << Gplayer.MP;
+                qDebug() << "当前最大蓝量：" << Gplayer.MAX_MP;
+                qDebug() << "触发阈值：" << mp_rate;
+                qDebug() << "当前比例" << cur_mp_rate;
                 DebugOutput::out("检测到蓝量低于安全值，自动加蓝");
                 // int mp_key_code = Gconfig.getValue("auto_add_health/mp_key").toInt();
                 // qDebug() << "驱动按键码:" << mp_key_code;

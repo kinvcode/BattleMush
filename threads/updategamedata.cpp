@@ -7,6 +7,7 @@
 #include "driver/mem.h"
 #include "global/gameoffset.h"
 #include "utils/gamestruct.h"
+#include "utils/mapserializer.h"
 
 using namespace Mem;
 
@@ -178,7 +179,6 @@ void UpdateGameData::process()
                 Gplayer.last_mapentity = Gplayer.p_curmapentity;
                 // 更新地图信息
                 UpdateRoomMap();
-                Gplayer.m_map_loaded = true;
                 continue;
             }
 
@@ -242,56 +242,85 @@ void UpdateGameData::UpdateRoomMap()
 {
     QString map_id = GameStruct::readEntityID(Gplayer.p_curmapentity);
 
-    MapBounding map_bounding = RoomMap::getMapBounding(Gplayer.p_curmapentity);
+    RoomMap::loadLocalMap(map_id);
 
-    // 遍历当前地图攀爬物体列表(有ClimbableComponent)
-    std::vector<ClimbRect> climbs = RoomMap::makeClimbList(Gplayer.p_curmapentity, Gplayer.p_collisionservice, map_bounding);
+    if(Gplayer.curmapinfo.map_bounding.width == 0){
+        Gplayer.curmapinfo.map_bounding = RoomMap::getMapBounding(Gplayer.p_curmapentity);
+    }
+
+    if(Gplayer.curmapinfo.climbs.empty()){
+        // 遍历当前地图攀爬物体列表(有ClimbableComponent)
+       Gplayer.curmapinfo.climbs = RoomMap::makeClimbList(Gplayer.p_curmapentity, Gplayer.p_collisionservice, Gplayer.curmapinfo.map_bounding);
+    }
 
     // 遍历地板
-    std::vector<FootholdRect> footholds = RoomMap::makeFootholdList(Gplayer.p_curmapentity, map_bounding);
+    if(Gplayer.curmapinfo.footholds.empty()){
+        Gplayer.curmapinfo.footholds = RoomMap::makeFootholdList(Gplayer.p_curmapentity, Gplayer.curmapinfo.map_bounding);
+    }
 
     // 1. 将所有地板ID放入到容器 footid_set里面
     std::unordered_set<int> footid_set;
-    for (const auto& item : footholds) {
+    for (const auto& item : Gplayer.curmapinfo.footholds) {
         footid_set.insert(item.id);
     }
 
     // 第一步：拿到地形数据并绘制地图
+    if(Gplayer.curmapinfo.wall_list.empty()){
+        // 创建墙体列表
+        Gplayer.curmapinfo.wall_list = RoomMap::makeWallList(Gplayer.curmapinfo.footholds, footid_set);
+    }
 
-    // 创建墙体列表
-    std::vector<Wall> wall_list = RoomMap::makeWallList(footholds, footid_set);
 
     // 创建平台列表
-    std::vector<Platform> platform_list = RoomMap::makePlatformList(footholds, wall_list, climbs, map_bounding, footid_set);
+    if(Gplayer.curmapinfo.platform_list.empty()){
+        Gplayer.curmapinfo.platform_list = RoomMap::makePlatformList(
+            Gplayer.curmapinfo.footholds,
+            Gplayer.curmapinfo.wall_list,
+            Gplayer.curmapinfo.climbs,
+            Gplayer.curmapinfo.map_bounding, footid_set
+        );
+    }
 
     // 绘制地图框架
-    cv::Mat cur_room_map = RoomMap::makeRoomMap(climbs, footholds, map_bounding);
+    if(Gplayer.curmapinfo.map_mat.empty()){
+        Gplayer.curmapinfo.map_mat = RoomMap::makeRoomMap(
+            Gplayer.curmapinfo.climbs,
+            Gplayer.curmapinfo.footholds,
+            Gplayer.curmapinfo.map_bounding
+        );
+    }
 
-    // Gplayer.curmapinfo.line_list = line_list;
-    Gplayer.curmapinfo.platform_list = platform_list;
-    Gplayer.curmapinfo.wall_list = wall_list;
-    Gplayer.curmapinfo.climbs = climbs;
-    Gplayer.curmapinfo.footholds = footholds;
-    Gplayer.curmapinfo.id = map_id;
-    Gplayer.curmapinfo.name = "";
-    Gplayer.curmapinfo.map_bounding = map_bounding;
-    Gplayer.curmapinfo.map_mat = cur_room_map;
+    if(Gplayer.curmapinfo.path_nodes.empty()){
+        Gplayer.curmapinfo.path_nodes = RoomMap::makeNodes(
+            Gplayer.curmapinfo.platform_list,
+            Gplayer.curmapinfo.wall_list,
+            Gplayer.curmapinfo.map_mat,
+            Gplayer.curmapinfo.map_bounding
+        );
+    }
 
+    // 序列化地图数据
+    QString savePath = QCoreApplication::applicationDirPath() + "/maps/map_" + map_id;
+    if (MapSerializer::saveToFile(Gplayer.curmapinfo, savePath)) {
+        qDebug() << "地图缓存成功!";
+        Gplayer.m_map_loaded = true;
+    } else {
+        qDebug() << "地图缓存失败!";
+        Gplayer.m_map_loaded = false;
+        Gplayer.last_mapentity = 0;
+        return;
+    }
 
-    QString currentDir = QCoreApplication::applicationDirPath() + "/room_map.png";
-    qDebug() << "图片保存路径：" << currentDir;
-    ImageTool::saveMatImage(cur_room_map, currentDir);
+    // QElapsedTimer astart_time;
+    // astart_time.start();
 
-    // 第二步：算出寻路数据
-    /**
-     * 向左走寻路
-     * 向右走寻路
-    **/
-    RoomMap::makeNodes(platform_list, wall_list, cur_room_map, map_bounding);
+    // std::vector<int> paths = PathAlgo::findAStarPath(0, 7, Gplayer.curmapinfo.path_nodes);
+    // for(const auto plat : paths){
+    //     qDebug() << "前往平台：" << plat;
+    // }
 
-    // 最终步骤：合并数据缓存到本地（如果本地存在地图缓存直接拿缓存数据）
-
-    // 地图更新完毕，退出
+    // quint64 astar_times = astart_time.elapsed();
+    // qDebug() << "AStar算法用时:" << astar_times;
 }
 
 void UpdateGameData::UpdateMonsters()

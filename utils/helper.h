@@ -99,9 +99,6 @@ public:
     // 创建攀爬物体
     static std::vector<ClimbRect> makeClimbList(quint64 cur_map, quint64 collisionservice, MapBounding map_bounding);
 
-    // 遍历瓦片
-    static std::vector<std::vector<COORDINATE>> dumpTilemapList(quint64 map);
-
     // 创建footholds
     static std::vector<FootholdRect> makeFootholdList(quint64 cur_map, MapBounding map_bounding);
 
@@ -109,17 +106,23 @@ public:
     static std::vector<Wall> makeWallList(const std::vector<FootholdRect> &footholds, std::unordered_set<int> &id_set);
 
     // 创建平台列表
-    static std::vector<Platform> makePlatformList(const std::vector<FootholdRect> &footholds,
-                                                const std::vector<Wall> &wall_list,
-                                                const std::vector<ClimbRect> &climb_list,
-                                                MapBounding map_bounding,
-                                                std::unordered_set<int> &id_set);
+    static std::vector<Platform> makePlatformList(
+        const std::vector<FootholdRect> &footholds,
+        const std::vector<Wall> &wall_list,
+        const std::vector<ClimbRect> &climb_list,
+        MapBounding map_bounding,
+        std::unordered_set<int> &id_set
+    );
 
     // 创建房间地图
-    static cv::Mat makeRoomMap(std::vector<ClimbRect> climb_list, std::vector<FootholdRect> foothold_list, MapBounding map_bounding);
+    static cv::Mat makeRoomMap(
+        const std::vector<ClimbRect> &climb_list,
+        const std::vector<FootholdRect> &foothold_list,
+        const MapBounding &map_bounding
+    );
 
     // 创建寻路节点
-    static void makeNodes(
+    static std::unordered_map<int, PathNode> makeNodes(
         const std::vector<Platform> &platform_list,
         const std::vector<Wall> &wall_list,
         const cv::Mat &cur_room_map,
@@ -129,11 +132,17 @@ public:
     // 计算物品所在平台坐标
     static cv::Point getItemLinePos(cv::Mat map, cv::Point pos);
 
+    // 计算地板所在平台
+    static int getFootPlatform(int foothold, const std::vector<Platform>& platform_list);
+
     // 计算坐标所在平台
     static int getPosPlatform(cv::Point pos, const std::vector<Platform> &platform_list, const cv::Mat &room_map);
 
     // 获取平台的类型
     static int getPlatformType(int platform_id, const std::vector<Platform> &platform_list);
+
+    // 从缓存中加载地图
+    static void loadLocalMap(const QString map_id);
 };
 
 class PathAlgo{

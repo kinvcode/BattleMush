@@ -41,6 +41,9 @@ MainWindow::MainWindow(QWidget *parent)
     // 设置配置组件
     initConfig();
 
+    // 初始化目录
+    initDir();
+
     // 绑定信号
     initSinalBind();
 
@@ -169,6 +172,18 @@ void MainWindow::initConfig()
     ui->lineEdit_auto_add_mp_key->m_config_path = "auto_add_health/mp_key";
     ui->lineEdit_auto_add_mp_key->m_currentKey = Gconfig.getValue("auto_add_health/mp_key").toInt();
     ui->lineEdit_auto_add_mp_key->updateDisplay();
+}
+
+void MainWindow::initDir()
+{
+    // 检查图片文件夹是否存在
+    QString img_dir = QCoreApplication::applicationDirPath() + "/maps/";
+
+    QDir project_img_dir(img_dir);
+    if(!project_img_dir.exists())
+    {
+        project_img_dir.mkdir(img_dir);
+    }
 }
 
 void MainWindow::initSinalBind()

@@ -120,14 +120,15 @@ void KillMonster::process()
         int user_foothold_id = 0;
         int user_climb_id = 0;
         int user_in_lineid = -1;
+
         if(user_foothold_p){
             user_foothold_id = readInt(user_foothold_p + BASE::Foothold::ID);
-            // user_in_lineid = RoomMap::getPlatformByFoothold(user_foothold_id, Gplayer.curmapinfo.line_list);
+            user_in_lineid = RoomMap::getFootPlatform(user_foothold_id, Gplayer.curmapinfo.platform_list);
         }
 
-        // int user_x = RoomMap::toMapPosX(readFloat(readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent) + BASE::TransformComponent::PositionX),
-        //                                 Gplayer.curmapinfo.map_bounding.x_offset);
-        // qDebug() << "人物坐标：" << user_x;
+        int user_x = RoomMap::toMapPosX(readFloat(readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent) + BASE::TransformComponent::PositionX),
+                                        Gplayer.curmapinfo.map_bounding.x_offset);
+        qDebug() << "人物坐标：" << user_x;
 
         if(user_in_lineid == -1){
             DebugOutput::out("暂不支持当前位置寻怪，人物可能在攀爬");
@@ -191,6 +192,7 @@ void KillMonster::findDropItem(int start_index)
             continue; // 物品坐标错误
         }
 
+        qDebug() << "找到物品坐标：" << x << "," << y;
         //
     }
 }
@@ -232,8 +234,7 @@ void KillMonster::updateAllMonsters()
         int foothold_id = readInt(readLong(readLong(entity + BASE::MODEntity::RigidbodyComponent)
                                            + BASE::RigidbodyComponent::currentFoothold)
                                   + BASE::Foothold::ID);
-        // int line_id = RoomMap::getPlatformByFoothold(foothold_id, Gplayer.curmapinfo.line_list);
-        int line_id = -1;
+        int line_id = RoomMap::getFootPlatform(foothold_id, Gplayer.curmapinfo.platform_list);
         if(line_id == -1){
             continue;
         }
