@@ -94,6 +94,7 @@ void KillMonster::process()
             m_currentmap = 0;
             m_allmonster.clear();
             DebugOutput::out("切换了地图");
+            DebugOutput::out("首次访问的地图需要计算地图路径，请耐心等待~");
             ProcessHelper::programDelay(1000);
             QApplication::processEvents();
             continue;

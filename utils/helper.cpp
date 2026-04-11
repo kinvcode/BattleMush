@@ -618,12 +618,6 @@ void RoomMap::makeNodes(
     for(const auto &platform : platform_list){
         path_nodes[platform.id].id = platform.id;
         path_nodes[platform.id].type = platform.type;
-
-        // path_nodes[platform.id].targets.reserve(platform_list.size());
-        // for(const auto &plat : platform_list){
-        //     path_nodes[platform.id].targets[plat.id].id = plat.id;
-        //     path_nodes[platform.id].targets[plat.id].type = plat.type;
-        // }
     }
 
     PathAlgo::walkToLeft(platform_list, cur_room_map, path_nodes);
@@ -642,9 +636,20 @@ void RoomMap::makeNodes(
 
     PathAlgo::down(platform_list, cur_room_map, map_bounding, path_nodes);
 
-
     quint64 total_time = begin_time.elapsed();
-    qDebug() << "寻路算法用时:" << total_time;
+    qDebug() << "平台寻路算法用时:" << total_time;
+
+    QElapsedTimer astart_time;
+    astart_time.start();
+
+    std::vector<int> paths = PathAlgo::findAStarPath(0, 7, path_nodes);
+    for(const auto plat : paths){
+        qDebug() << "前往平台：" << plat;
+    }
+
+    quint64 astar_times = astart_time.elapsed();
+    qDebug() << "AStar算法用时:" << astar_times;
+
 }
 
 bool Helper::parseHPString(const QString &Text, int &left, int &right) {
@@ -1285,10 +1290,11 @@ int RoomMap::getPlatformType(int platform_id, const std::vector<Platform> &platf
     return -1;
 }
 
-void PathAlgo::findAStarPath(int platformA, int platformB, const std::unordered_map<int, PathNode> path_nodes)
+std::vector<int> PathAlgo::findAStarPath(int platformA, int platformB, std::unordered_map<int, PathNode> &path_nodes)
 {
+    std::vector<int> path;
+
     // 开启列表(最小堆)
-    // std::priority_queue<PathNode, std::vector<PathNode>, std::greater<PathNode>> open_list;
     std::priority_queue<int, std::vector<int>, std::greater<int>> open_list;
 
     // 平台map
@@ -1298,48 +1304,44 @@ void PathAlgo::findAStarPath(int platformA, int platformB, const std::unordered_
     std::unordered_set<int> closed_list;
 
     // 初始化起始平台
-    // PathNode start_node = path_nodes[platformA];
-    // start_node.cost = 0; //从起点到当前节点的实际代价（已经走过的路径）。只计算这个就行，因为没法计算启发式代价
-    // start_node.heuristic_cost = heuristic(start_node, platform_map[platformB]);// 启发式代价（当前节点到目标节点的估计代价）
-    // start_node.total_cost = start_node.cost + start_node.heuristic_cost; // 总代价 = g_cost + h_cost
-
-    // open_list.push(start_node);
+    PathNode start_node = path_nodes[platformA];
+    open_list.push(start_node.id);
 
 
-    // while (!open_list.empty()) {
-    //     PathNode current = open_list.top(); // 获取第一个节点
-    //     open_list.pop(); // 从堆中删除
+    while (!open_list.empty()) {
+        int cur_plat = open_list.top();
+        PathNode current = path_nodes[cur_plat]; // 获取第一个节点
+        open_list.pop(); // 从堆中删除
 
-    //     // 如果找到目标平台，生成路径
-    //     if (current.id == platformB) {
+        // 如果找到目标平台，生成路径
+        if (current.id == platformB) {
+            while (came_from.find(current.id) != came_from.end()) {
+                path.push_back(current.id);
+                current = came_from[current.id];
+            }
+            path.push_back(platformA);
+            std::reverse(path.begin(), path.end());
+            return path; // 可以返回路径信息了
+        }
 
-    //         return path; // 可以返回路径信息了
-    //     }
+        // 记录当前节点（如果没到终点，把当前节点放入到关闭列表中）
+        closed_list.insert(current.id);
 
-    //     // 记录当前节点（如果没到终点，把当前节点放入到关闭列表中）
-    //     closed_list.insert(current.id);
+        // 遍历当前节点的所有目标平台
+        for (const auto& target : current.targets) {
+            if (closed_list.find(target.first) != closed_list.end()) {
+                continue;  // 如果目标已在关闭列表中，跳过
+            }
 
-    //     // 遍历当前节点的所有目标平台
-    //     for (const auto& target : current.targets) {
-    //         if (closed_list.find(target.id) != closed_list.end()) {
-    //             continue;  // 如果目标已在关闭列表中，跳过
-    //         }
+            // 如果目标平台不在开启列表中，加入
+            if (came_from.find(target.first) == came_from.end()) {
+                open_list.push(target.first);
+                came_from[target.first] = current;
+            }
+        }
+    }
 
-    //         // int tentative_cost = current.cost + 1;  // 固定加1就行。暂时不需要计算最近距离。平台之间能连接到就行
-    //         // int tentative_cost = 1 + 1;
-
-    //         // 如果目标平台不在开启列表中，加入
-    //         if (came_from.find(target.id) == came_from.end()) {
-    //             // target.cost = tentative_cost; // 已经花费的代价
-    //             // target.heuristic_cost = heuristic(target, platform_map[platformB]);
-    //             // target.total_cost = target.cost + target.heuristic_cost;
-
-    //             open_list.push(target);
-    //             came_from[target.id] = current;
-    //         }
-    //     }
-    // }
-
+    return path;
 }
 
 void PathAlgo::walkToLeft(

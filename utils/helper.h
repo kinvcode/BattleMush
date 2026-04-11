@@ -139,7 +139,7 @@ public:
 class PathAlgo{
 public:
     // 搜索A*路径
-    static void findAStarPath(int platformA, int platformB, const std::unordered_map<int, PathNode> path_nodes);
+    static std::vector<int> findAStarPath(int platformA, int platformB, std::unordered_map<int, PathNode> &path_nodes);
 
     static void walkToLeft(
         const std::vector<Platform> &platform_list,
