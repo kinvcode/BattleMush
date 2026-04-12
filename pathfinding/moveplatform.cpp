@@ -138,6 +138,8 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform)
                 qDebug() << "目标平台为地平线";
                 for(const auto &visit : target.second.visit_list){
 
+                    if(visit.visit_type != VISIT_TYPE::DOWN) continue; // 调试
+
                     switch (visit.visit_type) {
                     case VISIT_TYPE::JUMP_LEFT:
                         qDebug() << "向左跳跃可以到达目标平台";
@@ -660,7 +662,13 @@ bool MovePlatform::down(LineSegment area, int platform, bool is_climb)
             walk_to_platform.m_walk_timeout = timeout + 3000;
             walk_to_platform.runY();
 
-            ProcessHelper::programDelay(100);
+            quint64 foothold_p = getUserFootholdP();
+            while(foothold_p == 0){
+                ProcessHelper::programDelay(50);
+                QApplication::processEvents();
+                foothold_p = getUserFootholdP();
+            }
+
             if(platform == getUserPlatform()){
                 qDebug() << "向下攀爬已到达指定平台";
                 return true;

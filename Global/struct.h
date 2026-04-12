@@ -174,6 +174,11 @@ typedef struct{
 }MapInfo;
 
 
-
+typedef struct {
+    int general_atk;
+    int skill_atk1;
+    int jump;
+    int gohome;
+}BindKey;
 
 #endif // STRUCT_H

@@ -52,14 +52,8 @@ public:
     // 碰撞服务
     quint64 p_collisionservice = 0;
 
-    // localplayer
     quint64 p_localplayer = 0;
 
-    // PlayerComponent
-
-    // TransformComponent
-
-    // UI->LocalUserGroup->StatusPanel
     quint64 p_statuspanel = 0;
 
     // 角色昵称
@@ -84,7 +78,8 @@ public:
     int MP = 0;
     int MAX_MP = 0;
 
-
+    // 用户绑定的按键
+    BindKey m_bindkey;
 
     // 一些测试数据
     std::vector<std::pair<float, float>> move_pos_list;

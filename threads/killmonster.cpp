@@ -52,19 +52,19 @@ void KillMonster::pause()
 void KillMonster::resume()
 {
     qDebug() << "KillMonster" << m_id << "resumed";
-    m_bindkey_general_atk = Gconfig.getValue("bindkey/general_atk").toInt();
-    m_bindkey_skill_atk1  = Gconfig.getValue("bindkey/skill_atk1").toInt();
-    m_bindkey_jump        = Gconfig.getValue("bindkey/jump").toInt();
-    m_bindkey_gohome      = Gconfig.getValue("bindkey/gohome").toInt();
+    Gplayer.m_bindkey.general_atk = Gconfig.getValue("bindkey/general_atk").toInt();
+    Gplayer.m_bindkey.skill_atk1 = Gconfig.getValue("bindkey/skill_atk1").toInt();
+    Gplayer.m_bindkey.jump = Gconfig.getValue("bindkey/jump").toInt();
+    Gplayer.m_bindkey.gohome = Gconfig.getValue("bindkey/gohome").toInt();
     m_paused = false;
 }
 
 void KillMonster::process()
 {
-    m_bindkey_general_atk = Gconfig.getValue("bindkey/general_atk").toInt();
-    m_bindkey_skill_atk1  = Gconfig.getValue("bindkey/skill_atk1").toInt();
-    m_bindkey_jump        = Gconfig.getValue("bindkey/jump").toInt();
-    m_bindkey_gohome      = Gconfig.getValue("bindkey/gohome").toInt();
+    Gplayer.m_bindkey.general_atk = Gconfig.getValue("bindkey/general_atk").toInt();
+    Gplayer.m_bindkey.skill_atk1 = Gconfig.getValue("bindkey/skill_atk1").toInt();
+    Gplayer.m_bindkey.jump = Gconfig.getValue("bindkey/jump").toInt();
+    Gplayer.m_bindkey.gohome = Gconfig.getValue("bindkey/gohome").toInt();
 
     while (m_running) {
         // 处理暂停状态
@@ -114,44 +114,29 @@ void KillMonster::process()
 
         // 更新全图怪物
         updateAllMonsters();
+        // ProcessHelper::programDelay(3000); // 调试
+        // QApplication::processEvents();
+        // continue;
 
         // 获取人物所在地板
-        quint64 user_foothold_p = readLong(readLong(Gplayer.p_localplayer + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::currentFoothold);
-        quint64 user_attach_p = readLong(readLong(Gplayer.p_localplayer + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::attachEntity);
-        int user_foothold_id = 0;
-        int user_in_lineid = -1;
-
-        // int user_x = RoomMap::toMapPosX(readFloat(readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent) + BASE::TransformComponent::PositionX),
-                                        // Gplayer.curmapinfo.map_bounding.x_offset);
-        // qDebug() << "人物坐标：" << user_x;
-
-        if(user_foothold_p){
-            user_foothold_id = readInt(user_foothold_p + BASE::Foothold::ID);
-            user_in_lineid = RoomMap::getFootPlatform(user_foothold_id, Gplayer.curmapinfo.platform_list);
-        }
-        if(user_attach_p){
-            cv::Point pos = {-1,-1};
-            quint64 transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
-            float user_x = readFloat(transform + BASE::TransformComponent::PositionX);
-            float user_y = readFloat(transform + BASE::TransformComponent::PositionY);
-            pos.x = RoomMap::toMapPosX(user_x,Gplayer.curmapinfo.map_bounding.x_offset);
-            pos.y = RoomMap::toMapPosY(user_y,Gplayer.curmapinfo.map_bounding.y_offset, Gplayer.curmapinfo.map_bounding.height);
-            user_in_lineid = RoomMap::getClimbPlatform(pos, Gplayer.curmapinfo.platform_list, Gplayer.curmapinfo.map_mat);
-        }
+        int user_in_lineid = userPlatform();
 
         if(user_in_lineid == -1){
-            DebugOutput::out("暂不支持当前位置寻怪，人物可能在攀爬");
+            DebugOutput::out("暂不支持当前位置寻怪~");
             ProcessHelper::programDelay(1000);
             QApplication::processEvents();
             continue;
         }
 
+        // 先刷本平台的怪物
+
         // 待处理的怪物列表
         std::vector<Monster> handle_monsters = getLineMonsters(user_in_lineid);
 
-        // PathNode node = Gplayer.curmapinfo.path_nodes[2];
-        // qDebug() << "准备前往平台:" << 11;
-        // MovePlatform::toPlatform(node, 11);
+        // PathNode node = Gplayer.curmapinfo.path_nodes[11]; // 调试
+        // qDebug() << "准备前往平台:" << 7;
+        // MovePlatform::toPlatform(node, 7);
+        // qDebug() << "====== 平台移动测试结束 ======";
         // ProcessHelper::programDelay(1000);
         // QApplication::processEvents();
         // continue;
@@ -167,7 +152,9 @@ void KillMonster::process()
                 continue;
             }
 
+            bool is_find = false;
             for(const auto &monster : m_allmonster){
+                if(is_find) break;
                 int monster_platform = RoomMap::getFootPlatform(monster.foothold_id, Gplayer.curmapinfo.platform_list);
                 if(monster_platform == -1){
                     qDebug() << "怪物所在平台找不到";
@@ -181,34 +168,32 @@ void KillMonster::process()
                 }
 
                 for(auto plat : paths){
-
-
-                    user_foothold_p = readLong(readLong(Gplayer.p_localplayer + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::currentFoothold);
-                    user_foothold_id = readInt(user_foothold_p + BASE::Foothold::ID);
-                    user_in_lineid = RoomMap::getFootPlatform(user_foothold_id, Gplayer.curmapinfo.platform_list);
-
+                    user_in_lineid = userPlatform();
                     PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
                     qDebug() << "准备前往平台:" << plat;
-                    MovePlatform::toPlatform(node, plat);
+
+                    bool move_success = MovePlatform::toPlatform(node, plat);
+                    if(!move_success){
+                       qDebug() << "A星移动平台失败 平台:" << plat;
+                    }
 
                     handle_monsters = getLineMonsters(user_in_lineid);
 
-                    if(!handle_monsters.empty()){
-                        break;
+                    if(handle_monsters.empty()){
+                        continue;;
                     }
+                    is_find = true;
+                    qDebug() << "当前角色所在平台:" << user_in_lineid << "存在怪物，准备清理怪物";
+                    break;
                 }
             }
-
-            ProcessHelper::programDelay(1000);
-            QApplication::processEvents();
-            continue;
         }
 
         // 击杀怪物
         killNearMonster(handle_monsters);
 
         // 搜索一遍物品列表
-        findDropItem(m_map_start);
+        // findDropItem(m_map_start);
 
         DebugOutput::out("击杀怪物暂时没有任务执行，等待中...");
         ProcessHelper::programDelay(500);
@@ -216,6 +201,58 @@ void KillMonster::process()
     }
 
     qDebug() << "KillMonster" << m_id << "finished";
+}
+
+int KillMonster::userX()
+{
+    quint64 transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+    float user_x = readFloat(transform + BASE::TransformComponent::PositionX);
+    return RoomMap::toMapPosX(user_x,Gplayer.curmapinfo.map_bounding.x_offset);
+}
+
+int KillMonster::userY()
+{
+    quint64 transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+    float user_y = readFloat(transform + BASE::TransformComponent::PositionY);
+    return RoomMap::toMapPosY(user_y,Gplayer.curmapinfo.map_bounding.y_offset, Gplayer.curmapinfo.map_bounding.height);
+}
+
+cv::Point KillMonster::userPos()
+{
+    cv::Point pos;
+    quint64 transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+    float user_x = readFloat(transform + BASE::TransformComponent::PositionX);
+    float user_y = readFloat(transform + BASE::TransformComponent::PositionY);
+    pos.x = RoomMap::toMapPosX(user_x,Gplayer.curmapinfo.map_bounding.x_offset);
+    pos.y = RoomMap::toMapPosY(user_y,Gplayer.curmapinfo.map_bounding.y_offset, Gplayer.curmapinfo.map_bounding.height);
+    return pos;
+}
+
+quint64 KillMonster::userFoothold()
+{
+    return readLong(readLong(Gplayer.p_localplayer + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::currentFoothold);
+}
+
+quint64 KillMonster::userClimb()
+{
+    return readLong(readLong(Gplayer.p_localplayer + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::attachEntity);
+}
+
+quint64 KillMonster::userPlatform()
+{
+    quint64 user_foothold_p = userFoothold();
+    if(user_foothold_p){
+        int foot_id = readInt(user_foothold_p + BASE::Foothold::ID);
+        return RoomMap::getFootPlatform(foot_id, Gplayer.curmapinfo.platform_list);
+    }else{
+        quint64 user_climb_p = userClimb();
+        if(user_climb_p == 0){
+            return -1;
+        }
+
+        cv::Point pos = userPos();
+        return RoomMap::getClimbPlatform(pos, Gplayer.curmapinfo.platform_list, Gplayer.curmapinfo.map_mat);
+    }
 }
 
 void KillMonster::findDropItem(int start_index)
@@ -305,6 +342,13 @@ void KillMonster::updateAllMonsters()
         Monster cur_monster = {entity, foothold_id, line_id, {monster_x, monster_y}};
         m_allmonster.push_back(cur_monster);
     }
+
+    // 调试
+    qDebug() << "=============================================";
+    for(const auto &monster : m_allmonster) {
+        qDebug() << "怪物：" << QString::number(monster.entity,16).toUpper() << " 平台：" << monster.line_id << " " << monster.pos.x << "," << monster.pos.y;
+    }
+    qDebug() << "=============================================";
 }
 
 std::vector<Monster> KillMonster::getLineMonsters(int user_line)
@@ -325,40 +369,16 @@ void KillMonster::killNearMonster(std::vector<Monster> handle_monsters)
 {
     // 找到离自己最近的怪物
     // 获取人物坐标
-    int user_x = RoomMap::toMapPosX(readFloat(readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent) + BASE::TransformComponent::PositionX),
-                                    Gplayer.curmapinfo.map_bounding.x_offset);
-    qDebug() << "人物坐标：" << user_x;
-    Monster target_monster = Math::getNearMonster(handle_monsters, user_x);
+    cv::Point user_pos = userPos();
+    qDebug() << "人物坐标：" << user_pos.x << "," << user_pos.y;
+
+    Monster target_monster = Math::getNearMonster(handle_monsters, user_pos.x);
+
     qDebug() << "目标怪物：" << target_monster.line_id << "->" << QString::number(target_monster.entity,16).toUpper() << ":" << target_monster.pos.x << "," << target_monster.pos.y;
+    qDebug() << "开始寻路清怪~";
 
-    qDebug() << "开始寻路";
-    WalkBase walk_to_monster(target_monster.pos.x);
-    if(walk_to_monster.run()){
-        qDebug() << "已到达怪物位置";
-        bool allow_attack = readByte(readLong(Gplayer.p_localplayer + BASE::MODEntity::StateComponent) + BASE::StateComponent::attacking);
-        if(!allow_attack){
-            qDebug() << "处于攻击动作中,不允许攻击";
-            return;
-        }
-
-        // 再次判断怪物是否存在
-        bool exists = readByte(readLong(target_monster.entity + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::exists);
-        if(!exists){
-            qDebug() << "怪物已消失~,取消攻击";
-            return;
-        }
-
-        QString status = readString(readLong(readLong(target_monster.entity + BASE::MODEntity::StateComponent) + BASE::StateComponent::_CurrentStateName) + BASE::String::text, 10);
-        // qDebug() << "怪物状态：" << status;
-        if(status == "DEAD"){
-            qDebug() << "怪物已死亡~,取消攻击";
-            return;
-        }
-
-        MSDriverPRO::keyboardClick(m_bindkey_general_atk,1);
-    }else{
-        qDebug() << "寻怪失败~";
-    }
+    WalkBase user_move(target_monster.pos.x);
+    user_move.clearMonster(attack_range);
 }
 
 

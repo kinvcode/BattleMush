@@ -23,14 +23,11 @@ private:
     bool m_paused;
     int m_counter;
 
-    // 按键绑定
-    int m_bindkey_general_atk;
-    int m_bindkey_skill_atk1;
-    int m_bindkey_jump;
-    int m_bindkey_gohome;
-
     // 当前地图
     quint64 m_currentmap = 0;
+
+    // 攻击范围
+    cv::Point attack_range = {200, 50};
 
     // 地图开始索引
     int m_map_start;
@@ -40,6 +37,18 @@ private:
 
     // 全图物品
     // std::vector<Item> m_allItem;
+private:
+    int userX();
+
+    int userY();
+
+    cv::Point userPos();
+
+    quint64 userFoothold();
+
+    quint64 userClimb();
+
+    quint64 userPlatform();
 
 private:
     // 寻找掉落物品
@@ -54,7 +63,6 @@ private:
     std::vector<Monster> getLineMonsters(int user_line);
 
     // 击杀怪物
-
     void killNearMonster(std::vector<Monster> handle_monsters);
 
 
