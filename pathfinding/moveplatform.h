@@ -5,23 +5,23 @@
 class MovePlatform
 {
 public:
-    static bool toPlatform(const PathNode& plat, int target);
+    static bool toPlatform(const PathNode& plat, int target, bool is_town = true);
 
-    static bool walkLeft(LineSegment area, int platform);
+    static bool walkLeft(cv::Point range, int platform);
 
-    static bool walkRight(LineSegment area, int platform);
+    static bool walkRight(cv::Point range, int platform);
 
-    static bool jumpLeft(LineSegment area, int platform, bool is_climb = false, bool self_climb = false);
+    static bool jumpLeft(cv::Point range, int platform, bool is_climb = false, bool self_climb = false);
 
-    static bool jumpRight(LineSegment area, int platform, bool is_climb = false, bool self_climb = false);
+    static bool jumpRight(cv::Point range, int platform, bool is_climb = false, bool self_climb = false);
 
-    static bool jumpUP(LineSegment area, int platform, bool is_climb = false);
+    static bool jumpUP(cv::Point range, int platform, bool is_climb = false);
 
-    static bool jumpDown(LineSegment area, int platform);
+    static bool jumpDown(cv::Point range, int platform);
 
-    static bool up(LineSegment area, int platform,bool self_climb = false);
+    static bool up(cv::Point range, int platform,bool self_climb = false);
 
-    static bool down(LineSegment area, int platform, bool is_climb = false);
+    static bool down(cv::Point range, int platform, bool is_climb = false, bool self_climb = false);
 
 private :
     static quint64 getUserFootholdP();

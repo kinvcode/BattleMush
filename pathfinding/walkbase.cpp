@@ -225,6 +225,8 @@ void WalkBase::clearMonster(cv::Point range)
             if(pos.x != -1){
                 DebugOutput::out("范围内存在怪物，进行攻击");
                 attackMonster(pos);
+                qDebug() << "寻怪提前完毕~";
+                return;
             }
         }
 
@@ -249,6 +251,235 @@ void WalkBase::clearMonster(cv::Point range)
     }
 
     qDebug() << "寻怪结束~";
+}
+
+bool WalkBase::moveToItem(cv::Point range)
+{
+    m_skill_range = range;
+    m_transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+
+    int user_x = getUserX();
+
+    if(user_x == m_target_x)
+    {
+        qDebug() << "与物品X坐标相同";
+        return true;
+    }
+
+    // 清空一下按键
+    clearXkey();
+
+    // 跑动按键判断
+    int direction_x;
+    if (m_target_x > user_x) {
+        // 向右
+        qDebug() << "向右走~";
+        direction_x = MSKeyboard_RightArrow;
+    } else {
+        // 向左
+        qDebug() << "向左走~";
+        direction_x = MSKeyboard_LeftArrow;
+    }
+
+    // 是否到达
+    bool arrived = false;
+
+    QElapsedTimer begin_timer;
+    begin_timer.restart();
+
+    int last_time = begin_timer.elapsed();
+
+    // 开始移动
+    MSDriverPRO::keyboardDown(direction_x);
+
+    quint64 map_entity_count = readInt(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
+    quint64 entity_head = readLong(readLong(Gplayer.p_curmapentity
+                                            + BASE::MODEntity::children)
+                                   + BASE::List::InternalArray)
+                          + BASE::InternalArray::Head;
+    int map_start = 0;
+
+    // 先执行一次范围检测
+    cv::Point pos = monsterInRange(entity_head, map_entity_count, map_start);
+    if(pos.x != -1){
+        DebugOutput::out("范围内存在怪物，无需寻路即可攻击。攻击中~");
+        attackMonster(pos);
+    }
+
+    while(true){
+
+        int cur_time = begin_timer.elapsed();
+        if (cur_time > m_walk_timeout) {
+            DebugOutput::out("拾取物品寻路超时~");
+            clearXkey();
+            return false;
+        }
+
+        // 每0.1秒检测一次怪物
+        if(cur_time - last_time > 100){
+            cv::Point pos = monsterInRange(entity_head, map_entity_count, map_start);
+            if(pos.x != -1){
+                DebugOutput::out("范围内存在怪物，进行攻击");
+                attackMonster(pos);
+            }
+        }
+
+        // 到达
+        if (arrived) {
+            qDebug() << "到达目标物品~";
+            clearXkey();
+            return true;
+        }
+
+        user_x = getUserX();
+
+        if (abs(m_target_x - user_x) <= m_deviation) {
+            arrived = true;
+        }
+    }
+
+    qDebug() << "拾取物品结束,失败~";
+    return false;
+}
+
+bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
+{
+    m_skill_range = range;
+    m_transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+
+    int user_pos;
+    if(self_climb){
+        qDebug() << "攀爬体寻路到连接点";
+        user_pos = getUserY();
+    }else{
+        qDebug() << "地板寻路到连接点";
+        user_pos = getUserX();
+    }
+
+    qDebug() << "移动平台连接点开始";
+
+    if(user_pos >= range.x && user_pos <= range.y)
+    {
+        qDebug() << "已在平台连接点范围，无需移动平台连接点~";
+        return true;
+    }
+
+    // 清空一下按键
+    if(self_climb){
+        clearYkey();
+    }else{
+       clearXkey();
+    }
+
+    int m_target_pos = range.x + (range.y - range.x) / 2;
+
+    if(self_climb){
+        m_walk_timeout = abs(m_target_pos - user_pos) / 7 * 100;
+    }else{
+        m_walk_timeout = abs(m_target_pos - user_pos) / 14 * 100;
+    }
+
+    // 跑动按键判断
+    int direction_arrow;
+    if (m_target_pos > user_pos) {
+        if(self_climb){
+            qDebug() << "向下攀爬~";
+            direction_arrow = MSKeyboard_DownArrow;
+        }else{
+            qDebug() << "向右走~";
+            direction_arrow = MSKeyboard_RightArrow;
+        }
+    } else {
+        if(self_climb){
+            qDebug() << "向上攀爬~";
+            direction_arrow = MSKeyboard_UpArrow;
+        }else{
+            qDebug() << "向左走~";
+            direction_arrow = MSKeyboard_LeftArrow;
+        }
+    }
+
+    QElapsedTimer begin_timer;
+    begin_timer.restart();
+
+    int last_time = begin_timer.elapsed();
+
+    // 开始移动
+    MSDriverPRO::keyboardDown(direction_arrow);
+
+    quint64 map_entity_count = readInt(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
+    quint64 entity_head = readLong(readLong(Gplayer.p_curmapentity
+                                            + BASE::MODEntity::children)
+                                   + BASE::List::InternalArray)
+                          + BASE::InternalArray::Head;
+    int map_start = 0;
+
+    // 先执行一次范围检测
+    cv::Point pos = monsterInRange(entity_head, map_entity_count, map_start);
+    if(pos.x != -1){
+        DebugOutput::out("范围内存在怪物，结束移动到平台连接点。攻击中~");
+        if(self_climb){
+            clearYkey();
+        }else{
+            clearXkey();
+        }
+        attackMonster(pos);
+        return false;
+    }
+
+    while(true){
+
+        int cur_time = begin_timer.elapsed();
+        if (cur_time > m_walk_timeout) {
+            DebugOutput::out("寻路超时~");
+            if(self_climb){
+                clearYkey();
+            }else{
+                clearXkey();
+            }
+            return false;
+        }
+
+        // 每0.1秒检测一次怪物
+        if(cur_time - last_time > 100){
+            cv::Point pos = monsterInRange(entity_head, map_entity_count, map_start);
+            if(pos.x != -1){
+                DebugOutput::out("范围内存在怪物，进行攻击");
+                if(self_climb){
+                    clearYkey();
+                }else{
+                    clearXkey();
+                }
+                attackMonster(pos);
+                qDebug() << "移动平台连接点提前完毕~";
+                return false;
+            }
+        }
+
+        if(self_climb){
+            user_pos = getUserY();
+        }else{
+            user_pos = getUserX();
+        }
+
+        if(user_pos >= range.x && user_pos <= range.y) {
+            if(self_climb){
+                clearYkey();
+            }else{
+                clearXkey();
+            }
+            return true;
+        }
+    }
+
+    if(self_climb){
+        clearYkey();
+    }else{
+        clearXkey();
+    }
+
+    qDebug() << "移动到平台连接点结束~";
+    return false;
 }
 
 int WalkBase::getUserX()

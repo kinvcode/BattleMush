@@ -4,6 +4,7 @@
 #include "threads/iworker.h"
 #include <QThread>
 #include "global/struct.h"
+#include <unordered_set>
 
 class KillMonster : public IWorker
 {
@@ -30,13 +31,17 @@ private:
     cv::Point attack_range = {200, 50};
 
     // 地图开始索引
-    int m_map_start;
+    int m_map_start = 0;
 
     // 全图怪物
     std::vector<Monster> m_allmonster;
 
     // 全图物品
-    // std::vector<Item> m_allItem;
+    std::vector<Item> m_allItem;
+
+    // 黑名单物品（已经找过的物品，用于过滤掉其他玩家的物品）
+    std::unordered_set<quint64> m_black_item;
+
 private:
     int userX();
 
@@ -52,7 +57,7 @@ private:
 
 private:
     // 寻找掉落物品
-    void findDropItem(int start_index);
+    Item findDropItem();
 
     // 更新全图对象：0全部对象 1人物 2怪物 3物品
 
@@ -65,8 +70,7 @@ private:
     // 击杀怪物
     void killNearMonster(std::vector<Monster> handle_monsters);
 
-
-
+    void reciveItem(const Item &target_item);
 
 
 

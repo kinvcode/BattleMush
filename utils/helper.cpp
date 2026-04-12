@@ -1202,10 +1202,10 @@ cv::Point RoomMap::getItemLinePos(cv::Mat map, cv::Point pos)
         return cv::Point(-1, -1);
     }
 
-    int start_cols = std::max(0, pos.x - 20);
-    int end_cols = std::min(map.cols, pos.x + 20);
-    int start_rows = std::max(0, pos.y);
-    int end_rows = std::min(map.rows, pos.y + 20);
+    int start_cols = std::max(0, pos.x - 20); // x_left
+    int end_cols = std::min(map.cols, pos.x + 20); // x_right
+    int start_rows = std::max(0, pos.y); // y_top
+    int end_rows = std::min(map.rows, pos.y + 20); // y_bottom
 
     if (start_rows >= end_rows || start_cols >= end_cols) {
         return cv::Point(-1, -1);

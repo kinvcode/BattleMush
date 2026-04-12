@@ -24,6 +24,10 @@ public:
 
     void clearMonster(cv::Point range);
 
+    bool moveToItem(cv::Point range);
+
+    bool moveToPlatform(cv::Point range, bool self_climb = false);
+
 private:
     int getUserX();
 
@@ -41,7 +45,9 @@ private:
 private:
     // quint64 m_entity_head = 0;
     cv::Point m_skill_range; // 监测怪物的
+
     cv::Point monsterInRange(quint64 head, int count, int &start_index);
+
     void attackMonster(cv::Point pos);
 };
 

@@ -112,18 +112,68 @@ void KillMonster::process()
             continue;
         }
 
+        RetryCase:
+        if(m_paused) continue;
+
+        // 获取人物所在地板
+        int user_in_lineid = userPlatform();
+
+        // 优先找物品，找物品过程中可以找怪物，真正没有怪物的时候才会去找怪物
+        Item cur_item = findDropItem();
+        if(cur_item.entity != 0 && cur_item.line_id != -1){
+            DebugOutput::out("发现需要拾取的物品~");
+            if(cur_item.line_id == user_in_lineid){
+                // 拾取物品
+                DebugOutput::out("人物所在平台存在物品，开始拾取~");
+                reciveItem(cur_item);
+            }else{
+                DebugOutput::out("人物平台没有物品，开始寻路~");
+                std::vector<int> paths = PathAlgo::findAStarPath(user_in_lineid, cur_item.line_id, Gplayer.curmapinfo.path_nodes);
+
+                qDebug() << "======A星路径======";
+                for(auto const &path : paths){
+                    qDebug() << path;
+                }
+                qDebug() << "======A星路径======";
+
+                if(paths.empty()){
+                    qDebug() << "无法找到前往该物品平台的路径";
+                }else{
+                    for(auto plat : paths){
+                        user_in_lineid = userPlatform();
+                        PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
+                        qDebug() << "准备前往平台:" << plat;
+
+                        bool move_success = MovePlatform::toPlatform(node, plat);
+                        if(!move_success){
+                            qDebug() << "A星移动平台失败 平台:" << plat;
+
+                            ProcessHelper::programDelay(100);
+                            QApplication::processEvents();
+                            goto RetryCase;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            DebugOutput::out("拾取物品中...");
+            ProcessHelper::programDelay(100);
+            QApplication::processEvents();
+            goto RetryCase;
+        }
+
         // 更新全图怪物
         updateAllMonsters();
         // ProcessHelper::programDelay(3000); // 调试
         // QApplication::processEvents();
         // continue;
 
-        // 获取人物所在地板
-        int user_in_lineid = userPlatform();
+
 
         if(user_in_lineid == -1){
             DebugOutput::out("暂不支持当前位置寻怪~");
-            ProcessHelper::programDelay(1000);
+            ProcessHelper::programDelay(100);
             QApplication::processEvents();
             continue;
         }
@@ -147,56 +197,63 @@ void KillMonster::process()
             // 寻找其他平台的怪物，可以先随便找个怪物。然后生成A星路径，在路径图中如果存在怪物就击杀
             if(m_allmonster.empty()){
                 DebugOutput::out("全图未存在怪物~");
-                ProcessHelper::programDelay(1000);
+                ProcessHelper::programDelay(100);
                 QApplication::processEvents();
                 continue;
             }
 
-            bool is_find = false;
-            for(const auto &monster : m_allmonster){
-                if(is_find) break;
-                int monster_platform = RoomMap::getFootPlatform(monster.foothold_id, Gplayer.curmapinfo.platform_list);
-                if(monster_platform == -1){
-                    qDebug() << "怪物所在平台找不到";
-                    continue;
-                }
+            Monster monster = m_allmonster.front();
 
-                std::vector<int> paths = PathAlgo::findAStarPath(user_in_lineid, monster_platform, Gplayer.curmapinfo.path_nodes);
-                if(paths.empty()){
-                    qDebug() << "无法找到前往该怪物平台的路径";
-                    continue;
-                }
+            int monster_platform = RoomMap::getFootPlatform(monster.foothold_id, Gplayer.curmapinfo.platform_list);
+            if(monster_platform == -1){
+                qDebug() << "怪物所在平台找不到";
+                continue;
+            }
 
-                for(auto plat : paths){
-                    user_in_lineid = userPlatform();
-                    PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
-                    qDebug() << "准备前往平台:" << plat;
+            std::vector<int> paths = PathAlgo::findAStarPath(user_in_lineid, monster_platform, Gplayer.curmapinfo.path_nodes);
 
-                    bool move_success = MovePlatform::toPlatform(node, plat);
-                    if(!move_success){
-                       qDebug() << "A星移动平台失败 平台:" << plat;
-                    }
+            qDebug() << "======A星路径======";
+            for(auto const &path : paths){
+                qDebug() << path;
+            }
+            qDebug() << "======A星路径======";
 
-                    handle_monsters = getLineMonsters(user_in_lineid);
+            if(paths.empty()){
+                qDebug() << "无法找到前往该怪物平台的路径";
+                continue;
+            }
 
-                    if(handle_monsters.empty()){
-                        continue;;
-                    }
-                    is_find = true;
-                    qDebug() << "当前角色所在平台:" << user_in_lineid << "存在怪物，准备清理怪物";
+            for(auto plat : paths){
+                user_in_lineid = userPlatform();
+                PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
+                qDebug() << "准备前往平台:" << plat;
+
+                bool move_success = MovePlatform::toPlatform(node, plat);
+                if(!move_success){
+                    ProcessHelper::programDelay(100);
+                    QApplication::processEvents();
+
+                    qDebug() << "A星移动平台失败 平台:" << plat;
+
+                    goto RetryCase;
                     break;
                 }
+
+                handle_monsters = getLineMonsters(user_in_lineid);
+
+                if(handle_monsters.empty()){
+                    continue;;
+                }
+                qDebug() << "当前角色所在平台:" << user_in_lineid << "存在怪物，准备清理怪物";
+                break;
             }
         }
 
         // 击杀怪物
         killNearMonster(handle_monsters);
 
-        // 搜索一遍物品列表
-        // findDropItem(m_map_start);
-
-        DebugOutput::out("击杀怪物暂时没有任务执行，等待中...");
-        ProcessHelper::programDelay(500);
+        DebugOutput::out("即将进行下一轮找怪");
+        ProcessHelper::programDelay(100);
         QApplication::processEvents();
     }
 
@@ -255,18 +312,30 @@ quint64 KillMonster::userPlatform()
     }
 }
 
-void KillMonster::findDropItem(int start_index)
+Item KillMonster::findDropItem()
 {
+    Item target_item;
+    target_item.entity = 0;
     quint64 map_entity_count = readInt(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
     quint64 entity_head = readLong(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::InternalArray) + BASE::InternalArray::Head;
 
-    for(int i = start_index; i < map_entity_count; i++){
-        // 节省遍历时间
+    m_allItem.clear();
+    for(int i = m_map_start; i < map_entity_count; i++){
 
         quint64 cur_entity_address = entity_head + i * 8;
         quint64 entity = readLong(cur_entity_address);
 
+        // 过滤黑名单
+        if (m_black_item.find(entity) != m_black_item.end()) {
+            continue;
+        }
+
         QString name = GameStruct::readEntityName(entity);
+
+        if(name == "EndObj"){
+            m_map_start = i + 1;
+            continue;
+        }
 
         if(name != "PoolObject"){
             continue;
@@ -278,17 +347,50 @@ void KillMonster::findDropItem(int start_index)
         int x = RoomMap::toMapPosX(item_x, Gplayer.curmapinfo.map_bounding.x_offset);
         int y = RoomMap::toMapPosY(item_y, Gplayer.curmapinfo.map_bounding.y_offset,Gplayer.curmapinfo.map_bounding.height);
 
-        // qDebug() << "找到物品坐标：" << x << "," << y;
-
-        // 计算物品所在平台的位置
         cv::Point item_pos = RoomMap::getItemLinePos(Gplayer.curmapinfo.map_mat,{x, y});
         if(item_pos.x == -1){
-            continue; // 物品坐标错误
+            continue;
         }
 
-        qDebug() << "找到物品坐标：" << x << "," << y;
-        //
+        int line_id = RoomMap::getPosPlatform(item_pos, Gplayer.curmapinfo.platform_list, Gplayer.curmapinfo.map_mat);
+        if(line_id == -1){
+            continue;
+        }
+
+        target_item.pos = item_pos;
+        target_item.entity = entity;
+        target_item.line_id = line_id;
+        m_allItem.push_back(target_item);
     }
+
+    if(m_allItem.empty()){
+        return target_item;
+    }
+
+    // 移除失效的黑名单物品
+    int user_platform = userPlatform();
+    int user_x = userX();
+    int distance = 999999;
+    for(const auto &item : m_allItem){
+        if (m_black_item.find(item.entity) != m_black_item.end()) {
+            m_black_item.erase(item.entity);
+        }
+        // 找到离自己最近的物品
+        if(item.line_id == user_platform){
+            int diff = abs(user_x - item.pos.x);
+            if( diff < distance){
+                distance = diff;
+                target_item = item;
+            }
+        }
+    }
+
+    // 如果没找本平台物品
+    if(target_item.entity == 0){
+        target_item = m_allItem.front();
+    }
+
+    return target_item;
 }
 
 void KillMonster::updateAllMonsters()
@@ -344,11 +446,11 @@ void KillMonster::updateAllMonsters()
     }
 
     // 调试
-    qDebug() << "=============================================";
-    for(const auto &monster : m_allmonster) {
-        qDebug() << "怪物：" << QString::number(monster.entity,16).toUpper() << " 平台：" << monster.line_id << " " << monster.pos.x << "," << monster.pos.y;
-    }
-    qDebug() << "=============================================";
+    // qDebug() << "=============================================";
+    // for(const auto &monster : m_allmonster) {
+    //     qDebug() << "怪物：" << QString::number(monster.entity,16).toUpper() << " 平台：" << monster.line_id << " " << monster.pos.x << "," << monster.pos.y;
+    // }
+    // qDebug() << "=============================================";
 }
 
 std::vector<Monster> KillMonster::getLineMonsters(int user_line)
@@ -379,6 +481,22 @@ void KillMonster::killNearMonster(std::vector<Monster> handle_monsters)
 
     WalkBase user_move(target_monster.pos.x);
     user_move.clearMonster(attack_range);
+}
+
+void KillMonster::reciveItem(const Item &target_item)
+{
+    cv::Point user_pos = userPos();
+    qDebug() << "人物坐标：" << user_pos.x << "," << user_pos.y;
+
+
+    qDebug() << "目标物品：" << target_item.line_id << "->" << QString::number(target_item.entity,16).toUpper() << ":" << target_item.pos.x << "," << target_item.pos.y;
+    qDebug() << "开始寻路拾取~";
+
+    WalkBase user_move(target_item.pos.x);
+    if(user_move.moveToItem(attack_range)){
+        // 加入到黑名单
+        m_black_item.insert(target_item.entity);
+    }
 }
 
 
