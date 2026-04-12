@@ -41,11 +41,11 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform, bool is_town)
                         distance = dist;
                         target_pos = cv::Point(segment.first, segment.second);
                         visit_type = visit.visit_type;
-                        qDebug() << "当前在地板，找到最近距离的区域,距离人物" << distance;
+                        qDebug() << "当前在地板，找到最近距离的区域" << " 访问类型:" << visit_type << " 距离人物:" << distance;
                     }
                 }
             }
-
+            qDebug() << "移动区域:" << target_pos.x << "," << target_pos.y;
             if(target.second.type == 0){
                 qDebug() << "目标平台为地平线";
                 switch (visit_type) {
@@ -154,7 +154,9 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform, bool is_town)
             int distance = 999999;
             cv::Point target_pos = {-1,-1};
             VISIT_TYPE visit_type;
+            bool is_find = false;
             for(const auto &visit : target.second.visit_list){
+                if(is_find) break;
                 for(const auto &segment : visit.area){
                     int dist = (user_x < segment.first) ? (segment.first - user_x) : (user_x > segment.second) ? (user_x - segment.second) : segment.first;
                     if(dist < distance){
@@ -162,6 +164,11 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform, bool is_town)
                         target_pos = cv::Point(segment.first, segment.second);
                         visit_type = visit.visit_type;
                         qDebug() << "当前在攀爬体，找到最近距离的区域,距离人物" << distance;
+                        if(target.second.type == 0 && visit_type == VISIT_TYPE::UP){
+                            // 优先选择向上攀爬,不要跳
+                            is_find = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -272,10 +279,14 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
 
     WalkBase walk_to_platform(0);
     bool arrived = walk_to_platform.moveToPlatform(range, self_climb); // 走到范围
-    if(!arrived) return false;
+    if(!arrived) {
+        qDebug() << "到达区域失败，取消向左跳跃";
+        return false;
+    }
 
     // 这时候读人物的坐标
     if(is_climb){
+        qDebug() << "向左跳跃到攀爬物体";
         // 到达地点之后进行跳跃操作
         MSDriverPRO::keyboardDown(MSKeyboard_LeftArrow);
         MSDriverPRO::keyboardClick(jump_key);
@@ -297,7 +308,9 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
             qDebug() << "向左跳跃已到达指定攀爬物";
             return true;
         }
+        qDebug() << "没到达指定攀爬物";
     }else{
+        qDebug() << "向左跳跃到地板";
         // 到达地点之后进行跳跃操作
         MSDriverPRO::keyboardDown(MSKeyboard_LeftArrow);
         MSDriverPRO::keyboardClick(jump_key);
@@ -314,8 +327,10 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
             qDebug() << "向左跳跃已到达指定平台";
             return true;
         }
+        qDebug() << "没到达指定平台";
     }
 
+    qDebug() << "向左跳跃失败~";
     return false;
 }
 

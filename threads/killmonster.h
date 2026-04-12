@@ -28,7 +28,7 @@ private:
     quint64 m_currentmap = 0;
 
     // 攻击范围
-    cv::Point attack_range = {200, 50};
+    cv::Point m_attack_range = {200, 50};
 
     // 地图开始索引
     int m_map_start = 0;
@@ -68,7 +68,7 @@ private:
     std::vector<Monster> getLineMonsters(int user_line);
 
     // 击杀怪物
-    void killNearMonster(std::vector<Monster> handle_monsters);
+    void killNearMonster(const std::vector<Monster> &handle_monsters);
 
     void reciveItem(const Item &target_item);
 

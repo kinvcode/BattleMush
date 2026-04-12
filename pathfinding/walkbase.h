@@ -6,6 +6,8 @@
 class WalkBase
 {
 public:
+    WalkBase(int target_x);
+
     int m_target_x;
 
     int m_target_y;
@@ -15,8 +17,6 @@ public:
     int m_walk_timeout;
 
     quint64 m_transform;
-
-    WalkBase(int target_x);
 
     bool run();
 
@@ -44,9 +44,9 @@ private:
     // 找怪的函数
 private:
     // quint64 m_entity_head = 0;
-    cv::Point m_skill_range; // 监测怪物的
+    cv::Point m_skill_range = {200,50}; // 监测怪物的
 
-    cv::Point monsterInRange(quint64 head, int count, int &start_index);
+    cv::Point monsterInRange(int &start_index);
 
     void attackMonster(cv::Point pos);
 };

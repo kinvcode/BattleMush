@@ -326,6 +326,48 @@ void MainWindow::onApplicationQuit()
 {
     DebugOutput::out("安全关闭程序中... ...");
     if(!GetKeyState(VK_NUMLOCK)) MSDriverPRO::keyboardClick(0x45); // 打开小键盘
+
+    // 卸载驱动
+    DriverLoad drvLoad;
+    // 如果驱动已加载
+    if (MSDriverPRO::isLoadDriver())
+    {
+        QString service_name = "MicrosoftGuard";
+        // 停止驱动
+        bool stoped = drvLoad.stopDriver(service_name);
+        if(stoped)
+        {
+            qDebug() << "MS驱动已完成停止";
+        }
+        if(drvLoad.unInstallDriver(service_name)){
+            qDebug() << "MS驱动已完成卸载";
+        }
+    }
+
+    QString drvPath = "C:/Windows/System32/drivers/MicrosoftGuard.sys"; // 驱动文件路径
+
+    QFile local_driver_file(drvPath);
+    if(local_driver_file.exists()){
+
+        // 判断是否可写
+        if (!local_driver_file.isWritable()) {
+            QFile::Permissions currentPerms = local_driver_file.permissions();
+
+            // 添加写权限（移除非写权限）
+            if (local_driver_file.setPermissions(currentPerms | QFile::WriteOwner)) {
+            } else {
+                qDebug() << "使用Qt修改权限失败：" << local_driver_file.errorString();
+            }
+        }
+
+        bool removed = local_driver_file.remove();
+        if(removed){
+            qDebug() << "MS驱动文件已删除";
+        }else{
+            qDebug() << "MS驱动文件无法删除";
+        }
+    }
+
     // ProcessHelper::programDelay(3000);
     QApplication::processEvents();
 }
@@ -334,17 +376,12 @@ void MainWindow::on_pushButton_clicked()
 {
     VMProtectBegin("__FUNCTION__");
 
-    // cv::Mat image = cv::imread("D:\\data\\maps\\03.png");
-    // cv::Point pos = {273,1811};
-    // pos = {273,1810};
-    // cv::Point start = {244,1830};
-    // cv::Point end = {424,1710};
-    // bool res = ImageTool::isPointOnLine(image, pos, start, end);
-    // qDebug() << res;
-
-    // if(!GetKeyState(VK_NUMLOCK)) MSDriverPRO::keyboardClick(0x45);
-
-    // qDebug() << "打开小键盘";
+    Gplayer.p_gamepid = 9376;
+    int res = 233;
+    qDebug() << res;
+    res = Mem::readInt(0x1D15A453440);
+    qDebug() << res;
+    Gplayer.p_gamepid = 0;
 
     VMProtectEnd();
 }

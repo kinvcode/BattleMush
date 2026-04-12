@@ -350,7 +350,7 @@ std::vector<Wall> RoomMap::makeWallList(const std::vector<FootholdRect> &foothol
         // 如果item是一个墙体(x相同，y不同)
         if (item.x_left == item.x_right && item.y_left != item.y_right) {
 
-            // // 调试 过虑墙体
+            // 过虑墙体
             // if(item.x_left == 231 || item.x_left == 1221 || item.x_left == 1446){
             //     continue;
             // }
@@ -811,20 +811,50 @@ float Math::roundHalfAwayFromZero_bit(float value, int decimalPlaces)
 Monster Math::getNearMonster(std::vector<Monster> monsters, int x)
 {
     Monster monster;
-    // qDebug() << "对比人物坐标：" << x;
+    monster.entity = 0;
     int diff = 9999;
-    for(auto item : monsters){
-        // qDebug() << "当前怪物坐标:" << item.pos.x;
+    for(const auto &item : monsters){
+        if(item.pos.x == 0 && item.pos.y == 0) continue;
         int distance = abs(item.pos.x - x);
-        // qDebug() << "距离怪物:" << distance;
         if( distance < diff){
             diff = distance;
             monster = item;
-            // qDebug() << "当前选择怪物：" << QString::number(monster.entity,16).toUpper();
         }
     }
 
     return monster;
+}
+
+bool Math::posInRange(cv::Point posA, cv::Point posB, cv::Point range)
+{
+    // ClimbRect attack = {
+    //     posA.x,
+    //     posA.y - range.y / 2,
+    //     posA.x + range.x,
+    //     posA.y + range.y,
+    // };
+    // if( posB.x >= attack.x_left &&
+    //     posB.x <= attack.x_left &&
+    //     posB.y >= attack.y_top  &&
+    //     posB.y <= attack.y_bottom )
+    // {
+    //     return true;
+    // }
+
+    ClimbRect attack = {
+        posA.x,
+        posA.y - range.y / 2,
+        posA.x + range.x,
+        posA.y + range.y / 2,
+    };
+    if( posB.x >= attack.x_left &&
+        posB.x <= attack.x_right &&
+        posB.y >= attack.y_top  &&
+        posB.y <= attack.y_bottom )
+    {
+        return true;
+    }
+    return false;
 }
 
 

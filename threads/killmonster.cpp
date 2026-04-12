@@ -165,11 +165,6 @@ void KillMonster::process()
 
         // 更新全图怪物
         updateAllMonsters();
-        // ProcessHelper::programDelay(3000); // 调试
-        // QApplication::processEvents();
-        // continue;
-
-
 
         if(user_in_lineid == -1){
             DebugOutput::out("暂不支持当前位置寻怪~");
@@ -182,14 +177,6 @@ void KillMonster::process()
 
         // 待处理的怪物列表
         std::vector<Monster> handle_monsters = getLineMonsters(user_in_lineid);
-
-        // PathNode node = Gplayer.curmapinfo.path_nodes[11]; // 调试
-        // qDebug() << "准备前往平台:" << 7;
-        // MovePlatform::toPlatform(node, 7);
-        // qDebug() << "====== 平台移动测试结束 ======";
-        // ProcessHelper::programDelay(1000);
-        // QApplication::processEvents();
-        // continue;
 
         if(handle_monsters.empty()){
             DebugOutput::out("当前平台不存在怪物");
@@ -229,12 +216,11 @@ void KillMonster::process()
                 qDebug() << "准备前往平台:" << plat;
 
                 bool move_success = MovePlatform::toPlatform(node, plat);
+                // bool move_success = true;
                 if(!move_success){
+                    qDebug() << "A星移动平台失败 平台:" << plat;
                     ProcessHelper::programDelay(100);
                     QApplication::processEvents();
-
-                    qDebug() << "A星移动平台失败 平台:" << plat;
-
                     goto RetryCase;
                     break;
                 }
@@ -250,7 +236,9 @@ void KillMonster::process()
         }
 
         // 击杀怪物
-        killNearMonster(handle_monsters);
+        if(!handle_monsters.empty()){
+            killNearMonster(handle_monsters);
+        }
 
         DebugOutput::out("即将进行下一轮找怪");
         ProcessHelper::programDelay(100);
@@ -364,6 +352,7 @@ Item KillMonster::findDropItem()
     }
 
     if(m_allItem.empty()){
+        qDebug() << "全图未发现物品！！！";
         return target_item;
     }
 
@@ -381,12 +370,14 @@ Item KillMonster::findDropItem()
             if( diff < distance){
                 distance = diff;
                 target_item = item;
+                qDebug() << "发现本平台物品,距离自己:" << distance << "坐标:" << item.pos.x << "," << item.pos.y;
             }
         }
     }
 
     // 如果没找本平台物品
     if(target_item.entity == 0){
+        qDebug() << "本平台未发现物品！";
         target_item = m_allItem.front();
     }
 
@@ -441,23 +432,21 @@ void KillMonster::updateAllMonsters()
         int monster_x = RoomMap::toMapPosX(float_x, Gplayer.curmapinfo.map_bounding.x_offset);
         int monster_y = RoomMap::toMapPosY(float_y, Gplayer.curmapinfo.map_bounding.y_offset,Gplayer.curmapinfo.map_bounding.height);
 
+        if(monster_x == 0 && monster_y == 0){
+            continue;
+        }
+
         Monster cur_monster = {entity, foothold_id, line_id, {monster_x, monster_y}};
         m_allmonster.push_back(cur_monster);
     }
-
-    // 调试
-    // qDebug() << "=============================================";
-    // for(const auto &monster : m_allmonster) {
-    //     qDebug() << "怪物：" << QString::number(monster.entity,16).toUpper() << " 平台：" << monster.line_id << " " << monster.pos.x << "," << monster.pos.y;
-    // }
-    // qDebug() << "=============================================";
 }
 
 std::vector<Monster> KillMonster::getLineMonsters(int user_line)
 {
     std::vector<Monster> monsters;
 
-    for(auto item : m_allmonster){
+    for(const auto &item : m_allmonster){
+        if(item.pos.x == 0 && item.pos.y == 0) continue;
         // 读取怪物坐标
         if(item.line_id == user_line){
             monsters.push_back(item);
@@ -467,20 +456,24 @@ std::vector<Monster> KillMonster::getLineMonsters(int user_line)
     return monsters;
 }
 
-void KillMonster::killNearMonster(std::vector<Monster> handle_monsters)
+void KillMonster::killNearMonster(const std::vector<Monster> &handle_monsters)
 {
     // 找到离自己最近的怪物
     // 获取人物坐标
+    qDebug() << "发现本平台存在怪物，计算最近的怪物~";
     cv::Point user_pos = userPos();
     qDebug() << "人物坐标：" << user_pos.x << "," << user_pos.y;
 
     Monster target_monster = Math::getNearMonster(handle_monsters, user_pos.x);
-
+    if(target_monster.entity == 0){
+        qDebug() << "错误的怪物信息，放弃击杀怪物~";
+        return;
+    }
     qDebug() << "目标怪物：" << target_monster.line_id << "->" << QString::number(target_monster.entity,16).toUpper() << ":" << target_monster.pos.x << "," << target_monster.pos.y;
     qDebug() << "开始寻路清怪~";
 
     WalkBase user_move(target_monster.pos.x);
-    user_move.clearMonster(attack_range);
+    user_move.clearMonster(m_attack_range);
 }
 
 void KillMonster::reciveItem(const Item &target_item)
@@ -493,7 +486,7 @@ void KillMonster::reciveItem(const Item &target_item)
     qDebug() << "开始寻路拾取~";
 
     WalkBase user_move(target_item.pos.x);
-    if(user_move.moveToItem(attack_range)){
+    if(user_move.moveToItem(m_attack_range)){
         // 加入到黑名单
         m_black_item.insert(target_item.entity);
     }

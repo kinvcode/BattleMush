@@ -160,21 +160,29 @@ void WalkBase::clearMonster(cv::Point range)
     m_skill_range = range;
     m_transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
 
-    int user_x = getUserX();
+    cv::Point user_pos = getUserPos();
 
-    if(user_x == m_target_x)
+    if(Math::posInRange(user_pos,cv::Point(m_target_x,user_pos.y),range))
     {
-        qDebug() << "与怪物X坐标相同，直接攻击";
+        qDebug() << "怪物在攻击范围内，调整方向后攻击";
+        if(user_pos.x > m_target_x){
+            qDebug() << "调整人物方向，向左";
+            MSDriverPRO::keyboardClick(MSKeyboard_LeftArrow);
+        }else{
+            qDebug() << "调整人物方向，向右";
+            MSDriverPRO::keyboardClick(MSKeyboard_RightArrow);
+        }
         attackMonster({-1,-1});
         return;
     }
 
     // 清空一下按键
     clearXkey();
+    m_walk_timeout = abs(m_target_x - user_pos.x) / 14 * 100 + 3000;
 
     // 跑动按键判断
     int direction_x;
-    if (m_target_x > user_x) {
+    if (m_target_x > user_pos.x) {
         // 向右
         qDebug() << "向右走~";
         direction_x = MSKeyboard_RightArrow;
@@ -195,15 +203,10 @@ void WalkBase::clearMonster(cv::Point range)
     // 开始移动
     MSDriverPRO::keyboardDown(direction_x);
 
-    quint64 map_entity_count = readInt(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
-    quint64 entity_head = readLong(readLong(Gplayer.p_curmapentity
-        + BASE::MODEntity::children)
-        + BASE::List::InternalArray)
-        + BASE::InternalArray::Head;
     int map_start = 0;
 
     // 先执行一次范围检测
-    cv::Point pos = monsterInRange(entity_head, map_entity_count, map_start);
+    cv::Point pos = monsterInRange(map_start);
     if(pos.x != -1){
         DebugOutput::out("范围内存在怪物，无需寻路即可攻击。攻击中~");
         attackMonster(pos);
@@ -221,7 +224,9 @@ void WalkBase::clearMonster(cv::Point range)
 
         // 每0.1秒检测一次怪物
         if(cur_time - last_time > 100){
-            cv::Point pos = monsterInRange(entity_head, map_entity_count, map_start);
+            last_time = cur_time;
+            // qDebug() << "检测范围内是否存在怪物~";
+            cv::Point pos = monsterInRange(map_start);
             if(pos.x != -1){
                 DebugOutput::out("范围内存在怪物，进行攻击");
                 attackMonster(pos);
@@ -235,9 +240,10 @@ void WalkBase::clearMonster(cv::Point range)
             break;
         }
 
-        user_x = getUserX();
+        user_pos = getUserPos();
 
-        if (abs(m_target_x - user_x) <= m_deviation) {
+        if(Math::posInRange(user_pos,cv::Point(m_target_x,user_pos.y),range)){
+            qDebug() << "寻怪目标坐标在人物攻击范围，判定到达~";
             arrived = true;
         }
     }
@@ -292,22 +298,16 @@ bool WalkBase::moveToItem(cv::Point range)
     // 开始移动
     MSDriverPRO::keyboardDown(direction_x);
 
-    quint64 map_entity_count = readInt(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
-    quint64 entity_head = readLong(readLong(Gplayer.p_curmapentity
-                                            + BASE::MODEntity::children)
-                                   + BASE::List::InternalArray)
-                          + BASE::InternalArray::Head;
     int map_start = 0;
 
     // 先执行一次范围检测
-    cv::Point pos = monsterInRange(entity_head, map_entity_count, map_start);
+    cv::Point pos = monsterInRange(map_start);
     if(pos.x != -1){
         DebugOutput::out("范围内存在怪物，无需寻路即可攻击。攻击中~");
         attackMonster(pos);
     }
 
     while(true){
-
         int cur_time = begin_timer.elapsed();
         if (cur_time > m_walk_timeout) {
             DebugOutput::out("拾取物品寻路超时~");
@@ -317,7 +317,8 @@ bool WalkBase::moveToItem(cv::Point range)
 
         // 每0.1秒检测一次怪物
         if(cur_time - last_time > 100){
-            cv::Point pos = monsterInRange(entity_head, map_entity_count, map_start);
+            last_time = cur_time;
+            cv::Point pos = monsterInRange(map_start);
             if(pos.x != -1){
                 DebugOutput::out("范围内存在怪物，进行攻击");
                 attackMonster(pos);
@@ -344,7 +345,6 @@ bool WalkBase::moveToItem(cv::Point range)
 
 bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
 {
-    m_skill_range = range;
     m_transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
 
     int user_pos;
@@ -356,7 +356,7 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
         user_pos = getUserX();
     }
 
-    qDebug() << "移动平台连接点开始";
+    qDebug() << "移动平台连接点开始 人物X：" << user_pos;
 
     if(user_pos >= range.x && user_pos <= range.y)
     {
@@ -374,9 +374,9 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
     int m_target_pos = range.x + (range.y - range.x) / 2;
 
     if(self_climb){
-        m_walk_timeout = abs(m_target_pos - user_pos) / 7 * 100;
+        m_walk_timeout = abs(m_target_pos - user_pos) / 7 * 100 + 3000;
     }else{
-        m_walk_timeout = abs(m_target_pos - user_pos) / 14 * 100;
+        m_walk_timeout = abs(m_target_pos - user_pos) / 14 * 100 + 3000;
     }
 
     // 跑动按键判断
@@ -407,24 +407,21 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
     // 开始移动
     MSDriverPRO::keyboardDown(direction_arrow);
 
-    quint64 map_entity_count = readInt(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
-    quint64 entity_head = readLong(readLong(Gplayer.p_curmapentity
-                                            + BASE::MODEntity::children)
-                                   + BASE::List::InternalArray)
-                          + BASE::InternalArray::Head;
     int map_start = 0;
 
     // 先执行一次范围检测
-    cv::Point pos = monsterInRange(entity_head, map_entity_count, map_start);
-    if(pos.x != -1){
-        DebugOutput::out("范围内存在怪物，结束移动到平台连接点。攻击中~");
-        if(self_climb){
-            clearYkey();
-        }else{
-            clearXkey();
+    if(!self_climb){
+        cv::Point pos = monsterInRange(map_start);
+        if(pos.x != -1){
+            qDebug() << "范围内存在怪物，结束移动到平台连接点。攻击目标:" << pos.x << "," << pos.y;
+            if(self_climb){
+                clearYkey();
+            }else{
+                clearXkey();
+            }
+            attackMonster(pos);
+            return false;
         }
-        attackMonster(pos);
-        return false;
     }
 
     while(true){
@@ -441,18 +438,21 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
         }
 
         // 每0.1秒检测一次怪物
-        if(cur_time - last_time > 100){
-            cv::Point pos = monsterInRange(entity_head, map_entity_count, map_start);
-            if(pos.x != -1){
-                DebugOutput::out("范围内存在怪物，进行攻击");
-                if(self_climb){
-                    clearYkey();
-                }else{
-                    clearXkey();
+        if(!self_climb){
+            if(cur_time - last_time > 100){
+                last_time = cur_time;
+                cv::Point pos = monsterInRange(map_start);
+                if(pos.x != -1){
+                    DebugOutput::out("范围内存在怪物，进行攻击");
+                    if(self_climb){
+                        clearYkey();
+                    }else{
+                        clearXkey();
+                    }
+                    attackMonster(pos);
+                    qDebug() << "移动平台连接点提前完毕~";
+                    return false;
                 }
-                attackMonster(pos);
-                qDebug() << "移动平台连接点提前完毕~";
-                return false;
             }
         }
 
@@ -534,9 +534,18 @@ bool WalkBase::isAttaking()
     return readByte(readLong(Gplayer.p_localplayer + BASE::MODEntity::StateComponent) + BASE::StateComponent::attacking);
 }
 
-cv::Point WalkBase::monsterInRange(quint64 head, int count, int &start_index)
+cv::Point WalkBase::monsterInRange(int &start_index)
 {
+    quint64 count = readInt(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
+    quint64 head = readLong(readLong(Gplayer.p_curmapentity
+                                            + BASE::MODEntity::children)
+                                   + BASE::List::InternalArray)
+                          + BASE::InternalArray::Head;
+
     cv::Point monster_pos = {-1,-1};
+    // qDebug() << "======范围检测======";
+    cv::Point user_pos = getUserPos();
+    // qDebug() << "人物：" << user_pos.x << "," << user_pos.y;
     for(int i = start_index; i < count; i++){
         // 节省遍历时间
         quint64 cur_entity_address = head + i * 8;
@@ -579,23 +588,18 @@ cv::Point WalkBase::monsterInRange(quint64 head, int count, int &start_index)
         float float_y = readFloat(pos_p + BASE::RigidbodyComponent::airPos + 4);
         int monster_x = RoomMap::toMapPosX(float_x, Gplayer.curmapinfo.map_bounding.x_offset);
         int monster_y = RoomMap::toMapPosY(float_y, Gplayer.curmapinfo.map_bounding.y_offset,Gplayer.curmapinfo.map_bounding.height);
-
-        cv::Point user_pos = getUserPos();
-        ClimbRect attack = {
-            user_pos.x,
-            user_pos.y - m_skill_range.y / 2,
-            user_pos.x + m_skill_range.x,
-            user_pos.y + m_skill_range.y,
-        };
-        if( monster_x >= attack.x_left &&
-            monster_x <= attack.x_left &&
-            monster_y >= attack.y_top  &&
-            monster_y <= attack.y_bottom){
+        // qDebug() << monster_x << "," << monster_y;
+        monster_pos = {monster_x, monster_y};
+        if(Math::posInRange(user_pos,monster_pos,m_skill_range)){
             monster_pos = {monster_x,monster_y};
-            qDebug() << monster_x << "," << monster_y;
+            qDebug() << "人物当前位置:" << user_pos.x << "," << user_pos.y;
+            qDebug() << "发现怪物在攻击范围：" << monster_x << "," << monster_y;
             return monster_pos;
+        }else{
+            monster_pos = {-1, -1};
         }
     }
+    // qDebug() << "======范围检测======";
 
     return monster_pos;
 }

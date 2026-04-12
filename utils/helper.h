@@ -58,6 +58,9 @@ public:
 
     // 找到最小差值
     static Monster getNearMonster(std::vector<Monster> monsters,int x);
+
+    // 计算坐标是否在范围内（用于找怪）
+    static bool posInRange(cv::Point posA, cv::Point posB, cv::Point range);
 };
 
 class ImageTool{
