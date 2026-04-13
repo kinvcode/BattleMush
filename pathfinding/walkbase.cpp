@@ -155,42 +155,39 @@ bool WalkBase::runY()
     return false;
 }
 
-void WalkBase::clearMonster(cv::Point range)
+void WalkBase::clearMonster(Monster monster, cv::Point range)
 {
-    m_skill_range = range;
-    m_transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
-
     cv::Point user_pos = getUserPos();
-
-    if(Math::posInRange(user_pos,cv::Point(m_target_x,user_pos.y),range))
-    {
-        qDebug() << "怪物在攻击范围内，调整方向后攻击";
-        if(user_pos.x > m_target_x){
-            qDebug() << "调整人物方向，向左";
-            MSDriverPRO::keyboardClick(MSKeyboard_LeftArrow);
-        }else{
-            qDebug() << "调整人物方向，向右";
-            MSDriverPRO::keyboardClick(MSKeyboard_RightArrow);
-        }
-        attackMonster({-1,-1});
-        return;
-    }
-
-    // 清空一下按键
-    clearXkey();
-    m_walk_timeout = abs(m_target_x - user_pos.x) / 14 * 100 + 3000;
 
     // 跑动按键判断
     int direction_x;
-    if (m_target_x > user_pos.x) {
+    bool is_left = false;
+    qDebug() << "清理怪物,人物" << user_pos.x << "," << user_pos.y << "怪物"  << monster.pos.x << "," << monster.pos.y;
+    if (monster.pos.x > user_pos.x) {
         // 向右
         qDebug() << "向右走~";
         direction_x = MSKeyboard_RightArrow;
     } else {
         // 向左
         qDebug() << "向左走~";
+        is_left = true;
         direction_x = MSKeyboard_LeftArrow;
     }
+
+    m_skill_range = range;
+    m_transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+
+    if(Math::posInRange(is_left, user_pos, monster.pos, range))
+    {
+        // 因为还没有走路，方向可能不对。打怪之前纠正方向
+        MSDriverPRO::keyboardClick(direction_x);
+        attackMonster(user_pos, monster.pos);
+        return;
+    }
+
+    // 清空一下按键
+    clearXkey();
+    m_walk_timeout = abs(monster.pos.x - user_pos.x) / 14 * 100 + 3000;
 
     // 是否到达
     bool arrived = false;
@@ -206,10 +203,11 @@ void WalkBase::clearMonster(cv::Point range)
     int map_start = 0;
 
     // 先执行一次范围检测
-    cv::Point pos = monsterInRange(map_start);
+    cv::Point pos = monsterInRange(is_left, map_start);
     if(pos.x != -1){
         DebugOutput::out("范围内存在怪物，无需寻路即可攻击。攻击中~");
-        attackMonster(pos);
+        user_pos = getUserPos();
+        attackMonster(user_pos, pos);
         return;
     }
 
@@ -226,10 +224,11 @@ void WalkBase::clearMonster(cv::Point range)
         if(cur_time - last_time > 100){
             last_time = cur_time;
             // qDebug() << "检测范围内是否存在怪物~";
-            cv::Point pos = monsterInRange(map_start);
+            cv::Point pos = monsterInRange(is_left, map_start);
             if(pos.x != -1){
                 DebugOutput::out("范围内存在怪物，进行攻击");
-                attackMonster(pos);
+                user_pos = getUserPos();
+                attackMonster(user_pos, pos); // 实际上必须依赖这里进行攻击怪物。攻击频率10帧
                 qDebug() << "寻怪提前完毕~";
                 return;
             }
@@ -241,8 +240,8 @@ void WalkBase::clearMonster(cv::Point range)
         }
 
         user_pos = getUserPos();
-
-        if(Math::posInRange(user_pos,cv::Point(m_target_x,user_pos.y),range)){
+        // 判断怪物原始位置为目标地点
+        if(Math::posInRange(is_left, user_pos, monster.pos, range)){
             qDebug() << "寻怪目标坐标在人物攻击范围，判定到达~";
             arrived = true;
         }
@@ -251,9 +250,15 @@ void WalkBase::clearMonster(cv::Point range)
     clearXkey();
 
     if(arrived){
-        qDebug() << "到达目标怪物~";
-        cv::Point pos = {-1,-1};
-        attackMonster(pos);
+        qDebug() << "到达目标怪物地点~";
+        cv::Point pos = monsterInRange(is_left, map_start);
+        if(pos.x != -1){
+            DebugOutput::out("范围内存在怪物，进行攻击");
+            user_pos = getUserPos();
+            attackMonster(user_pos, pos);
+            qDebug() << "寻怪结束，最后一次攻击怪物~";
+            return;
+        }
     }
 
     qDebug() << "寻怪结束~";
@@ -277,6 +282,7 @@ bool WalkBase::moveToItem(cv::Point range)
 
     // 跑动按键判断
     int direction_x;
+    bool is_left = false;
     if (m_target_x > user_x) {
         // 向右
         qDebug() << "向右走~";
@@ -284,6 +290,7 @@ bool WalkBase::moveToItem(cv::Point range)
     } else {
         // 向左
         qDebug() << "向左走~";
+        is_left = true;
         direction_x = MSKeyboard_LeftArrow;
     }
 
@@ -301,10 +308,12 @@ bool WalkBase::moveToItem(cv::Point range)
     int map_start = 0;
 
     // 先执行一次范围检测
-    cv::Point pos = monsterInRange(map_start);
+    cv::Point pos = monsterInRange(is_left, map_start);
     if(pos.x != -1){
         DebugOutput::out("范围内存在怪物，无需寻路即可攻击。攻击中~");
-        attackMonster(pos);
+        cv::Point user_pos = getUserPos();
+        attackMonster(user_pos, pos);
+        return false; // 因为走路中断了，所以直接返回寻物失败即可
     }
 
     while(true){
@@ -318,10 +327,12 @@ bool WalkBase::moveToItem(cv::Point range)
         // 每0.1秒检测一次怪物
         if(cur_time - last_time > 100){
             last_time = cur_time;
-            cv::Point pos = monsterInRange(map_start);
+            cv::Point pos = monsterInRange(is_left, map_start);
             if(pos.x != -1){
                 DebugOutput::out("范围内存在怪物，进行攻击");
-                attackMonster(pos);
+                cv::Point user_pos = getUserPos();
+                attackMonster(user_pos, pos);
+                return false; // 因为走路中断了，所以直接返回寻物失败即可
             }
         }
 
@@ -381,6 +392,7 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
 
     // 跑动按键判断
     int direction_arrow;
+    bool is_left = false;
     if (m_target_pos > user_pos) {
         if(self_climb){
             qDebug() << "向下攀爬~";
@@ -394,6 +406,7 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
             qDebug() << "向上攀爬~";
             direction_arrow = MSKeyboard_UpArrow;
         }else{
+            is_left = true;
             qDebug() << "向左走~";
             direction_arrow = MSKeyboard_LeftArrow;
         }
@@ -411,7 +424,7 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
 
     // 先执行一次范围检测
     if(!self_climb){
-        cv::Point pos = monsterInRange(map_start);
+        cv::Point pos = monsterInRange(is_left, map_start);
         if(pos.x != -1){
             qDebug() << "范围内存在怪物，结束移动到平台连接点。攻击目标:" << pos.x << "," << pos.y;
             if(self_climb){
@@ -419,7 +432,8 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
             }else{
                 clearXkey();
             }
-            attackMonster(pos);
+            cv::Point user_pos = getUserPos();
+            attackMonster(user_pos, pos);
             return false;
         }
     }
@@ -441,7 +455,7 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
         if(!self_climb){
             if(cur_time - last_time > 100){
                 last_time = cur_time;
-                cv::Point pos = monsterInRange(map_start);
+                cv::Point pos = monsterInRange(is_left, map_start);
                 if(pos.x != -1){
                     DebugOutput::out("范围内存在怪物，进行攻击");
                     if(self_climb){
@@ -449,7 +463,8 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
                     }else{
                         clearXkey();
                     }
-                    attackMonster(pos);
+                    cv::Point user_pos = getUserPos();
+                    attackMonster(user_pos, pos);
                     qDebug() << "移动平台连接点提前完毕~";
                     return false;
                 }
@@ -488,7 +503,8 @@ int WalkBase::getUserX()
         return -1;
     }
 
-    float user_x = readFloat(m_transform + BASE::TransformComponent::PositionX);
+    quint64 transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+    float user_x = readFloat(transform + BASE::TransformComponent::PositionX);
 
     return RoomMap::toMapPosX(user_x,Gplayer.curmapinfo.map_bounding.x_offset);
 }
@@ -499,7 +515,8 @@ int WalkBase::getUserY()
         return -1;
     }
 
-    float user_y = readFloat(m_transform + BASE::TransformComponent::PositionY);
+    quint64 transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+    float user_y = readFloat(transform + BASE::TransformComponent::PositionY);
 
     return RoomMap::toMapPosY(user_y,Gplayer.curmapinfo.map_bounding.y_offset,Gplayer.curmapinfo.map_bounding.height);
 }
@@ -507,11 +524,10 @@ int WalkBase::getUserY()
 cv::Point WalkBase::getUserPos()
 {
     cv::Point pos = {-1, -1};
-    if(!m_transform){
-        return pos;
-    }
-    float user_x = readFloat(m_transform + BASE::TransformComponent::PositionX);
-    float user_y = readFloat(m_transform + BASE::TransformComponent::PositionY);
+
+    quint64 transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+    float user_x = readFloat(transform + BASE::TransformComponent::PositionX);
+    float user_y = readFloat(transform + BASE::TransformComponent::PositionY);
     pos.x = RoomMap::toMapPosX(user_x,Gplayer.curmapinfo.map_bounding.x_offset);
     pos.y = RoomMap::toMapPosY(user_y,Gplayer.curmapinfo.map_bounding.y_offset, Gplayer.curmapinfo.map_bounding.height);
     return pos;
@@ -531,10 +547,10 @@ void WalkBase::clearYkey()
 
 bool WalkBase::isAttaking()
 {
-    return readByte(readLong(Gplayer.p_localplayer + BASE::MODEntity::StateComponent) + BASE::StateComponent::attacking);
+    return readByte(readLong(Gplayer.p_localplayer + BASE::MODEntity::StateComponent) + BASE::StateComponent::attacking) == 0;
 }
 
-cv::Point WalkBase::monsterInRange(int &start_index)
+cv::Point WalkBase::monsterInRange(bool is_left, int &start_index)
 {
     quint64 count = readInt(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
     quint64 head = readLong(readLong(Gplayer.p_curmapentity
@@ -576,12 +592,12 @@ cv::Point WalkBase::monsterInRange(int &start_index)
         }
 
         // 存放怪物信息:怪物指针，怪物所在地板，怪物所在平台
-        int foothold_id = readInt(readLong(readLong(entity + BASE::MODEntity::RigidbodyComponent)
-            + BASE::RigidbodyComponent::currentFoothold) + BASE::Foothold::ID);
-        int line_id = RoomMap::getFootPlatform(foothold_id, Gplayer.curmapinfo.platform_list);
-        if(line_id == -1){
-            continue;
-        }
+        // int foothold_id = readInt(readLong(readLong(entity + BASE::MODEntity::RigidbodyComponent)
+            // + BASE::RigidbodyComponent::currentFoothold) + BASE::Foothold::ID);
+        // int line_id = RoomMap::getFootPlatform(foothold_id, Gplayer.curmapinfo.platform_list);
+        // if(line_id == -1){
+        //     continue;
+        // }
 
         quint64 pos_p = readLong(entity + BASE::MODEntity::RigidbodyComponent);
         float float_x = readFloat(pos_p + BASE::RigidbodyComponent::airPos);
@@ -590,7 +606,7 @@ cv::Point WalkBase::monsterInRange(int &start_index)
         int monster_y = RoomMap::toMapPosY(float_y, Gplayer.curmapinfo.map_bounding.y_offset,Gplayer.curmapinfo.map_bounding.height);
         // qDebug() << monster_x << "," << monster_y;
         monster_pos = {monster_x, monster_y};
-        if(Math::posInRange(user_pos,monster_pos,m_skill_range)){
+        if(Math::posInRange(is_left, user_pos, monster_pos,m_skill_range)){
             monster_pos = {monster_x,monster_y};
             qDebug() << "人物当前位置:" << user_pos.x << "," << user_pos.y;
             qDebug() << "发现怪物在攻击范围：" << monster_x << "," << monster_y;
@@ -604,16 +620,24 @@ cv::Point WalkBase::monsterInRange(int &start_index)
     return monster_pos;
 }
 
-void WalkBase::attackMonster(cv::Point pos)
+void WalkBase::attackMonster(cv::Point user_pos, cv::Point monster_pos)
 {
-    // 释放攻击
-    if(!isAttaking()){
-        qDebug() << "处于攻击动作中,不允许攻击";
-        return;
+    clearXkey();
+    qDebug() << "怪物在攻击范围内，调整方向后攻击";
+    qDebug() << "人物:" << user_pos.x << "," << user_pos.y << " 怪物:" << monster_pos.x << "," << monster_pos.y;
+    while(isAttaking()){
+        ProcessHelper::programDelay(50);
+        QApplication::processEvents();
     }
 
-    if(pos.x != -1){
-        // 调整人物方向
+    // 攻击之前再次检查怪物存在状态和是否在范围内
+
+    if(user_pos.x > monster_pos.x){
+        qDebug() << "调整人物方向，向左";
+        // MSDriverPRO::keyboardClick(MSKeyboard_LeftArrow);
+    }else{
+        qDebug() << "调整人物方向，向右";
+        // MSDriverPRO::keyboardClick(MSKeyboard_RightArrow);
     }
 
     // 如果血量低于10%
@@ -625,6 +649,6 @@ void WalkBase::attackMonster(cv::Point pos)
     }
 
     // 使用技能
-    qDebug() << "使用技能攻击";
+    qDebug() << "使用技能攻击" << QDateTime::currentMSecsSinceEpoch();
     MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skill_atk1, 1);
 }

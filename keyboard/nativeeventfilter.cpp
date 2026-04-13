@@ -1,6 +1,7 @@
 #include "nativeeventfilter.h"
 #include <windows.h>
 #include <iostream>
+#include "utils/helper.h"
 
 NativeEventFilter::NativeEventFilter(MainWindow* window)
 {
@@ -14,16 +15,19 @@ bool NativeEventFilter::nativeEventFilter(const QByteArray& eventType, void* mes
     {
         const quint32 keycode = HIWORD(msg->lParam);
         qDebug() << "当前按键：" + QString::number(keycode);
-        sendMsg("当前按键:" + QString::number(keycode));
             switch(keycode){
         case VK_F1:
             qDebug() << "F1";
             if(m_is_stop){
                 qDebug() << "恢复线程";
+                Helper::console("已启动自动模式~");
+                emit sendControleStatus(true);
                 main_win->m_threadManager->resumeAll();
                 m_is_stop = false;
             }else{
-                qDebug() << "暂停线程";
+                qDebug() << "自动模式已关闭~";
+                Helper::console("自动模式已关闭~");
+                emit sendControleStatus(false);
                 main_win->m_threadManager->pauseAll();
                 m_is_stop = true;
             }
@@ -33,7 +37,7 @@ bool NativeEventFilter::nativeEventFilter(const QByteArray& eventType, void* mes
                 // main_win->m_threadManager->stopAll();
             break;
         default:
-            sendMsg("未知快捷键触发:" + QString::number(keycode));
+            qDebug() << "未知快捷键触发:" + QString::number(keycode);
             break;
         }
     }

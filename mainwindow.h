@@ -17,10 +17,12 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     // 线程管理器
     ThreadManager* m_threadManager;
+
+    static MainWindow* getInstance();  // 单例模式
 
 private:
     Ui::MainWindow *ui;
@@ -89,7 +91,7 @@ private slots:
 public slots:
     void console(QString msg);
     void onApplicationQuit();
-
+    void updateCompoment(bool status);
 signals:
     void saveConfig();
 };

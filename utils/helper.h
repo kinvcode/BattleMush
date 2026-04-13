@@ -11,6 +11,8 @@
 class Helper
 {
 public:
+    static void console(const QString& msg);
+
     // 搜索Entity的子组件
     static quint64 findChild(quint64 parent, QString name);
 
@@ -57,10 +59,10 @@ public:
     static float roundHalfAwayFromZero_bit(float value, int decimalPlaces = 2);
 
     // 找到最小差值
-    static Monster getNearMonster(std::vector<Monster> monsters,int x);
+    static Monster getNearMonster(const std::vector<Monster> &monsters,int x);
 
     // 计算坐标是否在范围内（用于找怪）
-    static bool posInRange(cv::Point posA, cv::Point posB, cv::Point range);
+    static bool posInRange(bool to_left, cv::Point posA, cv::Point posB, cv::Point range);
 };
 
 class ImageTool{
@@ -140,7 +142,7 @@ public:
     );
 
     // 计算物品所在平台坐标
-    static cv::Point getItemLinePos(cv::Mat map, cv::Point pos);
+    static cv::Point getItemLinePos(const cv::Mat &map, cv::Point pos);
 
     // 计算地板所在平台
     static int getFootPlatform(int foothold, const std::vector<Platform>& platform_list);

@@ -22,7 +22,7 @@ public:
 
     bool runY();
 
-    void clearMonster(cv::Point range);
+    void clearMonster(Monster monster, cv::Point range);
 
     bool moveToItem(cv::Point range);
 
@@ -44,11 +44,11 @@ private:
     // 找怪的函数
 private:
     // quint64 m_entity_head = 0;
-    cv::Point m_skill_range = {200,50}; // 监测怪物的
+    cv::Point m_skill_range = {150,40}; // 监测怪物的
 
-    cv::Point monsterInRange(int &start_index);
+    cv::Point monsterInRange(bool is_left, int &start_index);
 
-    void attackMonster(cv::Point pos);
+    void attackMonster(cv::Point user_pos, cv::Point monster_pos);
 };
 
 #endif // WALKBASE_H

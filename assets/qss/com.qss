@@ -558,6 +558,16 @@ QTextEdit.commonlog QScrollBar::handle:vertical:hover {
     background: #6a6a6a;
 }
 
+/* ====== 开启与停止按钮 ====== */
+QPushButton.start-play-btn {
+    background-color: #4CAF50;  /* 绿色 */
+    color: white;
+}
+
+QPushButton.pause-play-btn {
+    background-color: #f44336;  /* 红色 */
+    color: white;
+}
 
 
 

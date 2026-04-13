@@ -96,6 +96,7 @@ void KillMonster::process()
             m_allmonster.clear();
             DebugOutput::out("切换了地图");
             DebugOutput::out("首次访问的地图需要计算地图路径，请耐心等待~");
+            Helper::console("切换了地图\r\n首次访问的地图需要计算地图路径，请耐心等待~");
             ProcessHelper::programDelay(1000);
             QApplication::processEvents();
             continue;
@@ -107,6 +108,7 @@ void KillMonster::process()
             m_currentmap = 0;
             m_allmonster.clear();
             DebugOutput::out("地图加载中... ...");
+            Helper::console("地图加载中... ...");
             ProcessHelper::programDelay(1000);
             QApplication::processEvents();
             continue;
@@ -308,6 +310,7 @@ Item KillMonster::findDropItem()
     quint64 entity_head = readLong(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::InternalArray) + BASE::InternalArray::Head;
 
     m_allItem.clear();
+    qDebug() << "====== 刷新物品 ======";
     for(int i = m_map_start; i < map_entity_count; i++){
 
         quint64 cur_entity_address = entity_head + i * 8;
@@ -337,11 +340,13 @@ Item KillMonster::findDropItem()
 
         cv::Point item_pos = RoomMap::getItemLinePos(Gplayer.curmapinfo.map_mat,{x, y});
         if(item_pos.x == -1){
+            qDebug() << "物品坐标" << x << "," << y << "无法转换平台坐标，已忽略";
             continue;
         }
 
         int line_id = RoomMap::getPosPlatform(item_pos, Gplayer.curmapinfo.platform_list, Gplayer.curmapinfo.map_mat);
         if(line_id == -1){
+            qDebug() << "物品坐标" << x << "," << y << "找不到平台，已忽略";
             continue;
         }
 
@@ -350,6 +355,7 @@ Item KillMonster::findDropItem()
         target_item.line_id = line_id;
         m_allItem.push_back(target_item);
     }
+    qDebug() << "====== 刷新物品 ======";
 
     if(m_allItem.empty()){
         qDebug() << "全图未发现物品！！！";
@@ -469,11 +475,12 @@ void KillMonster::killNearMonster(const std::vector<Monster> &handle_monsters)
         qDebug() << "错误的怪物信息，放弃击杀怪物~";
         return;
     }
+
     qDebug() << "目标怪物：" << target_monster.line_id << "->" << QString::number(target_monster.entity,16).toUpper() << ":" << target_monster.pos.x << "," << target_monster.pos.y;
     qDebug() << "开始寻路清怪~";
 
     WalkBase user_move(target_monster.pos.x);
-    user_move.clearMonster(m_attack_range);
+    user_move.clearMonster(target_monster, m_attack_range);
 }
 
 void KillMonster::reciveItem(const Item &target_item)
@@ -486,6 +493,7 @@ void KillMonster::reciveItem(const Item &target_item)
     qDebug() << "开始寻路拾取~";
 
     WalkBase user_move(target_item.pos.x);
+    user_move.m_deviation = 10; // 修改一下误差范围
     if(user_move.moveToItem(m_attack_range)){
         // 加入到黑名单
         m_black_item.insert(target_item.entity);

@@ -70,6 +70,7 @@ void UpdateGameData::process()
         if(Gplayer.p_gamepid == 0){
             // qDebug << "";
             DebugOutput::out("游戏进程不存在");
+            Helper::console("游戏进程不存在");
 
             ProcessHelper::programDelay(3000);
             QApplication::processEvents();
@@ -92,6 +93,7 @@ void UpdateGameData::process()
         if(Gplayer.p_gamecontext == 0){
             // 尚未进入游戏，
             DebugOutput::out("等待进入游戏中...");
+            Helper::console("等待进入游戏中...");
             ProcessHelper::programDelay(1000);
             QApplication::processEvents();
             continue;
@@ -128,6 +130,7 @@ void UpdateGameData::process()
         // Gplayer.last_mapentity = Gplayer.p_curmapentity;
         if(Gplayer.curmapinfo.id == "e5a83e46-390a-4ecf-a069-4e786ccf22c4"){
             DebugOutput::out("处理登录...");
+            Helper::console("登录功能开发中...");
             HandleLogin();
             continue;
         }

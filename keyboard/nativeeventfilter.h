@@ -22,7 +22,7 @@ public:
     bool nativeEventFilter(const QByteArray& eventType, void* message, long long* result);
     //
 signals:
-    void sendMsg(QString msg);
+    void sendControleStatus(bool status);
 };
 
 #endif // NATIVEEVENTFILTER_H

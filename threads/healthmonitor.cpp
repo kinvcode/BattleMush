@@ -87,8 +87,7 @@ void HealthMonitor::process()
                 qDebug() << "当前比例" << cur_hp_rate;
 
                 DebugOutput::out("检测到血量低于安全值，自动加血");
-                // int hp_key_code = Gconfig.getValue("auto_add_health/hp_key").toInt();
-                // qDebug() << "驱动按键码:" << hp_key_code;
+                Helper::console("检测到血量低于安全值，自动加血");
                 MSDriverPRO::keyboardClick(m_hp_key_code, 1);
                 ProcessHelper::programDelay(1000); // 防止加两次
             }
@@ -103,10 +102,7 @@ void HealthMonitor::process()
                 qDebug() << "触发阈值：" << mp_rate;
                 qDebug() << "当前比例" << cur_mp_rate;
                 DebugOutput::out("检测到蓝量低于安全值，自动加蓝");
-                // int mp_key_code = Gconfig.getValue("auto_add_health/mp_key").toInt();
-                // qDebug() << "驱动按键码:" << mp_key_code;
-
-                // MSDriverPRO::keyboardClick(0x49);
+                Helper::console("检测到蓝量低于安全值，自动加蓝");
                 MSDriverPRO::keyboardClick(m_mp_key_code, 1);
                 ProcessHelper::programDelay(1000);
             }

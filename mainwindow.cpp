@@ -64,6 +64,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+MainWindow *MainWindow::getInstance()
+{
+    static MainWindow instance;
+    return &instance;
+}
+
 void MainWindow::on_listWidget_clicked(const QModelIndex &index)
 {
     int cur = index.row();
@@ -131,6 +137,10 @@ void MainWindow::initCompomentUI()
 
     // 日志
     ui->textEdit_log->setProperty("class","commonlog");
+
+    // 主窗口按钮
+    ui->pushButton_start_play->setDisabled(true);
+    ui->pushButton_start_play->setProperty("class","start-play-btn");
 
     ui->comboBox->addItem("组包秒杀");
     ui->comboBox->addItem("搬砖");
@@ -372,17 +382,28 @@ void MainWindow::onApplicationQuit()
     QApplication::processEvents();
 }
 
+void MainWindow::updateCompoment(bool status)
+{
+    if(status){
+        ui->pushButton_start_play->setText("⏸️ 暂停 (F1)");
+        ui->pushButton_start_play->setProperty("class","pause-play-btn");
+    }else{
+        ui->pushButton_start_play->setText("▶️ 开始 (F1)");
+        ui->pushButton_start_play->setProperty("class","start-play-btn");
+    }
+    ui->pushButton_start_play->style()->polish(ui->pushButton_start_play);
+}
+
 void MainWindow::on_pushButton_clicked()
 {
     VMProtectBegin("__FUNCTION__");
 
-    Gplayer.p_gamepid = 9376;
-    int res = 233;
-    qDebug() << res;
-    res = Mem::readInt(0x1D15A453440);
-    qDebug() << res;
-    Gplayer.p_gamepid = 0;
-
+    quint64 m_transform = Mem::readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+    float user_x = Mem::readFloat(m_transform + BASE::TransformComponent::PositionX);
+    float user_y = Mem::readFloat(m_transform + BASE::TransformComponent::PositionY);
+    int x = RoomMap::toMapPosX(user_x,Gplayer.curmapinfo.map_bounding.x_offset);
+    int y = RoomMap::toMapPosY(user_y,Gplayer.curmapinfo.map_bounding.y_offset, Gplayer.curmapinfo.map_bounding.height);
+    qDebug() << x << "," << y;
     VMProtectEnd();
 }
 

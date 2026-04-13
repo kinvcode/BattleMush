@@ -7,6 +7,7 @@
 #include "global/globalplayer.h"
 #include <QElapsedTimer>
 #include "utils/mapserializer.h"
+#include "mainwindow.h"
 
 using namespace Mem;
 
@@ -17,6 +18,11 @@ void DebugOutput::out(const QString& message){
 
     // 输出到 DebugView
     OutputDebugStringW(output.toStdWString().c_str());
+}
+
+void Helper::console(const QString &msg)
+{
+    MainWindow::getInstance()->console(msg);
 }
 
 quint64 Helper::findChild(quint64 parent, QString name)
@@ -808,13 +814,32 @@ float Math::roundHalfAwayFromZero_bit(float value, int decimalPlaces)
     return result / multiplier;
 }
 
-Monster Math::getNearMonster(std::vector<Monster> monsters, int x)
+Monster Math::getNearMonster(const std::vector<Monster> &monsters, int x)
 {
     Monster monster;
     monster.entity = 0;
     int diff = 9999;
     for(const auto &item : monsters){
         if(item.pos.x == 0 && item.pos.y == 0) continue;
+
+        // 判断怪物是否存在
+        bool exists = readByte( readLong( item.entity +
+            BASE::MODEntity::RigidbodyComponent) +
+            BASE::RigidbodyComponent::exists);
+
+        if(!exists){
+            continue;
+        }
+
+        QString status = readString( readLong( readLong(
+            item.entity + BASE::MODEntity::StateComponent) +
+            BASE::StateComponent::_CurrentStateName) +
+            BASE::String::text, 10);
+
+        if(status == "DEAD"){
+            continue;
+        }
+
         int distance = abs(item.pos.x - x);
         if( distance < diff){
             diff = distance;
@@ -825,28 +850,25 @@ Monster Math::getNearMonster(std::vector<Monster> monsters, int x)
     return monster;
 }
 
-bool Math::posInRange(cv::Point posA, cv::Point posB, cv::Point range)
+bool Math::posInRange(bool to_left,cv::Point posA, cv::Point posB, cv::Point range)
 {
-    // ClimbRect attack = {
-    //     posA.x,
-    //     posA.y - range.y / 2,
-    //     posA.x + range.x,
-    //     posA.y + range.y,
-    // };
-    // if( posB.x >= attack.x_left &&
-    //     posB.x <= attack.x_left &&
-    //     posB.y >= attack.y_top  &&
-    //     posB.y <= attack.y_bottom )
-    // {
-    //     return true;
-    // }
+    ClimbRect attack;
+    if(to_left){
+        attack = {
+            posA.x - range.x,
+            posA.y - range.y / 2,
+            posA.x,
+            posA.y + range.y / 2,
+        };
+    }else{
+        attack = {
+            posA.x,
+            posA.y - range.y / 2,
+            posA.x + range.x,
+            posA.y + range.y / 2,
+        };
+    }
 
-    ClimbRect attack = {
-        posA.x,
-        posA.y - range.y / 2,
-        posA.x + range.x,
-        posA.y + range.y / 2,
-    };
     if( posB.x >= attack.x_left &&
         posB.x <= attack.x_right &&
         posB.y >= attack.y_top  &&
@@ -1226,36 +1248,19 @@ bool ImageTool::isPointOnLine(const cv::Mat &map, const cv::Point &pos, const cv
     return false;
 }
 
-cv::Point RoomMap::getItemLinePos(cv::Mat map, cv::Point pos)
+cv::Point RoomMap::getItemLinePos(const cv::Mat &map, cv::Point pos)
 {
+    cv::Point target(-1, -1);
     if (map.empty() || map.channels() != 3) {
-        return cv::Point(-1, -1);
+        return target;
     }
 
-    int start_cols = std::max(0, pos.x - 20); // x_left
-    int end_cols = std::min(map.cols, pos.x + 20); // x_right
-    int start_rows = std::max(0, pos.y); // y_top
-    int end_rows = std::min(map.rows, pos.y + 20); // y_bottom
-
-    if (start_rows >= end_rows || start_cols >= end_cols) {
-        return cv::Point(-1, -1);
+    cv::Point end(pos.x, pos.y + 30);
+    if(ImageTool::checkLineHasBlackPixel(map, pos, end, target)){
+        return target;
     }
 
-    cv::Point target_pos = {-1,-1};
-    if (map.isContinuous()) {
-        for (int i = start_rows; i < end_rows; i++) {
-            cv::Vec3b* rowPtr = map.ptr<cv::Vec3b>(i);
-            for (int j = start_cols; j < end_cols; j++) {
-                if (rowPtr[j][0] == 0 && rowPtr[j][1] == 0 && rowPtr[j][2] == 0) {
-                    return cv::Point(j, i);
-                }
-            }
-        }
-    }
-
-    // 找到
-
-    return target_pos;
+    return target;
 }
 
 int RoomMap::getFootPlatform(int foothold_id, const std::vector<Platform>& platform_list)

@@ -16,18 +16,23 @@ int main(int argc, char *argv[])
     setStyle(":assets/qss/com.qss");
 
     // 主窗口
-    MainWindow mainWindow;
-    mainWindow.show();
+    // MainWindow mainWindow;
+    // mainWindow.show();
+    MainWindow* mainWindow =MainWindow::getInstance();
+    mainWindow->show();
 
     // 注册热键
-    NativeEventFilter filter(&mainWindow);
+    NativeEventFilter filter(mainWindow);
     a.installNativeEventFilter(&filter);
     RegisterHotKey(NULL, VK_F1, NULL, VK_F1);
 
     // 连接 aboutToQuit 信号到槽函数
-    QObject::connect(&a, &QApplication::aboutToQuit, [&mainWindow]() {
-        mainWindow.onApplicationQuit();
+    QObject::connect(&a, &QApplication::aboutToQuit, [mainWindow]() {
+        mainWindow->onApplicationQuit();
     });
+
+    // 组件更新
+    QObject::connect(&filter, &NativeEventFilter::sendControleStatus, mainWindow, &MainWindow::updateCompoment);
 
     return a.exec();
 }
