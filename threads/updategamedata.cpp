@@ -178,6 +178,12 @@ void UpdateGameData::process()
                 break;
             }
 
+            // 更新用户信息
+            UpdateUserStatus(statuspanel);
+
+            // 更新快捷栏
+            updateQuickSlot(Gplayer.p_uientity);
+
             if(Gplayer.p_curmapentity != Gplayer.last_mapentity){
                 DebugOutput::out("切换了地图");
                 Gplayer.m_map_loaded = false;
@@ -186,13 +192,6 @@ void UpdateGameData::process()
                 UpdateRoomMap();
                 continue;
             }
-
-
-            // 更新用户信息
-            UpdateUserStatus(statuspanel);
-
-            // 更新快捷栏
-            updateQuickSlot(Gplayer.p_uientity);
 
             ProcessHelper::programDelay(500); // 0.5秒更新一次数据
             QApplication::processEvents();
@@ -257,6 +256,11 @@ void UpdateGameData::UpdateRoomMap()
         DebugOutput::out("地图数据加载成功~");
         Gplayer.m_map_loaded = true;
         return;
+    }
+
+    if(Gplayer.curmapinfo.name == ""){
+        Gplayer.curmapinfo.name = RoomMap::getMapName();
+        // 保存地图名称映射
     }
 
     if(Gplayer.curmapinfo.map_bounding.width == 0){

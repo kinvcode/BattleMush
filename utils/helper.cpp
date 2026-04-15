@@ -8,6 +8,7 @@
 #include <QElapsedTimer>
 #include "utils/mapserializer.h"
 #include "mainwindow.h"
+#include "utils/gamestruct.h"
 
 using namespace Mem;
 
@@ -160,6 +161,20 @@ MapBounding RoomMap::getMapBounding(quint64 cur_map)
     map_bounding.height = map_height;
 
     return map_bounding;
+}
+
+QString RoomMap::getMapName()
+{
+    quint64 ui_entity = Gplayer.p_uientity;
+    quint64 main_group = Helper::findChild(ui_entity, "MainGroup");
+    quint64 minimap = Helper::findChild(main_group,"Minimap");
+    quint64 background = Helper::findChild(minimap,"Minimap_Background");
+    quint64 scroll_top = Helper::findChild(background,"Scroll_Top");
+    quint64 middle = Helper::findChild(scroll_top,"Middle");
+    quint64 map_name_p = Helper::findChild(middle,"Minimap_MinText");
+
+    QString map_name = GameStruct::readEntityText(map_name_p);
+    return map_name;
 }
 
 int RoomMap::toMapPosX(float x, int offset)
@@ -628,6 +643,55 @@ std::unordered_map<int, PathNode> RoomMap::makeNodes(
     PathAlgo::up(platform_list, cur_room_map, path_nodes);
 
     PathAlgo::down(platform_list, cur_room_map, map_bounding, path_nodes);
+
+    // 对节点结果再次过滤
+    for(auto &node : path_nodes){
+        for(auto &target : node.second.targets){
+            // 如果是平台到平台
+            if(node.second.type == 0 && target.second.type == 0){
+                // 存在jumpdown，jumpup,walk。就直接删掉jumpleft，right
+                bool is_exists = false;
+                for(const auto &visit : target.second.visit_list){
+                    if( visit.visit_type == JUMP_UP ||
+                        visit.visit_type == JUMP_DOWN ||
+                        visit.visit_type == WALK_LEFT ||
+                        visit.visit_type == WALK_RIGHT
+                        ){
+                        is_exists = true;
+                    }
+                }
+                if(is_exists){
+                    for(auto it = target.second.visit_list.begin(); it != target.second.visit_list.end(); ) {
+                        if(it->visit_type == JUMP_LEFT || it->visit_type == JUMP_RIGHT){
+                            it = target.second.visit_list.erase(it);
+                        }else{
+                            ++it;
+                        }
+                    }
+                }
+            }
+
+            // 如果是攀爬物到平台：
+            if(node.second.type == 1 && target.second.type == 0){
+                // 存在up，down直接删掉jumpleft,right
+                bool is_exists = false;
+                for(const auto &visit : target.second.visit_list){
+                    if( visit.visit_type == UP || visit.visit_type == DOWN) {
+                        is_exists = true;
+                    }
+                }
+                if(is_exists){
+                    for(auto it = target.second.visit_list.begin(); it != target.second.visit_list.end(); ) {
+                        if(it->visit_type == JUMP_LEFT || it->visit_type == JUMP_RIGHT){
+                            it = target.second.visit_list.erase(it);
+                        }else{
+                            ++it;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     quint64 total_time = begin_time.elapsed();
     qDebug() << "平台寻路算法用时:" << total_time;
@@ -1352,7 +1416,7 @@ int RoomMap::getPlatformType(int platform_id, const std::vector<Platform> &platf
 void RoomMap::loadLocalMap(const QString map_id)
 {
     Gplayer.curmapinfo.id = map_id;
-    Gplayer.curmapinfo.name = "xxoo";
+    Gplayer.curmapinfo.name = "";
     Gplayer.curmapinfo.map_bounding = {};
     std::vector<ClimbRect>().swap(Gplayer.curmapinfo.climbs);
     std::vector<FootholdRect>().swap(Gplayer.curmapinfo.footholds);

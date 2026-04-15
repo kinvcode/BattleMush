@@ -717,3 +717,23 @@ void MainWindow::on_pushButton_show_room_map_clicked()
     dialog.exec();
 }
 
+
+void MainWindow::on_pushButton_show_room_map_name_clicked()
+{
+    if(Gplayer.p_uientity == 0){
+        DebugOutput::out("启动脚本后才可以获取地图名称");
+        return;
+    }
+
+    quint64 ui_entity = Gplayer.p_uientity;
+    quint64 main_group = Helper::findChild(ui_entity, "MainGroup");
+    quint64 minimap = Helper::findChild(main_group,"Minimap");
+    quint64 background = Helper::findChild(minimap,"Minimap_Background");
+    quint64 scroll_top = Helper::findChild(background,"Scroll_Top");
+    quint64 middle = Helper::findChild(scroll_top,"Middle");
+    quint64 map_name_p = Helper::findChild(middle,"Minimap_MinText");
+
+    QString map_name = GameStruct::readEntityText(map_name_p);
+    DebugOutput::out("地图名称" + map_name);
+}
+

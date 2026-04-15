@@ -111,6 +111,9 @@ public:
     // 获取地图边界
     static MapBounding getMapBounding(quint64 cur_map);
 
+    // 获取地图名称
+    static QString getMapName();
+
     // 转换地图坐标
     static int toMapPosX(float x, int offset);
     static int toMapPosY(float y, int offset,int height);
