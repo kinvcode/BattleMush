@@ -702,6 +702,44 @@ color: #FF5500;</string>
            </property>
           </widget>
          </widget>
+         <widget class="QGroupBox" name="groupBox_5">
+          <property name="geometry">
+           <rect>
+            <x>230</x>
+            <y>140</y>
+            <width>261</width>
+            <height>111</height>
+           </rect>
+          </property>
+          <property name="title">
+           <string>地图信息</string>
+          </property>
+          <widget class="QPushButton" name="pushButton_show_room_map">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>30</y>
+             <width>80</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>31</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>31</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>查看当前地图</string>
+           </property>
+          </widget>
+         </widget>
         </widget>
         <widget class="QWidget" name="tab_2">
          <attribute name="title">

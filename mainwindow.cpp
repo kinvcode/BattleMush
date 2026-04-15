@@ -20,6 +20,7 @@
 #include "driver/mem.h"
 #include "utils/gamestruct.h"
 #include "widgets/alertwindow.h"
+#include <QGraphicsScene>
 
 // 测试头文件
 #include "global/globalplayer.h"
@@ -660,5 +661,59 @@ void MainWindow::on_pushButton_print_ui_child_clicked()
 
 
 
+}
+
+
+void MainWindow::on_pushButton_show_room_map_clicked()
+{
+    if(Gplayer.curmapinfo.map_mat.empty()){
+        qDebug() << "当前地图尚未加载，请先启动";
+        return;
+    }
+    cv::Mat map_mat = Gplayer.curmapinfo.map_mat;
+
+    for(const auto &platform : Gplayer.curmapinfo.platform_list){
+        cv::Point position(platform.start.x, platform.start.y);
+        cv::putText(map_mat,std::to_string(platform.id),position,cv::FONT_HERSHEY_SIMPLEX,1.0,cv::Scalar(255, 0, 0),2);
+    }
+
+    // 保存地图
+    QString img_path = QCoreApplication::applicationDirPath() + "room_map_num.png";
+    ImageTool::saveMatImage(map_mat, img_path);
+
+    QImage qtImage(
+        map_mat.data,
+        map_mat.cols,
+        map_mat.rows,
+        map_mat.step,
+        QImage::Format_RGB888);
+    QPixmap pixmap = QPixmap::fromImage(qtImage);
+
+    // 创建模态对话框
+    QDialog dialog(this);
+    dialog.setWindowTitle("房间地图");
+    dialog.setModal(true);  // 模态
+
+    // 创建布局和标签
+    QVBoxLayout *layout = new QVBoxLayout(&dialog);
+    QLabel *label = new QLabel(&dialog);
+
+    // 设置图片并缩放以适应标签
+    // QPixmap pixmap = QPixmap::fromImage(qtImage);
+    label->setPixmap(pixmap.scaled(800, 600, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    label->setAlignment(Qt::AlignCenter);
+
+    // 添加关闭按钮
+    QPushButton *closeBtn = new QPushButton("关闭", &dialog);
+    connect(closeBtn, &QPushButton::clicked, &dialog, &QDialog::accept);
+
+    layout->addWidget(label);
+    layout->addWidget(closeBtn, 0, Qt::AlignCenter);
+
+    // 设置对话框大小
+    dialog.resize(820, 650);
+
+    // 显示模态对话框
+    dialog.exec();
 }
 
