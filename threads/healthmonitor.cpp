@@ -78,7 +78,6 @@ void HealthMonitor::process()
 
         // 检测药水数量
         if(Gplayer.quick_slot_pageup_count < 10){
-            // Helper::warning("血药数量不足10个！");
 
             if(!Gplayer.show_warning){
                 Helper heler_tool;
@@ -91,8 +90,13 @@ void HealthMonitor::process()
             continue;
         }
 
-        if(Gplayer.quick_slot_pageup_count < 10){
-            // Helper::warning("蓝药数量不足10个！");
+        if(Gplayer.quick_slot_pagedown_count < 10){
+
+            if(!Gplayer.show_warning){
+                Helper heler_tool;
+                heler_tool.warning("蓝药数量不足10个");
+            }
+
             DebugOutput::out("蓝药数量不足10个！");
             ProcessHelper::programDelay(1000);
             QApplication::processEvents();

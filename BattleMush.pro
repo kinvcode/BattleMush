@@ -44,6 +44,7 @@ SOURCES += \
     global/globalconfig.cpp \
     global/globalplayer.cpp \
     driver/driverload.cpp \
+    global/scriptconfig.cpp \
     helper/rand.cpp \
     keyboard/nativeeventfilter.cpp \
     logviewer.cpp \
@@ -75,6 +76,7 @@ HEADERS += \
     driver/driverload.h \
     driver/msdriverpro.h \
     driver/msstruct.h \
+    global/scriptconfig.h \
     global/struct.h \
     helper/rand.h \
     keyboard/nativeeventfilter.h \

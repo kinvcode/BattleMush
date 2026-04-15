@@ -47,12 +47,16 @@ private:
 
     int userY();
 
+    // 角色当前位置
     cv::Point userPos();
 
+    // 角色当前地板
     quint64 userFoothold();
 
+    // 角色当前攀爬物
     quint64 userClimb();
 
+    // 角色当前平台
     quint64 userPlatform();
 
 private:
@@ -70,20 +74,24 @@ private:
     // 击杀怪物
     void killNearMonster(const std::vector<Monster> &handle_monsters);
 
+    // 拾取物品
     void reciveItem(const Item &target_item);
 
 
+// 刷图线路
+private:
+    struct PlatformSequence{
+        int index;
+        std::vector<int> platform_set;
+    };
 
+    PlatformSequence m_platform_sequence;
 
+    // 自动清怪路线
+    void autoCleanLine();
 
-
-
-
-
-
-
-
-
+    // 执行平台路线
+    void excutePlatformSequence();
 
 };
 
