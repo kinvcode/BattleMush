@@ -25,6 +25,11 @@ void Helper::console(const QString &msg)
     MainWindow::getInstance()->console(msg);
 }
 
+void Helper::warning(QString msg)
+{
+    MainWindow::getInstance()->warning(msg);
+}
+
 quint64 Helper::findChild(quint64 parent, QString name)
 {
     quint64 child_entity = 0;
@@ -2121,6 +2126,9 @@ void PathAlgo::down(const std::vector<Platform> &platform_list,
                     // start.y -= 1;
                     cv::Point end = start;
                     end.y += 5; // 其实1~2就够了
+                    if(end.y >= map_bounding.height){
+                        end.y = map_bounding.height - 1;
+                    }
 
                     // 直接判断这个位置的像素是否是攀爬
                     cv::Vec3b cur_color = room_map.at<cv::Vec3b>(end);

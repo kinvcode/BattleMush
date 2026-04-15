@@ -26,6 +26,13 @@ public:
         {"gohome",MSKeyboard_LeftControl}
         }
     },
+    {"atk_range",QJsonObject{
+        {"general_x",50},
+        {"general_y",20},
+        {"skill1_x",150},
+        {"skill1_y",40},
+        }
+    },
     {"model","uplevel"}
 };
 

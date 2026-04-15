@@ -8,6 +8,7 @@
 #include "global/struct.h"
 #include "utils/helper.h"
 #include "utils/gamestruct.h"
+#include "global/globalconfig.h"
 
 using namespace Mem;
 
@@ -357,6 +358,9 @@ bool WalkBase::moveToItem(cv::Point range)
 bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
 {
     m_transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+    int atk_skill1_range_x = Gconfig.getValue("atk_range/skill1_x").toInt();
+    int atk_skill1_range_y = Gconfig.getValue("atk_range/skill2_y").toInt();
+    m_skill_range = {atk_skill1_range_x, atk_skill1_range_y};
 
     int user_pos;
     if(self_climb){

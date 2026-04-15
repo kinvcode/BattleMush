@@ -5,6 +5,8 @@
 #include "logviewer.h"
 #include "widgets/noticewidget.h"
 #include "threads/threadmanager.h"
+#include "widgets/alertwindow.h"
+#include <QPointer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -27,6 +29,8 @@ public:
 private:
     Ui::MainWindow *ui;
     LogViewer* logger = nullptr;
+    QPointer<AlertWindow> m_alert;  // 警报组件指针
+
     // 数据更新线程ID
     const int m_UpdateGameData_tid = 1;
     // 人物健康状态监控线程ID
@@ -52,7 +56,7 @@ private slots:
     void on_listWidget_clicked(const QModelIndex &index);
 
     // 测试按钮
-    void on_pushButton_clicked();
+    void on_pushButton_get_user_pos_clicked();
 
     void on_lineEdit_auto_add_mp_rate_editingFinished();
 
@@ -84,12 +88,23 @@ private slots:
     void onThreadStarted(int threadId, const QString& workerType);
     void onAllThreadsFinished();
 
-    void on_pushButton_2_clicked();
+    void on_pushButton_move_pos_list_clean_clicked();
 
-    void on_pushButton_3_clicked();
+    void on_pushButton_print_move_pos_list_clicked();
+
+    void on_lineEdit_atk_range_general_x_editingFinished();
+
+    void on_lineEdit_atk_range_general_y_editingFinished();
+
+    void on_lineEdit_atk_range_skill1_x_editingFinished();
+
+    void on_lineEdit_atk_range_skill1_y_editingFinished();
+
+    void on_pushButton_waring_alert_clicked();
 
 public slots:
     void console(QString msg);
+    void warning(QString msg);
     void onApplicationQuit();
     void updateCompoment(bool status);
 signals:

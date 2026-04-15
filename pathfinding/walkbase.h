@@ -44,7 +44,7 @@ private:
     // 找怪的函数
 private:
     // quint64 m_entity_head = 0;
-    cv::Point m_skill_range = {150,40}; // 监测怪物的
+    cv::Point m_skill_range = {150,40}; // 这里实际会被上层的清怪线程参数覆盖
 
     cv::Point monsterInRange(bool is_left, int &start_index);
 

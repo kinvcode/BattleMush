@@ -451,6 +451,9 @@ bool MovePlatform::jumpDown(cv::Point range, int platform)
 
     quint64 foothold_p = getUserFootholdP();
     while(foothold_p == 0){
+        if(getUserClimbP() != 0){
+            break;
+        }
         ProcessHelper::programDelay(50);
         QApplication::processEvents();
         foothold_p = getUserFootholdP();

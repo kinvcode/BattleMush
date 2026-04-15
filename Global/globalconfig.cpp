@@ -40,6 +40,13 @@ void GlobalConfig::loadFromJson()
     bindkeyConfig["jump"] = config->getValue("bindkey/jump", bindkeyConfig["jump"].toVariant()).toInt();
     bindkeyConfig["gohome"] = config->getValue("bindkey/gohome", bindkeyConfig["gohome"].toVariant()).toInt();
     data["bindkey"] = bindkeyConfig;
+
+    QJsonObject atkrangeConfig = data["atk_range"].toObject();
+    atkrangeConfig["general_x"] = config->getValue("atk_range/general_x", atkrangeConfig["general_x"].toVariant()).toInt();
+    atkrangeConfig["general_y"] = config->getValue("atk_range/general_y", atkrangeConfig["general_y"].toVariant()).toInt();
+    atkrangeConfig["skill1_x"] = config->getValue("atk_range/skill1_x", atkrangeConfig["skill1_x"].toVariant()).toInt();
+    atkrangeConfig["skill1_y"] = config->getValue("atk_range/skill1_y", atkrangeConfig["skill1_y"].toVariant()).toInt();
+    data["atk_range"] = atkrangeConfig;
 }
 
 QVariant GlobalConfig::getValue(const QString &keyPath, const QVariant& defaultValue) const

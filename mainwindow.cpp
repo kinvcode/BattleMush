@@ -18,6 +18,7 @@
 #include "widgets/hotkeyedit.h"
 #include "utils/helper.h"
 #include "driver/mem.h"
+#include "widgets/alertwindow.h"
 
 // 测试头文件
 #include "global/globalplayer.h"
@@ -123,7 +124,7 @@ void MainWindow::initCompomentUI()
     ui->listWidget->setProperty("class","leftMenu");
     QListWidgetItem *item1 = new QListWidgetItem(QIcon(":/assets/images/icons/home.svg"), "启动");
     ui->listWidget->addItem(item1);
-    QListWidgetItem *item2 = new QListWidgetItem(QIcon(":/assets/images/icons/setting.svg"), "配置");
+    QListWidgetItem *item2 = new QListWidgetItem(QIcon(":/assets/images/icons/setting.svg"), "信息");
     ui->listWidget->addItem(item2);
     QListWidgetItem *item3 = new QListWidgetItem(QIcon(":/assets/images/icons/vip.svg"), "VIP");
     ui->listWidget->addItem(item3);
@@ -141,10 +142,6 @@ void MainWindow::initCompomentUI()
     // 主窗口按钮
     ui->pushButton_start_play->setDisabled(true);
     ui->pushButton_start_play->setProperty("class","start-play-btn");
-
-    ui->comboBox->addItem("组包秒杀");
-    ui->comboBox->addItem("搬砖");
-    ui->comboBox->addItem("升级");
 
     // 重新设置样式表
     qApp->setStyleSheet(qApp->styleSheet());
@@ -168,6 +165,12 @@ void MainWindow::initConfig()
     ui->lineEdit_bindkey_gohome->m_config_path = "bindkey/gohome";
     ui->lineEdit_bindkey_gohome->m_currentKey = Gconfig.getValue("bindkey/gohome").toInt();
     ui->lineEdit_bindkey_gohome->updateDisplay();
+
+    // 攻击范围
+    ui->lineEdit_atk_range_general_x->setText(Gconfig.getValue("atk_range/general_x").toString());
+    ui->lineEdit_atk_range_general_y->setText(Gconfig.getValue("atk_range/general_y").toString());
+    ui->lineEdit_atk_range_skill1_x->setText(Gconfig.getValue("atk_range/skill1_x").toString());
+    ui->lineEdit_atk_range_skill1_y->setText(Gconfig.getValue("atk_range/skill1_y").toString());
 
     // 自动加血
     ui->checkBox_auto_add_hp->setChecked(Gconfig.getValue("auto_add_health/add_hp").toBool());
@@ -332,6 +335,18 @@ void MainWindow::console(QString msg)
     ui->textEdit_log->moveCursor(QTextCursor::End);
 }
 
+void MainWindow::warning(QString msg)
+{
+    msg = "警报：" + msg;
+    if (m_alert) {
+        m_alert->close();
+    }
+
+    m_alert = new AlertWindow(msg);
+    m_alert->setAttribute(Qt::WA_DeleteOnClose);
+    m_alert->show();
+}
+
 void MainWindow::onApplicationQuit()
 {
     DebugOutput::out("安全关闭程序中... ...");
@@ -394,7 +409,7 @@ void MainWindow::updateCompoment(bool status)
     ui->pushButton_start_play->style()->polish(ui->pushButton_start_play);
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_pushButton_get_user_pos_clicked()
 {
     VMProtectBegin("__FUNCTION__");
 
@@ -494,7 +509,7 @@ void MainWindow::onHotkeyChanged(int key)
 }
 
 
-void MainWindow::on_pushButton_2_clicked()
+void MainWindow::on_pushButton_move_pos_list_clean_clicked()
 {
     Gplayer.move_pos_list.clear();
     Gplayer.move_pos_list.reserve(1000);
@@ -502,7 +517,7 @@ void MainWindow::on_pushButton_2_clicked()
 }
 
 
-void MainWindow::on_pushButton_3_clicked()
+void MainWindow::on_pushButton_print_move_pos_list_clicked()
 {
     if(Gplayer.move_pos_list.empty()){
         qDebug() << "暂时没有运动轨迹";
@@ -520,5 +535,79 @@ void MainWindow::on_pushButton_3_clicked()
 
         qDebug() << item.first << "," << item.second << " " << cur_x_left << "," << cur_y_left;
     }
+}
+
+
+void MainWindow::on_lineEdit_atk_range_general_x_editingFinished()
+{
+    QString text = ui->lineEdit_atk_range_general_x->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 10000) {
+        // 校验通过
+        console("普通攻击X范围已保存");
+        Gconfig.setValue("atk_range/general_x", value);
+    } else {
+        showNotice("无效数值，请输入1-10000之间的数字");
+        ui->lineEdit_atk_range_general_x->setText("");  // 清空内容
+    }
+}
+
+
+void MainWindow::on_lineEdit_atk_range_general_y_editingFinished()
+{
+    QString text = ui->lineEdit_atk_range_general_y->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 10000) {
+        // 校验通过
+        console("普通攻击Y范围已保存");
+        Gconfig.setValue("atk_range/general_y", value);
+    } else {
+        showNotice("无效数值，请输入1-10000之间的数字");
+        ui->lineEdit_atk_range_general_y->setText("");  // 清空内容
+    }
+}
+
+
+void MainWindow::on_lineEdit_atk_range_skill1_x_editingFinished()
+{
+    QString text = ui->lineEdit_atk_range_skill1_x->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 10000) {
+        // 校验通过
+        console("技能攻击X范围已保存");
+        Gconfig.setValue("atk_range/skill1_x", value);
+    } else {
+        showNotice("无效数值，请输入1-10000之间的数字");
+        ui->lineEdit_atk_range_skill1_x->setText("");  // 清空内容
+    }
+}
+
+
+void MainWindow::on_lineEdit_atk_range_skill1_y_editingFinished()
+{
+    QString text = ui->lineEdit_atk_range_skill1_y->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 10000) {
+        // 校验通过
+        console("技能攻击Y范围已保存");
+        Gconfig.setValue("atk_range/skill1_y", value);
+    } else {
+        showNotice("无效数值，请输入1-10000之间的数字");
+        ui->lineEdit_atk_range_skill1_y->setText("");  // 清空内容
+    }
+}
+
+
+void MainWindow::on_pushButton_waring_alert_clicked()
+{
+    warning("蓝药数量不足！");
 }
 

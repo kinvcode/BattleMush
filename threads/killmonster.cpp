@@ -56,6 +56,11 @@ void KillMonster::resume()
     Gplayer.m_bindkey.skill_atk1 = Gconfig.getValue("bindkey/skill_atk1").toInt();
     Gplayer.m_bindkey.jump = Gconfig.getValue("bindkey/jump").toInt();
     Gplayer.m_bindkey.gohome = Gconfig.getValue("bindkey/gohome").toInt();
+
+    int atk_skill1_range_x = Gconfig.getValue("atk_range/skill1_x").toInt();
+    int atk_skill1_range_y = Gconfig.getValue("atk_range/skill2_y").toInt();
+    m_attack_range = {atk_skill1_range_x, atk_skill1_range_y};
+
     m_paused = false;
 }
 
@@ -65,6 +70,10 @@ void KillMonster::process()
     Gplayer.m_bindkey.skill_atk1 = Gconfig.getValue("bindkey/skill_atk1").toInt();
     Gplayer.m_bindkey.jump = Gconfig.getValue("bindkey/jump").toInt();
     Gplayer.m_bindkey.gohome = Gconfig.getValue("bindkey/gohome").toInt();
+
+    int atk_skill1_range_x = Gconfig.getValue("atk_range/skill1_x").toInt();
+    int atk_skill1_range_y = Gconfig.getValue("atk_range/skill2_y").toInt();
+    m_attack_range = {atk_skill1_range_x, atk_skill1_range_y};
 
     while (m_running) {
         // 处理暂停状态

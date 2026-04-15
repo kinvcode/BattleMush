@@ -13,6 +13,8 @@ class Helper
 public:
     static void console(const QString& msg);
 
+    static void warning(QString msg);
+
     // 搜索Entity的子组件
     static quint64 findChild(quint64 parent, QString name);
 
