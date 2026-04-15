@@ -9,6 +9,7 @@
 #include "utils/helper.h"
 #include "utils/gamestruct.h"
 #include "global/globalconfig.h"
+#include "global/controller.h"
 
 using namespace Mem;
 
@@ -156,8 +157,9 @@ bool WalkBase::runY()
     return false;
 }
 
-void WalkBase::clearMonster(Monster monster, cv::Point range)
+void WalkBase::clearMonster(Monster monster)
 {
+    Controller::updateAttackInfo();
     cv::Point user_pos = getUserPos();
 
     // 跑动按键判断
@@ -175,10 +177,10 @@ void WalkBase::clearMonster(Monster monster, cv::Point range)
         direction_x = MSKeyboard_LeftArrow;
     }
 
-    m_skill_range = range;
+    // m_skill_range = range;
     m_transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
 
-    if(Math::posInRange(is_left, user_pos, monster.pos, range))
+    if(Math::posInRange(is_left, user_pos, monster.pos, Gcontroller.m_attack_info.range))
     {
         // 因为还没有走路，方向可能不对。打怪之前纠正方向
         MSDriverPRO::keyboardClick(direction_x);
@@ -242,7 +244,7 @@ void WalkBase::clearMonster(Monster monster, cv::Point range)
 
         user_pos = getUserPos();
         // 判断怪物原始位置为目标地点
-        if(Math::posInRange(is_left, user_pos, monster.pos, range)){
+        if(Math::posInRange(is_left, user_pos, monster.pos, Gcontroller.m_attack_info.range)){
             qDebug() << "寻怪目标坐标在人物攻击范围，判定到达~";
             arrived = true;
         }
@@ -265,9 +267,10 @@ void WalkBase::clearMonster(Monster monster, cv::Point range)
     qDebug() << "寻怪结束~";
 }
 
-bool WalkBase::moveToItem(cv::Point range)
+bool WalkBase::moveToItem()
 {
-    m_skill_range = range;
+    Controller::updateAttackInfo();
+    // m_skill_range = range;
     m_transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
 
     int user_x = getUserX();
@@ -358,9 +361,10 @@ bool WalkBase::moveToItem(cv::Point range)
 bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
 {
     m_transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
-    int atk_skill1_range_x = Gconfig.getValue("atk_range/skill1_x").toInt();
-    int atk_skill1_range_y = Gconfig.getValue("atk_range/skill2_y").toInt();
-    m_skill_range = {atk_skill1_range_x, atk_skill1_range_y};
+    // int atk_skill1_range_x = Gconfig.getValue("atk_range/skill1_x").toInt();
+    // int atk_skill1_range_y = Gconfig.getValue("atk_range/skill2_y").toInt();
+    // m_skill_range = {atk_skill1_range_x, atk_skill1_range_y};
+    Controller::updateAttackInfo();
 
     int user_pos;
     if(self_climb){
@@ -610,7 +614,7 @@ cv::Point WalkBase::monsterInRange(bool is_left, int &start_index)
         int monster_y = RoomMap::toMapPosY(float_y, Gplayer.curmapinfo.map_bounding.y_offset,Gplayer.curmapinfo.map_bounding.height);
         // qDebug() << monster_x << "," << monster_y;
         monster_pos = {monster_x, monster_y};
-        if(Math::posInRange(is_left, user_pos, monster_pos,m_skill_range)){
+        if(Math::posInRange(is_left, user_pos, monster_pos,Gcontroller.m_attack_info.range)){
             monster_pos = {monster_x,monster_y};
             qDebug() << "人物当前位置:" << user_pos.x << "," << user_pos.y;
             qDebug() << "发现怪物在攻击范围：" << monster_x << "," << monster_y;
@@ -644,15 +648,23 @@ void WalkBase::attackMonster(cv::Point user_pos, cv::Point monster_pos)
         // MSDriverPRO::keyboardClick(MSKeyboard_RightArrow);
     }
 
-    // 如果血量低于10%
-    int cur_mp_rate = Gplayer.MP * 100 / Gplayer.MAX_MP;
-    if(cur_mp_rate < 10){
+    // // 如果血量低于10%
+    // int cur_mp_rate = Gplayer.MP * 100 / Gplayer.MAX_MP;
+    // if(cur_mp_rate < 10){
+    //     qDebug() << "使用普通攻击";
+    //     MSDriverPRO::keyboardClick(Gplayer.m_bindkey.general_atk, 1);
+    //     return;
+    // }
+
+    // // 使用技能
+    // qDebug() << "使用技能攻击" << QDateTime::currentMSecsSinceEpoch();
+    // MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skill_atk1, 1);
+
+    if(Gcontroller.m_attack_info.type == 0){
         qDebug() << "使用普通攻击";
         MSDriverPRO::keyboardClick(Gplayer.m_bindkey.general_atk, 1);
-        return;
+    }else{
+        qDebug() << "使用技能攻击" << QDateTime::currentMSecsSinceEpoch();
+        MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skill_atk1, 1);
     }
-
-    // 使用技能
-    qDebug() << "使用技能攻击" << QDateTime::currentMSecsSinceEpoch();
-    MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skill_atk1, 1);
 }

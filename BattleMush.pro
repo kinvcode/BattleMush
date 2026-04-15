@@ -41,10 +41,10 @@ LIBS += -lUser32 -lKernel32
 
 SOURCES += \
     driver/mem.cpp \
+    global/controller.cpp \
     global/globalconfig.cpp \
     global/globalplayer.cpp \
     driver/driverload.cpp \
-    global/scriptconfig.cpp \
     helper/rand.cpp \
     keyboard/nativeeventfilter.cpp \
     logviewer.cpp \
@@ -70,13 +70,13 @@ SOURCES += \
 HEADERS += \
     driver/mem.h \
     driver/mskeycode.h \
+    global/controller.h \
     global/gameoffset.h \
     global/globalconfig.h \
     global/globalplayer.h \
     driver/driverload.h \
     driver/msdriverpro.h \
     driver/msstruct.h \
-    global/scriptconfig.h \
     global/struct.h \
     helper/rand.h \
     keyboard/nativeeventfilter.h \

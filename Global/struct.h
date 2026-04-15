@@ -181,4 +181,9 @@ typedef struct {
     int gohome;
 }BindKey;
 
+typedef struct {
+    int type; // 攻击方式 0普通攻击 1技能攻击1
+    cv::Point range; // 攻击范围
+}AttackInfo;
+
 #endif // STRUCT_H

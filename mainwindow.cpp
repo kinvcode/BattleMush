@@ -678,7 +678,7 @@ void MainWindow::on_pushButton_show_room_map_clicked()
     }
 
     // 保存地图
-    QString img_path = QCoreApplication::applicationDirPath() + "room_map_num.png";
+    QString img_path = QCoreApplication::applicationDirPath() + "/room_map_num.png";
     ImageTool::saveMatImage(map_mat, img_path);
 
     QImage qtImage(

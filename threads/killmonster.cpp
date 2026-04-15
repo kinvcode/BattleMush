@@ -10,6 +10,7 @@
 #include "driver/mskeycode.h"
 #include "global/globalconfig.h"
 #include "pathfinding/moveplatform.h"
+#include "global/controller.h"
 
 using namespace Mem;
 
@@ -57,9 +58,12 @@ void KillMonster::resume()
     Gplayer.m_bindkey.jump = Gconfig.getValue("bindkey/jump").toInt();
     Gplayer.m_bindkey.gohome = Gconfig.getValue("bindkey/gohome").toInt();
 
+    int atk_general_range_x = Gconfig.getValue("atk_range/general_x").toInt();
+    int atk_general_range_y = Gconfig.getValue("atk_range/general_y").toInt();
     int atk_skill1_range_x = Gconfig.getValue("atk_range/skill1_x").toInt();
     int atk_skill1_range_y = Gconfig.getValue("atk_range/skill2_y").toInt();
-    m_attack_range = {atk_skill1_range_x, atk_skill1_range_y};
+    Gcontroller.m_attack_range_general = {atk_general_range_x, atk_general_range_y};
+    Gcontroller.m_attack_range_skill1 = {atk_skill1_range_x, atk_skill1_range_y};
 
     m_paused = false;
 }
@@ -71,9 +75,12 @@ void KillMonster::process()
     Gplayer.m_bindkey.jump = Gconfig.getValue("bindkey/jump").toInt();
     Gplayer.m_bindkey.gohome = Gconfig.getValue("bindkey/gohome").toInt();
 
+    int atk_general_range_x = Gconfig.getValue("atk_range/general_x").toInt();
+    int atk_general_range_y = Gconfig.getValue("atk_range/general_y").toInt();
     int atk_skill1_range_x = Gconfig.getValue("atk_range/skill1_x").toInt();
     int atk_skill1_range_y = Gconfig.getValue("atk_range/skill2_y").toInt();
-    m_attack_range = {atk_skill1_range_x, atk_skill1_range_y};
+    Gcontroller.m_attack_range_general = {atk_general_range_x, atk_general_range_y};
+    Gcontroller.m_attack_range_skill1 = {atk_skill1_range_x, atk_skill1_range_y};
 
     // 模拟路线
     m_platform_sequence.index = 0;
@@ -395,7 +402,7 @@ void KillMonster::killNearMonster(const std::vector<Monster> &handle_monsters)
     qDebug() << "开始寻路清怪~";
 
     WalkBase user_move(target_monster.pos.x);
-    user_move.clearMonster(target_monster, m_attack_range);
+    user_move.clearMonster(target_monster);
 }
 
 void KillMonster::reciveItem(const Item &target_item)
@@ -409,7 +416,7 @@ void KillMonster::reciveItem(const Item &target_item)
 
     WalkBase user_move(target_item.pos.x);
     user_move.m_deviation = 10; // 修改一下误差范围
-    if(user_move.moveToItem(m_attack_range)){
+    if(user_move.moveToItem()){
         // 加入到黑名单
         m_black_item.insert(target_item.entity);
     }

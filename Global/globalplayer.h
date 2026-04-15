@@ -85,7 +85,7 @@ public:
     int quick_slot_pagedown_count = 0;
 
     // 用户绑定的按键
-    BindKey m_bindkey;
+    BindKey m_bindkey; // 建议放到controller里面
 
     // 一些测试数据
     std::vector<std::pair<float, float>> move_pos_list;

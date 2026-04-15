@@ -45,6 +45,8 @@ public:
         const std::unordered_map<int, std::vector<TargetPoints>> &target_list
     );
 
+    // 获取当前攻击范围
+
 signals:
     void sendWarning(QString msg);
 };

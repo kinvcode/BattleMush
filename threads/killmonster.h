@@ -28,7 +28,7 @@ private:
     quint64 m_currentmap = 0;
 
     // 攻击范围
-    cv::Point m_attack_range = {150, 40};
+    // cv::Point m_attack_range = {150, 40};
 
     // 地图开始索引
     int m_map_start = 0;
