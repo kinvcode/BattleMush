@@ -23,13 +23,12 @@ public:
     ~MainWindow();
     // 线程管理器
     ThreadManager* m_threadManager;
-
+    QPointer<AlertWindow> m_alert;  // 警报组件指针
     static MainWindow* getInstance();  // 单例模式
-
 private:
     Ui::MainWindow *ui;
     LogViewer* logger = nullptr;
-    QPointer<AlertWindow> m_alert;  // 警报组件指针
+
 
     // 数据更新线程ID
     const int m_UpdateGameData_tid = 1;
@@ -101,6 +100,8 @@ private slots:
     void on_lineEdit_atk_range_skill1_y_editingFinished();
 
     void on_pushButton_waring_alert_clicked();
+
+    void on_pushButton_print_ui_child_clicked();
 
 public slots:
     void console(QString msg);

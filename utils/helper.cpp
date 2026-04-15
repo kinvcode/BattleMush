@@ -20,6 +20,11 @@ void DebugOutput::out(const QString& message){
     OutputDebugStringW(output.toStdWString().c_str());
 }
 
+Helper::Helper()
+{
+    connect(this, &Helper::sendWarning, MainWindow::getInstance(), &MainWindow::warning,Qt::UniqueConnection);
+}
+
 void Helper::console(const QString &msg)
 {
     MainWindow::getInstance()->console(msg);
@@ -27,7 +32,13 @@ void Helper::console(const QString &msg)
 
 void Helper::warning(QString msg)
 {
-    MainWindow::getInstance()->warning(msg);
+    Gplayer.show_warning = true;
+    emit sendWarning(msg);
+    // while(Gplayer.show_warning){
+    //     DebugOutput::out("警报播放中");
+    //     ProcessHelper::programDelay(1000);
+    //     QApplication::processEvents();
+    // }
 }
 
 quint64 Helper::findChild(quint64 parent, QString name)

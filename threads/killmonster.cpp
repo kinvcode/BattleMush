@@ -126,6 +126,9 @@ void KillMonster::process()
         RetryCase:
         if(m_paused) continue;
 
+        // 检查键盘
+        if ((GetKeyState(VK_NUMLOCK) & 1)) MSDriverPRO::keyboardClick(0x45);
+
         // 获取人物所在地板
         int user_in_lineid = userPlatform();
 

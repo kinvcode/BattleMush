@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <iostream>
 #include "utils/helper.h"
+#include "global/globalplayer.h"
 
 NativeEventFilter::NativeEventFilter(MainWindow* window)
 {
@@ -27,7 +28,15 @@ bool NativeEventFilter::nativeEventFilter(const QByteArray& eventType, void* mes
             }else{
                 qDebug() << "自动模式已关闭~";
                 Helper::console("自动模式已关闭~");
+
                 emit sendControleStatus(false);
+
+                // 关闭警报
+                if(main_win->m_alert){
+                    Gplayer.show_warning = false;
+                    main_win->m_alert->close();
+                }
+
                 main_win->m_threadManager->pauseAll();
                 m_is_stop = true;
             }

@@ -76,6 +76,29 @@ void HealthMonitor::process()
             continue;
         }
 
+        // 检测药水数量
+        if(Gplayer.quick_slot_pageup_count < 10){
+            // Helper::warning("血药数量不足10个！");
+
+            if(!Gplayer.show_warning){
+                Helper heler_tool;
+                heler_tool.warning("血药数量不足10个");
+            }
+
+            DebugOutput::out("血药数量不足10个！");
+            ProcessHelper::programDelay(1000);
+            QApplication::processEvents();
+            continue;
+        }
+
+        if(Gplayer.quick_slot_pageup_count < 10){
+            // Helper::warning("蓝药数量不足10个！");
+            DebugOutput::out("蓝药数量不足10个！");
+            ProcessHelper::programDelay(1000);
+            QApplication::processEvents();
+            continue;
+        }
+
         // 检测血量
         int hp_rate = Gconfig.getValue("auto_add_health/hp_rate").toInt();
         if(Gplayer.MAX_HP != 0 && Gplayer.HP < Gplayer.MAX_HP){

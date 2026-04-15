@@ -1,9 +1,13 @@
 #include "alertwindow.h"
+#include "global/globalplayer.h"
 
-AlertWindow::AlertWindow(const QString &msg, QWidget *parent) : QWidget(parent)
+AlertWindow::AlertWindow(QString msg, QWidget *parent) : QWidget(parent)
 {
-    setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+    // 暂停所有线程
+
+    setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
     setAttribute(Qt::WA_TranslucentBackground);
+    setWindowFlags(windowFlags() | Qt::WindowTransparentForInput);
 
     // 创建中央控件
     QWidget *centerWidget = new QWidget(this);
@@ -31,7 +35,7 @@ AlertWindow::AlertWindow(const QString &msg, QWidget *parent) : QWidget(parent)
     QVBoxLayout *centerLayout = new QVBoxLayout(centerWidget);
     centerLayout->addWidget(label);
 
-    setFocusPolicy(Qt::StrongFocus);
+    // setFocusPolicy(Qt::StrongFocus);
 
     // 使用定时器动画（不依赖 Q_PROPERTY）
     QTimer *timer = new QTimer(this);
@@ -72,11 +76,16 @@ AlertWindow::AlertWindow(const QString &msg, QWidget *parent) : QWidget(parent)
 
 void AlertWindow::keyPressEvent(QKeyEvent *event)
 {
-    close();
+    // Gplayer.show_warning = false;
+    // close();
+
+    int sc = event->nativeScanCode();
+    qDebug() << "当前sc按键：" << sc;
 }
 
 void AlertWindow::mousePressEvent(QMouseEvent *event)
 {
-    close();
+    // Gplayer.show_warning = false;
+    // close();
 }
 

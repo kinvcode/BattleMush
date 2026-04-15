@@ -11,12 +11,13 @@
 #include <QPropertyAnimation>
 #include <QTimer>
 #include <QDebug>
+#include <QKeyEvent>
 
 class AlertWindow : public QWidget
 {
     Q_OBJECT
 public:
-    AlertWindow(const QString &msg, QWidget *parent = nullptr);
+    AlertWindow(QString msg, QWidget *parent = nullptr);
 private:
     void keyPressEvent(QKeyEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;

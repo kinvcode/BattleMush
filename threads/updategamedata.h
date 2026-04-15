@@ -31,6 +31,8 @@ private:
     void UpdateRoomMap();
     // 更新怪物
     void UpdateMonsters();
+    // 更新快捷栏信息
+    void updateQuickSlot(quint64 ui_entity);
 };
 
 #endif // UPDATEGAMEDATA_H

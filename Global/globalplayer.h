@@ -14,6 +14,8 @@ public:
         return &instance;
     }
 
+    bool show_warning = false;
+
     // 游戏进程PID
     quint64 p_gamepid = 0;
 
@@ -77,6 +79,10 @@ public:
 
     int MP = 0;
     int MAX_MP = 0;
+
+    // 快捷键物品数量
+    int quick_slot_pageup_count = 0;
+    int quick_slot_pagedown_count = 0;
 
     // 用户绑定的按键
     BindKey m_bindkey;

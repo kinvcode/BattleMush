@@ -191,6 +191,9 @@ void UpdateGameData::process()
             // 更新用户信息
             UpdateUserStatus(statuspanel);
 
+            // 更新快捷栏
+            updateQuickSlot(Gplayer.p_uientity);
+
             ProcessHelper::programDelay(500); // 0.5秒更新一次数据
             QApplication::processEvents();
         }
@@ -338,24 +341,27 @@ void UpdateGameData::UpdateRoomMap()
 
 void UpdateGameData::UpdateMonsters()
 {
-    // 判断怪物
-    //     +F0 StateComponent
-    //         [+138]+10 状态 IDLE STAND MOVE
-    //     +11C StateUpdateSpace 0同步 1客户端 2服务端
 
-    //     MapleMonsterActionState Invalid = 0; // 0x0
-    // MapleMonsterActionState Stand = 1; // 0x0
-    // MapleMonsterActionState Move = 2; // 0x0
-    // MapleMonsterActionState Jump = 3; // 0x0
-    // MapleMonsterActionState Hit = 4; // 0x0
-    // MapleMonsterActionState Die = 5; // 0x0
+}
 
+void UpdateGameData::updateQuickSlot(quint64 ui_entity)
+{
+    quint64 main_group = Helper::findChild(ui_entity, "MainGroup");
+    quint64 back_ground = Helper::findChild(main_group,"BackGround");
+    quint64 quick_slot = Helper::findChild(back_ground,"QuickSlot");
+    quint64 page_up = Helper::findChild(quick_slot,"PageUp");
+    quint64 page_down = Helper::findChild(quick_slot,"PageDown");
+    quint64 page_up_count = Helper::findChild(page_up,"Count");
+    quint64 page_down_count = Helper::findChild(page_down,"Count");
 
-    // + 1D8 RigidbodyComponent
-    //     +A5 0死亡 1存活 可以判断怪物是否存在
-    //     +F8 当前所在地板 可以判断怪物是否存在
-    //     +118 行走{当前X坐标，X行走步长} 怪物没有
-    //     +120 airPos 怪物坐标
+    QString hp_count_text = GameStruct::readEntityText(page_up_count);
+    QString mp_count_text = GameStruct::readEntityText(page_down_count);
+
+    int hp_count = hp_count_text.toInt();
+    int mp_count = mp_count_text.toInt();
+
+    Gplayer.quick_slot_pageup_count = hp_count;
+    Gplayer.quick_slot_pagedown_count = mp_count;
 }
 
 

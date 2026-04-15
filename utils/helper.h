@@ -8,12 +8,15 @@
 #include "global/struct.h"
 #include <unordered_set>
 
-class Helper
+class Helper : public QObject
 {
+    Q_OBJECT
 public:
+    Helper();
+
     static void console(const QString& msg);
 
-    static void warning(QString msg);
+    void warning(QString msg);
 
     // 搜索Entity的子组件
     static quint64 findChild(quint64 parent, QString name);
@@ -33,16 +36,17 @@ public:
     static void posExists(std::vector<std::pair<float, float>> &move_pos_list,std::pair<float, float> pos);
 
     // 合并node节点(到达平台)
-    // static std::vector<LineSegment> mergeFootPoint(const std::vector<TargetPoints> &target_list);
     static std::unordered_map<int, std::vector<LineSegment>> mergeFootPoint(
         const std::unordered_map<int, std::vector<TargetPoints>> &target_list
     );
 
     // 合并node节点(到达攀爬)
-    // static std::vector<LineSegment> mergeClimbPoint(const std::vector<TargetPoints>& target_list);
     static std::unordered_map<int, std::vector<LineSegment>> mergeClimbPoint(
         const std::unordered_map<int, std::vector<TargetPoints>> &target_list
     );
+
+signals:
+    void sendWarning(QString msg);
 };
 
 class DebugOutput

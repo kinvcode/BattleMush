@@ -18,10 +18,13 @@
 #include "widgets/hotkeyedit.h"
 #include "utils/helper.h"
 #include "driver/mem.h"
+#include "utils/gamestruct.h"
 #include "widgets/alertwindow.h"
 
 // 测试头文件
 #include "global/globalplayer.h"
+
+using namespace Mem;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -609,5 +612,53 @@ void MainWindow::on_lineEdit_atk_range_skill1_y_editingFinished()
 void MainWindow::on_pushButton_waring_alert_clicked()
 {
     warning("蓝药数量不足！");
+}
+
+
+void MainWindow::on_pushButton_print_ui_child_clicked()
+{
+    // 检测游戏是否存在
+    Gplayer.p_gamepid = MSDriverPRO::getPid("msw.exe");
+
+    if(Gplayer.p_gamepid == 0){
+        DebugOutput::out("游戏进程不存在");
+        Helper::console("游戏进程不存在");
+        return;
+    }
+
+    DebugOutput::out("游戏进程:" + QString::number(Gplayer.p_gamepid));
+    Gplayer.p_assemblybase = MSDriverPRO::getModuleAddr(Gplayer.p_gamepid, "GameAssembly.dll");
+    DebugOutput::out("模块基址:" + QString::number(Gplayer.p_assemblybase, 16).toUpper());
+
+    Gplayer.p_gamecontext_entries = readPointer(Gplayer.p_assemblybase,
+                                                BASE::ClientCoreThreadManager_base,
+                                                BASE::ClientCoreThreadManager_offset_lv1,
+                                                BASE::ClientCoreThreadManager_offset_lv2,
+                                                BASE::ClientCoreThreadManager_GameDictionary,
+                                                BASE::Dictionary::InternalArray_entries);
+    Gplayer.p_gamecontext = readPointer(Gplayer.p_gamecontext_entries, BASE::InternalArray::Head + 0x10);
+    DebugOutput::out("GameContext:" + QString::number(Gplayer.p_gamecontext, 16).toUpper());
+    // 检测是否已经进入游戏
+    if(Gplayer.p_gamecontext == 0){
+        // 尚未进入游戏，
+        DebugOutput::out("等待进入游戏中...");
+        Helper::console("等待进入游戏中...");
+        return;
+    }
+
+    // 游戏重要的两个模块：地图和UI
+    Gplayer.p_mapsentity = readPointer(Gplayer.p_gamecontext, BASE::GameContext::MapsEntity);
+    DebugOutput::out("mapsentity:" + QString::number(Gplayer.p_mapsentity, 16).toUpper());
+
+    Gplayer.p_uientity = readPointer(Gplayer.p_gamecontext, BASE::GameContext::UIEntity);
+    DebugOutput::out("uientity:" + QString::number(Gplayer.p_uientity, 16).toUpper());
+
+    ///
+    ///
+
+    GameStruct::printEntityChild(Gplayer.p_uientity);
+
+
+
 }
 
