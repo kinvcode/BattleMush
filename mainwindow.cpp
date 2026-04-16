@@ -156,6 +156,19 @@ void MainWindow::initCompomentUI()
     ui->tableWidget->setColumnWidth(3, 145);
     ui->tableWidget->setColumnWidth(4, 205);
 
+    // 计划任务监控
+    ui->label_task_id_label->setProperty("class","task-key");
+    ui->label_task_type_label->setProperty("class","task-key");
+    ui->label_task_op1_label->setProperty("class","task-key");
+    ui->label_task_op2_label->setProperty("class","task-key");
+    ui->label_task_time_label->setProperty("class","task-key");
+    ui->label_task_id_text->setProperty("class","task-value");
+    ui->label_task_type_text->setProperty("class","task-value");
+    ui->label_task_op1_text->setProperty("class","task-value");
+    ui->label_task_op2_text->setProperty("class","task-value");
+    ui->label_task_time_text->setProperty("class","task-value");
+
+
     // 重新设置样式表
     qApp->setStyleSheet(qApp->styleSheet());
 }
@@ -430,11 +443,19 @@ void MainWindow::updateCompoment(bool status)
 
 void MainWindow::updateTaskMonitor(const TaskInfo &task)
 {
-    qDebug() << "更新任务监控";
-    qDebug() << task.id;
-    qDebug() << task.type;
-    qDebug() << task.option1_label;
-    qDebug() << task.option1_text;
+    // qDebug() << "更新任务监控";
+    // qDebug() << task.id;
+    // qDebug() << task.type;
+    // qDebug() << task.option1_label;
+    // qDebug() << task.option1_text;
+
+    ui->label_task_id_text->setText(QString::number(task.id));
+    ui->label_task_type_text->setText(task.type);
+    ui->label_task_op1_label->setText(task.option1_label);
+    ui->label_task_op1_text->setText(task.option1_text);
+    ui->label_task_op2_label->setText(task.option2_label);
+    ui->label_task_op2_text->setText(task.option2_text);
+    ui->label_task_time_text->setText(task.excute_time);
 }
 
 void MainWindow::on_pushButton_get_user_pos_clicked()

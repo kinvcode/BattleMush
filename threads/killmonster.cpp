@@ -168,15 +168,14 @@ void KillMonster::process()
             m_task_timer.start();
         }else{
             int run_time = Gcontroller.m_tasks.at(m_task_id).runTime;
-            int excute_time = m_task_timer.elapsed();
+            int excute_time = m_task_timer.elapsed() / 1000;
             if(excute_time > run_time){
                 DebugOutput::out("计划任务已执行:" + QString::number(excute_time) + "秒");
                 DebugOutput::out("本次计划任务已执行完毕，即将进行下一个计划");
 
-                m_task_id = m_task_id + 1;
+                m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 2) ? 0 : m_task_id + 1;
                 m_task_timer.restart();
                 m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
-
                 continue;
             }
         }
@@ -184,11 +183,12 @@ void KillMonster::process()
         TaskInfo task_info;
         task_info.id = m_task_id;
 
-        m_task_excute_time = m_task_timer.elapsed();
+        m_task_excute_time = m_task_timer.elapsed() / 1000;
         task_info.excute_time = Helper::timestampToHI(m_task_excute_time);
 
         if(m_task_type == 0){
-            task_info.option1_label = "刷图";
+            task_info.type = "刷图";
+            task_info.option1_label = "地图";
 
             int map_index = Gcontroller.m_tasks.at(m_task_id).option1_key;
             int path_index = Gcontroller.m_tasks.at(m_task_id).option2_key;
@@ -220,13 +220,13 @@ void KillMonster::process()
             // 执行路线刷图
             excutePlatformSequence();
         }else if(m_task_type == 1){
-            m_task_id = m_task_id + 1;
+            m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 2) ? 0 : m_task_id + 1;
             m_task_timer.restart();
             m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
 
             DebugOutput::out("暂不支持【休息】类型计划任务~,即将跳过此任务");
         }else if(m_task_type == 2){
-            m_task_id = m_task_id + 1;
+            m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 2) ? 0 : m_task_id + 1;
             m_task_timer.restart();
             m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
 
