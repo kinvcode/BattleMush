@@ -12,6 +12,7 @@
 #include <cstdio>
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include <QTime>
 
 #define COLOR_CLIMB cv::Vec3b(0,0xFF,00)
 #define COLOR_LINE cv::Vec3b(0,0,0)
@@ -185,5 +186,25 @@ typedef struct {
     int type; // 攻击方式 0普通攻击 1技能攻击1
     cv::Point range; // 攻击范围
 }AttackInfo;
+
+// ====== 计划任务 ======
+
+enum TaskType
+{
+    CleanRoom = 0,  // 刷图
+    Rest = 1,   // 休息
+    Quest = 2    // 任务
+};
+
+typedef struct
+{
+    int id;
+    TaskType type;
+    QString option1;
+    QString option2;
+    QTime runTime;
+}Task;
+
+
 
 #endif // STRUCT_H

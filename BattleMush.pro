@@ -65,7 +65,8 @@ SOURCES += \
     utils/mapserializer.cpp \
     widgets/alertwindow.cpp \
     widgets/hotkeyedit.cpp \
-    widgets/noticewidget.cpp
+    widgets/noticewidget.cpp \
+    widgets/taskeditdialog.cpp
 
 HEADERS += \
     driver/mem.h \
@@ -98,9 +99,11 @@ HEADERS += \
     vmp/VMProtectSDK.h \
     widgets/alertwindow.h \
     widgets/hotkeyedit.h \
-    widgets/noticewidget.h
+    widgets/noticewidget.h \
+    widgets/taskeditdialog.h
 
 FORMS += \
+    TaskEditDialog.ui \
     mainwindow.ui
 
 

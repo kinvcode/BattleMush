@@ -7,6 +7,7 @@
 #include "threads/threadmanager.h"
 #include "widgets/alertwindow.h"
 #include <QPointer>
+#include "global/struct.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -25,6 +26,7 @@ public:
     ThreadManager* m_threadManager;
     QPointer<AlertWindow> m_alert;  // 警报组件指针
     static MainWindow* getInstance();  // 单例模式
+    std::vector<Task> m_tasks; // 计划任务
 private:
     Ui::MainWindow *ui;
     LogViewer* logger = nullptr;
@@ -43,7 +45,6 @@ private:
     void showNotice(const QString& message);
     // 加载驱动
     void loadDriver();
-    // initCompoment();
     void initCompomentUI();
     void initConfig();
     void initDir();
@@ -107,6 +108,12 @@ private slots:
 
     void on_pushButton_show_room_map_name_clicked();
 
+    void on_pushButton_add_plan_clicked();
+
+    void on_tableWidget_cellDoubleClicked(int row, int column);
+
+    void on_tableWidget_customContextMenuRequested(const QPoint &pos);
+
 public slots:
     void console(QString msg);
     void warning(QString msg);
@@ -114,5 +121,11 @@ public slots:
     void updateCompoment(bool status);
 signals:
     void saveConfig();
+
+    // 普通函数
+private:
+    void refreshTable();
+    void deletePlanRow(int row);
+    void editPlanRow(int row);
 };
 #endif // MAINWINDOW_H

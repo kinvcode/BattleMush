@@ -6,21 +6,20 @@
 #include <QGuiApplication>
 #include <QCursor>
 #include <QPoint>
+#include <QMenu>
 
 #include <vmp/VMProtectSDK.h>
 #include "driver/msdriverpro.h"
 #include "driver/driverload.h"
 #include "global/globalconfig.h"
 #include "global/gameoffset.h"
-#include "threads/healthmonitor.h"
-#include "threads/updategamedata.h"
-#include "threads/monitortooltest.h"
 #include "widgets/hotkeyedit.h"
 #include "utils/helper.h"
 #include "driver/mem.h"
 #include "utils/gamestruct.h"
 #include "widgets/alertwindow.h"
 #include <QGraphicsScene>
+#include "widgets/taskeditdialog.h"
 
 // 测试头文件
 #include "global/globalplayer.h"
@@ -34,8 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    loadDriver();
-    // MSDriverPRO::keyboardClick(0x45);
+    // loadDriver(); // 调试
 
     // 初始化组件
     initCompomentUI();
@@ -121,8 +119,17 @@ void MainWindow::initCompomentUI()
     // ui->pushButton_2->setProperty("class","danger");
 
     // 表格
-    ui->tableWidget->setColumnCount(11);
-    ui->tableWidget->setHorizontalHeaderLabels({"怪物指针","怪物阵营", "怪物类型", "怪物代码","怪物名称","怪物血量","怪物坐标","宽度","高度","碰撞检测","建筑属性"});
+    ui->tableWidget->setColumnCount(5);
+    ui->tableWidget->setHorizontalHeaderLabels({"计划序号","计划类型", "选项1", "选项2","运行时间"});
+    ui->tableWidget->verticalHeader()->setVisible(false);
+    ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->tableWidget->setColumnWidth(0, 100);
+    ui->tableWidget->setColumnWidth(1, 100);
+    ui->tableWidget->setColumnWidth(2, 100);
+    ui->tableWidget->setColumnWidth(3, 100);
+    ui->tableWidget->setColumnWidth(4, 245);
 
     // 菜单
     ui->listWidget->setProperty("class","leftMenu");
@@ -130,7 +137,7 @@ void MainWindow::initCompomentUI()
     ui->listWidget->addItem(item1);
     QListWidgetItem *item2 = new QListWidgetItem(QIcon(":/assets/images/icons/setting.svg"), "信息");
     ui->listWidget->addItem(item2);
-    QListWidgetItem *item3 = new QListWidgetItem(QIcon(":/assets/images/icons/vip.svg"), "VIP");
+    QListWidgetItem *item3 = new QListWidgetItem(QIcon(":/assets/images/icons/vip.svg"), "计划");
     ui->listWidget->addItem(item3);
     QListWidgetItem *item4 = new QListWidgetItem(QIcon(":/assets/images/icons/sata.svg"), "功能");
     ui->listWidget->addItem(item4);
@@ -207,9 +214,6 @@ void MainWindow::initSinalBind()
 {
     // 连接配置信号槽
     connect(this, &MainWindow::saveConfig, &Gconfig, &GlobalConfig::updateConfig);
-
-    // 自动加蓝快捷键
-    // connect(ui->lineEdit_auto_add_mp_key, &HotkeyEdit::hotkeyChanged, this, &MainWindow::onHotkeyChanged);
 }
 
 void MainWindow::initThreads()
@@ -735,5 +739,151 @@ void MainWindow::on_pushButton_show_room_map_name_clicked()
 
     QString map_name = GameStruct::readEntityText(map_name_p);
     DebugOutput::out("地图名称" + map_name);
+}
+
+void MainWindow::refreshTable()
+{
+    ui->tableWidget->setRowCount(m_tasks.size());
+
+    for (int i = 0; i < m_tasks.size(); ++i)
+    {
+        const Task& t = m_tasks[i];
+
+        ui->tableWidget->setItem(i, 0, new QTableWidgetItem(QString::number(t.id)));
+
+        QString typeStr;
+        switch (t.type)
+        {
+        case TaskType::CleanRoom: typeStr = "刷图"; break;
+        case TaskType::Rest:  typeStr = "休息"; break;
+        case TaskType::Quest:  typeStr = "任务"; break;
+        }
+
+        // qDebug() << "类型:" << t.type;
+        // qDebug() << "选项1:" << t.option1;
+        // qDebug() << "选项2:" << t.option2;
+
+        ui->tableWidget->setItem(i, 1, new QTableWidgetItem(typeStr));
+        ui->tableWidget->setItem(i, 2, new QTableWidgetItem(t.option1));
+        ui->tableWidget->setItem(i, 3, new QTableWidgetItem(t.option2));
+        ui->tableWidget->setItem(i, 4, new QTableWidgetItem(t.runTime.toString("HH:mm:ss")));
+    }
+}
+
+void MainWindow::deletePlanRow(int row)
+{
+    // 确认对话框
+    QMessageBox::StandardButton reply = QMessageBox::question(
+        this,
+        "确认删除",
+        "确定要删除第 " + QString::number(row + 1) + " 行数据吗？",
+        QMessageBox::Yes | QMessageBox::No
+        );
+
+    if (reply == QMessageBox::Yes) {
+        ui->tableWidget->removeRow(row);
+        qDebug() << "删除了第" << row << "行";
+    }
+}
+
+void MainWindow::editPlanRow(int row)
+{
+    qDebug() << "编辑第" << row << "行";
+}
+
+
+void MainWindow::on_pushButton_add_plan_clicked()
+{
+    TaskEditDialog dlg(this);
+
+    if (dlg.exec() == QDialog::Accepted)
+    {
+        Task t = dlg.getTask();
+        m_tasks.push_back(t);
+        refreshTable();
+    }
+}
+
+void MainWindow::on_tableWidget_cellDoubleClicked(int row, int column)
+{
+    if (row < 0 || row >= m_tasks.size()) return;
+
+    TaskEditDialog dlg(this);
+    dlg.setTask(m_tasks[row]);
+
+    if (dlg.exec() == QDialog::Accepted)
+    {
+        m_tasks[row] = dlg.getTask();
+        refreshTable();
+    }
+}
+
+
+void MainWindow::on_tableWidget_customContextMenuRequested(const QPoint &pos)
+{
+    // 获取右键点击的行
+    QTableWidgetItem *item = ui->tableWidget->itemAt(pos);
+    if (item) {
+        int row = item->row();
+
+        // 创建菜单
+        QMenu menu(this);
+
+        QAction *deleteAction = menu.addAction("删除");
+        QAction *editAction = menu.addAction("编辑");
+        menu.addSeparator();
+        QAction *cancelAction = menu.addAction("取消");
+
+        // 显示菜单并获取选择的动作
+        QAction *selectedAction = menu.exec(ui->tableWidget->viewport()->mapToGlobal(pos));
+
+        if (selectedAction == deleteAction) {
+            deletePlanRow(row);
+        } else if (selectedAction == editAction) {
+            editPlanRow(row);
+        }
+    }
+}
+
+
+void MainWindow::on_pushButton_print_map_child_clicked()
+{
+    // 检测游戏是否存在
+    Gplayer.p_gamepid = MSDriverPRO::getPid("msw.exe");
+
+    if(Gplayer.p_gamepid == 0){
+        DebugOutput::out("游戏进程不存在");
+        Helper::console("游戏进程不存在");
+        return;
+    }
+
+    DebugOutput::out("游戏进程:" + QString::number(Gplayer.p_gamepid));
+    Gplayer.p_assemblybase = MSDriverPRO::getModuleAddr(Gplayer.p_gamepid, "GameAssembly.dll");
+    DebugOutput::out("模块基址:" + QString::number(Gplayer.p_assemblybase, 16).toUpper());
+
+    Gplayer.p_gamecontext_entries = readPointer(Gplayer.p_assemblybase,
+                                                BASE::ClientCoreThreadManager_base,
+                                                BASE::ClientCoreThreadManager_offset_lv1,
+                                                BASE::ClientCoreThreadManager_offset_lv2,
+                                                BASE::ClientCoreThreadManager_GameDictionary,
+                                                BASE::Dictionary::InternalArray_entries);
+    Gplayer.p_gamecontext = readPointer(Gplayer.p_gamecontext_entries, BASE::InternalArray::Head + 0x10);
+    DebugOutput::out("GameContext:" + QString::number(Gplayer.p_gamecontext, 16).toUpper());
+    // 检测是否已经进入游戏
+    if(Gplayer.p_gamecontext == 0){
+        // 尚未进入游戏，
+        DebugOutput::out("等待进入游戏中...");
+        Helper::console("等待进入游戏中...");
+        return;
+    }
+
+    // 游戏重要的两个模块：地图和UI
+    Gplayer.p_mapsentity = readPointer(Gplayer.p_gamecontext, BASE::GameContext::MapsEntity);
+    DebugOutput::out("mapsentity:" + QString::number(Gplayer.p_mapsentity, 16).toUpper());
+
+    Gplayer.p_uientity = readPointer(Gplayer.p_gamecontext, BASE::GameContext::UIEntity);
+    DebugOutput::out("uientity:" + QString::number(Gplayer.p_uientity, 16).toUpper());
+
+    GameStruct::printEntityChild(Gplayer.p_mapsentity);
 }
 

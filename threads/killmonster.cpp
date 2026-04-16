@@ -150,7 +150,7 @@ void KillMonster::process()
          *
         **/
 
-        int clean_line = 1; // 路线选择：0是固定的 自动路线
+        int clean_line = 0; // 路线选择：0是固定的 自动路线
 
         switch (clean_line) {
         case 1:
