@@ -3,6 +3,7 @@
 #include "global/globalplayer.h"
 #include "global/gameoffset.h"
 #include "driver/mem.h";
+#include "utils/helper.h"
 
 using namespace Mem;
 
@@ -159,7 +160,7 @@ void Controller::saveTaskConfig()
     config->setFilePath(config_path);
     config->m_jsonArray = task_list;
     config->saveArray();
-    qDebug() << "更新配置文件";
+    DebugOutput::out("更新计划任务配置文件");
 }
 
 void Controller::loadTaskConfig()
@@ -232,5 +233,12 @@ void Controller::loadTaskConfig()
         qDebug() << task.option2_key;
         qDebug() << task.option2_value;
         qDebug() << task.runTime;
+    }
+}
+
+void Controller::reSortTask()
+{
+    for(int i = 0; i < m_tasks.size(); i++){
+        m_tasks[i].id = i;
     }
 }

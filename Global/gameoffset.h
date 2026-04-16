@@ -6,7 +6,7 @@
 
 namespace BASE {
 
-    static int ClientCoreThreadManager_base = 0xA1E0AE0;
+    static int ClientCoreThreadManager_base = 0xA230ED8;
     static int ClientCoreThreadManager_offset_lv1 = 0xB8;
     static int ClientCoreThreadManager_offset_lv2 = 0x0;
     static int ClientCoreThreadManager_GameDictionary = 0x10;

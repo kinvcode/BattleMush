@@ -26,7 +26,6 @@ public:
     ThreadManager* m_threadManager;
     QPointer<AlertWindow> m_alert;  // 警报组件指针
     static MainWindow* getInstance();  // 单例模式
-    std::vector<Task> m_tasks; // 计划任务
 private:
     Ui::MainWindow *ui;
     LogViewer* logger = nullptr;
@@ -126,6 +125,8 @@ signals:
     void saveConfig();
 
     // 普通函数
+public:
+    void updateTaskMonitor(const TaskInfo &task);
 private:
     void refreshTable();
     void deletePlanRow(int row);

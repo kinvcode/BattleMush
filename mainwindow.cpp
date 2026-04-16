@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // loadDriver(); // 调试
+    loadDriver();
 
     // 初始化组件
     initCompomentUI();
@@ -428,6 +428,15 @@ void MainWindow::updateCompoment(bool status)
     ui->pushButton_start_play->style()->polish(ui->pushButton_start_play);
 }
 
+void MainWindow::updateTaskMonitor(const TaskInfo &task)
+{
+    qDebug() << "更新任务监控";
+    qDebug() << task.id;
+    qDebug() << task.type;
+    qDebug() << task.option1_label;
+    qDebug() << task.option1_text;
+}
+
 void MainWindow::on_pushButton_get_user_pos_clicked()
 {
     VMProtectBegin("__FUNCTION__");
@@ -803,14 +812,30 @@ void MainWindow::deletePlanRow(int row)
         );
 
     if (reply == QMessageBox::Yes) {
-        ui->tableWidget->removeRow(row);
         qDebug() << "删除了第" << row << "行";
+        Gcontroller.m_tasks.erase(Gcontroller.m_tasks.begin() + row);
+        Controller::reSortTask();
+        Controller::saveTaskConfig();
+        ui->tableWidget->removeRow(row);
+        refreshTable();
     }
 }
 
 void MainWindow::editPlanRow(int row)
 {
     qDebug() << "编辑第" << row << "行";
+
+    if (row < 0 || row >= Gcontroller.m_tasks.size()) return;
+
+    TaskEditDialog dlg(this);
+    dlg.setTask(Gcontroller.m_tasks[row]);
+
+    if (dlg.exec() == QDialog::Accepted)
+    {
+        Gcontroller.m_tasks[row] = dlg.getTask();
+        Controller::saveTaskConfig();
+        refreshTable();
+    }
 }
 
 

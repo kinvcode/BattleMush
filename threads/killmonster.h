@@ -27,9 +27,6 @@ private:
     // 当前地图
     quint64 m_currentmap = 0;
 
-    // 攻击范围
-    // cv::Point m_attack_range = {150, 40};
-
     // 地图开始索引
     int m_map_start = 0;
 
@@ -41,6 +38,14 @@ private:
 
     // 黑名单物品（已经找过的物品，用于过滤掉其他玩家的物品）
     std::unordered_set<quint64> m_black_item;
+
+    // 计划任务
+    bool m_task_running = false;
+    int m_task_id = 0; // 当前执行的任务ID
+    int m_task_type = 0; // 当前执行的任务类型
+    int m_task_excute_time = 0; // 当前任务执行的时间
+    std::vector<int> m_task_room_path; //当前执行的路径
+    QElapsedTimer m_task_timer; // 当前任务计时器
 
 private:
     int userX();
@@ -93,6 +98,8 @@ private:
     // 执行平台路线
     void excutePlatformSequence();
 
+// signals:
+    void sendTaskInfo(const TaskInfo &task);
 };
 
 #endif // KILLMONSTER_H

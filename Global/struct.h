@@ -207,6 +207,16 @@ typedef struct
     int runTime;
 }Task;
 
+typedef struct{
+    int id;
+    QString type;
+    QString option1_label;
+    QString option1_text;
+    QString option2_label;
+    QString option2_text;
+    QString excute_time;
+}TaskInfo;
+
 typedef struct {
     int id;
     QString name;

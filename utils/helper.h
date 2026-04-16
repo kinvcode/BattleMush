@@ -45,7 +45,8 @@ public:
         const std::unordered_map<int, std::vector<TargetPoints>> &target_list
     );
 
-    // 获取当前攻击范围
+    // 时间戳转【时分】
+    static QString timestampToHI(int timestamp);
 
 signals:
     void sendWarning(QString msg);
@@ -233,7 +234,10 @@ public:
 };
 
 
-
+class TaskTool{
+public:
+    static void taskTest();
+};
 
 
 

@@ -44,6 +44,8 @@ public:
     static void saveTaskConfig();
 
     static void loadTaskConfig();
+
+    static void reSortTask();
 };
 
 // 内联全局引用

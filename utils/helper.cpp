@@ -851,6 +851,15 @@ std::unordered_map<int, std::vector<LineSegment>> Helper::mergeClimbPoint(
     return line_set;
 }
 
+QString Helper::timestampToHI(int timestamp)
+{
+    int hours = timestamp / 3600;
+    int minutes = (timestamp % 3600) / 60;
+    return QString("%1小时:%2分钟")
+        .arg(hours, 2, 10, QChar('0'))
+        .arg(minutes, 2, 10, QChar('0'));
+}
+
 void Math::ComputeClimbRect(const ClimbOrigin *climb, FloatRect &climb_rect)
 {
     const float kHalf = 0.5f;

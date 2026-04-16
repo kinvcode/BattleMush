@@ -11,6 +11,7 @@
 #include "global/globalconfig.h"
 #include "pathfinding/moveplatform.h"
 #include "global/controller.h"
+#include "mainwindow.h"
 
 using namespace Mem;
 
@@ -82,6 +83,11 @@ void KillMonster::process()
     Gcontroller.m_attack_range_general = {atk_general_range_x, atk_general_range_y};
     Gcontroller.m_attack_range_skill1 = {atk_skill1_range_x, atk_skill1_range_y};
 
+    // 初始化任务
+    m_task_id = 0;
+    m_task_excute_time = 0;
+    m_task_running = false;
+
     // 模拟路线
     m_platform_sequence.index = 0;
     m_platform_sequence.platform_set = {2,3,4,5,6,7,8,9,10};
@@ -140,29 +146,92 @@ void KillMonster::process()
         // 检查键盘
         if ((GetKeyState(VK_NUMLOCK) & 1)) MSDriverPRO::keyboardClick(0x45);
 
-        /**
-         * 智能系统 -- 任务队列执行
-         * 任务类型 | 选项1 | 选项2 | 运行时间
-         * 刷图 | 地图 | 路线 | 分钟
-         * 休息 | 地图 | 位置 | 分钟
-         * 做任务 | 任务名称
-         *
-         *
-        **/
-
-        int clean_line = 0; // 路线选择：0是固定的 自动路线
-
-        switch (clean_line) {
-        case 1:
-            excutePlatformSequence();
-            break;
-        case 0:
-        default:
+        // 获取当前的任务
+        if(Gcontroller.m_tasks.empty())
+        {
+            DebugOutput::out("当前没有计划任务，即将执行智能路线模式");
             autoCleanLine();
-            break;
+            ProcessHelper::programDelay(100);
+            QApplication::processEvents();
+            continue;
         }
 
-        // autoCleanLine();
+        if(m_task_id >= Gcontroller.m_tasks.size()){
+            DebugOutput::out("计划任务ID错误，即将重置任务");
+            m_task_id = 0;
+            continue;
+        }
+
+        if(!m_task_running){
+            m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
+            m_task_running = true;
+            m_task_timer.start();
+        }else{
+            int run_time = Gcontroller.m_tasks.at(m_task_id).runTime;
+            int excute_time = m_task_timer.elapsed();
+            if(excute_time > run_time){
+                DebugOutput::out("计划任务已执行:" + QString::number(excute_time) + "秒");
+                DebugOutput::out("本次计划任务已执行完毕，即将进行下一个计划");
+
+                m_task_id = m_task_id + 1;
+                m_task_timer.restart();
+                m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
+
+                continue;
+            }
+        }
+
+        TaskInfo task_info;
+        task_info.id = m_task_id;
+
+        m_task_excute_time = m_task_timer.elapsed();
+        task_info.excute_time = Helper::timestampToHI(m_task_excute_time);
+
+        if(m_task_type == 0){
+            task_info.option1_label = "刷图";
+
+            int map_index = Gcontroller.m_tasks.at(m_task_id).option1_key;
+            int path_index = Gcontroller.m_tasks.at(m_task_id).option2_key;
+
+            // 读取地图
+            MapRoomPath task_map = Gcontroller.m_clean_room_list.at(map_index);
+            task_info.option1_text = task_map.name;
+
+            // 当前地图UUID
+            if(Gplayer.curmapinfo.id != task_map.uuid){
+                // 前往该地图
+                // moveToRoomByUUID(task_map.uuid);
+
+                DebugOutput::out("暂不支持自动前往的地图:" + task_map.name);
+                DebugOutput::out("请手动前往该地图！");
+                ProcessHelper::programDelay(5000);
+                QApplication::processEvents();
+                continue;
+            }
+
+            // 读取路线
+            m_task_room_path = task_map.paths.at(path_index).platforms;
+            task_info.option2_label = "路线";
+            task_info.option2_text = task_map.paths.at(path_index).name;
+
+            // 更新任务信息
+            sendTaskInfo(task_info);
+
+            // 执行路线刷图
+            excutePlatformSequence();
+        }else if(m_task_type == 1){
+            m_task_id = m_task_id + 1;
+            m_task_timer.restart();
+            m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
+
+            DebugOutput::out("暂不支持【休息】类型计划任务~,即将跳过此任务");
+        }else if(m_task_type == 2){
+            m_task_id = m_task_id + 1;
+            m_task_timer.restart();
+            m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
+
+            DebugOutput::out("暂不支持【NPC任务】类型计划任务~,即将跳过此任务");
+        }
 
         DebugOutput::out("即将进行下一轮找怪");
         ProcessHelper::programDelay(100);
@@ -630,6 +699,11 @@ void KillMonster::excutePlatformSequence()
             }
         }
     }
+}
+
+void KillMonster::sendTaskInfo(const TaskInfo &task)
+{
+    MainWindow::getInstance()->updateTaskMonitor(task);
 }
 
 
