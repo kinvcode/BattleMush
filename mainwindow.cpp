@@ -7,12 +7,14 @@
 #include <QCursor>
 #include <QPoint>
 #include <QMenu>
+#include <QJsonArray>
 
 #include <vmp/VMProtectSDK.h>
 #include "driver/msdriverpro.h"
 #include "driver/driverload.h"
 #include "global/globalconfig.h"
 #include "global/gameoffset.h"
+#include "global/controller.h"
 #include "widgets/hotkeyedit.h"
 #include "utils/helper.h"
 #include "driver/mem.h"
@@ -118,26 +120,13 @@ void MainWindow::initCompomentUI()
 {
     // ui->pushButton_2->setProperty("class","danger");
 
-    // 表格
-    ui->tableWidget->setColumnCount(5);
-    ui->tableWidget->setHorizontalHeaderLabels({"计划序号","计划类型", "选项1", "选项2","运行时间"});
-    ui->tableWidget->verticalHeader()->setVisible(false);
-    ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-    ui->tableWidget->setColumnWidth(0, 100);
-    ui->tableWidget->setColumnWidth(1, 100);
-    ui->tableWidget->setColumnWidth(2, 100);
-    ui->tableWidget->setColumnWidth(3, 100);
-    ui->tableWidget->setColumnWidth(4, 245);
-
     // 菜单
     ui->listWidget->setProperty("class","leftMenu");
     QListWidgetItem *item1 = new QListWidgetItem(QIcon(":/assets/images/icons/home.svg"), "启动");
     ui->listWidget->addItem(item1);
-    QListWidgetItem *item2 = new QListWidgetItem(QIcon(":/assets/images/icons/setting.svg"), "信息");
+    QListWidgetItem *item2 = new QListWidgetItem(QIcon(":/assets/images/icons/setting.svg"), "计划");
     ui->listWidget->addItem(item2);
-    QListWidgetItem *item3 = new QListWidgetItem(QIcon(":/assets/images/icons/vip.svg"), "计划");
+    QListWidgetItem *item3 = new QListWidgetItem(QIcon(":/assets/images/icons/vip.svg"), "信息");
     ui->listWidget->addItem(item3);
     QListWidgetItem *item4 = new QListWidgetItem(QIcon(":/assets/images/icons/sata.svg"), "功能");
     ui->listWidget->addItem(item4);
@@ -154,12 +143,28 @@ void MainWindow::initCompomentUI()
     ui->pushButton_start_play->setDisabled(true);
     ui->pushButton_start_play->setProperty("class","start-play-btn");
 
+    // 计划任务表格
+    ui->tableWidget->setColumnCount(5);
+    ui->tableWidget->setHorizontalHeaderLabels({"序号","类型", "选项1", "选项2","运行时间"});
+    ui->tableWidget->verticalHeader()->setVisible(false);
+    ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->tableWidget->setColumnWidth(0, 50);
+    ui->tableWidget->setColumnWidth(1, 100);
+    ui->tableWidget->setColumnWidth(2, 145);
+    ui->tableWidget->setColumnWidth(3, 145);
+    ui->tableWidget->setColumnWidth(4, 205);
+
     // 重新设置样式表
     qApp->setStyleSheet(qApp->styleSheet());
 }
 
 void MainWindow::initConfig()
 {
+    // 任务队列初始化
+    initTask();
+
     // 按键绑定
     ui->lineEdit_bindkey_general_atk->m_config_path = "bindkey/general_atk";
     ui->lineEdit_bindkey_general_atk->m_currentKey = Gconfig.getValue("bindkey/general_atk").toInt();
@@ -242,6 +247,12 @@ void MainWindow::initThreads()
 
 
     console("启动所有线程");
+}
+
+void MainWindow::initTask()
+{
+    Controller::loadTaskConfig();
+    refreshTable();
 }
 
 void MainWindow::onStartAll()
@@ -743,30 +754,41 @@ void MainWindow::on_pushButton_show_room_map_name_clicked()
 
 void MainWindow::refreshTable()
 {
-    ui->tableWidget->setRowCount(m_tasks.size());
+    ui->tableWidget->setRowCount(Gcontroller.m_tasks.size());
 
-    for (int i = 0; i < m_tasks.size(); ++i)
+    for (int i = 0; i < Gcontroller.m_tasks.size(); ++i)
     {
-        const Task& t = m_tasks[i];
+        const Task& t = Gcontroller.m_tasks[i];
 
         ui->tableWidget->setItem(i, 0, new QTableWidgetItem(QString::number(t.id)));
 
         QString typeStr;
+        QTableWidgetItem *type_item = nullptr;
         switch (t.type)
         {
-        case TaskType::CleanRoom: typeStr = "刷图"; break;
-        case TaskType::Rest:  typeStr = "休息"; break;
-        case TaskType::Quest:  typeStr = "任务"; break;
+        case TaskType::CleanRoom:
+            typeStr = "刷图";
+            type_item = new QTableWidgetItem(typeStr);
+            type_item->setIcon(QIcon(":/assets/images/icons/1.svg"));
+            break;
+        case TaskType::Rest:
+            typeStr = "休息";
+            type_item = new QTableWidgetItem(typeStr);
+            type_item->setIcon(QIcon(":/assets/images/icons/2.svg"));
+            break;
+        case TaskType::Quest:
+            typeStr = "任务";
+            type_item = new QTableWidgetItem(typeStr);
+            type_item->setIcon(QIcon(":/assets/images/icons/4.svg"));
+            break;
         }
 
-        // qDebug() << "类型:" << t.type;
-        // qDebug() << "选项1:" << t.option1;
-        // qDebug() << "选项2:" << t.option2;
+        ui->tableWidget->setItem(i, 1, type_item);
+        ui->tableWidget->setItem(i, 2, new QTableWidgetItem(t.option1_value));
+        ui->tableWidget->setItem(i, 3, new QTableWidgetItem(t.option2_value));
 
-        ui->tableWidget->setItem(i, 1, new QTableWidgetItem(typeStr));
-        ui->tableWidget->setItem(i, 2, new QTableWidgetItem(t.option1));
-        ui->tableWidget->setItem(i, 3, new QTableWidgetItem(t.option2));
-        ui->tableWidget->setItem(i, 4, new QTableWidgetItem(t.runTime.toString("HH:mm:ss")));
+        QTime time = QTime::fromMSecsSinceStartOfDay(t.runTime * 1000);
+        ui->tableWidget->setItem(i, 4, new QTableWidgetItem(time.toString("HH:mm:ss")));
     }
 }
 
@@ -796,24 +818,29 @@ void MainWindow::on_pushButton_add_plan_clicked()
 {
     TaskEditDialog dlg(this);
 
+    Task new_task;
+    new_task.id = Gcontroller.m_tasks.size();
+    dlg.setTask(new_task);
     if (dlg.exec() == QDialog::Accepted)
     {
         Task t = dlg.getTask();
-        m_tasks.push_back(t);
+        Gcontroller.m_tasks.push_back(t);
+        Controller::saveTaskConfig();
         refreshTable();
     }
 }
 
 void MainWindow::on_tableWidget_cellDoubleClicked(int row, int column)
 {
-    if (row < 0 || row >= m_tasks.size()) return;
+    if (row < 0 || row >= Gcontroller.m_tasks.size()) return;
 
     TaskEditDialog dlg(this);
-    dlg.setTask(m_tasks[row]);
+    dlg.setTask(Gcontroller.m_tasks[row]);
 
     if (dlg.exec() == QDialog::Accepted)
     {
-        m_tasks[row] = dlg.getTask();
+        Gcontroller.m_tasks[row] = dlg.getTask();
+        Controller::saveTaskConfig();
         refreshTable();
     }
 }

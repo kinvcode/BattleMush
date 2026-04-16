@@ -50,6 +50,7 @@ private:
     void initDir();
     void initSinalBind();
     void initThreads();
+    void initTask();
 
 private slots:
 
@@ -113,6 +114,8 @@ private slots:
     void on_tableWidget_cellDoubleClicked(int row, int column);
 
     void on_tableWidget_customContextMenuRequested(const QPoint &pos);
+
+    void on_pushButton_print_map_child_clicked();
 
 public slots:
     void console(QString msg);

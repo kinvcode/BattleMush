@@ -4,6 +4,7 @@
 #include <QFile>
 #include "keyboard/nativeeventfilter.h"
 #include <windows.h>
+#include "global/controller.h"
 
 void setStyle(const QString &style);
 
@@ -15,9 +16,10 @@ int main(int argc, char *argv[])
     // 设置全局样式表
     setStyle(":assets/qss/com.qss");
 
+    // 初始化地图列表
+    Controller::initTaskList();
+
     // 主窗口
-    // MainWindow mainWindow;
-    // mainWindow.show();
     MainWindow* mainWindow =MainWindow::getInstance();
     mainWindow->show();
 

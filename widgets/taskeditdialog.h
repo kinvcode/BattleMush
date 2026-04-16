@@ -24,11 +24,24 @@ private slots:
 
     void on_pushButton_cancel_clicked();
 
+    void on_comboOption1_currentIndexChanged(int index);
+
+// ====== 成员变量 ======
+private:
+    // std::vector<MapRoomPath> m_clean_room_list;
+    // std::vector<MapRoomPath> m_rest_point_list;
 private:
     Ui::TaskEditDialog *ui;
     bool m_is_add;
     void initCompomentUI();
+    void initData();
 
+    void flushCleanRoomOption(); // 刷图列表
+    void flushRestOption(); // 休息列表
+    void flushQuestOption(); // 任务列表
+
+    void flushCleanRoomPath(int room_id);
+    void flushRestPoint(int rest_id);
 public:
     Task getTask() const;
 

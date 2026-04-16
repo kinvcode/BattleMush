@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QFile>
 #include <QVariant>
+#include <QJsonArray>
 
 class Config : public QObject
 {
@@ -23,9 +24,12 @@ public:
     bool contains(const QString& keyPath) const; // 检查是否包含键
 
     void save();  // 保存修改到文件
+    void saveArray();
     void load();  // 从文件加载数据
 
     QJsonObject m_jsonObject;
+
+    QJsonValue m_jsonArray;
 
     QJsonValue getValueHelper(const QStringList& keys, const QJsonObject& jsonObj) const;
 private:

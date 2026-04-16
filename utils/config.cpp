@@ -122,6 +122,20 @@ void Config::save()
     file.close();
 }
 
+void Config::saveArray()
+{
+    QFile file(m_filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning() << "Couldn't open file for writing:" << m_filePath;
+        return;
+    }
+
+    QJsonDocument doc;
+    doc.setArray(m_jsonArray.toArray());
+    file.write(doc.toJson());
+    file.close();
+}
+
 void Config::load()
 {
     QFile file(m_filePath);

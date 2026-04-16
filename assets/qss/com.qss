@@ -183,8 +183,8 @@ QTableView {
 QHeaderView::section {
     text-transform: uppercase;
     height: 36px;
-    background-color: #F5F5F5;
-    color: #5D5D5D;
+    background-color: #F8F8FF;
+    color: #013220;
     padding: 4px;
     border: none;
     border-right: 1px solid #E1E1E1;

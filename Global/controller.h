@@ -23,10 +23,27 @@ public:
 
     static cv::Point m_attack_range_skill1;
 
+    // 刷图地图列表
+    static std::vector<MapRoomPath> m_clean_room_list;
+
+    // 休息地图列表
+    static std::vector<MapRoomPath> m_rest_point_list;
+
+    // NPC任务列表
+    static std::vector<NPCQuest> m_quest_list;
+
+    // 计划列表
+    static std::vector<Task> m_tasks;
 
 // ====== 便捷函数 ======
 public:
     static void updateAttackInfo();
+
+    static void initTaskList();
+
+    static void saveTaskConfig();
+
+    static void loadTaskConfig();
 };
 
 // 内联全局引用

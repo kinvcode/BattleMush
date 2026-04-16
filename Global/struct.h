@@ -200,11 +200,37 @@ typedef struct
 {
     int id;
     TaskType type;
-    QString option1;
-    QString option2;
-    QTime runTime;
+    int option1_key;
+    QString option1_value;
+    int option2_key;
+    QString option2_value;
+    int runTime;
 }Task;
 
+typedef struct {
+    int id;
+    QString name;
+    std::vector<int> platforms;
+}RoomPath;
+
+typedef struct{
+    int id;
+    QString name;
+    int platform;
+}RoomRest;
+
+typedef struct {
+    int id;
+    QString name;
+    QString uuid;
+    std::vector<RoomPath> paths;
+    std::vector<RoomRest> rests;
+}MapRoomPath;
+
+typedef struct{
+    int id;
+    QString name;
+}NPCQuest;
 
 
 #endif // STRUCT_H
