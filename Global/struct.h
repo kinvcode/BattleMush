@@ -242,5 +242,9 @@ typedef struct{
     QString name;
 }NPCQuest;
 
+typedef struct{
+    int buff1;
+}SkillRecast;
+
 
 #endif // STRUCT_H

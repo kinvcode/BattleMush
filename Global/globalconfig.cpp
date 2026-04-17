@@ -61,6 +61,11 @@ void GlobalConfig::loadFromJson()
     atkrangeConfig["skill1_x"] = config->getValue("atk_range/skill1_x", atkrangeConfig["skill1_x"].toVariant()).toInt();
     atkrangeConfig["skill1_y"] = config->getValue("atk_range/skill1_y", atkrangeConfig["skill1_y"].toVariant()).toInt();
     data["atk_range"] = atkrangeConfig;
+
+    // 技能频率
+    QJsonObject atkRecast = data["atk_recast"].toObject();
+    atkRecast["buff1"] = config->getValue("atk_recast/buff1", atkrangeConfig["buff1"].toVariant()).toInt();
+    data["atk_recast"] = atkRecast;
 }
 
 QVariant GlobalConfig::getValue(const QString &keyPath, const QVariant& defaultValue) const

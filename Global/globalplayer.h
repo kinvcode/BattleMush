@@ -81,8 +81,8 @@ public:
     int MAX_MP = 0;
 
     // 快捷键物品数量
-    int quick_slot_pageup_count = 0;
-    int quick_slot_pagedown_count = 0;
+    int quick_slot_pageup_count = 999999;
+    int quick_slot_pagedown_count = 999999;
 
     // 用户绑定的按键
     BindKey m_bindkey; // 建议放到controller里面

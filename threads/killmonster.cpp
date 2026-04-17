@@ -54,6 +54,9 @@ void KillMonster::pause()
 void KillMonster::resume()
 {
     qDebug() << "KillMonster" << m_id << "resumed";
+
+    // m_timer.restart();
+
     Gplayer.m_bindkey.general_atk = Gconfig.getValue("bindkey/general_atk").toInt();
     Gplayer.m_bindkey.skill_atk1 = Gconfig.getValue("bindkey/skill_atk1").toInt();
     Gplayer.m_bindkey.jump = Gconfig.getValue("bindkey/jump").toInt();
@@ -65,12 +68,19 @@ void KillMonster::resume()
     int atk_skill1_range_y = Gconfig.getValue("atk_range/skill2_y").toInt();
     Gcontroller.m_attack_range_general = {atk_general_range_x, atk_general_range_y};
     Gcontroller.m_attack_range_skill1 = {atk_skill1_range_x, atk_skill1_range_y};
+
+    m_recast_buff1_keycode = Gconfig.getValue("bindkey/buff1").toInt();
+    m_recast_buff1_enable = Gconfig.getValue("atk_swtich/buff1").toBool();
+    m_recast_buff1_time = Gconfig.getValue("atk_recast/buff1").toInt();
+
 
     m_paused = false;
 }
 
 void KillMonster::process()
 {
+    m_timer.start();
+
     Gplayer.m_bindkey.general_atk = Gconfig.getValue("bindkey/general_atk").toInt();
     Gplayer.m_bindkey.skill_atk1 = Gconfig.getValue("bindkey/skill_atk1").toInt();
     Gplayer.m_bindkey.jump = Gconfig.getValue("bindkey/jump").toInt();
@@ -82,6 +92,9 @@ void KillMonster::process()
     int atk_skill1_range_y = Gconfig.getValue("atk_range/skill2_y").toInt();
     Gcontroller.m_attack_range_general = {atk_general_range_x, atk_general_range_y};
     Gcontroller.m_attack_range_skill1 = {atk_skill1_range_x, atk_skill1_range_y};
+
+    m_recast_buff1_keycode = Gconfig.getValue("bindkey/buff1").toInt();
+    m_recast_buff1_enable = Gconfig.getValue("atk_swtich/buff1").toBool();
 
     // 初始化任务
     m_task_id = 0;
@@ -90,7 +103,7 @@ void KillMonster::process()
 
     // 模拟路线
     m_platform_sequence.index = 0;
-    m_platform_sequence.platform_set = {2,3,4,5,6,7,8,9,10};
+    m_platform_sequence.platform_set = {};
 
     while (m_running) {
         // 处理暂停状态
@@ -216,10 +229,15 @@ void KillMonster::process()
 
             // 更新任务信息
             sendTaskInfo(task_info);
-            m_platform_sequence.platform_set = m_task_room_path;
-            m_platform_sequence.index = 0;
-            // 执行路线刷图
-            excutePlatformSequence();
+            // 默认第一条路线都是自动路线
+            if(path_index == 0){
+                autoCleanLine();
+            }else{
+                m_platform_sequence.platform_set = m_task_room_path;
+                m_platform_sequence.index = 0;
+                // 执行路线刷图
+                excutePlatformSequence();
+            }
         }else if(m_task_type == 1){
             m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
             m_task_timer.restart();
@@ -492,8 +510,42 @@ void KillMonster::reciveItem(const Item &target_item)
     }
 }
 
+void KillMonster::skillRecast()
+{
+    int now_time = m_timer.elapsed() / 1000;
+    qDebug() << "现在时间:" << now_time;
+    qDebug() << "上次释放时间" << m_recast_buff1_lasttime;
+    qDebug() << "释放频率" << m_recast_buff1_time;
+    qDebug() << "释放技能已过去" << (now_time - m_recast_buff1_lasttime);
+    if((now_time - m_recast_buff1_lasttime) > m_recast_buff1_time || m_recast_buff1_lasttime == 0){
+
+        DebugOutput::out("BUFF1已到释放时间，自动释放BUFF1");
+        Helper::console("BUFF1已到释放时间，自动释放BUFF1");
+
+        while(isAttaking()){
+            ProcessHelper::programDelay(50);
+            QApplication::processEvents();
+        }
+
+        MSDriverPRO::keyboardClick(m_recast_buff1_keycode, 1);
+        Helper::console("BUFF1已按");
+
+        m_recast_buff1_lasttime = m_timer.elapsed() / 1000;
+        // ProcessHelper::programDelay(1000);
+    }
+}
+
+bool KillMonster::isAttaking()
+{
+    return readByte(readLong(Gplayer.p_localplayer + BASE::MODEntity::StateComponent) + BASE::StateComponent::attacking) == 0;
+}
+
 void KillMonster::autoCleanLine()
 {
+
+    // 先检查BUFF
+    skillRecast();
+
     // 智能线路
     // 获取人物所在地板
     int user_in_lineid = userPlatform();
@@ -625,6 +677,9 @@ void KillMonster::excutePlatformSequence()
     if(m_paused){
         return;
     }
+
+    // 先检查BUFF
+    skillRecast();
 
     qDebug() << "当前路线节点索引：" << m_platform_sequence.index;
 

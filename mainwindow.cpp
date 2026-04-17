@@ -228,6 +228,9 @@ void MainWindow::initConfig()
     // 药水数量监控
     ui->checkBox_potion_num->setChecked(Gconfig.getValue("auto_add_health/potion_num_switch").toBool());
     ui->lineEdit_potion_num->setText(Gconfig.getValue("auto_add_health/potion_num").toString());
+
+    // 技能释放频率
+    ui->lineEdit_recast_buff1->setText(Gconfig.getValue("atk_recast/buff1").toString());
 }
 
 void MainWindow::initDir()
@@ -1012,6 +1015,23 @@ void MainWindow::on_checkBox_atk_switch_buff1_stateChanged(int arg1)
     }else{
         showNotice("BUFF1已关闭");
         Gconfig.setValue("atk_swtich/buff1", false);
+    }
+}
+
+
+void MainWindow::on_lineEdit_recast_buff1_editingFinished()
+{
+    QString text = ui->lineEdit_recast_buff1->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 3600) {
+        // 校验通过
+        showNotice("BUFF1释放频率已保存");
+        Gconfig.setValue("atk_recast/buff1", value);
+    } else {
+        showNotice("无效数值，请输入1-3600之间的数字");
+        ui->lineEdit_recast_buff1->setText("");  // 清空内容
     }
 }
 

@@ -42,6 +42,10 @@ public:
         {"skill1_y",40},
         }
     },
+    {"atk_recast",QJsonObject{
+        {"buff1",60}
+        }
+    },
     {"model","uplevel"}
 };
 

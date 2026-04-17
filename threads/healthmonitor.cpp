@@ -6,6 +6,7 @@
 #include "utils/helper.h"
 #include "global/gameoffset.h"
 #include "driver/mem.h"
+#include "global/controller.h"
 
 using namespace Mem;
 
@@ -48,6 +49,7 @@ void HealthMonitor::pause()
 void HealthMonitor::resume()
 {
     qDebug() << "HealthMonitor" << m_id << "resumed";
+
     m_hp_key_code = Gconfig.getValue("auto_add_health/hp_key").toInt();
     m_mp_key_code = Gconfig.getValue("auto_add_health/mp_key").toInt();
     m_paused = false;
@@ -79,6 +81,8 @@ void HealthMonitor::process()
         // 检测血量
         bool add_hp = Gconfig.getValue("auto_add_health/add_hp").toBool();
         bool add_mp = Gconfig.getValue("auto_add_health/add_mp").toBool();
+        bool potion_monitor = Gconfig.getValue("auto_add_health/potion_num_switch").toBool();
+
         if(add_hp){
             int hp_rate = Gconfig.getValue("auto_add_health/hp_rate").toInt();
             if(Gplayer.MAX_HP != 0 && Gplayer.HP < Gplayer.MAX_HP){
@@ -116,30 +120,33 @@ void HealthMonitor::process()
 
 
         // 检测药水数量
-        if(Gplayer.MAX_HP != 0 && Gplayer.MAX_MP != 0){
-            if(Gplayer.quick_slot_pageup_count < 10){
+        if(potion_monitor){
+            int potion_num = Gconfig.getValue("auto_add_health/potion_num").toInt();
+            if(Gplayer.MAX_HP != 0 && Gplayer.MAX_MP != 0){
+                if(Gplayer.quick_slot_pageup_count < potion_num){
 
-                if(!Gplayer.show_warning){
-                    Helper heler_tool;
-                    heler_tool.warning("血药数量不足10个");
+                    if(!Gplayer.show_warning){
+                        Helper heler_tool;
+                        heler_tool.warning("血药数量不足"+QString::number(potion_num)+"个");
+                    }
+
+                    DebugOutput::out("血药数量不足10个！");
+                    ProcessHelper::programDelay(1000);
+                    QApplication::processEvents();
+                    continue;
                 }
 
-                DebugOutput::out("血药数量不足10个！");
-                ProcessHelper::programDelay(1000);
-                QApplication::processEvents();
-                continue;
-            }
+                if(Gplayer.quick_slot_pagedown_count < potion_num){
+                    if(!Gplayer.show_warning){
+                        Helper heler_tool;
+                        heler_tool.warning("蓝药数量不足"+QString::number(potion_num)+"个");
+                    }
 
-            if(Gplayer.quick_slot_pagedown_count < 10){
-                if(!Gplayer.show_warning){
-                    Helper heler_tool;
-                    heler_tool.warning("蓝药数量不足10个");
+                    DebugOutput::out("蓝药数量不足10个！");
+                    ProcessHelper::programDelay(1000);
+                    QApplication::processEvents();
+                    continue;
                 }
-
-                DebugOutput::out("蓝药数量不足10个！");
-                ProcessHelper::programDelay(1000);
-                QApplication::processEvents();
-                continue;
             }
         }
 
@@ -148,4 +155,9 @@ void HealthMonitor::process()
     }
 
     qDebug() << "HealthMonitor" << m_id << "finished";
+}
+
+bool HealthMonitor::isAttaking()
+{
+    return readByte(readLong(Gplayer.p_localplayer + BASE::MODEntity::StateComponent) + BASE::StateComponent::attacking) == 0;
 }

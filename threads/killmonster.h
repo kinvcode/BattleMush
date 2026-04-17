@@ -47,6 +47,13 @@ private:
     std::vector<int> m_task_room_path; //当前执行的路径
     QElapsedTimer m_task_timer; // 当前任务计时器
 
+    // 技能频率
+    QElapsedTimer m_timer; // 当前线程计时器
+    bool m_recast_buff1_enable = false;
+    int m_recast_buff1_time;
+    int m_recast_buff1_lasttime = 0;
+    int m_recast_buff1_keycode;
+
 private:
     int userX();
 
@@ -82,6 +89,10 @@ private:
     // 拾取物品
     void reciveItem(const Item &target_item);
 
+    // 技能频率
+    void skillRecast();
+
+    bool isAttaking();
 
 // 刷图线路
 private:

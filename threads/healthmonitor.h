@@ -25,6 +25,8 @@ private:
 
     int m_hp_key_code;
     int m_mp_key_code;
+
+    bool isAttaking();
 };
 
 #endif // HEALTHMONITOR_H
