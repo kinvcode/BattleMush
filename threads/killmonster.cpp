@@ -513,10 +513,10 @@ void KillMonster::reciveItem(const Item &target_item)
 void KillMonster::skillRecast()
 {
     int now_time = m_timer.elapsed() / 1000;
-    qDebug() << "现在时间:" << now_time;
-    qDebug() << "上次释放时间" << m_recast_buff1_lasttime;
-    qDebug() << "释放频率" << m_recast_buff1_time;
-    qDebug() << "释放技能已过去" << (now_time - m_recast_buff1_lasttime);
+    // qDebug() << "现在时间:" << now_time;
+    // qDebug() << "上次释放时间" << m_recast_buff1_lasttime;
+    // qDebug() << "释放频率" << m_recast_buff1_time;
+    // qDebug() << "释放技能已过去" << (now_time - m_recast_buff1_lasttime);
     if((now_time - m_recast_buff1_lasttime) > m_recast_buff1_time || m_recast_buff1_lasttime == 0){
 
         DebugOutput::out("BUFF1已到释放时间，自动释放BUFF1");

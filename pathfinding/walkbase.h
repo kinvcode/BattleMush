@@ -22,7 +22,7 @@ public:
 
     bool runY();
 
-    void clearMonster(Monster monster);
+    void clearMonster(const Monster &monster);
 
     bool moveToItem();
 
@@ -41,14 +41,18 @@ private:
 
     bool isAttaking();
 
+    bool isFaceLeft();
+
+    bool monsterExists(const Monster &monster);
+
     // 找怪的函数
 private:
     // quint64 m_entity_head = 0;
     // cv::Point m_skill_range = {150,40}; // 这里实际会被上层的清怪线程参数覆盖
 
-    cv::Point monsterInRange(bool is_left, int &start_index);
+    Monster monsterInRange(bool is_left, int &start_index);
 
-    void attackMonster(cv::Point user_pos, cv::Point monster_pos);
+    void attackMonster(cv::Point user_pos, const Monster &monster);
 };
 
 #endif // WALKBASE_H

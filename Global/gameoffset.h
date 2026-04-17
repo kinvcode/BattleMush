@@ -68,6 +68,7 @@ namespace BASE {
     namespace MODEntity{
         static int MapComponent = 0x70;
         static int TileMapComponent = 0x88;
+        static int MovementComponent = 0xC0;
         static int ClimbableComponent = 0xC8;
         static int StateComponent = 0xF0;
         static int ButtonComponent = 0x140;
@@ -116,6 +117,10 @@ namespace BASE {
         static int attachEntity = 0x110;
         static int airPos = 0x120;
         static int _Position = 0x1A4;
+    };
+
+    namespace MovementComponent{
+        static int faceLeft = 0x158;
     };
 
     namespace StateComponent{
