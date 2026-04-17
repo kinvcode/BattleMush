@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>变色龙简易助手</string>
+   <string>华夏东海舰队 - 自由舰</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -39,17 +39,23 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1" rowspan="2">
+      <item row="0" column="2">
        <widget class="QTabWidget" name="tabWidget">
         <property name="enabled">
          <bool>true</bool>
         </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>600</height>
+         </size>
+        </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="tab_main">
          <attribute name="title">
-          <string>1</string>
+          <string>主页</string>
          </attribute>
          <widget class="QTextEdit" name="textEdit_log">
           <property name="geometry">
@@ -67,7 +73,7 @@
             <x>10</x>
             <y>10</y>
             <width>651</width>
-            <height>331</height>
+            <height>401</height>
            </rect>
           </property>
           <property name="verticalScrollBarPolicy">
@@ -83,9 +89,9 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-79</y>
+             <y>0</y>
              <width>635</width>
-             <height>748</height>
+             <height>399</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -102,13 +108,13 @@
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>330</height>
+                  <height>50</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>330</height>
+                  <height>85</height>
                  </size>
                 </property>
                 <property name="title">
@@ -142,505 +148,135 @@
                   <bool>false</bool>
                  </property>
                 </widget>
-                <widget class="QGroupBox" name="groupBox_6">
-                 <property name="geometry">
-                  <rect>
-                   <x>20</x>
-                   <y>90</y>
-                   <width>581</width>
-                   <height>221</height>
-                  </rect>
-                 </property>
-                 <property name="title">
-                  <string>计划任务监控</string>
-                 </property>
-                 <widget class="QWidget" name="formLayoutWidget">
-                  <property name="geometry">
-                   <rect>
-                    <x>10</x>
-                    <y>30</y>
-                    <width>561</width>
-                    <height>181</height>
-                   </rect>
-                  </property>
-                  <layout class="QFormLayout" name="formLayout">
-                   <item row="0" column="0">
-                    <widget class="QLabel" name="label_task_id_label">
-                     <property name="minimumSize">
-                      <size>
-                       <width>80</width>
-                       <height>30</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>计划序号</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="1">
-                    <widget class="QLabel" name="label_task_id_text">
-                     <property name="text">
-                      <string>无</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="0">
-                    <widget class="QLabel" name="label_task_type_label">
-                     <property name="minimumSize">
-                      <size>
-                       <width>80</width>
-                       <height>30</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>计划类型</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1">
-                    <widget class="QLabel" name="label_task_type_text">
-                     <property name="text">
-                      <string>无</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="0">
-                    <widget class="QLabel" name="label_task_op1_label">
-                     <property name="minimumSize">
-                      <size>
-                       <width>80</width>
-                       <height>30</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>选项1</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="1">
-                    <widget class="QLabel" name="label_task_op1_text">
-                     <property name="text">
-                      <string>无</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="3" column="0">
-                    <widget class="QLabel" name="label_task_op2_label">
-                     <property name="minimumSize">
-                      <size>
-                       <width>80</width>
-                       <height>30</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>选项2</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="3" column="1">
-                    <widget class="QLabel" name="label_task_op2_text">
-                     <property name="text">
-                      <string>无</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="4" column="0">
-                    <widget class="QLabel" name="label_task_time_label">
-                     <property name="minimumSize">
-                      <size>
-                       <width>80</width>
-                       <height>30</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>运行时间</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="4" column="1">
-                    <widget class="QLabel" name="label_task_time_text">
-                     <property name="text">
-                      <string>无</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
-                </widget>
                </widget>
               </item>
               <item>
-               <widget class="QGroupBox" name="groupBox_attack">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>120</height>
-                 </size>
-                </property>
+               <widget class="QGroupBox" name="groupBox_6">
                 <property name="title">
-                 <string>攻击范围</string>
+                 <string>计划任务监控</string>
                 </property>
-                <widget class="QWidget" name="horizontalLayoutWidget_3">
-                 <property name="geometry">
-                  <rect>
-                   <x>30</x>
-                   <y>70</y>
-                   <width>191</width>
-                   <height>31</height>
-                  </rect>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_3">
-                  <item>
-                   <widget class="QLabel" name="label_12">
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>技能攻击</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_14">
-                    <property name="text">
-                     <string>X</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="lineEdit_atk_range_skill1_x">
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_15">
-                    <property name="text">
-                     <string>Y</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="lineEdit_atk_range_skill1_y">
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-                <widget class="QWidget" name="horizontalLayoutWidget_4">
-                 <property name="geometry">
-                  <rect>
-                   <x>30</x>
-                   <y>30</y>
-                   <width>191</width>
-                   <height>31</height>
-                  </rect>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_4">
-                  <item>
-                   <widget class="QLabel" name="label_13">
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>普通攻击</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_16">
-                    <property name="text">
-                     <string>X</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="lineEdit_atk_range_general_x">
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_17">
-                    <property name="text">
-                     <string>Y</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="lineEdit_atk_range_general_y">
-                    <property name="maximumSize">
-                     <size>
-                      <width>50</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-               </widget>
-              </item>
-              <item>
-               <widget class="QGroupBox" name="groupBox_key_binding">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>140</height>
-                 </size>
-                </property>
-                <property name="title">
-                 <string>快捷键设置</string>
-                </property>
-                <widget class="QWidget" name="verticalLayoutWidget">
-                 <property name="geometry">
-                  <rect>
-                   <x>20</x>
-                   <y>30</y>
-                   <width>161</width>
-                   <height>71</height>
-                  </rect>
-                 </property>
-                 <layout class="QGridLayout" name="gridLayout_2">
-                  <item row="0" column="1">
-                   <widget class="HotkeyEdit" name="lineEdit_bindkey_general_atk">
-                    <property name="minimumSize">
-                     <size>
-                      <width>100</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="HotkeyEdit" name="lineEdit_bindkey_skill_atk1">
-                    <property name="minimumSize">
-                     <size>
-                      <width>100</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label">
-                    <property name="text">
-                     <string>普通攻击:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="label_8">
-                    <property name="text">
-                     <string>技能攻击:</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-                <widget class="QWidget" name="gridLayoutWidget">
-                 <property name="geometry">
-                  <rect>
-                   <x>200</x>
-                   <y>30</y>
-                   <width>141</width>
-                   <height>71</height>
-                  </rect>
-                 </property>
-                 <layout class="QGridLayout" name="gridLayout_3">
-                  <item row="0" column="1">
-                   <widget class="HotkeyEdit" name="lineEdit_bindkey_jump">
-                    <property name="minimumSize">
-                     <size>
-                      <width>100</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_9">
-                    <property name="text">
-                     <string>跳跃:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="0">
-                   <widget class="QLabel" name="label_10">
-                    <property name="text">
-                     <string>回城:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="HotkeyEdit" name="lineEdit_bindkey_gohome">
-                    <property name="minimumSize">
-                     <size>
-                      <width>100</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-                <widget class="QLabel" name="label_11">
-                 <property name="geometry">
-                  <rect>
-                   <x>20</x>
-                   <y>110</y>
-                   <width>321</width>
-                   <height>21</height>
-                  </rect>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">font: 350 14pt &quot;思源黑体&quot;;
-color: #FF5500;</string>
-                 </property>
-                 <property name="text">
-                  <string>蓝量低于10%使用普通攻击</string>
-                 </property>
-                </widget>
-               </widget>
-              </item>
-              <item>
-               <widget class="QGroupBox" name="HealthBox">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>120</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>120</height>
-                 </size>
-                </property>
-                <property name="title">
-                 <string>自动吃药</string>
-                </property>
-                <widget class="QWidget" name="horizontalLayoutWidget">
+                <widget class="QWidget" name="formLayoutWidget">
                  <property name="geometry">
                   <rect>
                    <x>10</x>
-                   <y>80</y>
-                   <width>351</width>
-                   <height>31</height>
-                  </rect>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout">
-                  <item>
-                   <widget class="QCheckBox" name="checkBox_auto_add_mp">
-                    <property name="text">
-                     <string>自动加蓝</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_3">
-                    <property name="text">
-                     <string>当蓝量降到</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="lineEdit_auto_add_mp_rate"/>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_5">
-                    <property name="text">
-                     <string>%，按</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="HotkeyEdit" name="lineEdit_auto_add_mp_key">
-                    <property name="minimumSize">
-                     <size>
-                      <width>100</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
-                <widget class="QWidget" name="horizontalLayoutWidget_2">
-                 <property name="geometry">
-                  <rect>
-                   <x>9</x>
                    <y>30</y>
-                   <width>351</width>
-                   <height>31</height>
+                   <width>561</width>
+                   <height>181</height>
                   </rect>
                  </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_2">
-                  <item>
-                   <widget class="QCheckBox" name="checkBox_auto_add_hp">
-                    <property name="text">
-                     <string>自动加血</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_6">
-                    <property name="text">
-                     <string>当血量降到</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLineEdit" name="lineEdit_auto_add_hp_rate"/>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_7">
-                    <property name="text">
-                     <string>%，按</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="HotkeyEdit" name="lineEdit_auto_add_hp_key">
+                 <layout class="QFormLayout" name="formLayout">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_task_id_label">
                     <property name="minimumSize">
                      <size>
-                      <width>100</width>
-                      <height>0</height>
+                      <width>80</width>
+                      <height>30</height>
                      </size>
+                    </property>
+                    <property name="text">
+                     <string>计划序号</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLabel" name="label_task_id_text">
+                    <property name="text">
+                     <string>无</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_task_type_label">
+                    <property name="minimumSize">
+                     <size>
+                      <width>80</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>计划类型</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLabel" name="label_task_type_text">
+                    <property name="text">
+                     <string>无</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="label_task_op1_label">
+                    <property name="minimumSize">
+                     <size>
+                      <width>80</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>选项1</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLabel" name="label_task_op1_text">
+                    <property name="text">
+                     <string>无</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="label_task_op2_label">
+                    <property name="minimumSize">
+                     <size>
+                      <width>80</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>选项2</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLabel" name="label_task_op2_text">
+                    <property name="text">
+                     <string>无</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0">
+                   <widget class="QLabel" name="label_task_time_label">
+                    <property name="minimumSize">
+                     <size>
+                      <width>80</width>
+                      <height>30</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>运行时间</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QLabel" name="label_task_time_text">
+                    <property name="text">
+                     <string>无</string>
                     </property>
                    </widget>
                   </item>
@@ -656,7 +292,7 @@ color: #FF5500;</string>
         </widget>
         <widget class="QWidget" name="tab_plan_sequence">
          <attribute name="title">
-          <string>3</string>
+          <string>计划</string>
          </attribute>
          <widget class="QTableWidget" name="tableWidget">
           <property name="geometry">
@@ -694,9 +330,459 @@ color: #FF5500;</string>
           </property>
          </widget>
         </widget>
+        <widget class="QWidget" name="tab_other">
+         <attribute name="title">
+          <string>配置</string>
+         </attribute>
+         <widget class="QScrollArea" name="scrollArea_2">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>10</y>
+            <width>651</width>
+            <height>531</height>
+           </rect>
+          </property>
+          <property name="widgetResizable">
+           <bool>true</bool>
+          </property>
+          <widget class="QWidget" name="scrollAreaWidgetContents_2">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>635</width>
+             <height>536</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QGroupBox" name="groupBox_attack_switch">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>120</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>120</height>
+               </size>
+              </property>
+              <property name="title">
+               <string>攻击开关</string>
+              </property>
+              <widget class="QWidget" name="verticalLayoutWidget_2">
+               <property name="geometry">
+                <rect>
+                 <x>9</x>
+                 <y>30</y>
+                 <width>181</width>
+                 <height>80</height>
+                </rect>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_5">
+                <item>
+                 <widget class="QCheckBox" name="checkBox">
+                  <property name="text">
+                   <string>普通攻击</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBox_2">
+                  <property name="text">
+                   <string>技能攻击</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBox_3">
+                  <property name="text">
+                   <string>BUFF</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_attack">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>120</height>
+               </size>
+              </property>
+              <property name="title">
+               <string>攻击范围</string>
+              </property>
+              <widget class="QWidget" name="horizontalLayoutWidget_3">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>70</y>
+                 <width>191</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QLabel" name="label_12">
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>技能攻击</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_14">
+                  <property name="text">
+                   <string>X</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_atk_range_skill1_x">
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_15">
+                  <property name="text">
+                   <string>Y</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_atk_range_skill1_y">
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="horizontalLayoutWidget_4">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>30</y>
+                 <width>191</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_4">
+                <item>
+                 <widget class="QLabel" name="label_13">
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>普通攻击</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_16">
+                  <property name="text">
+                   <string>X</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_atk_range_general_x">
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_17">
+                  <property name="text">
+                   <string>Y</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_atk_range_general_y">
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_key_binding">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>140</height>
+               </size>
+              </property>
+              <property name="title">
+               <string>快捷键设置</string>
+              </property>
+              <widget class="QWidget" name="verticalLayoutWidget">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>30</y>
+                 <width>161</width>
+                 <height>71</height>
+                </rect>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_2">
+                <item row="0" column="1">
+                 <widget class="HotkeyEdit" name="lineEdit_bindkey_general_atk">
+                  <property name="minimumSize">
+                   <size>
+                    <width>100</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="HotkeyEdit" name="lineEdit_bindkey_skill_atk1">
+                  <property name="minimumSize">
+                   <size>
+                    <width>100</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>普通攻击:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_8">
+                  <property name="text">
+                   <string>技能攻击:</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="gridLayoutWidget">
+               <property name="geometry">
+                <rect>
+                 <x>190</x>
+                 <y>30</y>
+                 <width>141</width>
+                 <height>71</height>
+                </rect>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_3">
+                <item row="0" column="1">
+                 <widget class="HotkeyEdit" name="lineEdit_bindkey_jump">
+                  <property name="minimumSize">
+                   <size>
+                    <width>100</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_9">
+                  <property name="text">
+                   <string>跳跃:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_10">
+                  <property name="text">
+                   <string>回城:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="HotkeyEdit" name="lineEdit_bindkey_gohome">
+                  <property name="minimumSize">
+                   <size>
+                    <width>100</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QLabel" name="label_11">
+               <property name="geometry">
+                <rect>
+                 <x>20</x>
+                 <y>110</y>
+                 <width>321</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">font: 350 14pt &quot;思源黑体&quot;;
+color: #FF5500;</string>
+               </property>
+               <property name="text">
+                <string>蓝量低于10%使用普通攻击</string>
+               </property>
+              </widget>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="HealthBox">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>120</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>120</height>
+               </size>
+              </property>
+              <property name="title">
+               <string>自动吃药</string>
+              </property>
+              <widget class="QWidget" name="horizontalLayoutWidget">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>80</y>
+                 <width>351</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout">
+                <item>
+                 <widget class="QCheckBox" name="checkBox_auto_add_mp">
+                  <property name="text">
+                   <string>自动加蓝</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_3">
+                  <property name="text">
+                   <string>当蓝量降到</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_auto_add_mp_rate"/>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_5">
+                  <property name="text">
+                   <string>%，按</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="HotkeyEdit" name="lineEdit_auto_add_mp_key">
+                  <property name="minimumSize">
+                   <size>
+                    <width>100</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="horizontalLayoutWidget_2">
+               <property name="geometry">
+                <rect>
+                 <x>9</x>
+                 <y>30</y>
+                 <width>351</width>
+                 <height>31</height>
+                </rect>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_2">
+                <item>
+                 <widget class="QCheckBox" name="checkBox_auto_add_hp">
+                  <property name="text">
+                   <string>自动加血</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_6">
+                  <property name="text">
+                   <string>当血量降到</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_auto_add_hp_rate"/>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_7">
+                  <property name="text">
+                   <string>%，按</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="HotkeyEdit" name="lineEdit_auto_add_hp_key">
+                  <property name="minimumSize">
+                   <size>
+                    <width>100</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+           <zorder>groupBox_attack</zorder>
+           <zorder>groupBox_key_binding</zorder>
+           <zorder>HealthBox</zorder>
+           <zorder>groupBox_attack_switch</zorder>
+          </widget>
+         </widget>
+        </widget>
         <widget class="QWidget" name="tab_info">
          <attribute name="title">
-          <string>2</string>
+          <string>信息</string>
          </attribute>
          <widget class="QGroupBox" name="groupBox">
           <property name="geometry">
@@ -950,24 +1036,6 @@ color: #FF5500;</string>
             <string>地图名称</string>
            </property>
           </widget>
-         </widget>
-        </widget>
-        <widget class="QWidget" name="tab_other">
-         <attribute name="title">
-          <string>4</string>
-         </attribute>
-         <widget class="QLabel" name="label_4">
-          <property name="geometry">
-           <rect>
-            <x>30</x>
-            <y>50</y>
-            <width>53</width>
-            <height>15</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>奔放中</string>
-          </property>
          </widget>
         </widget>
        </widget>

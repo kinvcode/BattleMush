@@ -126,9 +126,9 @@ void MainWindow::initCompomentUI()
     ui->listWidget->addItem(item1);
     QListWidgetItem *item2 = new QListWidgetItem(QIcon(":/assets/images/icons/setting.svg"), "计划");
     ui->listWidget->addItem(item2);
-    QListWidgetItem *item3 = new QListWidgetItem(QIcon(":/assets/images/icons/vip.svg"), "信息");
+    QListWidgetItem *item3 = new QListWidgetItem(QIcon(":/assets/images/icons/vip.svg"), "配置");
     ui->listWidget->addItem(item3);
-    QListWidgetItem *item4 = new QListWidgetItem(QIcon(":/assets/images/icons/sata.svg"), "功能");
+    QListWidgetItem *item4 = new QListWidgetItem(QIcon(":/assets/images/icons/sata.svg"), "数据");
     ui->listWidget->addItem(item4);
     ui->listWidget->setCurrentRow(0);
 
