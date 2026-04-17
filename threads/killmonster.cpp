@@ -173,7 +173,7 @@ void KillMonster::process()
                 DebugOutput::out("计划任务已执行:" + QString::number(excute_time) + "秒");
                 DebugOutput::out("本次计划任务已执行完毕，即将进行下一个计划");
 
-                m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 2) ? 0 : m_task_id + 1;
+                m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
                 m_task_timer.restart();
                 m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
                 continue;
@@ -216,17 +216,18 @@ void KillMonster::process()
 
             // 更新任务信息
             sendTaskInfo(task_info);
-
+            m_platform_sequence.platform_set = m_task_room_path;
+            m_platform_sequence.index = 0;
             // 执行路线刷图
             excutePlatformSequence();
         }else if(m_task_type == 1){
-            m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 2) ? 0 : m_task_id + 1;
+            m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
             m_task_timer.restart();
             m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
 
             DebugOutput::out("暂不支持【休息】类型计划任务~,即将跳过此任务");
         }else if(m_task_type == 2){
-            m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 2) ? 0 : m_task_id + 1;
+            m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
             m_task_timer.restart();
             m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
 
@@ -641,7 +642,7 @@ void KillMonster::excutePlatformSequence()
 
     user_in_lineid = userPlatform();
 
-    if(user_in_lineid == plat_id){
+    if(user_in_lineid == plat_id && plat_count > 1){
         m_platform_sequence.index = m_platform_sequence.index + 1;
         DebugOutput::out("人物平台与当前路线目标节点相同，即将前往下一个路线节点");
         return;
@@ -699,6 +700,16 @@ void KillMonster::excutePlatformSequence()
             }
         }
     }
+}
+
+void KillMonster::updateTaskID()
+{
+    if(Gcontroller.m_tasks.size() == 1){
+        m_task_id = 0;
+        return;
+    }
+    m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
+    return;
 }
 
 void KillMonster::sendTaskInfo(const TaskInfo &task)

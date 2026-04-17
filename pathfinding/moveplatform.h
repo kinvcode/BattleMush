@@ -21,7 +21,7 @@ public:
 
     static bool up(cv::Point range, int platform,bool self_climb = false);
 
-    static bool down(cv::Point range, int platform, bool is_climb = false, bool self_climb = false);
+    static bool down(cv::Point range, int platform, bool self_climb = false);
 
 private :
     static quint64 getUserFootholdP();

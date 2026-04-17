@@ -60,8 +60,8 @@ void Controller::initTaskList()
 
     RoomRest map0000_rest00;
     map0000_rest00.id = 0;
-    map0000_rest00.name = "【休息点A】左边第一根绳索";
-    map0000_rest00.platform = 0;
+    map0000_rest00.name = "【休息点A】左边第一平台";
+    map0000_rest00.platform = 1;
 
     RoomPath map0000_path00;
     map0000_path00.id = 0;
@@ -75,12 +75,12 @@ void Controller::initTaskList()
     RoomPath map0000_path02;
     map0000_path02.id = 2;
     map0000_path02.name = "【路线B】只刷上面一层";
-    map0000_path02.platforms = {0};
+    map0000_path02.platforms = {5};
 
     RoomPath map0000_path03;
     map0000_path03.id = 3;
     map0000_path03.name = "【路线C】上下两层循环刷";
-    map0000_path03.platforms = {0};
+    map0000_path03.platforms = {0,10,5};
 
     map0000.paths.push_back(map0000_path00);
     map0000.paths.push_back(map0000_path01);

@@ -98,6 +98,9 @@ private:
     // 执行平台路线
     void excutePlatformSequence();
 
+    // 更新计划任务ID
+    void updateTaskID();
+
 // signals:
     void sendTaskInfo(const TaskInfo &task);
 };

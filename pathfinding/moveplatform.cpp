@@ -128,7 +128,7 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform, bool is_town)
                         break;
                     case VISIT_TYPE::DOWN:
                         qDebug() << "向下可以到达目标攀爬体";
-                        if(down(target_pos, platform, true)){
+                        if(down(target_pos, platform, false)){
                             return true;
                         }
                         qDebug() << "向下未到目标攀爬体，即将尝试其他方式";
@@ -200,7 +200,7 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform, bool is_town)
                     break;
                 case VISIT_TYPE::DOWN:
                     qDebug() << "向下可以到达目标平台";
-                    if(down(target_pos, platform)){
+                    if(down(target_pos, platform, true)){
                         return true;
                     }
                     qDebug() << "向下未到目标平台，即将尝试其他方式";
@@ -470,19 +470,30 @@ bool MovePlatform::jumpDown(cv::Point range, int platform)
 
 bool MovePlatform::up(cv::Point range, int platform, bool self_climb)
 {
-    WalkBase walk_to_platform(0);
-    bool arrived = walk_to_platform.moveToPlatform(range, self_climb); // 走到范围
-    if(!arrived) return false;
-
     if(self_climb){
-        ProcessHelper::programDelay(100);
+        MSDriverPRO::keyboardDown(MSKeyboard_UpArrow);
+
+        quint64 foothold_p = getUserFootholdP();
+        quint64 climb_p = getUserClimbP();
+        while(foothold_p == 0 && climb_p != 0){
+            ProcessHelper::programDelay(50);
+            QApplication::processEvents();
+            climb_p = getUserClimbP();
+            foothold_p = getUserFootholdP();
+        }
+
+        MSDriverPRO::keyboardUp(MSKeyboard_UpArrow);
         if(platform == getUserPlatform()){
             qDebug() << "向上攀爬已到达指定平台";
             return true;
         }
 
     }else{
-        // 到达地点之后进行跳跃操作
+        WalkBase walk_to_platform(0);
+        bool arrived = walk_to_platform.moveToPlatform(range, self_climb); // 走到范围
+        if(!arrived) return false;
+
+        // 到达地点之后按上键
         MSDriverPRO::keyboardClick(MSKeyboard_UpArrow);
 
         ProcessHelper::programDelay(100);
@@ -507,14 +518,31 @@ bool MovePlatform::up(cv::Point range, int platform, bool self_climb)
     return false;
 }
 
-bool MovePlatform::down(cv::Point range, int platform, bool is_climb, bool self_climb)
+bool MovePlatform::down(cv::Point range, int platform, bool self_climb)
 {
-    WalkBase walk_to_platform(0);
-    bool arrived = walk_to_platform.moveToPlatform(range, self_climb); // 走到范围
-    if(!arrived) return false;
+    if(self_climb){
+        MSDriverPRO::keyboardDown(MSKeyboard_DownArrow);
 
-    if(is_climb){
-        // 到达地点之后进行跳跃操作
+        quint64 foothold_p = getUserFootholdP();
+        quint64 climb_p = getUserClimbP();
+        while(foothold_p == 0 && climb_p != 0){
+            ProcessHelper::programDelay(50);
+            QApplication::processEvents();
+            climb_p = getUserClimbP();
+            foothold_p = getUserFootholdP();
+        }
+
+        MSDriverPRO::keyboardUp(MSKeyboard_DownArrow);
+        if(platform == getUserPlatform()){
+            qDebug() << "向下攀爬已到达指定平台";
+            return true;
+        }
+    }else{
+        WalkBase walk_to_platform(0);
+        bool arrived = walk_to_platform.moveToPlatform(range, self_climb); // 走到范围
+        if(!arrived) return false;
+
+        // 到达地点之后按下方向键
         MSDriverPRO::keyboardClick(MSKeyboard_DownArrow);
 
         ProcessHelper::programDelay(100);
@@ -525,18 +553,6 @@ bool MovePlatform::down(cv::Point range, int platform, bool is_climb, bool self_
         }
         if(platform == getUserPlatform(true)){
             qDebug() << "向下已到达指定攀爬物";
-            return true;
-        }
-    }else{
-        quint64 foothold_p = getUserFootholdP();
-        while(foothold_p == 0){
-            ProcessHelper::programDelay(50);
-            QApplication::processEvents();
-            foothold_p = getUserFootholdP();
-        }
-
-        if(platform == getUserPlatform()){
-            qDebug() << "向下攀爬已到达指定平台";
             return true;
         }
     }
