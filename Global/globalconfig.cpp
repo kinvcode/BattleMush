@@ -25,6 +25,15 @@ void GlobalConfig::loadFromJson()
 
     // 加载配置
     config->load();
+
+    // 技能开关
+    QJsonObject atkSwitchConfig = data["atk_swtich"].toObject();
+    atkSwitchConfig["general"] = config->getValue("atk_swtich/general", atkSwitchConfig["general"].toVariant()).toBool();
+    atkSwitchConfig["skill1"] = config->getValue("atk_swtich/skill1", atkSwitchConfig["skill1"].toVariant()).toBool();
+    atkSwitchConfig["buff1"] = config->getValue("atk_swtich/buff1", atkSwitchConfig["buff1"].toVariant()).toBool();
+    data["atk_swtich"] = atkSwitchConfig;
+
+    // 监控血蓝
     QJsonObject healthConfig = data["auto_add_health"].toObject();
     healthConfig["add_hp"] = config->getValue("auto_add_health/add_hp", healthConfig["add_hp"].toVariant()).toBool();
     healthConfig["add_mp"] = config->getValue("auto_add_health/add_mp", healthConfig["add_mp"].toVariant()).toBool();
@@ -32,15 +41,20 @@ void GlobalConfig::loadFromJson()
     healthConfig["mp_rate"] = config->getValue("auto_add_health/mp_rate", healthConfig["mp_rate"].toVariant()).toInt();
     healthConfig["hp_key"] = config->getValue("auto_add_health/hp_key", healthConfig["hp_key"].toVariant()).toInt();
     healthConfig["mp_key"] = config->getValue("auto_add_health/mp_key", healthConfig["mp_key"].toVariant()).toInt();
+    healthConfig["potion_num_switch"] = config->getValue("auto_add_health/potion_num_switch", healthConfig["potion_num_switch"].toVariant()).toBool();
+    healthConfig["potion_num"] = config->getValue("auto_add_health/potion_num", healthConfig["potion_num"].toVariant()).toInt();
     data["auto_add_health"] = healthConfig;
 
+    // 快捷键绑定
     QJsonObject bindkeyConfig = data["bindkey"].toObject();
     bindkeyConfig["general_atk"] = config->getValue("bindkey/general_atk", bindkeyConfig["general_atk"].toVariant()).toInt();
     bindkeyConfig["skill_atk1"] = config->getValue("bindkey/skill_atk1", bindkeyConfig["skill_atk1"].toVariant()).toInt();
+    bindkeyConfig["buff1"] = config->getValue("bindkey/buff1", bindkeyConfig["buff1"].toVariant()).toInt();
     bindkeyConfig["jump"] = config->getValue("bindkey/jump", bindkeyConfig["jump"].toVariant()).toInt();
     bindkeyConfig["gohome"] = config->getValue("bindkey/gohome", bindkeyConfig["gohome"].toVariant()).toInt();
     data["bindkey"] = bindkeyConfig;
 
+    // 技能范围
     QJsonObject atkrangeConfig = data["atk_range"].toObject();
     atkrangeConfig["general_x"] = config->getValue("atk_range/general_x", atkrangeConfig["general_x"].toVariant()).toInt();
     atkrangeConfig["general_y"] = config->getValue("atk_range/general_y", atkrangeConfig["general_y"].toVariant()).toInt();

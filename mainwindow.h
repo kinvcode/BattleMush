@@ -66,10 +66,6 @@ private slots:
 
     void on_checkBox_auto_add_hp_stateChanged(int arg1);
 
-    void on_lineEdit_auto_add_hp_rate_textEdited(const QString &arg1);
-
-    void on_lineEdit_auto_add_mp_rate_textEdited(const QString &arg1);
-
 private slots:
     void onHotkeyChanged(int key);
 
@@ -115,6 +111,16 @@ private slots:
     void on_tableWidget_customContextMenuRequested(const QPoint &pos);
 
     void on_pushButton_print_map_child_clicked();
+
+    void on_checkBox_potion_num_stateChanged(int arg1);
+
+    void on_lineEdit_potion_num_editingFinished();
+
+    void on_checkBox_atk_switch_general_stateChanged(int arg1);
+
+    void on_checkBox_atk_switch_skill1_stateChanged(int arg1);
+
+    void on_checkBox_atk_switch_buff1_stateChanged(int arg1);
 
 public slots:
     void console(QString msg);

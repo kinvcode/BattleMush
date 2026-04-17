@@ -77,36 +77,43 @@ void HealthMonitor::process()
         }
 
         // 检测血量
-        int hp_rate = Gconfig.getValue("auto_add_health/hp_rate").toInt();
-        if(Gplayer.MAX_HP != 0 && Gplayer.HP < Gplayer.MAX_HP){
-            int cur_hp_rate = Gplayer.HP * 100 / Gplayer.MAX_HP;
-            if(cur_hp_rate <= hp_rate){
-                qDebug() << "当前血量：" << Gplayer.HP;
-                qDebug() << "当前最大血量：" << Gplayer.MAX_HP;
-                qDebug() << "触发阈值：" << hp_rate;
-                qDebug() << "当前比例" << cur_hp_rate;
+        bool add_hp = Gconfig.getValue("auto_add_health/add_hp").toBool();
+        bool add_mp = Gconfig.getValue("auto_add_health/add_mp").toBool();
+        if(add_hp){
+            int hp_rate = Gconfig.getValue("auto_add_health/hp_rate").toInt();
+            if(Gplayer.MAX_HP != 0 && Gplayer.HP < Gplayer.MAX_HP){
+                int cur_hp_rate = Gplayer.HP * 100 / Gplayer.MAX_HP;
+                if(cur_hp_rate <= hp_rate){
+                    qDebug() << "当前血量：" << Gplayer.HP;
+                    qDebug() << "当前最大血量：" << Gplayer.MAX_HP;
+                    qDebug() << "触发阈值：" << hp_rate;
+                    qDebug() << "当前比例" << cur_hp_rate;
 
-                DebugOutput::out("检测到血量低于安全值，自动加血");
-                Helper::console("检测到血量低于安全值，自动加血");
-                MSDriverPRO::keyboardClick(m_hp_key_code, 1);
-                ProcessHelper::programDelay(1000); // 防止加两次
+                    DebugOutput::out("检测到血量低于安全值，自动加血");
+                    Helper::console("检测到血量低于安全值，自动加血");
+                    MSDriverPRO::keyboardClick(m_hp_key_code, 1);
+                    ProcessHelper::programDelay(1000); // 防止加两次
+                }
             }
         }
 
-        int mp_rate = Gconfig.getValue("auto_add_health/mp_rate").toInt();
-        if(Gplayer.MAX_MP != 0 && Gplayer.MP < Gplayer.MAX_MP){
-            int cur_mp_rate = Gplayer.MP * 100 / Gplayer.MAX_MP;
-            if(cur_mp_rate <= mp_rate){
-                qDebug() << "当前蓝量：" << Gplayer.MP;
-                qDebug() << "当前最大蓝量：" << Gplayer.MAX_MP;
-                qDebug() << "触发阈值：" << mp_rate;
-                qDebug() << "当前比例" << cur_mp_rate;
-                DebugOutput::out("检测到蓝量低于安全值，自动加蓝");
-                Helper::console("检测到蓝量低于安全值，自动加蓝");
-                MSDriverPRO::keyboardClick(m_mp_key_code, 1);
-                ProcessHelper::programDelay(1000);
+        if(add_mp){
+            int mp_rate = Gconfig.getValue("auto_add_health/mp_rate").toInt();
+            if(Gplayer.MAX_MP != 0 && Gplayer.MP < Gplayer.MAX_MP){
+                int cur_mp_rate = Gplayer.MP * 100 / Gplayer.MAX_MP;
+                if(cur_mp_rate <= mp_rate){
+                    qDebug() << "当前蓝量：" << Gplayer.MP;
+                    qDebug() << "当前最大蓝量：" << Gplayer.MAX_MP;
+                    qDebug() << "触发阈值：" << mp_rate;
+                    qDebug() << "当前比例" << cur_mp_rate;
+                    DebugOutput::out("检测到蓝量低于安全值，自动加蓝");
+                    Helper::console("检测到蓝量低于安全值，自动加蓝");
+                    MSDriverPRO::keyboardClick(m_mp_key_code, 1);
+                    ProcessHelper::programDelay(1000);
+                }
             }
         }
+
 
         // 检测药水数量
         if(Gplayer.MAX_HP != 0 && Gplayer.MAX_MP != 0){

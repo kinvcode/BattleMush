@@ -178,6 +178,11 @@ void MainWindow::initConfig()
     // 任务队列初始化
     initTask();
 
+    // 技能开关
+    ui->checkBox_atk_switch_general->setChecked(Gconfig.getValue("atk_swtich/general").toBool());
+    ui->checkBox_atk_switch_skill1->setChecked(Gconfig.getValue("atk_swtich/skill1").toBool());
+    ui->checkBox_atk_switch_buff1->setChecked(Gconfig.getValue("atk_swtich/buff1").toBool());
+
     // 按键绑定
     ui->lineEdit_bindkey_general_atk->m_config_path = "bindkey/general_atk";
     ui->lineEdit_bindkey_general_atk->m_currentKey = Gconfig.getValue("bindkey/general_atk").toInt();
@@ -186,6 +191,11 @@ void MainWindow::initConfig()
     ui->lineEdit_bindkey_skill_atk1->m_config_path = "bindkey/skill_atk1";
     ui->lineEdit_bindkey_skill_atk1->m_currentKey = Gconfig.getValue("bindkey/skill_atk1").toInt();
     ui->lineEdit_bindkey_skill_atk1->updateDisplay();
+
+    ui->lineEdit_bindkey_buff1->m_config_path = "bindkey/buff1";
+    ui->lineEdit_bindkey_buff1->m_currentKey = Gconfig.getValue("bindkey/buff1").toInt();
+    ui->lineEdit_bindkey_buff1->updateDisplay();
+
 
     ui->lineEdit_bindkey_jump->m_config_path = "bindkey/jump";
     ui->lineEdit_bindkey_jump->m_currentKey = Gconfig.getValue("bindkey/jump").toInt();
@@ -214,6 +224,10 @@ void MainWindow::initConfig()
     ui->lineEdit_auto_add_mp_key->m_config_path = "auto_add_health/mp_key";
     ui->lineEdit_auto_add_mp_key->m_currentKey = Gconfig.getValue("auto_add_health/mp_key").toInt();
     ui->lineEdit_auto_add_mp_key->updateDisplay();
+
+    // 药水数量监控
+    ui->checkBox_potion_num->setChecked(Gconfig.getValue("auto_add_health/potion_num_switch").toBool());
+    ui->lineEdit_potion_num->setText(Gconfig.getValue("auto_add_health/potion_num").toString());
 }
 
 void MainWindow::initDir()
@@ -525,30 +539,6 @@ void MainWindow::on_checkBox_auto_add_hp_stateChanged(int arg1)
     }else{
         console("自动加血已关闭");
         Gconfig.setValue("auto_add_health/add_hp", false);
-    }
-}
-
-
-void MainWindow::on_lineEdit_auto_add_hp_rate_textEdited(const QString &arg1)
-{
-    QString text = ui->lineEdit_auto_add_hp_rate->text();
-    bool is_number;
-    int value = text.toInt(&is_number);
-
-    if (!is_number || value < 1 || value > 100) {
-        console("请输入1-100之间的数字");
-    }
-}
-
-
-void MainWindow::on_lineEdit_auto_add_mp_rate_textEdited(const QString &arg1)
-{
-    QString text = ui->lineEdit_auto_add_mp_rate->text();
-    bool is_number;
-    int value = text.toInt(&is_number);
-
-    if (!is_number || value < 1 || value > 100) {
-        console("请输入1-100之间的数字");
     }
 }
 
@@ -958,5 +948,70 @@ void MainWindow::on_pushButton_print_map_child_clicked()
     DebugOutput::out("uientity:" + QString::number(Gplayer.p_uientity, 16).toUpper());
 
     GameStruct::printEntityChild(Gplayer.p_mapsentity);
+}
+
+
+void MainWindow::on_checkBox_potion_num_stateChanged(int arg1)
+{
+    if(ui->checkBox_potion_num->isChecked()){
+        showNotice("监控药水数量已开启");
+        Gconfig.setValue("auto_add_health/potion_num_switch", true);
+    }else{
+        showNotice("监控药水数量已关闭");
+        Gconfig.setValue("auto_add_health/potion_num_switch", false);
+    }
+}
+
+
+void MainWindow::on_lineEdit_potion_num_editingFinished()
+{
+    QString text = ui->lineEdit_potion_num->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 10000) {
+        // 校验通过
+        showNotice("监控药水数量已保存");
+        Gconfig.setValue("auto_add_health/potion_num", value);
+    } else {
+        showNotice("无效数值，请输入1-10000之间的数字");
+        ui->lineEdit_auto_add_mp_rate->setText("");  // 清空内容
+    }
+}
+
+
+void MainWindow::on_checkBox_atk_switch_general_stateChanged(int arg1)
+{
+    if(ui->checkBox_atk_switch_general->isChecked()){
+        showNotice("普通攻击已开启");
+        Gconfig.setValue("atk_swtich/general", true);
+    }else{
+        showNotice("普通攻击已关闭");
+        Gconfig.setValue("atk_swtich/general", false);
+    }
+}
+
+
+void MainWindow::on_checkBox_atk_switch_skill1_stateChanged(int arg1)
+{
+    if(ui->checkBox_atk_switch_skill1->isChecked()){
+        showNotice("技能攻击1已开启");
+        Gconfig.setValue("atk_swtich/skill1", true);
+    }else{
+        showNotice("技能攻击1已关闭");
+        Gconfig.setValue("atk_swtich/skill1", false);
+    }
+}
+
+
+void MainWindow::on_checkBox_atk_switch_buff1_stateChanged(int arg1)
+{
+    if(ui->checkBox_atk_switch_buff1->isChecked()){
+        showNotice("BUFF1已开启");
+        Gconfig.setValue("atk_swtich/buff1", true);
+    }else{
+        showNotice("BUFF1已关闭");
+        Gconfig.setValue("atk_swtich/buff1", false);
+    }
 }
 
