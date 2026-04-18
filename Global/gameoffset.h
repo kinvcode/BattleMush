@@ -74,6 +74,7 @@ namespace BASE {
         static int ButtonComponent = 0x140;
         static int TransformComponent = 0x158;
         static int PlayerControllerComponent = 0x170;
+        static int SpriteRendererComponent = 0x180;
         static int PlayerComponent = 0x198;
         static int RigidbodyComponent = 0x1D8;
         static int TextComponent = 0x1F8;
@@ -126,6 +127,10 @@ namespace BASE {
     namespace StateComponent{
         static int attacking = 0xEC;
         static int _CurrentStateName = 0x138;
+    };
+
+    namespace SpriteRendererComponent{
+        static int _SpriteRUID = 0x158;
     };
 
     namespace FootholdImpl{

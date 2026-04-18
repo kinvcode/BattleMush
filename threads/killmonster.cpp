@@ -346,6 +346,15 @@ Item KillMonster::findDropItem()
         qDebug() << "物品:" << QString::number(entity,16).toUpper();
         // qDebug() << "UUID:" << GameStruct::readEntityID(entity);
 
+
+        // 如果物品已经消失
+        QString _SpriteRUID = readString(readLong(readLong(entity + BASE::MODEntity::SpriteRendererComponent)
+            + BASE::SpriteRendererComponent::_SpriteRUID) + BASE::String::text,100);
+        if(_SpriteRUID == "7eba29245d2f4e7fb157a9dbe160a241"){
+            qDebug() << "物品已消失~";
+            continue;
+        }
+
         // // 过滤黑名单
         if(m_black_item_pro.find(entity) != m_black_item_pro.end()){
             if(m_timer.elapsed() - m_black_item_pro[entity] > 5000){
