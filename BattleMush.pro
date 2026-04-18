@@ -60,6 +60,7 @@ SOURCES += \
     threads/threadmanager.cpp \
     threads/updategamedata.cpp \
     utils/config.cpp \
+    utils/data.cpp \
     utils/gamestruct.cpp \
     utils/helper.cpp \
     utils/mapserializer.cpp \
@@ -93,6 +94,7 @@ HEADERS += \
     threads/threadmanager.h \
     threads/updategamedata.h \
     utils/config.h \
+    utils/data.h \
     utils/gamestruct.h \
     utils/helper.h \
     utils/mapserializer.h \

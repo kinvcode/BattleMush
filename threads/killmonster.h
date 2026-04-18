@@ -38,6 +38,7 @@ private:
 
     // 黑名单物品（已经找过的物品，用于过滤掉其他玩家的物品）
     std::unordered_set<quint64> m_black_item;
+    std::unordered_map<quint64,int> m_black_item_pro;
 
     // 计划任务
     bool m_task_running = false;

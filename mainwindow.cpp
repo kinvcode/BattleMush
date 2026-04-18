@@ -22,6 +22,7 @@
 #include "widgets/alertwindow.h"
 #include <QGraphicsScene>
 #include "widgets/taskeditdialog.h"
+#include "utils/data.h"
 
 // 测试头文件
 #include "global/globalplayer.h"
@@ -381,7 +382,8 @@ void MainWindow::console(QString msg)
     QString formattedDateTime = currentDateTime.toString("HH:mm:ss ");
     msg = formattedDateTime + msg;
     ui->textEdit_log->append(msg);
-    ui->textEdit_log->moveCursor(QTextCursor::End);
+    // ui->textEdit_log->moveCursor(QTextCursor::End);
+    ui->textEdit_log->ensureCursorVisible();
 }
 
 void MainWindow::warning(QString msg)
@@ -1033,5 +1035,17 @@ void MainWindow::on_lineEdit_recast_buff1_editingFinished()
         showNotice("无效数值，请输入1-3600之间的数字");
         ui->lineEdit_recast_buff1->setText("");  // 清空内容
     }
+}
+
+
+void MainWindow::on_pushButton_show_room_map_items_clicked()
+{
+    Data::Game::roomMapItems();
+}
+
+
+void MainWindow::on_pushButton_print_map_collision_clicked()
+{
+    Data::Game::roomMapCollision();
 }
 

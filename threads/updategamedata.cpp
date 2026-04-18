@@ -100,7 +100,7 @@ void UpdateGameData::process()
         }
 
         // 服务列表
-        Gplayer.p_allServices = Mem::readPointer(Gplayer.p_gamecontext, 0x298);
+        Gplayer.p_allServices = Mem::readPointer(Gplayer.p_gamecontext, BASE::GameContext::allServices);
         DebugOutput::out("allServices:" + QString::number(Gplayer.p_allServices, 16).toUpper());
 
         // 碰撞服务
@@ -156,7 +156,7 @@ void UpdateGameData::process()
 
         //
         while(Gplayer.p_gamecontext){
-            if (!m_running) break;
+            if (m_paused) break;
 
             Gplayer.p_gamecontext = readPointer(Gplayer.p_gamecontext_entries, BASE::InternalArray::Head + 0x10);
             if(Gplayer.p_gamecontext == 0){

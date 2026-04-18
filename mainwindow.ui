@@ -51,7 +51,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="tab_main">
          <attribute name="title">
@@ -350,7 +350,7 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-365</y>
+             <y>0</y>
              <width>635</width>
              <height>952</height>
             </rect>
@@ -1661,6 +1661,31 @@ color: #FF5500;</string>
             <string>UI遍历</string>
            </property>
           </widget>
+          <widget class="QPushButton" name="pushButton_print_map_collision">
+           <property name="geometry">
+            <rect>
+             <x>100</x>
+             <y>30</y>
+             <width>80</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>碰撞列表</string>
+           </property>
+          </widget>
          </widget>
          <widget class="QGroupBox" name="groupBox_5">
           <property name="geometry">
@@ -1722,6 +1747,31 @@ color: #FF5500;</string>
            </property>
            <property name="text">
             <string>地图名称</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton_show_room_map_items">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>70</y>
+             <width>80</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>31</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>31</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>地图物品</string>
            </property>
           </widget>
          </widget>

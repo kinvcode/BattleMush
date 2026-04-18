@@ -124,6 +124,10 @@ private slots:
 
     void on_lineEdit_recast_buff1_editingFinished();
 
+    void on_pushButton_show_room_map_items_clicked();
+
+    void on_pushButton_print_map_collision_clicked();
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

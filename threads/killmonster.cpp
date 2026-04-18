@@ -316,6 +316,12 @@ Item KillMonster::findDropItem()
 {
     Item target_item;
     target_item.entity = 0;
+
+    // quint64 p_curmapentity = readPointer(map_entity,
+    //     BASE::MODEntity::children,
+    //     BASE::List::InternalArray,
+    //     BASE::InternalArray::Head + 0 * 8);
+
     quint64 map_entity_count = readInt(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
     quint64 entity_head = readLong(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::InternalArray) + BASE::InternalArray::Head;
 
@@ -325,11 +331,6 @@ Item KillMonster::findDropItem()
 
         quint64 cur_entity_address = entity_head + i * 8;
         quint64 entity = readLong(cur_entity_address);
-
-        // 过滤黑名单
-        if (m_black_item.find(entity) != m_black_item.end()) {
-            continue;
-        }
 
         QString name = GameStruct::readEntityName(entity);
 
@@ -342,23 +343,42 @@ Item KillMonster::findDropItem()
             continue;
         }
 
+        qDebug() << "物品:" << QString::number(entity,16).toUpper();
+        // qDebug() << "UUID:" << GameStruct::readEntityID(entity);
+
+        // // 过滤黑名单
+        if(m_black_item_pro.find(entity) != m_black_item_pro.end()){
+            if(m_timer.elapsed() - m_black_item_pro[entity] > 5000){
+                 qDebug() << "存在黑名单中超过5秒，移除黑名单";
+                m_black_item_pro.erase(entity);
+            }else{
+                qDebug() << "该物品在黑名单";
+                continue;
+            }
+        }
+
         float item_x = readFloat(readLong(entity + BASE::MODEntity::TransformComponent)+BASE::TransformComponent::PositionX);
         float item_y = readFloat(readLong(entity + BASE::MODEntity::TransformComponent)+BASE::TransformComponent::PositionY);
+        qDebug() << "浮点坐标:" << item_x << "," << item_y;
 
         int x = RoomMap::toMapPosX(item_x, Gplayer.curmapinfo.map_bounding.x_offset);
         int y = RoomMap::toMapPosY(item_y, Gplayer.curmapinfo.map_bounding.y_offset,Gplayer.curmapinfo.map_bounding.height);
 
         cv::Point item_pos = RoomMap::getItemLinePos(Gplayer.curmapinfo.map_mat,{x, y});
         if(item_pos.x == -1){
-            qDebug() << "物品坐标" << x << "," << y << "无法转换平台坐标，已忽略";
+            qDebug() << "无法转换平台坐标，已忽略";
             continue;
         }
+
+        qDebug() << "物品坐标" << x << "," << y;
 
         int line_id = RoomMap::getPosPlatform(item_pos, Gplayer.curmapinfo.platform_list, Gplayer.curmapinfo.map_mat);
         if(line_id == -1){
             qDebug() << "物品坐标" << x << "," << y << "找不到平台，已忽略";
             continue;
         }
+
+        qDebug() << "物品平台" << line_id;
 
         target_item.pos = item_pos;
         target_item.entity = entity;
@@ -377,8 +397,8 @@ Item KillMonster::findDropItem()
     int user_x = userX();
     int distance = 999999;
     for(const auto &item : m_allItem){
-        if (m_black_item.find(item.entity) != m_black_item.end()) {
-            m_black_item.erase(item.entity);
+        if (m_black_item_pro.find(item.entity) != m_black_item_pro.end()) {
+            m_black_item_pro.erase(item.entity);
         }
         // 找到离自己最近的物品
         if(item.line_id == user_platform){
@@ -500,13 +520,14 @@ void KillMonster::reciveItem(const Item &target_item)
 
 
     qDebug() << "目标物品：" << target_item.line_id << "->" << QString::number(target_item.entity,16).toUpper() << ":" << target_item.pos.x << "," << target_item.pos.y;
+    qDebug() << "UUID:" << GameStruct::readEntityID(target_item.entity);
     qDebug() << "开始寻路拾取~";
 
     WalkBase user_move(target_item.pos.x);
     user_move.m_deviation = 10; // 修改一下误差范围
     if(user_move.moveToItem()){
         // 加入到黑名单
-        m_black_item.insert(target_item.entity);
+        m_black_item_pro[target_item.entity] = m_timer.elapsed();
     }
 }
 
@@ -542,7 +563,6 @@ bool KillMonster::isAttaking()
 
 void KillMonster::autoCleanLine()
 {
-
     // 先检查BUFF
     skillRecast();
 
@@ -552,6 +572,8 @@ void KillMonster::autoCleanLine()
 
     // 优先找物品，找物品过程中可以找怪物，真正没有怪物的时候才会去找怪物
     Item cur_item = findDropItem();
+    continue_recive:
+    if(m_paused || !m_running) return;
     if(cur_item.entity != 0 && cur_item.line_id != -1){
         DebugOutput::out("发现需要拾取的物品~");
         if(cur_item.line_id == user_in_lineid){
@@ -588,10 +610,14 @@ void KillMonster::autoCleanLine()
             }
         }
 
-        DebugOutput::out("拾取物品中...");
-        ProcessHelper::programDelay(100);
-        QApplication::processEvents();
-        return;
+        cur_item = findDropItem();
+        if(cur_item.entity != 0 && cur_item.line_id != -1){
+            DebugOutput::out("拾取物品中...");
+            ProcessHelper::programDelay(100);
+            QApplication::processEvents();
+            goto continue_recive;
+        }
+        // return;
     }
 
     // 更新全图怪物

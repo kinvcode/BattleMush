@@ -355,9 +355,18 @@ bool WalkBase::moveToItem()
 
         user_x = getUserX();
 
-        if (abs(m_target_x - user_x) <= m_deviation) {
-            arrived = true;
+        if(is_left){
+            if(m_target_x - user_x >= m_deviation){
+                arrived = true;
+            }
+        }else{
+            if(user_x - m_target_x >= m_deviation){
+                arrived = true;
+            }
         }
+        // if (abs(m_target_x - user_x) <= m_deviation) {
+        //     arrived = true;
+        // }
     }
 
     qDebug() << "拾取物品结束,失败~";
