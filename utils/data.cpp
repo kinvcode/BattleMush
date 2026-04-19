@@ -50,6 +50,13 @@ quint64 Data::Game::mapEntity()
     return p_mapsentity;
 }
 
+quint64 Data::Game::uiEntity()
+{
+    quint64 p_gamecontext = gamecontext();
+    quint64 p_uientity = readPointer(p_gamecontext, BASE::GameContext::UIEntity);
+    return p_uientity;
+}
+
 void Data::Game::roomMapItems()
 {
     quint64 map_entity = mapEntity();
@@ -204,6 +211,58 @@ void Data::Game::roomMapCollision()
             qDebug() << "转换碰撞位置rect：" << cur_rect.x_left << "," << cur_rect.y_top << " " << cur_rect.x_right << "," << cur_rect.y_bottom;
         }
     }
+}
+
+void Data::Game::runeUISprites()
+{
+    quint64 ui_entity = mapEntity();
+
+
+    quint64 alarm_group = Helper::findChild(ui_entity, "LocalUserAlarmGroup");
+    quint64 rune_ui = Helper::findChild(alarm_group,"RuneUI");
+
+    if(rune_ui == 0){
+        DebugOutput::out("不存在符文封印");
+        return;
+    }
+
+    DebugOutput::out("RuneUI:" + QString::number(rune_ui,16).toUpper());
+
+    quint64 sprite1 = Helper::findChild(rune_ui,"Sprite1");
+    quint64 sprite2 = Helper::findChild(rune_ui,"Sprite2");
+    quint64 sprite3 = Helper::findChild(rune_ui,"Sprite3");
+    quint64 sprite4 = Helper::findChild(rune_ui,"Sprite4");
+
+    DebugOutput::out("Sprite1:" + QString::number(sprite1,16).toUpper());
+    DebugOutput::out("Sprite2:" + QString::number(sprite2,16).toUpper());
+    DebugOutput::out("Sprite3:" + QString::number(sprite3,16).toUpper());
+    DebugOutput::out("Sprite4:" + QString::number(sprite4,16).toUpper());
+
+    // 找到图片ID
+    QString sprite1_dataid = readString(readLong(readLong(readLong(
+        sprite1 + BASE::MODEntity::SpriteGUIRendererComponent)
+        +BASE::SpriteGUIRendererComponent::MODDataRef)
+        +BASE::MODDataRef::dataId) + BASE::String::text, 100);
+
+    QString sprite2_dataid = readString(readLong(readLong(readLong(
+        sprite2 + BASE::MODEntity::SpriteGUIRendererComponent)
+        +BASE::SpriteGUIRendererComponent::MODDataRef)
+        +BASE::MODDataRef::dataId) + BASE::String::text, 100);
+
+    QString sprite3_dataid = readString(readLong(readLong(readLong(
+        sprite3 + BASE::MODEntity::SpriteGUIRendererComponent)
+        +BASE::SpriteGUIRendererComponent::MODDataRef)
+        +BASE::MODDataRef::dataId) + BASE::String::text, 100);
+
+    QString sprite4_dataid = readString(readLong(readLong(readLong(
+        sprite4 + BASE::MODEntity::SpriteGUIRendererComponent)
+        +BASE::SpriteGUIRendererComponent::MODDataRef)
+        +BASE::MODDataRef::dataId) + BASE::String::text, 100);
+
+    DebugOutput::out("sprite1_dataid:" + sprite1_dataid);
+    DebugOutput::out("sprite2_dataid:" + sprite2_dataid);
+    DebugOutput::out("sprite3_dataid:" + sprite3_dataid);
+    DebugOutput::out("sprite4_dataid:" + sprite4_dataid);
 }
 
 

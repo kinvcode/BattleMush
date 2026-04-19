@@ -93,7 +93,14 @@ private:
     // 技能频率
     void skillRecast();
 
+    // 是否正在释放技能
     bool isAttaking();
+
+    // 是否存在符文
+    bool isExistsRune();
+
+    // 解除符文
+    void solveRune();
 
 // 刷图线路
 private:

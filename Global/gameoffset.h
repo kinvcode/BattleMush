@@ -71,6 +71,7 @@ namespace BASE {
         static int MovementComponent = 0xC0;
         static int ClimbableComponent = 0xC8;
         static int StateComponent = 0xF0;
+        static int SpriteGUIRendererComponent = 0x110;
         static int ButtonComponent = 0x140;
         static int TransformComponent = 0x158;
         static int PlayerControllerComponent = 0x170;
@@ -131,6 +132,14 @@ namespace BASE {
 
     namespace SpriteRendererComponent{
         static int _SpriteRUID = 0x158;
+    };
+
+    namespace SpriteGUIRendererComponent{
+        static int MODDataRef = 0x168;
+    };
+
+    namespace MODDataRef{
+        static int dataId = 0x10;
     };
 
     namespace FootholdImpl{

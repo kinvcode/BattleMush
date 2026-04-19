@@ -1610,6 +1610,31 @@ color: #FF5500;</string>
             <string>警报提示</string>
            </property>
           </widget>
+          <widget class="QPushButton" name="pushButton_screenshot">
+           <property name="geometry">
+            <rect>
+             <x>100</x>
+             <y>40</y>
+             <width>80</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>截图</string>
+           </property>
+          </widget>
          </widget>
          <widget class="QGroupBox" name="groupBox_4">
           <property name="geometry">
@@ -1772,6 +1797,44 @@ color: #FF5500;</string>
            </property>
            <property name="text">
             <string>地图物品</string>
+           </property>
+          </widget>
+         </widget>
+         <widget class="QGroupBox" name="groupBox_8">
+          <property name="geometry">
+           <rect>
+            <x>230</x>
+            <y>260</y>
+            <width>261</width>
+            <height>121</height>
+           </rect>
+          </property>
+          <property name="title">
+           <string>符文接触</string>
+          </property>
+          <widget class="QPushButton" name="pushButton_runeui_sprite">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>30</y>
+             <width>80</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>31</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>31</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>查看指令</string>
            </property>
           </widget>
          </widget>

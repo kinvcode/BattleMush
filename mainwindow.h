@@ -128,6 +128,10 @@ private slots:
 
     void on_pushButton_print_map_collision_clicked();
 
+    void on_pushButton_runeui_sprite_clicked();
+
+    void on_pushButton_screenshot_clicked();
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

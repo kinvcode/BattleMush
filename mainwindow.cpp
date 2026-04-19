@@ -1049,3 +1049,15 @@ void MainWindow::on_pushButton_print_map_collision_clicked()
     Data::Game::roomMapCollision();
 }
 
+
+void MainWindow::on_pushButton_runeui_sprite_clicked()
+{
+    Data::Game::runeUISprites();
+}
+
+
+void MainWindow::on_pushButton_screenshot_clicked()
+{
+    ImageTool::screenshot();
+}
+

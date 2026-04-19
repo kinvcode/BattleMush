@@ -1337,6 +1337,31 @@ bool ImageTool::isPointOnLine(const cv::Mat &map, const cv::Point &pos, const cv
     return false;
 }
 
+void ImageTool::screenshot()
+{
+    HWND game_hwnd = FindWindow(NULL,TEXT("MapleStory Worlds-Artale (繁體中文版)"));
+    if(game_hwnd == NULL){
+        DebugOutput::out("游戏窗口不存在");
+        return;
+    }
+    RECT game_rect;
+    GetWindowRect(game_hwnd, &game_rect);
+    QScreen* m_pScreen  = QGuiApplication::primaryScreen();
+    QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
+    int game_x          = game_rect.left;
+    int game_y          = game_rect.top;
+    int game_width      = game_rect.right - game_rect.left;
+    int game_height     = game_rect.bottom - game_rect.top;
+    cur_capture         = cur_capture.copy(game_x,game_y,game_width,game_height);
+
+    qDebug() << "窗口大小：" << game_width << "," << game_height;
+    qDebug() << "窗口位置:" << game_x << "," << game_y;
+
+    QString savePath = QCoreApplication::applicationDirPath() + "/screenshot.png";
+    cur_capture.save(savePath);
+    DebugOutput::out("截图已保存在程序目录");
+}
+
 cv::Point RoomMap::getItemLinePos(const cv::Mat &map, cv::Point pos)
 {
     cv::Point target(-1, -1);

@@ -102,6 +102,8 @@ public:
     static bool isPointOnFoot(const cv::Point& pos);
 
     static bool isPointOnLine(const cv::Mat &map, const cv::Point &pos, const cv::Point &start, const cv::Point &end);
+
+    static void screenshot();
 };
 
 class RoomMap{

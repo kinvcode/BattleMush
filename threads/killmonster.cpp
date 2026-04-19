@@ -317,11 +317,6 @@ Item KillMonster::findDropItem()
     Item target_item;
     target_item.entity = 0;
 
-    // quint64 p_curmapentity = readPointer(map_entity,
-    //     BASE::MODEntity::children,
-    //     BASE::List::InternalArray,
-    //     BASE::InternalArray::Head + 0 * 8);
-
     quint64 map_entity_count = readInt(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
     quint64 entity_head = readLong(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::InternalArray) + BASE::InternalArray::Head;
 
@@ -570,6 +565,39 @@ bool KillMonster::isAttaking()
     return readByte(readLong(Gplayer.p_localplayer + BASE::MODEntity::StateComponent) + BASE::StateComponent::attacking) == 0;
 }
 
+bool KillMonster::isExistsRune()
+{
+    quint64 map_entity_count = readInt(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
+    quint64 entity_head = readLong(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::InternalArray) + BASE::InternalArray::Head;
+
+    for(int i = m_map_start; i < map_entity_count; i++){
+
+        quint64 cur_entity_address = entity_head + i * 8;
+        quint64 entity = readLong(cur_entity_address);
+
+        QString name = GameStruct::readEntityName(entity);
+
+        if(name == "EndObj"){
+            m_map_start = i + 1;
+            continue;
+        }
+
+        if(name == "Rune"){
+            quint64 p_realease = Helper::findChild(entity, "ReleaseEffect");
+            if(p_realease != 0){
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+void KillMonster::solveRune()
+{
+    DebugOutput::out("处理解除符文~，暂时没有相关解决方式");
+}
+
 void KillMonster::autoCleanLine()
 {
     // 先检查BUFF
@@ -583,6 +611,16 @@ void KillMonster::autoCleanLine()
     Item cur_item = findDropItem();
     continue_recive:
     if(m_paused || !m_running) return;
+
+    // 符文检测
+    if(isExistsRune()){
+        qDebug() << "检测到解除符文封印，尝试解除中...";
+        solveRune();
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        goto continue_recive;
+    }
+
     if(cur_item.entity != 0 && cur_item.line_id != -1){
         DebugOutput::out("发现需要拾取的物品~");
         if(cur_item.line_id == user_in_lineid){
@@ -709,9 +747,11 @@ void KillMonster::autoCleanLine()
 void KillMonster::excutePlatformSequence()
 {
     retryEnter:
-    if(m_paused){
+    if(m_paused || !m_running){
         return;
     }
+
+    // 符文检测
 
     // 先检查BUFF
     skillRecast();
@@ -728,6 +768,7 @@ void KillMonster::excutePlatformSequence()
         return;
     }
 
+    // 获取当前要前往的平台
     int plat_id = m_platform_sequence.platform_set[m_platform_sequence.index];
 
     user_in_lineid = userPlatform();

@@ -15,11 +15,17 @@ public:
     // 获取map entity
     static quint64 mapEntity();
 
+    // 获取UI entity
+    static quint64 uiEntity();
+
     // 打印物品
     static void roomMapItems();
 
     // 打印碰撞列表
     static void roomMapCollision();
+
+    // 打印符文解除指令
+    static void runeUISprites();
 };
 
 };
