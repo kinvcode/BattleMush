@@ -173,62 +173,65 @@ void KillMonster::process()
 
         m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
         m_task_timer.restart();
-
         m_task_info.id = m_task_id;
 
         if(m_task_type == 0){
-            qDebug() << "当前执行计划：刷图";
-            m_task_info.type = "刷图";
-            m_task_info.option1_label = "地图";
+            taskCleanRoom();
 
-            int map_index = Gcontroller.m_tasks.at(m_task_id).option1_key;
-            int path_index = Gcontroller.m_tasks.at(m_task_id).option2_key;
+            // qDebug() << "当前执行计划：刷图";
+            // m_task_info.type = "刷图";
+            // m_task_info.option1_label = "地图";
 
-            // 读取地图
-            MapRoomPath task_map = Gcontroller.m_clean_room_list.at(map_index);
-            m_task_info.option1_text = task_map.name;
+            // int map_index = Gcontroller.m_tasks.at(m_task_id).option1_key;
+            // int path_index = Gcontroller.m_tasks.at(m_task_id).option2_key;
 
-            // 当前地图UUID
-            if(Gplayer.curmapinfo.id != task_map.uuid){
-                // 前往该地图
-                // moveToRoomByUUID(task_map.uuid);
-                DebugOutput::out("暂不支持自动前往的地图:" + task_map.name);
-                DebugOutput::out("请手动前往该地图！");
-                ProcessHelper::programDelay(5000);
-                QApplication::processEvents();
-                continue;
-            }
+            // // 读取地图
+            // MapRoomPath task_map = Gcontroller.m_clean_room_list.at(map_index);
+            // m_task_info.option1_text = task_map.name;
 
-            // 读取路线
-            m_task_info.option2_label = "路线";
-            m_task_info.option2_text = task_map.paths.at(path_index).name;
+            // // 当前地图UUID
+            // if(Gplayer.curmapinfo.id != task_map.uuid){
+            //     // 前往该地图
+            //     // moveToRoomByUUID(task_map.uuid);
+            //     DebugOutput::out("暂不支持自动前往的地图:" + task_map.name);
+            //     DebugOutput::out("请手动前往该地图！");
+            //     ProcessHelper::programDelay(5000);
+            //     QApplication::processEvents();
+            //     continue;
+            // }
 
-            // 默认第一条路线都是自动路线
-            if(path_index == 0){
-                qDebug() << "刷图路线：自动规划路线";
-                autoCleanLine();
-            }else{
-                qDebug() << "刷图路线：" + m_task_info.option2_text;
-                m_platform_sequence.platform_set = task_map.paths.at(path_index).platforms;
-                m_platform_sequence.index = 0;
-                // 执行路线刷图
-                excutePlatformSequence();
-            }
+            // // 读取路线
+            // m_task_info.option2_label = "路线";
+            // m_task_info.option2_text = task_map.paths.at(path_index).name;
+
+            // // 默认第一条路线都是自动路线
+            // if(path_index == 0){
+            //     qDebug() << "刷图路线：自动规划路线";
+            //     autoCleanLine();
+            // }else{
+            //     qDebug() << "刷图路线：" + m_task_info.option2_text;
+            //     m_platform_sequence.platform_set = task_map.paths.at(path_index).platforms;
+            //     m_platform_sequence.index = 0;
+            //     // 执行路线刷图
+            //     excutePlatformSequence();
+            // }
         }else if(m_task_type == 1){
-            m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
-            m_task_timer.restart();
-            m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
+            taskRest();
+            // m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
+            // m_task_timer.restart();
+            // m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
 
-            DebugOutput::out("暂不支持【休息】类型计划任务~,即将跳过此任务");
+            // DebugOutput::out("暂不支持【休息】类型计划任务~,即将跳过此任务");
         }else if(m_task_type == 2){
-            m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
-            m_task_timer.restart();
-            m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
+            taskQuest();
+            // m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
+            // m_task_timer.restart();
+            // m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
 
-            DebugOutput::out("暂不支持【NPC任务】类型计划任务~,即将跳过此任务");
+            // DebugOutput::out("暂不支持【NPC任务】类型计划任务~,即将跳过此任务");
         }
 
-        DebugOutput::out("即将进行下一轮找怪");
+        DebugOutput::out("主线程循环体进入下一次循环");
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
     }
@@ -517,25 +520,29 @@ void KillMonster::reciveItem(const Item &target_item)
 void KillMonster::skillRecast()
 {
     int now_time = m_timer.elapsed() / 1000;
+
     // qDebug() << "现在时间:" << now_time;
     // qDebug() << "上次释放时间" << m_recast_buff1_lasttime;
     // qDebug() << "释放频率" << m_recast_buff1_time;
     // qDebug() << "释放技能已过去" << (now_time - m_recast_buff1_lasttime);
-    if((now_time - m_recast_buff1_lasttime) > m_recast_buff1_time || m_recast_buff1_lasttime == 0){
 
-        DebugOutput::out("BUFF1已到释放时间，自动释放BUFF1");
-        Helper::console("BUFF1已到释放时间，自动释放BUFF1");
+    if(m_recast_buff1_enable){
+        if((now_time - m_recast_buff1_lasttime) > m_recast_buff1_time || m_recast_buff1_lasttime == 0){
 
-        while(isAttaking()){
-            ProcessHelper::programDelay(50);
-            QApplication::processEvents();
+            DebugOutput::out("BUFF1已到释放时间，自动释放BUFF1");
+            Helper::console("BUFF1已到释放时间，自动释放BUFF1");
+
+            while(isAttaking()){
+                ProcessHelper::programDelay(50);
+                QApplication::processEvents();
+            }
+
+            MSDriverPRO::keyboardClick(m_recast_buff1_keycode, 1);
+            Helper::console("BUFF1已按");
+
+            m_recast_buff1_lasttime = m_timer.elapsed() / 1000;
+            // ProcessHelper::programDelay(1000);
         }
-
-        MSDriverPRO::keyboardClick(m_recast_buff1_keycode, 1);
-        Helper::console("BUFF1已按");
-
-        m_recast_buff1_lasttime = m_timer.elapsed() / 1000;
-        // ProcessHelper::programDelay(1000);
     }
 }
 
@@ -893,6 +900,111 @@ void KillMonster::excutePlatformSequence()
     goto retryEnter;
 }
 
+void KillMonster::excutePlatformRest(int rest_platform)
+{
+    retryEnter:
+    if(m_paused || !m_running){
+        return;
+    }
+
+    // 更新任务信息
+    m_task_info.excute_time = Helper::timestampToHI(m_task_excute_time);
+    sendTaskInfo(m_task_info);
+
+    m_task_excute_time = m_task_timer.elapsed() / 1000;
+    int run_time = Gcontroller.m_tasks.at(m_task_id).runTime;
+    if(m_task_excute_time > run_time){
+        DebugOutput::out("计划任务已执行:" + QString::number(m_task_excute_time) + "秒");
+        DebugOutput::out("本次计划任务已执行完毕，即将进行下一个计划");
+        m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
+        return;
+    }
+
+    // 获取人物所在地板
+    int user_in_lineid = userPlatform();
+    if(user_in_lineid == -1){
+        // qDebug() << "人物平台未知，可能在空中";
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        goto retryEnter;
+    }
+
+    if(user_in_lineid == rest_platform){
+        qDebug() << "人物已在休息平台，等待休息结束~";
+        ProcessHelper::programDelay(5000);
+        QApplication::processEvents();
+        goto retryEnter;
+    }
+
+    std::vector<int> paths = PathAlgo::findAStarPath(user_in_lineid, rest_platform, Gplayer.curmapinfo.path_nodes);
+    qDebug() << "======A星路径======";
+    for(auto const &path : paths){
+        qDebug() << path;
+    }
+    qDebug() << "======A星路径======";
+
+    if(paths.empty()){
+        qDebug() << "无法找到前往该平台的路径";
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        return;
+    }
+
+    for(auto plat : paths){
+        user_in_lineid = userPlatform();
+
+        // 先找物品
+        Item cur_item = findDropItem();
+        if(cur_item.line_id == user_in_lineid && cur_item.entity != 0){
+            DebugOutput::out("人物所在平台存在物品，开始拾取~");
+            reciveItem(cur_item);
+            goto retryEnter;
+        }
+
+        PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
+        qDebug() << "准备前往平台:" << plat;
+
+        bool move_success = MovePlatform::toPlatform(node, plat);
+        if(!move_success){
+            qDebug() << "A星移动平台失败 平台:" << plat;
+            ProcessHelper::programDelay(100);
+            QApplication::processEvents();
+            goto retryEnter;
+        }
+
+        user_in_lineid = userPlatform();
+        if(user_in_lineid == rest_platform){
+            DebugOutput::out("A星已到达目标路线节点");
+            goto retryEnter;
+        }
+    }
+}
+
+void KillMonster::excuteQuest()
+{
+    retryEnter:
+    if(m_paused || !m_running){
+        return;
+    }
+
+    // 更新任务信息
+    m_task_info.excute_time = Helper::timestampToHI(m_task_excute_time);
+    sendTaskInfo(m_task_info);
+
+    m_task_excute_time = m_task_timer.elapsed() / 1000;
+    int run_time = Gcontroller.m_tasks.at(m_task_id).runTime;
+    if(m_task_excute_time > run_time){
+        DebugOutput::out("计划任务已执行:" + QString::number(m_task_excute_time) + "秒");
+        DebugOutput::out("本次计划任务已执行完毕，即将进行下一个计划");
+        m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
+        return;
+    }
+
+    ProcessHelper::programDelay(5000);
+    QApplication::processEvents();
+    goto retryEnter;
+}
+
 void KillMonster::updateTaskID()
 {
     if(Gcontroller.m_tasks.size() == 1){
@@ -906,6 +1018,97 @@ void KillMonster::updateTaskID()
 void KillMonster::sendTaskInfo(const TaskInfo &task)
 {
     MainWindow::getInstance()->updateTaskMonitor(task);
+}
+
+void KillMonster::taskCleanRoom()
+{
+    qDebug() << "当前执行计划：刷图";
+    m_task_info.type = "刷图";
+    m_task_info.option1_label = "地图";
+
+    int map_index = Gcontroller.m_tasks.at(m_task_id).option1_key;
+    int path_index = Gcontroller.m_tasks.at(m_task_id).option2_key;
+
+    // 读取地图
+    MapRoomPath task_map = Gcontroller.m_clean_room_list.at(map_index);
+    m_task_info.option1_text = task_map.name;
+
+    // 当前地图UUID
+    if(Gplayer.curmapinfo.id != task_map.uuid){
+        // 前往该地图
+        // moveToRoomByUUID(task_map.uuid);
+        DebugOutput::out("暂不支持自动前往的地图:" + task_map.name);
+        DebugOutput::out("请手动前往该地图！");
+        ProcessHelper::programDelay(5000);
+        QApplication::processEvents();
+        return;
+    }
+
+    // 读取路线
+    m_task_info.option2_label = "路线";
+    m_task_info.option2_text = task_map.paths.at(path_index).name;
+
+    // 默认第一条路线都是自动路线
+    if(path_index == 0){
+        qDebug() << "刷图路线：自动规划路线";
+        autoCleanLine();
+    }else{
+        qDebug() << "刷图路线：" + m_task_info.option2_text;
+        m_platform_sequence.platform_set = task_map.paths.at(path_index).platforms;
+        m_platform_sequence.index = 0;
+        // 执行路线刷图
+        excutePlatformSequence();
+    }
+}
+
+void KillMonster::taskRest()
+{
+    qDebug() << "当前执行计划：休息";
+    m_task_info.type = "休息";
+    m_task_info.option1_label = "地图";
+
+    int map_index = Gcontroller.m_tasks.at(m_task_id).option1_key;
+    int rest_index = Gcontroller.m_tasks.at(m_task_id).option2_key;
+
+    // 读取地图
+    MapRoomPath task_map = Gcontroller.m_rest_point_list.at(map_index);
+    m_task_info.option1_text = task_map.name;
+
+    // 当前地图UUID
+    if(Gplayer.curmapinfo.id != task_map.uuid){
+        // 前往该地图
+        // moveToRoomByUUID(task_map.uuid);
+        DebugOutput::out("暂不支持自动前往的地图:" + task_map.name);
+        DebugOutput::out("请手动前往该地图！");
+        ProcessHelper::programDelay(5000);
+        QApplication::processEvents();
+        return;
+    }
+
+    // 读取休息点
+    m_task_info.option2_label = "休息点";
+    m_task_info.option2_text = task_map.rests.at(rest_index).name;
+
+    qDebug() << "休息点：" + m_task_info.option2_text;
+    int rest_platform = task_map.rests.at(rest_index).platform;
+    // 执行休息
+    excutePlatformRest(rest_platform);
+}
+
+void KillMonster::taskQuest()
+{
+    qDebug() << "当前执行计划：NPC任务";
+    m_task_info.type = "任务";
+    m_task_info.option1_label = "任务名称";
+
+    int quest_index = Gcontroller.m_tasks.at(m_task_id).option1_key;
+
+    // 读取任务
+    NPCQuest task_quest = Gcontroller.m_quest_list.at(quest_index);
+    m_task_info.option1_text = task_quest.name;
+
+    // 执行任务
+    excuteQuest();
 }
 
 

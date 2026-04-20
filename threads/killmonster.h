@@ -45,13 +45,14 @@ private:
     int m_task_excute_time = 0; // 当前任务执行的时间
     QElapsedTimer m_task_timer; // 当前任务计时器
 
-    // 技能频率
+    // 定时释放技能
     QElapsedTimer m_timer; // 当前线程计时器
     bool m_recast_buff1_enable = false;
     int m_recast_buff1_time;
     int m_recast_buff1_lasttime = 0;
     int m_recast_buff1_keycode;
 
+// 角色信息
 private:
     int userX();
 
@@ -69,11 +70,10 @@ private:
     // 角色当前平台
     quint64 userPlatform();
 
+// 图内对象信息
 private:
     // 寻找掉落物品
     Item findDropItem();
-
-    // 更新全图对象：0全部对象 1人物 2怪物 3物品
 
     // 更新全图怪物
     void updateAllMonsters();
@@ -81,25 +81,13 @@ private:
     // 获取当前线路怪物
     std::vector<Monster> getLineMonsters(int user_line);
 
-    // 击杀怪物
-    void killNearMonster(const std::vector<Monster> &handle_monsters);
-
-    // 拾取物品
-    void reciveItem(const Item &target_item);
-
-    // 技能频率
-    void skillRecast();
-
     // 是否正在释放技能
     bool isAttaking();
 
     // 是否存在符文
     bool isExistsRune();
 
-    // 解除符文
-    void solveRune();
-
-// 刷图线路
+// 计划任务
 private:
     struct PlatformSequence{
         int index;
@@ -112,17 +100,47 @@ private:
     // 当前计划信息
     TaskInfo m_task_info;
 
+    // 更新计划任务ID
+    void updateTaskID();
+
+    // 更新任务信息到UI
+    void sendTaskInfo(const TaskInfo &task);
+
+// 具体操作
+private:
+    // 击杀怪物
+    void killNearMonster(const std::vector<Monster> &handle_monsters);
+
+    // 拾取物品
+    void reciveItem(const Item &target_item);
+
+    // 定时释放的技能。目前支持的有：个人BUFF
+    void skillRecast();
+
+    // 解除符文
+    void solveRune();
+
     // 自动清怪路线
     void autoCleanLine();
 
     // 执行平台路线
     void excutePlatformSequence();
 
-    // 更新计划任务ID
-    void updateTaskID();
+    // 执行平台休息
+    void excutePlatformRest(int rest_platform);
 
-// signals:
-    void sendTaskInfo(const TaskInfo &task);
+    // 执行NPC任务
+    void excuteQuest();
+
+private:
+    // 刷图计划
+    void taskCleanRoom();
+
+    // 休息计划
+    void taskRest();
+
+    // NPC任务计划
+    void taskQuest();
 };
 
 #endif // KILLMONSTER_H
