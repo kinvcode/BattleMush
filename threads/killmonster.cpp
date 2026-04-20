@@ -193,22 +193,19 @@ void KillMonster::process()
             }
         }
 
-        TaskInfo task_info;
-        task_info.id = m_task_id;
-
-        m_task_excute_time = m_task_timer.elapsed() / 1000;
-        task_info.excute_time = Helper::timestampToHI(m_task_excute_time);
+        // m_task_info;
+        m_task_info.id = m_task_id;
 
         if(m_task_type == 0){
-            task_info.type = "刷图";
-            task_info.option1_label = "地图";
+            m_task_info.type = "刷图";
+            m_task_info.option1_label = "地图";
 
             int map_index = Gcontroller.m_tasks.at(m_task_id).option1_key;
             int path_index = Gcontroller.m_tasks.at(m_task_id).option2_key;
 
             // 读取地图
             MapRoomPath task_map = Gcontroller.m_clean_room_list.at(map_index);
-            task_info.option1_text = task_map.name;
+            m_task_info.option1_text = task_map.name;
 
             // 当前地图UUID
             if(Gplayer.curmapinfo.id != task_map.uuid){
@@ -224,13 +221,15 @@ void KillMonster::process()
 
             // 读取路线
             m_task_room_path = task_map.paths.at(path_index).platforms;
-            task_info.option2_label = "路线";
-            task_info.option2_text = task_map.paths.at(path_index).name;
+            m_task_info.option2_label = "路线";
+            m_task_info.option2_text = task_map.paths.at(path_index).name;
 
-            // 更新任务信息
-            sendTaskInfo(task_info);
             // 默认第一条路线都是自动路线
             if(path_index == 0){
+                // 更新任务信息
+                m_task_excute_time = m_task_timer.elapsed() / 1000;
+                m_task_info.excute_time = Helper::timestampToHI(m_task_excute_time);
+                sendTaskInfo(m_task_info);
                 autoCleanLine();
             }else{
                 m_platform_sequence.platform_set = m_task_room_path;
@@ -751,49 +750,45 @@ void KillMonster::excutePlatformSequence()
         return;
     }
 
+    // 更新任务信息
+    m_task_excute_time = m_task_timer.elapsed() / 1000;
+    m_task_info.excute_time = Helper::timestampToHI(m_task_excute_time);
+    sendTaskInfo(m_task_info);
+
     // 符文检测
+    if(isExistsRune()){
+        qDebug() << "检测到解除符文封印，尝试解除中...";
+        solveRune();
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        goto retryEnter;
+    }
 
     // 先检查BUFF
     skillRecast();
 
-    qDebug() << "当前路线节点索引：" << m_platform_sequence.index;
-
     // 获取人物所在地板
     int user_in_lineid = userPlatform();
+    if(user_in_lineid == -1){
+        qDebug() << "人物平台未知，可能在空中";
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        goto retryEnter;
+    }
 
     int plat_count = m_platform_sequence.platform_set.size();
-    if(m_platform_sequence.index >= plat_count){
-        m_platform_sequence.index = 0;
-        DebugOutput::out("错误的路线索引号，已强制重置索引");
-        return;
+    qDebug() << "节点数量：" << plat_count;
+
+    bool user_in_platline = false;
+    for(int i = 0; i < plat_count; i++){
+        if(m_platform_sequence.platform_set[i] == user_in_lineid){
+            m_platform_sequence.index = i;
+            user_in_platline = true;
+        }
     }
-
-    // 获取当前要前往的平台
-    int plat_id = m_platform_sequence.platform_set[m_platform_sequence.index];
-
-    user_in_lineid = userPlatform();
-
-    if(user_in_lineid == plat_id && plat_count > 1){
-        m_platform_sequence.index = m_platform_sequence.index + 1;
-        DebugOutput::out("人物平台与当前路线目标节点相同，即将前往下一个路线节点");
-        return;
-    }
-
-    std::vector<int> paths = PathAlgo::findAStarPath(user_in_lineid, plat_id, Gplayer.curmapinfo.path_nodes);
-
-    qDebug() << "======A星路径======";
-    for(auto const &path : paths){
-        qDebug() << path;
-    }
-    qDebug() << "======A星路径======";
-
-    if(paths.empty()){
-        qDebug() << "无法找到前往该平台的路径";
-        return;
-    }else{
-        for(auto plat : paths){
-            user_in_lineid = userPlatform();
-
+    if(user_in_platline){
+        // 如果只有一个节点
+        if(plat_count == 1){
             // 先找物品
             Item cur_item = findDropItem();
             if(cur_item.line_id == user_in_lineid && cur_item.entity != 0){
@@ -811,26 +806,85 @@ void KillMonster::excutePlatformSequence()
                 goto retryEnter;
             }
 
-            PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
-            qDebug() << "准备前往平台:" << plat;
+            DebugOutput::out("循环当前单路线");
+            ProcessHelper::programDelay(100);
+            QApplication::processEvents();
+            goto retryEnter;
+        }
 
-            bool move_success = MovePlatform::toPlatform(node, plat);
-            if(!move_success){
-                qDebug() << "A星移动平台失败 平台:" << plat;
+        int plat = m_platform_sequence.index + 1 >= plat_count ? m_platform_sequence.platform_set[0] : m_platform_sequence.platform_set[m_platform_sequence.index+1];
+        qDebug() << "前往下个节点：" << plat;
 
+        PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
+        bool move_success = MovePlatform::toPlatform(node, plat);
+        if(move_success){
+            user_in_lineid = userPlatform();
+            if(user_in_lineid == plat){
+                DebugOutput::out("已到达目标路线节点，即将前往下一个节点");
                 ProcessHelper::programDelay(100);
                 QApplication::processEvents();
-                return;
+                goto retryEnter;
             }
+            DebugOutput::out("人物不在目标路线节点~");
+        }
+        DebugOutput::out("到达目标路线节点失败~");
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        goto retryEnter;
+    }
 
-            user_in_lineid = userPlatform();
-            if(user_in_lineid == plat_id){
-                m_platform_sequence.index++;
-                DebugOutput::out("已到达目标路线节点，即将前往下一个节点");
-                return;
-            }
+    int plat_id = m_platform_sequence.platform_set[0];
+    // 如果人物与当前节点相同，则直接进入下个节点，否则使用A星寻路
+    user_in_lineid = userPlatform();
+    if(plat_id == user_in_lineid) goto retryEnter;
+
+    std::vector<int> paths = PathAlgo::findAStarPath(user_in_lineid, plat_id, Gplayer.curmapinfo.path_nodes);
+    qDebug() << "======A星路径======";
+    for(auto const &path : paths){
+        qDebug() << path;
+    }
+    qDebug() << "======A星路径======";
+
+    if(paths.empty()){
+        qDebug() << "无法找到前往该平台的路径";
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        return;
+    }
+
+    for(auto plat : paths){
+        user_in_lineid = userPlatform();
+
+        // 先找物品
+        Item cur_item = findDropItem();
+        if(cur_item.line_id == user_in_lineid && cur_item.entity != 0){
+            DebugOutput::out("人物所在平台存在物品，开始拾取~");
+            reciveItem(cur_item);
+            goto retryEnter;
+        }
+
+        PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
+        qDebug() << "准备前往平台:" << plat;
+
+        bool move_success = MovePlatform::toPlatform(node, plat);
+        if(!move_success){
+            qDebug() << "A星移动平台失败 平台:" << plat;
+            ProcessHelper::programDelay(100);
+            QApplication::processEvents();
+            goto retryEnter;
+        }
+
+        user_in_lineid = userPlatform();
+        if(user_in_lineid == plat_id){
+            DebugOutput::out("A星已到达目标路线节点");
+            goto retryEnter;
         }
     }
+
+    DebugOutput::out("A星到达路线节点失败~，重新执行路线");
+    ProcessHelper::programDelay(100);
+    QApplication::processEvents();
+    goto retryEnter;
 }
 
 void KillMonster::updateTaskID()

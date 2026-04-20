@@ -184,17 +184,17 @@ void Data::Game::roomMapCollision()
         qDebug() << "=== === === === === ===";
         qDebug() << "碰撞组：" << QString::number(cur_address,16).toUpper();
         for(int node_i = 0; node_i < node_count; node_i++,node_head += 0x60){ // 0x60碰撞信息大小，暂时无法找到基址
-            quint64 p_climbableComponent = readLong(node_head + 0x28); // 攀爬信息偏移，暂时无法找到基址
+            quint64 p_climbableComponent = readLong(node_head + 0x28); // 这个其实是碰撞绑定对象
             if(!p_climbableComponent) continue;
 
             qDebug() << "--- --- ---";
             qDebug() << "p_coolision：" << QString::number(node_head,16).toUpper() << ":" << QString::number(p_climbableComponent,16).toUpper();
 
             ClimbOrigin cur_climb;
-            cur_climb.left = readFloat(node_head + 0x30); // 攀爬信息
-            cur_climb.top = readFloat(node_head + 0x34); // 攀爬信息
-            cur_climb.factor1 = readFloat(node_head + 0x48); // 攀爬信息
-            cur_climb.factor2 = readFloat(node_head + 0x4C); // 攀爬信息
+            cur_climb.left = readFloat(node_head + 0x30);
+            cur_climb.top = readFloat(node_head + 0x34);
+            cur_climb.factor1 = readFloat(node_head + 0x48);
+            cur_climb.factor2 = readFloat(node_head + 0x4C);
 
             FloatRect float_rect;
             Math::ComputeClimbRect(&cur_climb, float_rect);
@@ -215,8 +215,7 @@ void Data::Game::roomMapCollision()
 
 void Data::Game::runeUISprites()
 {
-    quint64 ui_entity = mapEntity();
-
+    quint64 ui_entity = uiEntity();
 
     quint64 alarm_group = Helper::findChild(ui_entity, "LocalUserAlarmGroup");
     quint64 rune_ui = Helper::findChild(alarm_group,"RuneUI");
@@ -263,6 +262,144 @@ void Data::Game::runeUISprites()
     DebugOutput::out("sprite2_dataid:" + sprite2_dataid);
     DebugOutput::out("sprite3_dataid:" + sprite3_dataid);
     DebugOutput::out("sprite4_dataid:" + sprite4_dataid);
+}
+
+void Data::Game::roomMapPortal()
+{
+    quint64 p_gamecontext = gamecontext();
+    quint64 p_uientity = readPointer(p_gamecontext, BASE::GameContext::UIEntity);
+
+    quint64 map_entity = mapEntity();
+
+    quint64 p_curmapentity = readPointer(map_entity,
+        BASE::MODEntity::children,
+        BASE::List::InternalArray,
+        BASE::InternalArray::Head + 0 * 8);
+
+    QString map_id = GameStruct::readEntityID(p_curmapentity);
+    qDebug() << "UUID:" << map_id;
+
+    quint64 ui_entity = p_uientity;
+    quint64 main_group = Helper::findChild(ui_entity, "MainGroup");
+    quint64 minimap = Helper::findChild(main_group,"Minimap");
+    quint64 background = Helper::findChild(minimap,"Minimap_Background");
+    quint64 scroll_top = Helper::findChild(background,"Scroll_Top");
+    quint64 middle = Helper::findChild(scroll_top,"Middle");
+    quint64 map_name_p = Helper::findChild(middle,"Minimap_MinText");
+    QString map_name = GameStruct::readEntityText(map_name_p);
+
+    qDebug() << "name:" << map_name;
+
+
+    quint64 p_allServices = Mem::readPointer(p_gamecontext, BASE::GameContext::allServices);
+
+    // 碰撞服务
+    quint64 p_collisionservice = Helper::findService(p_allServices,"CollisionService");
+
+    int simulator_count = readInt(readLong(p_collisionservice + BASE::CollisionService::simulatorByMap) + BASE::Dictionary::count);
+    quint64 p_coolision = 0;
+    quint64 p_coolision_head = readPointer(p_collisionservice, BASE::CollisionService::simulatorByMap,BASE::Dictionary::InternalArray_entries)
+                               +BASE::InternalArray::Head;
+
+    // 找到当前地图的碰撞数组
+    for(int i = 0; i < simulator_count; i++){
+        p_coolision = readLong(p_coolision_head + i * 0x18 + 0x10);
+        if(p_coolision != 0){
+            break;
+        }
+    }
+
+    if(p_coolision == 0){
+        DebugOutput::out("找不到碰撞数据");
+        return;
+    }
+
+    quint64 p_MultipleDynamicTreeBroadPhase = readLong(readLong(p_coolision + BASE::CollisionSimulator::World)+BASE::World::MultipleDynamicTreeBroadPhase);
+
+    // 遍历数组索引
+    int index_count = readInt(readLong(p_MultipleDynamicTreeBroadPhase + BASE::MultipleDynamicTreeBroadPhase::numbersByProxyId) + BASE::Dictionary::count);
+    quint64 index_head = readLong(readLong(p_MultipleDynamicTreeBroadPhase
+                                           + BASE::MultipleDynamicTreeBroadPhase::numbersByProxyId)
+                                  + BASE::Dictionary::InternalArray_entries)
+                         + BASE::InternalArray::Head;
+    std::set<std::pair<int, int>> uniquePairs;
+    for(int index_i = 0; index_i < index_count; index_i++,index_head += 3 * 8 ){
+        int index1 = readInt(index_head + 0xC); // 数组索引
+        int index2 = readInt(index_head + 0x10); // 数组索引
+        uniquePairs.insert({index1, index2});
+    }
+
+    // 遍历碰撞坐标原始数据
+    int rect_array_2_count = readInt(readLong(readLong(p_MultipleDynamicTreeBroadPhase + BASE::MultipleDynamicTreeBroadPhase::trees) + 0x10) + 0x10);
+    quint64 rect_head = readLong(p_MultipleDynamicTreeBroadPhase + BASE::MultipleDynamicTreeBroadPhase::trees) + BASE::InternalArray::Head;
+
+    MapBounding map_bounding = RoomMap::getMapBounding(p_curmapentity);
+
+    for (const auto& pair : uniquePairs) {
+        quint64 cur_address = rect_head + pair.first * rect_array_2_count * 8 + pair.second * 8;
+        int node_count = readInt(readLong(cur_address) + BASE::DynamicTree::_nodeCount);
+        quint64 node_head = readLong(readLong(cur_address) + BASE::DynamicTree::_nodes) + BASE::InternalArray::Head;
+
+        // qDebug() << "=== === === === === ===";
+        // qDebug() << "碰撞组：" << QString::number(cur_address,16).toUpper();
+        for(int node_i = 0; node_i < node_count; node_i++,node_head += 0x60){ // 0x60碰撞信息大小，暂时无法找到基址
+            quint64 p_climbableComponent = readLong(node_head + 0x28);
+            if(!p_climbableComponent) continue;
+
+            // 判断是不是传送阵
+            // qDebug() << readLong(p_climbableComponent);
+            // qDebug() << readLong(readLong(p_climbableComponent) + 0x10);
+            QString component_name = readAnsiString(readLong(readLong(p_climbableComponent) + 0x10),50);
+
+            if(component_name != "PortalComponent") continue;
+
+            qDebug() << "--- --- ---";
+            // qDebug() << "p_coolision：" << QString::number(node_head,16).toUpper() << ":" << QString::number(p_climbableComponent,16).toUpper();
+
+            ClimbOrigin cur_climb;
+            cur_climb.left = readFloat(node_head + 0x30);
+            cur_climb.top = readFloat(node_head + 0x34);
+            cur_climb.factor1 = readFloat(node_head + 0x48);
+            cur_climb.factor2 = readFloat(node_head + 0x4C);
+
+            FloatRect float_rect;
+            Math::ComputeClimbRect(&cur_climb, float_rect);
+            qDebug() << "浮点rect：" << float_rect.x_left << "," << float_rect.y_top << " " << float_rect.x_right << "," << float_rect.y_bottom;
+
+            ClimbRect cur_rect;
+            // cur_rect.id = climb_id;
+
+            cur_rect.x_left = RoomMap::toMapPosX(float_rect.x_left, map_bounding.x_offset);
+            cur_rect.x_right = RoomMap::toMapPosX(float_rect.x_right, map_bounding.x_offset);
+            cur_rect.y_top = RoomMap::toMapPosY(float_rect.y_top, map_bounding.y_offset, map_bounding.height);
+            cur_rect.y_bottom = RoomMap::toMapPosY(float_rect.y_bottom, map_bounding.y_offset, map_bounding.height);
+
+            qDebug() << "转换后rect：" << cur_rect.x_left << "," << cur_rect.y_top << " " << cur_rect.x_right << "," << cur_rect.y_bottom;
+        }
+    }
+/**
+[{
+    "id": "uuid",
+    "name": "地图1",
+    "target": [{
+        "id": "uuid",
+        "rect": [0, 1, 2, 3]
+    }， {
+        "id": "uuid",
+        "rect": [0, 1, 2, 3]
+    }]
+}， {
+    "id": "uuid",
+    "name": "地图2",
+    "target": [{
+        "id": "uuid",
+        "rect": [0, 1, 2, 3]
+    }， {
+        "id": "uuid",
+        "rect": [0, 1, 2, 3]
+    }]
+}]
+**/
 }
 
 

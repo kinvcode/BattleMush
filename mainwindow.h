@@ -132,6 +132,8 @@ private slots:
 
     void on_pushButton_screenshot_clicked();
 
+    void on_pushButton_show_room_map_portal_clicked();
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

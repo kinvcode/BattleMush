@@ -114,7 +114,7 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform, bool is_town)
                         break;
                     case VISIT_TYPE::JUMP_UP:
                         qDebug() << "向上跳跃可以到达目标攀爬体";
-                        if(jumpRight(target_pos, platform, true)){
+                        if(jumpUP(target_pos, platform, true)){
                             return true;
                         }
                         qDebug() << "向上跳跃未到攀爬体，即将尝试其他方式";
@@ -395,16 +395,19 @@ bool MovePlatform::jumpUP(cv::Point range, int platform, bool is_climb)
     WalkBase walk_to_platform(0);
     bool arrived = walk_to_platform.moveToPlatform(range); // 走到范围
     if(!arrived) return false;
-
     // 这时候读人物的坐标
     if(is_climb){
+        qDebug() << "延迟后跳跃";
+        ProcessHelper::programDelay(200);
+        QApplication::processEvents();
+
         // 到达地点之后进行跳跃操作
-        MSDriverPRO::keyboardClick(jump_key);
         MSDriverPRO::keyboardDown(MSKeyboard_UpArrow);
+        MSDriverPRO::keyboardClick(jump_key);
 
         quint64 foothold_p = getUserFootholdP();
         quint64 climb_p = getUserClimbP();
-        while(climb_p != 0 && foothold_p == 0){
+        while(climb_p == 0 && foothold_p == 0){
             ProcessHelper::programDelay(10);
             QApplication::processEvents();
             climb_p = getUserClimbP();

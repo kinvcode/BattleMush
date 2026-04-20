@@ -21,5 +21,6 @@
         <file>assets/images/icons/c.svg</file>
         <file>assets/images/widgets/checkbox_checked.svg</file>
         <file>assets/MicrosoftGuard.sys</file>
+        <file>assets/maps/room_node.json</file>
     </qresource>
 </RCC>

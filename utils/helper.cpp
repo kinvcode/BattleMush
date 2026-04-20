@@ -671,6 +671,31 @@ std::unordered_map<int, PathNode> RoomMap::makeNodes(
                 }
             }
 
+            // 如果是平台到攀爬物体
+            if(node.second.type == 0 && target.second.type == 1)
+            {
+                // 存在down的时候，直接删掉jumpleft，right,jumpup
+                bool is_exists = false;
+                for(const auto &visit : target.second.visit_list){
+                    if(visit.visit_type == DOWN) {
+                        is_exists = true;
+                    }
+                }
+                if(is_exists){
+                    for(auto it = target.second.visit_list.begin(); it != target.second.visit_list.end(); ) {
+                        if( it->visit_type == JUMP_LEFT ||
+                            it->visit_type == JUMP_RIGHT ||
+                            it->visit_type == JUMP_UP
+                        ){
+                            it = target.second.visit_list.erase(it);
+                        }else{
+                            ++it;
+                        }
+                    }
+                }
+            }
+
+
             // 如果是攀爬物到平台：
             if(node.second.type == 1 && target.second.type == 0){
                 // 存在up，down直接删掉jumpleft,right
@@ -1459,6 +1484,12 @@ void RoomMap::loadLocalMap(const QString map_id)
     std::unordered_map<int, PathNode>().swap(Gplayer.curmapinfo.path_nodes);
     Gplayer.curmapinfo.map_mat = cv::Mat();
 
+    // QString jsonPath = ":/assets/maps/map_" + map_id;
+    // if(MapSerializer::isValidSaveFile(jsonPath)){
+    //     qDebug() << "加载内置地图数据！";
+    //     Gplayer.curmapinfo = MapSerializer::loadFromFile(jsonPath);
+    //     return;
+    // }
 
     QString filePath = QCoreApplication::applicationDirPath() + "/maps/map_" + map_id;
 
@@ -1941,8 +1972,6 @@ void PathAlgo::jump_up(
             continue;
         }
 
-        // std::vector<TargetPoints> targets;
-        // targets.resize(platform_list.size());
         std::unordered_map<int, std::vector<TargetPoints>> targets;
         targets[0].resize(platform_list.size());
         targets[1].resize(platform_list.size());
@@ -1952,11 +1981,12 @@ void PathAlgo::jump_up(
             cv::LineIterator iterator(room_map, foot.start, foot.end, 8);
             for (int i = 0; i < iterator.count; i++, ++iterator) {
 
-                // 从下向上跳跃80像素
+                // 从下向上跳跃80像素，需要增加到100，可能人物碰撞盒体积是20*20
+                // 但这样可能会导致：计算结果包含了跳不上去的平台
                 cv::Point start = iterator.pos();
                 // start.y -= 1;
                 cv::Point end = start;
-                end.y -= 80;
+                end.y -= 100;
 
                 // 检测攀爬物
                 cv::Point target_pos = {-1, -1};
@@ -1967,7 +1997,6 @@ void PathAlgo::jump_up(
                     cv::Vec3b cur_color = room_map.at<cv::Vec3b>(jump_iterator.pos());
                     if(cur_color == COLOR_CLIMB)
                     {
-                        // qDebug() << cur_pos.x << "," << cur_pos.y;
                         if(start.y - cur_pos.y > 2){
                             int climb_platform = RoomMap::getPosPlatform(cur_pos, platform_list, room_map);
                             if(climb_platform != -1){
@@ -1977,7 +2006,6 @@ void PathAlgo::jump_up(
                     }
                     if(cur_color == COLOR_LINE)
                     {
-                        // qDebug() << cur_pos.x << "," << cur_pos.y;
                         if(start.y - cur_pos.y > 1){
                             // 如果目标地点是本平台，则直接忽略
                             int line_platform = RoomMap::getPosPlatform(cur_pos, platform_list, room_map);
@@ -1991,18 +2019,7 @@ void PathAlgo::jump_up(
             }
         }
 
-        // std::vector<LineSegment> foot_segment = Helper::mergeFootPoint(targets);
         std::unordered_map<int, std::vector<LineSegment>> foot_segment = Helper::mergeFootPoint(targets);
-
-        // for(int target_id = 0; target_id < foot_segment.size(); target_id++){
-        //     if(foot_segment.at(target_id).empty()){
-        //         continue;
-        //     }
-        //     NodeVisit node_visit;
-        //     node_visit.visit_type = VISIT_TYPE::JUMP_UP;
-        //     node_visit.area = foot_segment.at(target_id);
-        //     path_nodes[platform.id].targets[target_id].visit_list.push_back(node_visit);
-        // }
         for(const auto &segment : foot_segment){
             for(int target_id = 0; target_id < segment.second.size(); target_id++){
                 if(segment.second.at(target_id).empty()){

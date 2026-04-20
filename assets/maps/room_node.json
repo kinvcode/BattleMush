@@ -1,0 +1,21 @@
+[{
+    "id": "uuid",
+    "name": "地图1",
+    "target": [{
+        "id": "uuid",
+        "rect": [0, 1, 2, 3]
+    }， {
+        "id": "uuid",
+        "rect": [0, 1, 2, 3]
+    }]
+}， {
+    "id": "uuid",
+    "name": "地图2",
+    "target": [{
+        "id": "uuid",
+        "rect": [0, 1, 2, 3]
+    }， {
+        "id": "uuid",
+        "rect": [0, 1, 2, 3]
+    }]
+}]

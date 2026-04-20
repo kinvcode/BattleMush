@@ -1799,6 +1799,31 @@ color: #FF5500;</string>
             <string>地图物品</string>
            </property>
           </widget>
+          <widget class="QPushButton" name="pushButton_show_room_map_portal">
+           <property name="geometry">
+            <rect>
+             <x>110</x>
+             <y>70</y>
+             <width>80</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>31</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>31</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>传送阵</string>
+           </property>
+          </widget>
          </widget>
          <widget class="QGroupBox" name="groupBox_8">
           <property name="geometry">

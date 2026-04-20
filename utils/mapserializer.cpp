@@ -124,7 +124,8 @@ MapInfo MapSerializer::deserializeMapInfo(const QJsonObject& json, const QString
     }
 
     // 反序列化地图图片
-    QString img_file = filePath + ".png";
+    // QString img_file = filePath + ".png";
+    QString img_file = QCoreApplication::applicationDirPath() + "/maps/map_" + mapInfo.id + ".png";
     cv::Mat loaded_image = cv::imread(img_file.toStdString(), cv::IMREAD_COLOR);
     if (loaded_image.empty()) {
         mapInfo.map_mat = cv::Mat();

@@ -26,6 +26,9 @@ public:
 
     // 打印符文解除指令
     static void runeUISprites();
+
+    // 打印地图传送阵列表
+    static void roomMapPortal();
 };
 
 };

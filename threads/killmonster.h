@@ -111,6 +111,9 @@ private:
 
     PlatformSequence m_platform_sequence;
 
+    // 当前计划信息
+    TaskInfo m_task_info;
+
     // 自动清怪路线
     void autoCleanLine();
 

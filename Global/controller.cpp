@@ -80,7 +80,7 @@ void Controller::initTaskList()
     RoomPath map0000_path03;
     map0000_path03.id = 3;
     map0000_path03.name = "【路线C】上下两层循环刷";
-    map0000_path03.platforms = {0,10,5};
+    map0000_path03.platforms = {0,7,5,10};
 
     map0000.paths.push_back(map0000_path00);
     map0000.paths.push_back(map0000_path01);
