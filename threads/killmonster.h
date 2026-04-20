@@ -132,6 +132,9 @@ private:
     // 执行NPC任务
     void excuteQuest();
 
+    // 前往指定地图
+    void moveToRoomByUUID(const QString &uuid);
+
 private:
     // 刷图计划
     void taskCleanRoom();

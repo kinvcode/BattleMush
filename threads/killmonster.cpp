@@ -177,58 +177,10 @@ void KillMonster::process()
 
         if(m_task_type == 0){
             taskCleanRoom();
-
-            // qDebug() << "当前执行计划：刷图";
-            // m_task_info.type = "刷图";
-            // m_task_info.option1_label = "地图";
-
-            // int map_index = Gcontroller.m_tasks.at(m_task_id).option1_key;
-            // int path_index = Gcontroller.m_tasks.at(m_task_id).option2_key;
-
-            // // 读取地图
-            // MapRoomPath task_map = Gcontroller.m_clean_room_list.at(map_index);
-            // m_task_info.option1_text = task_map.name;
-
-            // // 当前地图UUID
-            // if(Gplayer.curmapinfo.id != task_map.uuid){
-            //     // 前往该地图
-            //     // moveToRoomByUUID(task_map.uuid);
-            //     DebugOutput::out("暂不支持自动前往的地图:" + task_map.name);
-            //     DebugOutput::out("请手动前往该地图！");
-            //     ProcessHelper::programDelay(5000);
-            //     QApplication::processEvents();
-            //     continue;
-            // }
-
-            // // 读取路线
-            // m_task_info.option2_label = "路线";
-            // m_task_info.option2_text = task_map.paths.at(path_index).name;
-
-            // // 默认第一条路线都是自动路线
-            // if(path_index == 0){
-            //     qDebug() << "刷图路线：自动规划路线";
-            //     autoCleanLine();
-            // }else{
-            //     qDebug() << "刷图路线：" + m_task_info.option2_text;
-            //     m_platform_sequence.platform_set = task_map.paths.at(path_index).platforms;
-            //     m_platform_sequence.index = 0;
-            //     // 执行路线刷图
-            //     excutePlatformSequence();
-            // }
         }else if(m_task_type == 1){
             taskRest();
-            // m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
-            // m_task_timer.restart();
-            // m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
-
-            // DebugOutput::out("暂不支持【休息】类型计划任务~,即将跳过此任务");
         }else if(m_task_type == 2){
             taskQuest();
-            // m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
-            // m_task_timer.restart();
-            // m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
-
-            // DebugOutput::out("暂不支持【NPC任务】类型计划任务~,即将跳过此任务");
         }
 
         DebugOutput::out("主线程循环体进入下一次循环");
@@ -589,7 +541,7 @@ void KillMonster::autoCleanLine()
     continue_recive:
     if(m_paused || !m_running) return;
 
-    if(Gcontroller.m_tasks.empty())
+    if(!Gcontroller.m_tasks.empty())
     {
         // 更新任务信息
         m_task_info.excute_time = Helper::timestampToHI(m_task_excute_time);
@@ -1005,6 +957,11 @@ void KillMonster::excuteQuest()
     goto retryEnter;
 }
 
+void KillMonster::moveToRoomByUUID(const QString &uuid)
+{
+    qDebug() << "前往地图：" << uuid;
+}
+
 void KillMonster::updateTaskID()
 {
     if(Gcontroller.m_tasks.size() == 1){
@@ -1036,7 +993,7 @@ void KillMonster::taskCleanRoom()
     // 当前地图UUID
     if(Gplayer.curmapinfo.id != task_map.uuid){
         // 前往该地图
-        // moveToRoomByUUID(task_map.uuid);
+        moveToRoomByUUID(task_map.uuid);
         DebugOutput::out("暂不支持自动前往的地图:" + task_map.name);
         DebugOutput::out("请手动前往该地图！");
         ProcessHelper::programDelay(5000);
