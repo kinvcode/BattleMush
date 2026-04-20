@@ -966,6 +966,9 @@ Monster Math::getNearMonster(const std::vector<Monster> &monsters, int x)
 
 bool Math::posInRange(bool to_left,cv::Point posA, cv::Point posB, cv::Point range)
 {
+    // qDebug() << "====== 范围内是否有怪物 ======";
+    // qDebug() << "检测范围:" << range.x << "," << range.y;
+
     ClimbRect attack;
     if(to_left){
         attack = {
@@ -983,13 +986,20 @@ bool Math::posInRange(bool to_left,cv::Point posA, cv::Point posB, cv::Point ran
         };
     }
 
+    // qDebug() << "在左边:" << to_left;
+    // qDebug() << "人物:" << posA.x << "," << posA.y;
+    // qDebug() << "检测框RECT：" << attack.x_left << "," << attack.y_top << " " << attack.x_right << "," << attack.y_bottom;
+    // qDebug() << "目标位置:" << posB.x << "," << posB.y;
+
     if( posB.x >= attack.x_left &&
         posB.x <= attack.x_right &&
         posB.y >= attack.y_top  &&
         posB.y <= attack.y_bottom )
     {
+        // qDebug() << "====== 范围内是否有怪物 存在 ======";
         return true;
     }
+    // qDebug() << "====== 范围内是否有怪物 没有 ======";
     return false;
 }
 

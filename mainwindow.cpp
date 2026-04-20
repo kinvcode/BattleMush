@@ -1067,3 +1067,9 @@ void MainWindow::on_pushButton_show_room_map_portal_clicked()
     Data::Game::roomMapPortal();
 }
 
+
+void MainWindow::on_pushButton_get_inrang_monster_clicked()
+{
+    Data::Game::rangeMonster();
+}
+

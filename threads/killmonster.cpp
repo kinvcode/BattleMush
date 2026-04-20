@@ -65,7 +65,7 @@ void KillMonster::resume()
     int atk_general_range_x = Gconfig.getValue("atk_range/general_x").toInt();
     int atk_general_range_y = Gconfig.getValue("atk_range/general_y").toInt();
     int atk_skill1_range_x = Gconfig.getValue("atk_range/skill1_x").toInt();
-    int atk_skill1_range_y = Gconfig.getValue("atk_range/skill2_y").toInt();
+    int atk_skill1_range_y = Gconfig.getValue("atk_range/skill1_y").toInt();
     Gcontroller.m_attack_range_general = {atk_general_range_x, atk_general_range_y};
     Gcontroller.m_attack_range_skill1 = {atk_skill1_range_x, atk_skill1_range_y};
 
@@ -89,7 +89,7 @@ void KillMonster::process()
     int atk_general_range_x = Gconfig.getValue("atk_range/general_x").toInt();
     int atk_general_range_y = Gconfig.getValue("atk_range/general_y").toInt();
     int atk_skill1_range_x = Gconfig.getValue("atk_range/skill1_x").toInt();
-    int atk_skill1_range_y = Gconfig.getValue("atk_range/skill2_y").toInt();
+    int atk_skill1_range_y = Gconfig.getValue("atk_range/skill1_y").toInt();
     Gcontroller.m_attack_range_general = {atk_general_range_x, atk_general_range_y};
     Gcontroller.m_attack_range_skill1 = {atk_skill1_range_x, atk_skill1_range_y};
 
@@ -99,7 +99,6 @@ void KillMonster::process()
     // 初始化任务
     m_task_id = 0;
     m_task_excute_time = 0;
-    m_task_running = false;
 
     // 模拟路线
     m_platform_sequence.index = 0;
@@ -153,9 +152,6 @@ void KillMonster::process()
             continue;
         }
 
-        // RetryCase:
-        if(m_paused) continue;
-
         // 检查键盘
         if ((GetKeyState(VK_NUMLOCK) & 1)) MSDriverPRO::keyboardClick(0x45);
 
@@ -175,28 +171,13 @@ void KillMonster::process()
             continue;
         }
 
-        if(!m_task_running){
-            m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
-            m_task_running = true;
-            m_task_timer.start();
-        }else{
-            int run_time = Gcontroller.m_tasks.at(m_task_id).runTime;
-            int excute_time = m_task_timer.elapsed() / 1000;
-            if(excute_time > run_time){
-                DebugOutput::out("计划任务已执行:" + QString::number(excute_time) + "秒");
-                DebugOutput::out("本次计划任务已执行完毕，即将进行下一个计划");
+        m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
+        m_task_timer.restart();
 
-                m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
-                m_task_timer.restart();
-                m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
-                continue;
-            }
-        }
-
-        // m_task_info;
         m_task_info.id = m_task_id;
 
         if(m_task_type == 0){
+            qDebug() << "当前执行计划：刷图";
             m_task_info.type = "刷图";
             m_task_info.option1_label = "地图";
 
@@ -211,7 +192,6 @@ void KillMonster::process()
             if(Gplayer.curmapinfo.id != task_map.uuid){
                 // 前往该地图
                 // moveToRoomByUUID(task_map.uuid);
-
                 DebugOutput::out("暂不支持自动前往的地图:" + task_map.name);
                 DebugOutput::out("请手动前往该地图！");
                 ProcessHelper::programDelay(5000);
@@ -220,19 +200,16 @@ void KillMonster::process()
             }
 
             // 读取路线
-            m_task_room_path = task_map.paths.at(path_index).platforms;
             m_task_info.option2_label = "路线";
             m_task_info.option2_text = task_map.paths.at(path_index).name;
 
             // 默认第一条路线都是自动路线
             if(path_index == 0){
-                // 更新任务信息
-                m_task_excute_time = m_task_timer.elapsed() / 1000;
-                m_task_info.excute_time = Helper::timestampToHI(m_task_excute_time);
-                sendTaskInfo(m_task_info);
+                qDebug() << "刷图路线：自动规划路线";
                 autoCleanLine();
             }else{
-                m_platform_sequence.platform_set = m_task_room_path;
+                qDebug() << "刷图路线：" + m_task_info.option2_text;
+                m_platform_sequence.platform_set = task_map.paths.at(path_index).platforms;
                 m_platform_sequence.index = 0;
                 // 执行路线刷图
                 excutePlatformSequence();
@@ -320,7 +297,7 @@ Item KillMonster::findDropItem()
     quint64 entity_head = readLong(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::InternalArray) + BASE::InternalArray::Head;
 
     m_allItem.clear();
-    qDebug() << "====== 刷新物品 ======";
+    // qDebug() << "====== 刷新物品 ======";
     for(int i = m_map_start; i < map_entity_count; i++){
 
         quint64 cur_entity_address = entity_head + i * 8;
@@ -337,7 +314,7 @@ Item KillMonster::findDropItem()
             continue;
         }
 
-        qDebug() << "物品:" << QString::number(entity,16).toUpper();
+        // qDebug() << "物品:" << QString::number(entity,16).toUpper();
         // qDebug() << "UUID:" << GameStruct::readEntityID(entity);
 
 
@@ -345,25 +322,25 @@ Item KillMonster::findDropItem()
         QString _SpriteRUID = readString(readLong(readLong(entity + BASE::MODEntity::SpriteRendererComponent)
             + BASE::SpriteRendererComponent::_SpriteRUID) + BASE::String::text,100);
         if(_SpriteRUID == "7eba29245d2f4e7fb157a9dbe160a241"){
-            qDebug() << "物品已消失~";
+            // qDebug() << "物品已消失~";
             continue;
         }
 
         // // 过滤黑名单
         if(m_black_item_pro.find(entity) != m_black_item_pro.end()){
             if(m_timer.elapsed() - m_black_item_pro[entity] > 5000){
-                qDebug() << "存在黑名单中超过5秒，移除黑名单";
+                // qDebug() << "存在黑名单中超过5秒，移除黑名单";
                 m_black_item_pro.erase(entity);
                 Gplayer.m_black_item_pro = m_black_item_pro;
             }else{
-                qDebug() << "该物品在黑名单";
+                // qDebug() << "该物品在黑名单";
                 continue;
             }
         }
 
         float item_x = readFloat(readLong(entity + BASE::MODEntity::TransformComponent)+BASE::TransformComponent::PositionX);
         float item_y = readFloat(readLong(entity + BASE::MODEntity::TransformComponent)+BASE::TransformComponent::PositionY);
-        qDebug() << "浮点坐标:" << item_x << "," << item_y;
+        // qDebug() << "浮点坐标:" << item_x << "," << item_y;
 
         int x = RoomMap::toMapPosX(item_x, Gplayer.curmapinfo.map_bounding.x_offset);
         int y = RoomMap::toMapPosY(item_y, Gplayer.curmapinfo.map_bounding.y_offset,Gplayer.curmapinfo.map_bounding.height);
@@ -374,7 +351,7 @@ Item KillMonster::findDropItem()
             continue;
         }
 
-        qDebug() << "物品坐标" << x << "," << y;
+        // qDebug() << "物品坐标" << x << "," << y;
 
         int line_id = RoomMap::getPosPlatform(item_pos, Gplayer.curmapinfo.platform_list, Gplayer.curmapinfo.map_mat);
         if(line_id == -1){
@@ -382,14 +359,14 @@ Item KillMonster::findDropItem()
             continue;
         }
 
-        qDebug() << "物品平台" << line_id;
+        // qDebug() << "物品平台" << line_id;
 
         target_item.pos = item_pos;
         target_item.entity = entity;
         target_item.line_id = line_id;
         m_allItem.push_back(target_item);
     }
-    qDebug() << "====== 刷新物品 ======";
+    // qDebug() << "====== 刷新物品 ======";
 
     if(m_allItem.empty()){
         qDebug() << "全图未发现物品！！！";
@@ -411,7 +388,7 @@ Item KillMonster::findDropItem()
             if( diff < distance){
                 distance = diff;
                 target_item = item;
-                qDebug() << "发现本平台物品,距离自己:" << distance << "坐标:" << item.pos.x << "," << item.pos.y;
+                // qDebug() << "发现本平台物品,距离自己:" << distance << "坐标:" << item.pos.x << "," << item.pos.y;
             }
         }
     }
@@ -520,13 +497,13 @@ void KillMonster::killNearMonster(const std::vector<Monster> &handle_monsters)
 
 void KillMonster::reciveItem(const Item &target_item)
 {
-    cv::Point user_pos = userPos();
-    qDebug() << "人物坐标：" << user_pos.x << "," << user_pos.y;
+    // cv::Point user_pos = userPos();
+    // qDebug() << "人物坐标：" << user_pos.x << "," << user_pos.y;
 
 
-    qDebug() << "目标物品：" << target_item.line_id << "->" << QString::number(target_item.entity,16).toUpper() << ":" << target_item.pos.x << "," << target_item.pos.y;
-    qDebug() << "UUID:" << GameStruct::readEntityID(target_item.entity);
-    qDebug() << "开始寻路拾取~";
+    // qDebug() << "目标物品：" << target_item.line_id << "->" << QString::number(target_item.entity,16).toUpper() << ":" << target_item.pos.x << "," << target_item.pos.y;
+    // qDebug() << "UUID:" << GameStruct::readEntityID(target_item.entity);
+    // qDebug() << "开始寻路拾取~";
 
     WalkBase user_move(target_item.pos.x);
     user_move.m_deviation = 10; // 修改一下误差范围
@@ -602,17 +579,27 @@ void KillMonster::solveRune()
 
 void KillMonster::autoCleanLine()
 {
-    // 先检查BUFF
-    skillRecast();
-
-    // 智能线路
-    // 获取人物所在地板
-    int user_in_lineid = userPlatform();
-
-    // 优先找物品，找物品过程中可以找怪物，真正没有怪物的时候才会去找怪物
-    Item cur_item = findDropItem();
     continue_recive:
     if(m_paused || !m_running) return;
+
+    if(Gcontroller.m_tasks.empty())
+    {
+        // 更新任务信息
+        m_task_info.excute_time = Helper::timestampToHI(m_task_excute_time);
+        sendTaskInfo(m_task_info);
+
+        m_task_excute_time = m_task_timer.elapsed() / 1000;
+        int run_time = Gcontroller.m_tasks.at(m_task_id).runTime;
+        if(m_task_excute_time > run_time){
+            DebugOutput::out("计划任务已执行:" + QString::number(m_task_excute_time) + "秒");
+            DebugOutput::out("本次计划任务已执行完毕，即将进行下一个计划");
+            m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
+            return;
+        }
+    }
+
+    // 先检查BUFF
+    skillRecast();
 
     // 符文检测
     if(isExistsRune()){
@@ -622,6 +609,13 @@ void KillMonster::autoCleanLine()
         QApplication::processEvents();
         goto continue_recive;
     }
+
+    // 智能线路
+    // 获取人物所在地板
+    int user_in_lineid = userPlatform();
+
+    // 优先找物品，找物品过程中可以找怪物，真正没有怪物的时候才会去找怪物
+    Item cur_item = findDropItem();
 
     if(cur_item.entity != 0 && cur_item.line_id != -1){
         DebugOutput::out("发现需要拾取的物品~");
@@ -754,9 +748,17 @@ void KillMonster::excutePlatformSequence()
     }
 
     // 更新任务信息
-    m_task_excute_time = m_task_timer.elapsed() / 1000;
     m_task_info.excute_time = Helper::timestampToHI(m_task_excute_time);
     sendTaskInfo(m_task_info);
+
+    m_task_excute_time = m_task_timer.elapsed() / 1000;
+    int run_time = Gcontroller.m_tasks.at(m_task_id).runTime;
+    if(m_task_excute_time > run_time){
+        DebugOutput::out("计划任务已执行:" + QString::number(m_task_excute_time) + "秒");
+        DebugOutput::out("本次计划任务已执行完毕，即将进行下一个计划");
+        m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
+        return;
+    }
 
     // 符文检测
     if(isExistsRune()){
@@ -773,14 +775,14 @@ void KillMonster::excutePlatformSequence()
     // 获取人物所在地板
     int user_in_lineid = userPlatform();
     if(user_in_lineid == -1){
-        qDebug() << "人物平台未知，可能在空中";
+        // qDebug() << "人物平台未知，可能在空中";
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
         goto retryEnter;
     }
 
     int plat_count = m_platform_sequence.platform_set.size();
-    qDebug() << "节点数量：" << plat_count;
+    qDebug() << "路线节点数量：" << plat_count;
 
     bool user_in_platline = false;
     for(int i = 0; i < plat_count; i++){
@@ -817,7 +819,7 @@ void KillMonster::excutePlatformSequence()
         }
 
         int plat = m_platform_sequence.index + 1 >= plat_count ? m_platform_sequence.platform_set[0] : m_platform_sequence.platform_set[m_platform_sequence.index+1];
-        qDebug() << "前往下个节点：" << plat;
+        qDebug() << "前往路线下个节点：" << plat;
 
         PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
         bool move_success = MovePlatform::toPlatform(node, plat);

@@ -36,6 +36,7 @@ void Controller::updateAttackInfo()
 
     m_attack_info.type = attack_type;
     m_attack_info.range = atk_range;
+    // qDebug() << "攻击类型:" << m_attack_info.type << " 范围:" << m_attack_info.range.x << "," <<m_attack_info.range.y;
 }
 
 void Controller::initTaskList()

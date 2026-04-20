@@ -235,7 +235,7 @@ void WalkBase::clearMonster(const Monster &monster)
             // qDebug() << "检测范围内是否存在怪物~";
             new_monster = monsterInRange(is_left, map_start);
             if(new_monster.pos.x != -1){
-                DebugOutput::out("范围内存在怪物，进行攻击");
+                // DebugOutput::out("范围内存在怪物，进行攻击");
                 user_pos = getUserPos();
                 attackMonster(user_pos, new_monster); // 实际上必须依赖这里进行攻击怪物。攻击频率10帧
                 qDebug() << "寻怪提前完毕~";
@@ -653,8 +653,8 @@ Monster WalkBase::monsterInRange(bool is_left, int &start_index)
         monster_pos = {monster_x, monster_y};
         if(Math::posInRange(is_left, user_pos, monster_pos,Gcontroller.m_attack_info.range)){
             monster_pos = {monster_x,monster_y};
-            qDebug() << "人物当前位置:" << user_pos.x << "," << user_pos.y;
-            qDebug() << "发现怪物在攻击范围：" << monster_x << "," << monster_y;
+            // qDebug() << "人物当前位置:" << user_pos.x << "," << user_pos.y;
+            // qDebug() << "发现怪物在攻击范围：" << monster_x << "," << monster_y;
             target_monster.entity = entity;
             target_monster.pos = {monster_x, monster_y};
             return target_monster;
@@ -695,13 +695,13 @@ bool WalkBase::itemExists(int start_index)
         QString _SpriteRUID = readString(readLong(readLong(entity + BASE::MODEntity::SpriteRendererComponent)
                                                   + BASE::SpriteRendererComponent::_SpriteRUID) + BASE::String::text,100);
         if(_SpriteRUID == "7eba29245d2f4e7fb157a9dbe160a241"){
-            qDebug() << "物品已消失~";
+            // qDebug() << "物品已消失~";
             continue;
         }
 
         // 过滤黑名单
         if(Gplayer.m_black_item_pro.find(entity) != Gplayer.m_black_item_pro.end()){
-            qDebug() << "该物品在黑名单";
+            // qDebug() << "该物品在黑名单";
             continue;
         }
         return true;

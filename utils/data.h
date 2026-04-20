@@ -29,6 +29,9 @@ public:
 
     // 打印地图传送阵列表
     static void roomMapPortal();
+
+    // 打印范围内怪物
+    static void rangeMonster();
 };
 
 };

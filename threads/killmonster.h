@@ -37,15 +37,12 @@ private:
     std::vector<Item> m_allItem;
 
     // 黑名单物品（已经找过的物品，用于过滤掉其他玩家的物品）
-    std::unordered_set<quint64> m_black_item;
     std::unordered_map<quint64,int> m_black_item_pro;
 
     // 计划任务
-    bool m_task_running = false;
     int m_task_id = 0; // 当前执行的任务ID
     int m_task_type = 0; // 当前执行的任务类型
     int m_task_excute_time = 0; // 当前任务执行的时间
-    std::vector<int> m_task_room_path; //当前执行的路径
     QElapsedTimer m_task_timer; // 当前任务计时器
 
     // 技能频率
@@ -109,6 +106,7 @@ private:
         std::vector<int> platform_set;
     };
 
+    // 当前刷图路线
     PlatformSequence m_platform_sequence;
 
     // 当前计划信息

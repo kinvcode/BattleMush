@@ -5,6 +5,7 @@
 #include "utils/helper.h"
 #include "global/gameoffset.h"
 #include "utils/gamestruct.h"
+#include "global/controller.h"
 
 using namespace Mem;
 
@@ -400,6 +401,79 @@ void Data::Game::roomMapPortal()
     }]
 }]
 **/
+}
+
+void Data::Game::rangeMonster()
+{
+    qDebug() << "攻击类型:" << Gcontroller.m_attack_info.type << " 范围:" << Gcontroller.m_attack_info.range.x << "," << Gcontroller.m_attack_info.range.y;
+
+    quint64 map_entity = mapEntity();
+
+    Item target_item;
+    target_item.entity = 0;
+
+    quint64 p_curmapentity = readPointer(map_entity,
+                                         BASE::MODEntity::children,
+                                         BASE::List::InternalArray,
+                                         BASE::InternalArray::Head + 0 * 8);
+
+    quint64 map_entity_count = readInt(readLong(p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
+    quint64 entity_head = readLong(readLong(p_curmapentity + BASE::MODEntity::children) + BASE::List::InternalArray) + BASE::InternalArray::Head;
+
+    // MapBounding map_bounding = RoomMap::getMapBounding(p_curmapentity);
+
+    bool is_item_start = false;
+    cv::Point user_pos = {-1, -1};
+
+    quint64 transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+    float user_x = readFloat(transform + BASE::TransformComponent::PositionX);
+    float user_y = readFloat(transform + BASE::TransformComponent::PositionY);
+    user_pos.x = RoomMap::toMapPosX(user_x,Gplayer.curmapinfo.map_bounding.x_offset);
+    user_pos.y = RoomMap::toMapPosY(user_y,Gplayer.curmapinfo.map_bounding.y_offset, Gplayer.curmapinfo.map_bounding.height);
+
+
+    bool is_left = false;
+    for(int i = 0; i < map_entity_count; i++){
+
+        quint64 cur_entity_address = entity_head + i * 8;
+        quint64 entity = readLong(cur_entity_address);
+
+        QString name = GameStruct::readEntityName(entity);
+        // qDebug() << name;
+        if(name == "EndObj"){
+            is_item_start = true;
+            continue;
+        }
+
+        if(!is_item_start){
+            continue;
+        }
+
+        if(name != "Monster"){
+            continue;
+        }
+
+        // 判断怪物是否存在
+        bool exists = readByte(readLong(entity + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::exists);
+        if(!exists){
+            continue;
+        }
+
+        QString status = readString( readLong( readLong(entity + BASE::MODEntity::StateComponent)
+                                             + BASE::StateComponent::_CurrentStateName) + BASE::String::text, 10);
+        if(status == "DEAD"){
+            continue;
+        }
+
+        quint64 pos_p = readLong(entity + BASE::MODEntity::RigidbodyComponent);
+        float float_x = readFloat(pos_p + BASE::RigidbodyComponent::airPos);
+        float float_y = readFloat(pos_p + BASE::RigidbodyComponent::airPos + 4);
+        int monster_x = RoomMap::toMapPosX(float_x, Gplayer.curmapinfo.map_bounding.x_offset);
+        int monster_y = RoomMap::toMapPosY(float_y, Gplayer.curmapinfo.map_bounding.y_offset,Gplayer.curmapinfo.map_bounding.height);
+        // qDebug() << monster_x << "," << monster_y;
+        cv::Point monster_pos = {monster_x, monster_y};
+        Math::posInRange(is_left, user_pos, monster_pos,Gcontroller.m_attack_info.range);
+    }
 }
 
 
