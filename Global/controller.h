@@ -35,6 +35,8 @@ public:
     // 计划列表
     static std::vector<Task> m_tasks;
 
+    static bool m_disable_attack;
+
 // ====== 便捷函数 ======
 public:
     static void updateAttackInfo();

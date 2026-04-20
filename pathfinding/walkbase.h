@@ -28,6 +28,8 @@ public:
 
     bool moveToPlatform(cv::Point range, bool self_climb = false);
 
+    bool moveToPortal(cv::Point range);
+
 private:
     int getUserX();
 

@@ -959,7 +959,89 @@ void KillMonster::excuteQuest()
 
 void KillMonster::moveToRoomByUUID(const QString &uuid)
 {
+    retryEnter:
+    if(m_paused || !m_running){
+        return;
+    }
+
     qDebug() << "前往地图：" << uuid;
+    //3294 , 2273   3395 , 2415  43 弓箭手村训练场1
+    // 2297 , 1442   2371 , 1495 31 菇菇山丘
+
+    // IntRect portal = {3294,2273,3395,2415};
+
+    // // 找到地板id
+    // for(const auto &platform : Gplayer.curmapinfo.platform_list)
+    // {
+    //     //
+    // }
+
+    int platform = 31;
+    cv::Point area = {2297,2371};
+
+    int user_in_lineid;
+    user_in_lineid = userPlatform();
+
+    if(user_in_lineid == platform){
+        qDebug() << "人物已到达传送阵所在平台";
+
+        WalkBase walk_to_platform(0);
+        qDebug() << "寻路到传送阵";
+        Gcontroller.m_disable_attack = true;
+        bool success = walk_to_platform.moveToPlatform(area); // 走到范围
+        Gcontroller.m_disable_attack = false;
+        if(success){
+            qDebug() << "已到达传送阵位置";
+            ProcessHelper::programDelay(3000);
+            QApplication::processEvents();
+            goto retryEnter;
+        }
+        qDebug() << "移动传送阵位置失败";
+        ProcessHelper::programDelay(500);
+        goto retryEnter;
+    }
+
+    std::vector<int> paths = PathAlgo::findAStarPath(user_in_lineid, platform, Gplayer.curmapinfo.path_nodes);
+    qDebug() << "======A星路径======";
+    for(auto const &path : paths){
+        qDebug() << path;
+    }
+    qDebug() << "======A星路径======";
+
+    if(paths.empty()){
+        qDebug() << "无法找到前往该平台的路径";
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        goto retryEnter;
+    }
+
+    for(auto plat : paths){
+        user_in_lineid = userPlatform();
+
+        PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
+        qDebug() << "准备前往平台:" << plat;
+        Gcontroller.m_disable_attack = true;
+        bool move_success = MovePlatform::toPlatform(node, plat);
+        Gcontroller.m_disable_attack = false;
+        if(!move_success){
+            qDebug() << "A星移动平台失败 平台:" << plat;
+            ProcessHelper::programDelay(100);
+            QApplication::processEvents();
+            goto retryEnter;
+        }
+
+        user_in_lineid = userPlatform();
+        if(user_in_lineid == platform){
+            DebugOutput::out("A星已到达目标路线节点");
+            goto retryEnter;
+        }
+    }
+
+    DebugOutput::out("A星到达路线节点失败~，重新执行路线");
+    ProcessHelper::programDelay(100);
+    QApplication::processEvents();
+    goto retryEnter;
+
 }
 
 void KillMonster::updateTaskID()
@@ -993,7 +1075,7 @@ void KillMonster::taskCleanRoom()
     // 当前地图UUID
     if(Gplayer.curmapinfo.id != task_map.uuid){
         // 前往该地图
-        moveToRoomByUUID(task_map.uuid);
+        // moveToRoomByUUID(task_map.uuid);
         DebugOutput::out("暂不支持自动前往的地图:" + task_map.name);
         DebugOutput::out("请手动前往该地图！");
         ProcessHelper::programDelay(5000);
@@ -1034,7 +1116,7 @@ void KillMonster::taskRest()
     // 当前地图UUID
     if(Gplayer.curmapinfo.id != task_map.uuid){
         // 前往该地图
-        // moveToRoomByUUID(task_map.uuid);
+        moveToRoomByUUID(task_map.uuid);
         DebugOutput::out("暂不支持自动前往的地图:" + task_map.name);
         DebugOutput::out("请手动前往该地图！");
         ProcessHelper::programDelay(5000);

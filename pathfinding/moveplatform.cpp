@@ -294,7 +294,7 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
 
         quint64 foothold_p = getUserFootholdP();
         quint64 climb_p = getUserClimbP();
-        while(climb_p != 0 && foothold_p == 0){
+        while(climb_p == 0 && foothold_p == 0){
             ProcessHelper::programDelay(10);
             QApplication::processEvents();
             climb_p = getUserClimbP();
@@ -339,19 +339,21 @@ bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool 
     int jump_key = Gplayer.m_bindkey.jump;
 
     WalkBase walk_to_platform(0);
+    // qDebug() << "移动到范围:" << range.x << "," << range.y;
     bool arrived = walk_to_platform.moveToPlatform(range, self_climb); // 走到范围
     if(!arrived) return false;
 
     // 这时候读人物的坐标
     if(is_climb){
         // 到达地点之后进行跳跃操作
+        // qDebug() << "向右跳跃";
         MSDriverPRO::keyboardDown(MSKeyboard_RightArrow);
-        MSDriverPRO::keyboardClick(jump_key);
         MSDriverPRO::keyboardDown(MSKeyboard_UpArrow);
+        MSDriverPRO::keyboardClick(jump_key);
 
         quint64 foothold_p = getUserFootholdP();
         quint64 climb_p = getUserClimbP();
-        while(climb_p != 0 && foothold_p == 0){
+        while(climb_p == 0 && foothold_p == 0){
             ProcessHelper::programDelay(10);
             QApplication::processEvents();
             climb_p = getUserClimbP();

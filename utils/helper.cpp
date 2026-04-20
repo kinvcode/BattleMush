@@ -693,6 +693,25 @@ std::unordered_map<int, PathNode> RoomMap::makeNodes(
                         }
                     }
                 }
+
+                // 存在jumpup的时候，直接删掉jumpleft，right
+                is_exists = false;
+                for(const auto &visit : target.second.visit_list){
+                    if(visit.visit_type == JUMP_UP) {
+                        is_exists = true;
+                    }
+                }
+                if(is_exists){
+                    for(auto it = target.second.visit_list.begin(); it != target.second.visit_list.end(); ) {
+                        if( it->visit_type == JUMP_LEFT ||
+                            it->visit_type == JUMP_RIGHT
+                            ){
+                            it = target.second.visit_list.erase(it);
+                        }else{
+                            ++it;
+                        }
+                    }
+                }
             }
 
 

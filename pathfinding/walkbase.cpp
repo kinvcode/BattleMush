@@ -445,17 +445,19 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
     // 先执行一次范围检测
     Monster new_monster;
     if(!self_climb){
-        new_monster = monsterInRange(is_left, map_start);
-        if(new_monster.pos.x != -1){
-            qDebug() << "范围内存在怪物，结束移动到平台连接点。攻击目标:" << new_monster.pos.x << "," << new_monster.pos.y;
-            if(self_climb){
-                clearYkey();
-            }else{
-                clearXkey();
+        if(!Gcontroller.m_disable_attack){
+            new_monster = monsterInRange(is_left, map_start);
+            if(new_monster.pos.x != -1){
+                qDebug() << "范围内存在怪物，结束移动到平台连接点。攻击目标:" << new_monster.pos.x << "," << new_monster.pos.y;
+                if(self_climb){
+                    clearYkey();
+                }else{
+                    clearXkey();
+                }
+                cv::Point user_pos = getUserPos();
+                attackMonster(user_pos, new_monster);
+                return false;
             }
-            cv::Point user_pos = getUserPos();
-            attackMonster(user_pos, new_monster);
-            return false;
         }
     }
 
@@ -473,28 +475,30 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
         }
 
         // 每0.1秒检测一次怪物和物品
-        if(!self_climb){
-            if(cur_time - last_time > 100){
-                last_time = cur_time;
+        if(!Gcontroller.m_disable_attack){
+            if(!self_climb){
+                if(cur_time - last_time > 100){
+                    last_time = cur_time;
 
-                // 存在物品直接退出
-                if(itemExists(map_start)){
-                    DebugOutput::out("存在物品，退出平台移动");
-                    return false;
-                }
-
-                new_monster = monsterInRange(is_left, map_start);
-                if(new_monster.pos.x != -1){
-                    DebugOutput::out("范围内存在怪物，进行攻击");
-                    if(self_climb){
-                        clearYkey();
-                    }else{
-                        clearXkey();
+                    // 存在物品直接退出
+                    if(itemExists(map_start)){
+                        DebugOutput::out("存在物品，退出平台移动");
+                        return false;
                     }
-                    cv::Point user_pos = getUserPos();
-                    attackMonster(user_pos, new_monster);
-                    qDebug() << "移动平台连接点提前完毕~";
-                    return false;
+
+                    new_monster = monsterInRange(is_left, map_start);
+                    if(new_monster.pos.x != -1){
+                        DebugOutput::out("范围内存在怪物，进行攻击");
+                        if(self_climb){
+                            clearYkey();
+                        }else{
+                            clearXkey();
+                        }
+                        cv::Point user_pos = getUserPos();
+                        attackMonster(user_pos, new_monster);
+                        qDebug() << "移动平台连接点提前完毕~";
+                        return false;
+                    }
                 }
             }
         }

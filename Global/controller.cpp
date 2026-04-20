@@ -21,6 +21,8 @@ std::vector<NPCQuest> Controller::m_quest_list = {};
 
 std::vector<Task> Controller::m_tasks = {};
 
+bool Controller::m_disable_attack = false;
+
 void Controller::updateAttackInfo()
 {
     cv::Point atk_range;

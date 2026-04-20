@@ -50,6 +50,13 @@ typedef struct{
     float y_bottom;
 }FloatRect;
 
+typedef struct{
+    int x_left;
+    int y_top;
+    int x_right;
+    int y_bottom;
+}IntRect;
+
 typedef struct  {
     float left;
     float top;
