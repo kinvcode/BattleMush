@@ -52,6 +52,8 @@ private:
 
     Monster monsterInRange(bool is_left, int &start_index);
 
+    bool itemExists(int start_index);
+
     void attackMonster(cv::Point user_pos, const Monster &monster);
 };
 

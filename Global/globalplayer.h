@@ -87,6 +87,8 @@ public:
     // 用户绑定的按键
     BindKey m_bindkey; // 建议放到controller里面
 
+    std::unordered_map<quint64,int> m_black_item_pro;
+
     // 一些测试数据
     std::vector<std::pair<float, float>> move_pos_list;
 

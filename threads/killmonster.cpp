@@ -352,8 +352,9 @@ Item KillMonster::findDropItem()
         // // 过滤黑名单
         if(m_black_item_pro.find(entity) != m_black_item_pro.end()){
             if(m_timer.elapsed() - m_black_item_pro[entity] > 5000){
-                 qDebug() << "存在黑名单中超过5秒，移除黑名单";
+                qDebug() << "存在黑名单中超过5秒，移除黑名单";
                 m_black_item_pro.erase(entity);
+                Gplayer.m_black_item_pro = m_black_item_pro;
             }else{
                 qDebug() << "该物品在黑名单";
                 continue;
@@ -402,6 +403,7 @@ Item KillMonster::findDropItem()
     for(const auto &item : m_allItem){
         if (m_black_item_pro.find(item.entity) != m_black_item_pro.end()) {
             m_black_item_pro.erase(item.entity);
+            Gplayer.m_black_item_pro = m_black_item_pro;
         }
         // 找到离自己最近的物品
         if(item.line_id == user_platform){
@@ -531,6 +533,7 @@ void KillMonster::reciveItem(const Item &target_item)
     if(user_move.moveToItem()){
         // 加入到黑名单
         m_black_item_pro[target_item.entity] = m_timer.elapsed();
+        Gplayer.m_black_item_pro = m_black_item_pro;
     }
 }
 
@@ -787,16 +790,17 @@ void KillMonster::excutePlatformSequence()
         }
     }
     if(user_in_platline){
+
+        // 先找物品
+        Item cur_item = findDropItem();
+        if(cur_item.line_id == user_in_lineid && cur_item.entity != 0){
+            DebugOutput::out("人物所在平台存在物品，开始拾取~");
+            reciveItem(cur_item);
+            goto retryEnter;
+        }
+
         // 如果只有一个节点
         if(plat_count == 1){
-            // 先找物品
-            Item cur_item = findDropItem();
-            if(cur_item.line_id == user_in_lineid && cur_item.entity != 0){
-                DebugOutput::out("人物所在平台存在物品，开始拾取~");
-                reciveItem(cur_item);
-                goto retryEnter;
-            }
-
             // 清理该平台怪物
             updateAllMonsters();
             std::vector<Monster> handle_monsters = getLineMonsters(user_in_lineid);

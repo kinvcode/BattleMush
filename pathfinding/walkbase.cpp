@@ -376,9 +376,6 @@ bool WalkBase::moveToItem()
 bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
 {
     m_transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
-    // int atk_skill1_range_x = Gconfig.getValue("atk_range/skill1_x").toInt();
-    // int atk_skill1_range_y = Gconfig.getValue("atk_range/skill2_y").toInt();
-    // m_skill_range = {atk_skill1_range_x, atk_skill1_range_y};
     Controller::updateAttackInfo();
 
     int user_pos;
@@ -475,10 +472,17 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
             return false;
         }
 
-        // 每0.1秒检测一次怪物
+        // 每0.1秒检测一次怪物和物品
         if(!self_climb){
             if(cur_time - last_time > 100){
                 last_time = cur_time;
+
+                // 存在物品直接退出
+                if(itemExists(map_start)){
+                    DebugOutput::out("存在物品，退出平台移动");
+                    return false;
+                }
+
                 new_monster = monsterInRange(is_left, map_start);
                 if(new_monster.pos.x != -1){
                     DebugOutput::out("范围内存在怪物，进行攻击");
@@ -640,14 +644,6 @@ Monster WalkBase::monsterInRange(bool is_left, int &start_index)
             continue;
         }
 
-        // 存放怪物信息:怪物指针，怪物所在地板，怪物所在平台
-        // int foothold_id = readInt(readLong(readLong(entity + BASE::MODEntity::RigidbodyComponent)
-            // + BASE::RigidbodyComponent::currentFoothold) + BASE::Foothold::ID);
-        // int line_id = RoomMap::getFootPlatform(foothold_id, Gplayer.curmapinfo.platform_list);
-        // if(line_id == -1){
-        //     continue;
-        // }
-
         quint64 pos_p = readLong(entity + BASE::MODEntity::RigidbodyComponent);
         float float_x = readFloat(pos_p + BASE::RigidbodyComponent::airPos);
         float float_y = readFloat(pos_p + BASE::RigidbodyComponent::airPos + 4);
@@ -669,6 +665,49 @@ Monster WalkBase::monsterInRange(bool is_left, int &start_index)
     // qDebug() << "======范围检测======";
 
     return target_monster;
+}
+
+bool WalkBase::itemExists(int start_index)
+{
+    quint64 count = readInt(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
+    quint64 head = readLong(readLong(Gplayer.p_curmapentity
+        + BASE::MODEntity::children)
+        + BASE::List::InternalArray)
+        + BASE::InternalArray::Head;
+
+    for(int i = start_index; i < count; i++){
+        // 节省遍历时间
+        quint64 cur_entity_address = head + i * 8;
+        quint64 entity = readLong(cur_entity_address);
+
+        // 找到End标记位
+        QString name = GameStruct::readEntityName(entity);
+        if(name == "EndObj"){
+            start_index = i + 1;
+            continue;
+        }
+
+        if(name != "PoolObject"){
+            continue;
+        }
+
+        // 如果物品已经消失
+        QString _SpriteRUID = readString(readLong(readLong(entity + BASE::MODEntity::SpriteRendererComponent)
+                                                  + BASE::SpriteRendererComponent::_SpriteRUID) + BASE::String::text,100);
+        if(_SpriteRUID == "7eba29245d2f4e7fb157a9dbe160a241"){
+            qDebug() << "物品已消失~";
+            continue;
+        }
+
+        // 过滤黑名单
+        if(Gplayer.m_black_item_pro.find(entity) != Gplayer.m_black_item_pro.end()){
+            qDebug() << "该物品在黑名单";
+            continue;
+        }
+        return true;
+    }
+
+    return false;
 }
 
 void WalkBase::attackMonster(cv::Point user_pos, const Monster &monster)
