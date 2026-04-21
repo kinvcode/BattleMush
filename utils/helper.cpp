@@ -1491,6 +1491,24 @@ int RoomMap::getClimbPlatform(cv::Point pos, const std::vector<Platform> &platfo
     return -1;
 }
 
+int RoomMap::getRectPlatform(IntRect rect, const std::vector<Platform> &platform_list)
+{
+    int x = rect.x_left;
+    for(int i = rect.y_bottom; i > rect.y_top; i--){
+        for(const auto &platform : platform_list){
+            for(const auto &foot : platform.line_child){
+                if(i == foot.start.y && i == foot.end.y){
+                    if(x >= foot.start.x && x <= foot.end.x){
+                        return platform.id;
+                    }
+                }
+            }
+        }
+    }
+
+    return -1;
+}
+
 int RoomMap::getPlatformType(int platform_id, const std::vector<Platform> &platform_list)
 {
     for(const auto &item : platform_list){

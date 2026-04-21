@@ -167,6 +167,9 @@ public:
     // 计算坐标所在攀爬平台
     static int getClimbPlatform(cv::Point pos, const std::vector<Platform> &platform_list, const cv::Mat &room_map);
 
+    // 计算RECT所在平台
+    static int getRectPlatform(IntRect rect,const std::vector<Platform> &platform_list);
+
     // 获取平台的类型
     static int getPlatformType(int platform_id, const std::vector<Platform> &platform_list);
 

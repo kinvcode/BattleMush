@@ -267,6 +267,11 @@ void Data::Game::runeUISprites()
 
 void Data::Game::roomMapPortal()
 {
+    if(Gplayer.curmapinfo.platform_list.empty()){
+        qDebug() << "地图平台列表为空，无法计算";
+        return;
+    }
+
     quint64 p_gamecontext = gamecontext();
     quint64 p_uientity = readPointer(p_gamecontext, BASE::GameContext::UIEntity);
 
@@ -279,6 +284,8 @@ void Data::Game::roomMapPortal()
 
     QString map_id = GameStruct::readEntityID(p_curmapentity);
     qDebug() << "UUID:" << map_id;
+
+    // 必须要有地图文件
 
     quint64 ui_entity = p_uientity;
     quint64 main_group = Helper::findChild(ui_entity, "MainGroup");
@@ -365,9 +372,9 @@ void Data::Game::roomMapPortal()
 
             FloatRect float_rect;
             Math::ComputeClimbRect(&cur_climb, float_rect);
-            qDebug() << "浮点rect：" << float_rect.x_left << "," << float_rect.y_top << " " << float_rect.x_right << "," << float_rect.y_bottom;
+            // qDebug() << "浮点rect：" << float_rect.x_left << "," << float_rect.y_top << " " << float_rect.x_right << "," << float_rect.y_bottom;
 
-            ClimbRect cur_rect;
+            IntRect cur_rect;
             // cur_rect.id = climb_id;
 
             cur_rect.x_left = RoomMap::toMapPosX(float_rect.x_left, map_bounding.x_offset);
@@ -375,7 +382,10 @@ void Data::Game::roomMapPortal()
             cur_rect.y_top = RoomMap::toMapPosY(float_rect.y_top, map_bounding.y_offset, map_bounding.height);
             cur_rect.y_bottom = RoomMap::toMapPosY(float_rect.y_bottom, map_bounding.y_offset, map_bounding.height);
 
+            int platform = RoomMap::getRectPlatform(cur_rect, Gplayer.curmapinfo.platform_list);
+
             qDebug() << "转换后rect：" << cur_rect.x_left << "," << cur_rect.y_top << " " << cur_rect.x_right << "," << cur_rect.y_bottom;
+            qDebug() << "平台：" << platform;
         }
     }
 /**

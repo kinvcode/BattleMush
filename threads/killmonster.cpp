@@ -523,6 +523,10 @@ bool KillMonster::isExistsRune()
         if(name == "Rune"){
             quint64 p_realease = Helper::findChild(entity, "ReleaseEffect");
             if(p_realease != 0){
+
+                // 记录当前符文位置：平台坐标
+                m_rune_info.platform = 0;
+                m_rune_info.area = {0,0};
                 return true;
             }
         }
@@ -533,7 +537,159 @@ bool KillMonster::isExistsRune()
 
 void KillMonster::solveRune()
 {
+retryEnter:
     DebugOutput::out("处理解除符文~，暂时没有相关解决方式");
+
+    // 前往符文位置：平台坐标
+    int platform = m_rune_info.platform;
+    cv::Point area = m_rune_info.area;
+
+    int user_in_lineid;
+    user_in_lineid = userPlatform();
+
+    if(user_in_lineid == platform){
+        WalkBase walk_to_platform(0);
+        qDebug() << "寻路到符文位置";
+        Gcontroller.m_disable_attack = true;
+        bool success = walk_to_platform.moveToPlatform(area); // 走到范围
+        Gcontroller.m_disable_attack = false;
+        if(success){
+            qDebug() << "已到达符文解除位置";
+
+            // 按
+            runneKeyboard(); // 符文按键
+
+            ProcessHelper::programDelay(3000);
+            QApplication::processEvents();
+            goto retryEnter;
+        }
+        qDebug() << "移动符文位置失败";
+        ProcessHelper::programDelay(500);
+        goto retryEnter;
+    }
+
+    std::vector<int> paths = PathAlgo::findAStarPath(user_in_lineid, platform, Gplayer.curmapinfo.path_nodes);
+    qDebug() << "======A星路径======";
+    for(auto const &path : paths){
+        qDebug() << path;
+    }
+    qDebug() << "======A星路径======";
+
+    if(paths.empty()){
+        qDebug() << "无法找到前往该平台的路径";
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        goto retryEnter;
+    }
+
+    for(auto plat : paths){
+        user_in_lineid = userPlatform();
+
+        PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
+        qDebug() << "准备前往平台:" << plat;
+        Gcontroller.m_disable_attack = true;
+        bool move_success = MovePlatform::toPlatform(node, plat);
+        Gcontroller.m_disable_attack = false;
+        if(!move_success){
+            qDebug() << "A星移动平台失败 平台:" << plat;
+            ProcessHelper::programDelay(100);
+            QApplication::processEvents();
+            goto retryEnter;
+        }
+
+        user_in_lineid = userPlatform();
+        if(user_in_lineid == platform){
+            DebugOutput::out("A星已到达目标路线节点");
+            goto retryEnter;
+        }
+    }
+
+    DebugOutput::out("A星到达路线节点失败~，重新执行路线");
+    ProcessHelper::programDelay(100);
+    QApplication::processEvents();
+    goto retryEnter;
+}
+
+void KillMonster::runneKeyboard()
+{
+    // 按上键触发指令
+    MSDriverPRO::keyboardClick(MSKeyboard_UpArrow,1);
+
+    quint64 alarm_group = Helper::findChild(Gplayer.p_uientity, "LocalUserAlarmGroup");
+    quint64 rune_ui = Helper::findChild(alarm_group,"RuneUI");
+
+    // 如果没有，则重新触发
+    if(rune_ui == 0){
+        DebugOutput::out("不存在符文封印");
+        return;
+    }
+
+    DebugOutput::out("RuneUI:" + QString::number(rune_ui,16).toUpper());
+
+    quint64 sprite1 = Helper::findChild(rune_ui,"Sprite1");
+    quint64 sprite2 = Helper::findChild(rune_ui,"Sprite2");
+    quint64 sprite3 = Helper::findChild(rune_ui,"Sprite3");
+    quint64 sprite4 = Helper::findChild(rune_ui,"Sprite4");
+
+    DebugOutput::out("Sprite1:" + QString::number(sprite1,16).toUpper());
+    DebugOutput::out("Sprite2:" + QString::number(sprite2,16).toUpper());
+    DebugOutput::out("Sprite3:" + QString::number(sprite3,16).toUpper());
+    DebugOutput::out("Sprite4:" + QString::number(sprite4,16).toUpper());
+
+    // 找到图片ID
+    QString sprite1_dataid = readString(readLong(readLong(readLong(
+        sprite1 + BASE::MODEntity::SpriteGUIRendererComponent)
+        +BASE::SpriteGUIRendererComponent::MODDataRef)
+        +BASE::MODDataRef::dataId) + BASE::String::text, 100);
+
+    QString sprite2_dataid = readString(readLong(readLong(readLong(
+        sprite2 + BASE::MODEntity::SpriteGUIRendererComponent)
+        +BASE::SpriteGUIRendererComponent::MODDataRef)
+        +BASE::MODDataRef::dataId) + BASE::String::text, 100);
+
+    QString sprite3_dataid = readString(readLong(readLong(readLong(
+        sprite3 + BASE::MODEntity::SpriteGUIRendererComponent)
+        +BASE::SpriteGUIRendererComponent::MODDataRef)
+        +BASE::MODDataRef::dataId) + BASE::String::text, 100);
+
+    QString sprite4_dataid = readString(readLong(readLong(readLong(
+        sprite4 + BASE::MODEntity::SpriteGUIRendererComponent)
+        +BASE::SpriteGUIRendererComponent::MODDataRef)
+        +BASE::MODDataRef::dataId) + BASE::String::text, 100);
+
+    DebugOutput::out("sprite1_dataid:" + sprite1_dataid);
+    DebugOutput::out("sprite2_dataid:" + sprite2_dataid);
+    DebugOutput::out("sprite3_dataid:" + sprite3_dataid);
+    DebugOutput::out("sprite4_dataid:" + sprite4_dataid);
+
+    std::vector<QString> arrows;
+    arrows.push_back(sprite1_dataid);
+    arrows.push_back(sprite2_dataid);
+    arrows.push_back(sprite3_dataid);
+    arrows.push_back(sprite4_dataid);
+
+    // 依次按键
+    for(int i = 0; i < 4; i++){
+        if(arrows[i] == "467d3efd79eb46368dcb17a6d891ca1a"){
+            qDebug() << "指令：左键";
+            MSDriverPRO::keyboardClick(MSKeyboard_LeftArrow,1);
+        }else if(arrows[i] == "bdcd80c306884d58be078cd31b33ac02"){
+            qDebug() << "指令：右键";
+            MSDriverPRO::keyboardClick(MSKeyboard_RightArrow,1);
+        }else if(arrows[i] == "d74418eb49f44475953e75c7df39f01f"){
+            qDebug() << "指令：上键";
+            MSDriverPRO::keyboardClick(MSKeyboard_UpArrow,1);
+        }else if(arrows[i] == "997c024d824e4c60995d461f718f1e86"){
+            qDebug() << "指令：下键";
+            MSDriverPRO::keyboardClick(MSKeyboard_DownArrow,1);
+        }
+
+        ProcessHelper::randomDelay(800,1500);
+        QApplication::processEvents();
+    }
+
+    ProcessHelper::programDelay(2000);
+    QApplication::processEvents();
 }
 
 void KillMonster::autoCleanLine()
@@ -563,7 +719,7 @@ void KillMonster::autoCleanLine()
     // 符文检测
     if(isExistsRune()){
         qDebug() << "检测到解除符文封印，尝试解除中...";
-        solveRune();
+        // solveRune();
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
         goto continue_recive;

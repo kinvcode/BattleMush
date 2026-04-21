@@ -52,6 +52,12 @@ private:
     int m_recast_buff1_lasttime = 0;
     int m_recast_buff1_keycode;
 
+    // 符文信息
+    struct{
+        int platform;
+        cv::Point area;
+    }m_rune_info;
+
 // 角色信息
 private:
     int userX();
@@ -119,6 +125,9 @@ private:
 
     // 解除符文
     void solveRune();
+
+    // 解除封印按键
+    void runneKeyboard();
 
     // 自动清怪路线
     void autoCleanLine();
