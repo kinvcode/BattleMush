@@ -878,7 +878,7 @@ void KillMonster::excutePlatformSequence()
     // 符文检测
     if(isExistsRune()){
         qDebug() << "检测到解除符文封印，尝试解除中...";
-        solveRune();
+        // solveRune();
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
         goto retryEnter;
@@ -1121,19 +1121,25 @@ void KillMonster::moveToRoomByUUID(const QString &uuid)
     }
 
     qDebug() << "前往地图：" << uuid;
-    //3294 , 2273   3395 , 2415  43 弓箭手村训练场1
-    // 2297 , 1442   2371 , 1495 31 菇菇山丘
 
-    // IntRect portal = {3294,2273,3395,2415};
+    if(Gplayer.curmapinfo.id == uuid)
+    {
+        qDebug() << "人物已在目标地图，无需过图";
+        return;
+    }
 
-    // // 找到地板id
-    // for(const auto &platform : Gplayer.curmapinfo.platform_list)
-    // {
-    //     //
-    // }
+    // 搜索算法
+    std::vector<TargetRoom> portals = PathAlgo::findAstarRoom(Gplayer.curmapinfo.id, uuid);
 
-    int platform = 31;
-    cv::Point area = {2297,2371};
+    if(portals.empty()){
+        qDebug() << "暂不支持前往该地图";
+        Helper::console("暂不支持前往该地图");
+        return;
+    }
+
+    TargetRoom target_room = portals.front();
+    int platform = target_room.platform;
+    cv::Point area = {target_room.area.x_left, target_room.area.x_right};
 
     int user_in_lineid;
     user_in_lineid = userPlatform();
@@ -1148,9 +1154,14 @@ void KillMonster::moveToRoomByUUID(const QString &uuid)
         Gcontroller.m_disable_attack = false;
         if(success){
             qDebug() << "已到达传送阵位置";
-            ProcessHelper::programDelay(3000);
+            ProcessHelper::programDelay(100);
             QApplication::processEvents();
-            goto retryEnter;
+
+            qDebug() << "切换地图中...";
+            MSDriverPRO::keyboardClick(MSKeyboard_UpArrow, 1);
+            ProcessHelper::programDelay(1500);
+            QApplication::processEvents();
+            return;
         }
         qDebug() << "移动传送阵位置失败";
         ProcessHelper::programDelay(500);
@@ -1231,10 +1242,9 @@ void KillMonster::taskCleanRoom()
     // 当前地图UUID
     if(Gplayer.curmapinfo.id != task_map.uuid){
         // 前往该地图
-        // moveToRoomByUUID(task_map.uuid);
-        DebugOutput::out("暂不支持自动前往的地图:" + task_map.name);
-        DebugOutput::out("请手动前往该地图！");
-        ProcessHelper::programDelay(5000);
+        Helper::console("前往地图:" + task_map.name);
+        moveToRoomByUUID(task_map.uuid);
+        ProcessHelper::programDelay(1000);
         QApplication::processEvents();
         return;
     }
@@ -1272,10 +1282,9 @@ void KillMonster::taskRest()
     // 当前地图UUID
     if(Gplayer.curmapinfo.id != task_map.uuid){
         // 前往该地图
+        Helper::console("前往地图:" + task_map.name);
         moveToRoomByUUID(task_map.uuid);
-        DebugOutput::out("暂不支持自动前往的地图:" + task_map.name);
-        DebugOutput::out("请手动前往该地图！");
-        ProcessHelper::programDelay(5000);
+        ProcessHelper::programDelay(1000);
         QApplication::processEvents();
         return;
     }

@@ -179,8 +179,11 @@ public:
 
 class PathAlgo{
 public:
-    // 搜索A*路径
+    // 搜索A*路径（平台之间连接）
     static std::vector<int> findAStarPath(int platformA, int platformB, std::unordered_map<int, PathNode> &path_nodes);
+
+    // 搜索A*路径（地图之间连接）
+    static std::vector<TargetRoom> findAstarRoom(const QString &roomA, const QString &roomB);
 
     static void walkToLeft(
         const std::vector<Platform> &platform_list,

@@ -3,6 +3,8 @@
 
 #include <QCoreApplication>
 #include <QPoint>
+#include <QJsonArray>
+#include <QJsonObject>
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
@@ -50,12 +52,19 @@ typedef struct{
     float y_bottom;
 }FloatRect;
 
-typedef struct{
+struct IntRect{
     int x_left;
     int y_top;
     int x_right;
     int y_bottom;
-}IntRect;
+
+    static IntRect fromJsonArray(const QJsonArray& arr) {
+        if (arr.size() >= 4) {
+            return {arr[0].toInt(), arr[1].toInt(), arr[2].toInt(), arr[3].toInt()};
+        }
+        return {0, 0, 0, 0};
+    }
+};
 
 typedef struct  {
     float left;
@@ -253,5 +262,17 @@ typedef struct{
     int buff1;
 }SkillRecast;
 
+typedef struct{
+    QString uuid;
+    QString name;
+    int platform;
+    IntRect area;
+}TargetRoom;
+
+typedef struct{
+    QString uuid;
+    QString name;
+    std::vector<TargetRoom> targets;
+}RoomNode;
 
 #endif // STRUCT_H

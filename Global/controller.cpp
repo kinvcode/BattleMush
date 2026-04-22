@@ -143,6 +143,71 @@ void Controller::initTaskList()
     m_quest_list.push_back(quest0001);
 }
 
+void Controller::initRoomNodes()
+{
+    std::unordered_map<QString, RoomNode> roomMap;
+
+    // 读取地图文件
+    QString json_file = ":/assets/maps/room_node.json";
+    QFile file(json_file);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "Failed to open file for reading:" << json_file;
+        return;
+    }
+
+    QByteArray data = file.readAll();
+    file.close();
+
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    if (doc.isNull()) {
+        qDebug() << "Failed to parse JSON from file:" << json_file;
+        return;
+    }
+
+    // QJsonObject json = doc.object();
+
+    QJsonArray rootArray = doc.array();
+
+    // 遍历每个房间节点
+
+    for (const QJsonValue& roomValue : rootArray) {
+        if (!roomValue.isObject()) continue;
+
+        QJsonObject roomObj = roomValue.toObject();
+        RoomNode room;
+
+        room.uuid = roomObj["uuid"].toString();
+        room.name = roomObj["name"].toString();
+
+        // 解析 targets
+        if (roomObj.contains("targets") && roomObj["targets"].isArray()) {
+            QJsonArray targetsArray = roomObj["targets"].toArray();
+
+            for (const QJsonValue& targetValue : targetsArray) {
+                if (!targetValue.isObject()) continue;
+
+                QJsonObject targetObj = targetValue.toObject();
+                TargetRoom target;
+
+                target.uuid = targetObj["uuid"].toString();
+                target.name = targetObj["name"].toString();
+                target.platform = targetObj["platform"].toInt();
+
+                if (targetObj.contains("area") && targetObj["area"].isArray()) {
+                    target.area = IntRect::fromJsonArray(targetObj["area"].toArray());
+                }
+
+                room.targets.push_back(target);
+            }
+        }
+
+        // 插入 map，如果 UUID 重复会覆盖（实际应该不会重复）
+        roomMap[room.uuid] = room;
+    }
+
+    Gplayer.room_nodes = roomMap;
+}
+
 void Controller::saveTaskConfig()
 {
     // 数据保存逻辑，保存为json文件

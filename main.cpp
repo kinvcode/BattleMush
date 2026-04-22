@@ -19,6 +19,9 @@ int main(int argc, char *argv[])
     // 初始化地图列表
     Controller::initTaskList();
 
+    // 初始化地图节点
+    Controller::initRoomNodes();
+
     // 主窗口
     MainWindow* mainWindow =MainWindow::getInstance();
     mainWindow->show();

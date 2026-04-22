@@ -39,6 +39,9 @@ public:
     // 当前地图信息
     MapInfo curmapinfo;
 
+    // 地图节点列表
+    std::unordered_map<QString, RoomNode> room_nodes;
+
     // 地图是否加载完毕
     bool m_map_loaded = false;
 

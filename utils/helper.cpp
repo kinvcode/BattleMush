@@ -1609,6 +1609,78 @@ std::vector<int> PathAlgo::findAStarPath(int platformA, int platformB, std::unor
     return path;
 }
 
+std::vector<TargetRoom> PathAlgo::findAstarRoom(const QString &roomA, const QString &roomB)
+{
+    std::vector<TargetRoom> path;
+
+    if(Gplayer.room_nodes.empty()) return path;
+
+    // 检查房间是否存在
+    if (Gplayer.room_nodes.find(roomA) == Gplayer.room_nodes.end() ||
+        Gplayer.room_nodes.find(roomB) == Gplayer.room_nodes.end()) {
+        return path;
+    }
+
+    // 如果起点等于终点
+    if (roomA == roomB) {
+        return path;
+    }
+
+    // 开启列表
+    std::queue<QString> open_list;
+
+    // 记录路径：key=目标房间UUID, value=从哪里来以及使用的传送门
+    std::unordered_map<QString, std::pair<QString, TargetRoom>> came_from;
+
+    // 用于记录已经访问过的节点
+    std::unordered_set<QString> closed_list;
+
+    // 初始化起始平台
+    RoomNode start_node = Gplayer.room_nodes[roomA];
+    open_list.push(start_node.uuid);
+
+
+    while (!open_list.empty()) {
+        QString cur_room = open_list.front();
+        RoomNode current = Gplayer.room_nodes[cur_room]; // 获取第一个节点
+        open_list.pop(); // 从堆中删除
+
+        // 如果节点已在关闭列表中，跳过
+        if (closed_list.find(current.uuid) != closed_list.end()) {
+            continue;
+        }
+
+        // 如果找到目标平台，生成路径
+        if (current.uuid == roomB) {
+            QString cur = roomB;
+            while (came_from.find(cur) != came_from.end()) {
+                path.push_back(came_from[cur].second);  // 添加传送门信息
+                cur = came_from[cur].first;             // 回溯到上一个房间
+            }
+            std::reverse(path.begin(), path.end());  // 反转得到正确顺序
+            return path;
+        }
+
+        // 记录当前节点（如果没到终点，把当前节点放入到关闭列表中）
+        closed_list.insert(current.uuid);
+
+        // 遍历当前节点的所有目标平台
+        for (const auto& target : current.targets) {
+            if (closed_list.find(target.uuid) != closed_list.end()) {
+                continue;  // 如果目标已在关闭列表中，跳过
+            }
+
+            // 如果目标平台不在开启列表中，加入
+            if (came_from.find(target.uuid) == came_from.end()) {
+                open_list.push(target.uuid);
+                came_from[target.uuid] = {current.uuid, target};
+            }
+        }
+    }
+
+    return path;
+}
+
 void PathAlgo::walkToLeft(
     const std::vector<Platform> &platform_list,
     const cv::Mat &cur_room_map,

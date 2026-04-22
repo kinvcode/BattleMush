@@ -43,6 +43,8 @@ public:
 
     static void initTaskList();
 
+    static void initRoomNodes();
+
     static void saveTaskConfig();
 
     static void loadTaskConfig();
