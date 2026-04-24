@@ -524,9 +524,31 @@ bool KillMonster::isExistsRune()
             quint64 p_realease = Helper::findChild(entity, "ReleaseEffect");
             if(p_realease != 0){
 
+                // 找到地板
+                int foothold_id = readInt(readLong(readLong(entity
+                    + BASE::MODEntity::RigidbodyComponent)
+                    + BASE::RigidbodyComponent::currentFoothold)
+                    + BASE::Foothold::ID);
+                int line_id = RoomMap::getFootPlatform(foothold_id, Gplayer.curmapinfo.platform_list);
+                if(line_id == -1){
+                    qDebug() << "无法计算符文所在平台";
+                    return false;
+                }
+
+                quint64 pos_p = readLong(entity + BASE::MODEntity::RigidbodyComponent);
+                float float_x = readFloat(pos_p + BASE::RigidbodyComponent::airPos);
+                float float_y = readFloat(pos_p + BASE::RigidbodyComponent::airPos + 4);
+                int rune_x = RoomMap::toMapPosX(float_x, Gplayer.curmapinfo.map_bounding.x_offset);
+                int rune_y = RoomMap::toMapPosY(float_y, Gplayer.curmapinfo.map_bounding.y_offset,Gplayer.curmapinfo.map_bounding.height);
+
+                if(rune_x == 0 && rune_y == 0){
+                    qDebug() << "无法转换符文坐标";
+                    return false;
+                }
+
                 // 记录当前符文位置：平台坐标
-                m_rune_info.platform = 0;
-                m_rune_info.area = {0,0};
+                m_rune_info.platform = line_id;
+                m_rune_info.area = {rune_x,rune_y};
                 return true;
             }
         }
@@ -538,7 +560,7 @@ bool KillMonster::isExistsRune()
 void KillMonster::solveRune()
 {
 retryEnter:
-    DebugOutput::out("处理解除符文~，暂时没有相关解决方式");
+    // DebugOutput::out("处理解除符文~，暂时没有相关解决方式");
 
     // 前往符文位置：平台坐标
     int platform = m_rune_info.platform;
@@ -555,10 +577,11 @@ retryEnter:
         Gcontroller.m_disable_attack = false;
         if(success){
             qDebug() << "已到达符文解除位置";
-
-            // 按
             runneKeyboard(); // 符文按键
-
+            if(!isExistsRune()){
+                qDebug() << "符文封印已解除！";
+                return;
+            }
             ProcessHelper::programDelay(3000);
             QApplication::processEvents();
             goto retryEnter;
@@ -719,7 +742,7 @@ void KillMonster::autoCleanLine()
     // 符文检测
     if(isExistsRune()){
         qDebug() << "检测到解除符文封印，尝试解除中...";
-        // solveRune();
+        solveRune();
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
         goto continue_recive;
@@ -878,7 +901,7 @@ void KillMonster::excutePlatformSequence()
     // 符文检测
     if(isExistsRune()){
         qDebug() << "检测到解除符文封印，尝试解除中...";
-        // solveRune();
+        solveRune();
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
         goto retryEnter;
