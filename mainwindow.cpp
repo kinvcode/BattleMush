@@ -372,6 +372,7 @@ void MainWindow::onAllThreadsFinished()
 
 void MainWindow::console(QString msg)
 {
+    QMutexLocker locker(&consoleMutex);  // 自动加锁/解锁
     int cursor = ui->textEdit_log->textCursor().blockNumber();
     if(cursor > 50000){
         ui->textEdit_log->clear();
@@ -1071,5 +1072,11 @@ void MainWindow::on_pushButton_show_room_map_portal_clicked()
 void MainWindow::on_pushButton_get_inrang_monster_clicked()
 {
     Data::Game::rangeMonster();
+}
+
+
+void MainWindow::on_pushButton_show_room_map_npc_clicked()
+{
+    Data::Game::NPCScreenCoor();
 }
 

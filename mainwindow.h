@@ -29,7 +29,7 @@ public:
 private:
     Ui::MainWindow *ui;
     LogViewer* logger = nullptr;
-
+    QMutex consoleMutex;// 调试台锁
 
     // 数据更新线程ID
     const int m_UpdateGameData_tid = 1;
@@ -135,6 +135,8 @@ private slots:
     void on_pushButton_show_room_map_portal_clicked();
 
     void on_pushButton_get_inrang_monster_clicked();
+
+    void on_pushButton_show_room_map_npc_clicked();
 
 public slots:
     void console(QString msg);

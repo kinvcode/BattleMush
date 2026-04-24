@@ -11,6 +11,10 @@ namespace BASE {
     static int ClientCoreThreadManager_offset_lv2 = 0x0;
     static int ClientCoreThreadManager_GameDictionary = 0x10;
 
+    static int Camera_base = 0xA1B33B0;
+    static int Camera_offset_lv1 = 0xB8;
+    static int Camera_offset_lv2 = 0x0;
+
     namespace Dictionary{
         static int InternalArray_entries = 0x18;
         static int count = 0x20;
@@ -152,6 +156,14 @@ namespace BASE {
         static int EndPoint = 0x1C;
         static int length = 0x40;
         static int groupID = 0x4C;
+    };
+
+    namespace MODPlayerMain{
+        static int CinemachineBrain = 0x20;
+    };
+
+    namespace CinemachineBrain{
+        static int Camera = 0x50;
     };
 };
 

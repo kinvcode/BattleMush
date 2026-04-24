@@ -145,8 +145,8 @@ void KillMonster::process()
             m_map_start = 0;
             m_currentmap = 0;
             m_allmonster.clear();
-            DebugOutput::out("地图加载中... ...");
-            Helper::console("地图加载中... ...");
+            DebugOutput::out("地图加载中,停止自动");
+            Helper::console("地图加载中,停止自动");
             ProcessHelper::programDelay(1000);
             QApplication::processEvents();
             continue;

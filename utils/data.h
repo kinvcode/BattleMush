@@ -32,6 +32,11 @@ public:
 
     // 打印范围内怪物
     static void rangeMonster();
+
+    static std::vector<quint64> npcEntityList();
+
+    // NPC屏幕坐标
+    static void NPCScreenCoor();
 };
 
 };

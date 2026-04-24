@@ -78,6 +78,15 @@ void HealthMonitor::process()
             continue;
         }
 
+        // 如果地图没有加载完毕，
+        if(!Gplayer.m_map_loaded){
+            DebugOutput::out("地图加载中，停止血蓝监控");
+            Helper::console("地图加载中，停止血蓝监控");
+            ProcessHelper::programDelay(1000);
+            QApplication::processEvents();
+            continue;
+        }
+
         // 检测血量
         bool add_hp = Gconfig.getValue("auto_add_health/add_hp").toBool();
         bool add_mp = Gconfig.getValue("auto_add_health/add_mp").toBool();

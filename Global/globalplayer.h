@@ -95,6 +95,10 @@ public:
     // 一些测试数据
     std::vector<std::pair<float, float>> move_pos_list;
 
+    // 相机属性
+    float camera_width = 1296.0f;
+    float camera_height = 759.0f;
+
 private:
 
 };

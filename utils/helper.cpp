@@ -2459,3 +2459,56 @@ void PathAlgo::down(const std::vector<Platform> &platform_list,
 }
 
 
+
+Matrix4x4 CameraTool::ReadMatrix(quint64 addr)
+{
+    Matrix4x4 mat{};
+    Mem::readMemory(addr, reinterpret_cast<PBYTE>(mat.m), sizeof(mat.m));
+    return mat;
+}
+
+void CameraTool::WorldToClip(const COORDINATE &pos, const Matrix4x4 &view, const Matrix4x4 &proj, float &cx, float &cy, float &cz, float &cw)
+{
+    float x = pos.x;
+    float y = pos.y;
+    float z = pos.z;
+
+    // View
+    float vx = x*view.m[0] + y*view.m[4] + z*view.m[8]  + view.m[12];
+    float vy = x*view.m[1] + y*view.m[5] + z*view.m[9]  + view.m[13];
+    float vz = x*view.m[2] + y*view.m[6] + z*view.m[10] + view.m[14];
+    float vw = x*view.m[3] + y*view.m[7] + z*view.m[11] + view.m[15];
+
+    // Projection
+    cx = vx*proj.m[0] + vy*proj.m[4] + vz*proj.m[8]  + vw*proj.m[12];
+    cy = vx*proj.m[1] + vy*proj.m[5] + vz*proj.m[9]  + vw*proj.m[13];
+    cz = vx*proj.m[2] + vy*proj.m[6] + vz*proj.m[10] + vw*proj.m[14];
+    cw = vx*proj.m[3] + vy*proj.m[7] + vz*proj.m[11] + vw*proj.m[15];
+}
+
+bool CameraTool::WorldToScreen(uintptr_t cam, const COORDINATE &pos, cv::Point &out)
+{
+    uintptr_t viewBase = cam + 0x80;
+    uintptr_t projBase = cam + 0xC0;
+
+    Matrix4x4 view = ReadMatrix(viewBase);
+    Matrix4x4 proj = ReadMatrix(projBase);
+
+    float cx, cy, cz, cw;
+    WorldToClip(pos, view, proj, cx, cy, cz, cw);
+
+    if (cw < 0.1f)
+        return false;
+
+    float ndcX = cx / cw;
+    float ndcY = cy / cw;
+
+    // 👉 这里你写死的分辨率
+    float width  = Gplayer.camera_width;
+    float height = Gplayer.camera_height;
+
+    out.x = (ndcX + 1.0f) * 0.5f * width;
+    out.y = (1.0f - ndcY) * 0.5f * height;
+
+    return true;
+}

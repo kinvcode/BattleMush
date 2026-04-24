@@ -486,6 +486,99 @@ void Data::Game::rangeMonster()
     }
 }
 
+std::vector<quint64> Data::Game::npcEntityList()
+{
+    std::vector<quint64> pointers;
+
+    quint64 map_entity = mapEntity();
+
+    Item target_item;
+    target_item.entity = 0;
+
+    quint64 p_curmapentity = readPointer(map_entity,
+        BASE::MODEntity::children,
+        BASE::List::InternalArray,
+        BASE::InternalArray::Head + 0 * 8);
+
+    quint64 map_entity_count = readInt(readLong(p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
+    quint64 entity_head = readLong(readLong(p_curmapentity + BASE::MODEntity::children) + BASE::List::InternalArray) + BASE::InternalArray::Head;
+
+    MapBounding map_bounding = RoomMap::getMapBounding(p_curmapentity);
+
+    qDebug() << "====== NPC列表 ======";
+    for(int i = 0; i < map_entity_count; i++){
+
+        quint64 cur_entity_address = entity_head + i * 8;
+        quint64 entity = readLong(cur_entity_address);
+
+        QString name = GameStruct::readEntityName(entity);
+
+        if (!name.startsWith("npc-"))
+        {
+            continue;
+        }
+
+        qDebug() << "name:" << name;
+
+        qDebug() << "NPC:" << QString::number(entity,16).toUpper();
+        float item_x = readFloat(readLong(entity + BASE::MODEntity::TransformComponent)+BASE::TransformComponent::PositionX);
+        float item_y = readFloat(readLong(entity + BASE::MODEntity::TransformComponent)+BASE::TransformComponent::PositionY);
+        // qDebug() << "浮点坐标:" << item_x << "," << item_y;
+
+        int x = RoomMap::toMapPosX(item_x, map_bounding.x_offset);
+        int y = RoomMap::toMapPosY(item_y, map_bounding.y_offset,map_bounding.height);
+
+        // qDebug() << "转换坐标" << x << "," << y;
+
+        pointers.push_back(entity);
+    }
+
+    return pointers;
+}
+
+void Data::Game::NPCScreenCoor()
+{
+    // quint64 npc = 0x27d19ca2540;
+
+    std::vector<quint64> npc_list = npcEntityList();
+
+    if(Gplayer.p_gamepid == 0){
+        DebugOutput::out("游戏进程不存在");
+        Helper::console("游戏进程不存在");
+        return;
+    }
+
+    quint64 p_camera = readPointer(Gplayer.p_assemblybase,
+        BASE::Camera_base,
+        BASE::Camera_offset_lv1,
+        BASE::Camera_offset_lv2,
+        BASE::MODPlayerMain::CinemachineBrain,
+        BASE::CinemachineBrain::Camera, 0x10);
+
+    // qDebug() << "相机：" << QString::number(p_camera,16).toUpper();
+
+    for(const auto npc : npc_list){
+
+        float npc_x = readFloat(readLong(npc + BASE::MODEntity::TransformComponent)+BASE::TransformComponent::PositionX);
+        float npc_y = readFloat(readLong(npc + BASE::MODEntity::TransformComponent)+BASE::TransformComponent::PositionY);
+
+        COORDINATE pos{npc_x, npc_y, 0.0f};
+        qDebug() << "NPC坐标:" << npc_x << "," << npc_y;
+
+        cv::Point screen;
+
+        if (CameraTool::WorldToScreen(p_camera, pos, screen))
+        {
+            qDebug() << "Screen:" << screen.x << screen.y;
+        }
+        else
+        {
+            qDebug() << "Behind camera";
+        }
+    }
+
+}
+
 
 
 

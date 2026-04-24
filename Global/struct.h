@@ -26,6 +26,11 @@ const T& clamp(const T& value, const T& low, const T& high) {
     return std::min(std::max(value, low), high);
 }
 
+typedef struct
+{
+    float m[16];
+}Matrix4x4;
+
 typedef struct {
     float x;
     float y;

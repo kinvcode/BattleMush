@@ -247,7 +247,16 @@ public:
     static void taskTest();
 };
 
+class CameraTool
+{
+public:
+    static Matrix4x4 ReadMatrix(quint64 addr);
 
+    static void WorldToClip(const COORDINATE &pos, const Matrix4x4& view, const Matrix4x4& proj,
+        float& cx, float& cy, float& cz, float& cw);
+
+    static bool WorldToScreen(uintptr_t cam, const COORDINATE& pos, cv::Point& out);
+};
 
 
 
