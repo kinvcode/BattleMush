@@ -43,7 +43,7 @@ bool NativeEventFilter::nativeEventFilter(const QByteArray& eventType, void* mes
             break;
         case VK_F2:
             qDebug() << "F2";
-                // main_win->m_threadManager->stopAll();
+            ImageTool::screenshot();
             break;
         default:
             qDebug() << "未知快捷键触发:" + QString::number(keycode);

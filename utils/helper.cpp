@@ -1400,6 +1400,7 @@ void ImageTool::screenshot()
     }
     RECT game_rect;
     GetWindowRect(game_hwnd, &game_rect);
+
     QScreen* m_pScreen  = QGuiApplication::primaryScreen();
     QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
     int game_x          = game_rect.left;
@@ -1408,10 +1409,32 @@ void ImageTool::screenshot()
     int game_height     = game_rect.bottom - game_rect.top;
     cur_capture         = cur_capture.copy(game_x,game_y,game_width,game_height);
 
+    // 如果游戏窗口大小不是1296*759,调整至1296*759
+    if (game_width != BASE::game_width || game_height != BASE::game_height) {
+        // 调整窗口大小和位置（可选保持原位置）
+        SetWindowPos(game_hwnd,  // 窗口句柄
+            NULL,                // 不改变Z顺序
+            game_rect.left,      // X位置（保持不变）
+            game_rect.top,       // Y位置（保持不变）
+            BASE::game_width,    // 新宽度
+            BASE::game_height,   // 新高度
+            SWP_NOZORDER | SWP_NOACTIVATE);  // 标志位
+
+        GetWindowRect(game_hwnd, &game_rect);
+        m_pScreen  = QGuiApplication::primaryScreen();
+        cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
+        game_x          = game_rect.left;
+        game_y          = game_rect.top;
+        game_width      = game_rect.right - game_rect.left;
+        game_height     = game_rect.bottom - game_rect.top;
+        cur_capture     = cur_capture.copy(game_x,game_y,game_width,game_height);
+    }
+
     qDebug() << "窗口大小：" << game_width << "," << game_height;
     qDebug() << "窗口位置:" << game_x << "," << game_y;
 
-    QString savePath = QCoreApplication::applicationDirPath() + "/screenshot.png";
+    QString timestamp = QString::number(QDateTime::currentMSecsSinceEpoch());
+    QString savePath = QCoreApplication::applicationDirPath() + "/screenshot_" + timestamp + ".png";
     cur_capture.save(savePath);
     DebugOutput::out("截图已保存在程序目录");
 }

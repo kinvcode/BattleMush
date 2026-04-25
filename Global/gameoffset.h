@@ -5,7 +5,8 @@
 #define C_Entity_Child 0x3A8; // Entity子组件
 
 namespace BASE {
-
+    static int game_width = 1296;
+    static int game_height = 759;
     static int ClientCoreThreadManager_base = 0xA230ED8;
     static int ClientCoreThreadManager_offset_lv1 = 0xB8;
     static int ClientCoreThreadManager_offset_lv2 = 0x0;
