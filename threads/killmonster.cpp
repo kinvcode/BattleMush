@@ -1372,16 +1372,54 @@ void KillMonster::buyPotion()
                 return;
             }
 
+            qDebug() << "选择NPC";
             MSKM::humanMove(screen_coor.x, screen_coor.y);
             MSDriverPRO::mouseLeftClick();
             ProcessHelper::programDelay(1000);
             QApplication::processEvents();
 
             // 判断商店是否打开
-            MatchTemp tempmatch(":assets/templat/leave_shop");
+            MatchTemp tempmatch(":assets/templat/potion_shop/leave_shop");
             cv::Point leave_coor;
             if(tempmatch.match(leave_coor)){
                 qDebug() << "选择药水";
+
+                MatchTemp match_redpotion(":assets/templat/potion_shop/red_potion");
+                cv::Point redpotion_coor;
+                if(match_redpotion.match(redpotion_coor)){
+                    qDebug() << "购买红色药水";
+                    MSKM::humanMove(redpotion_coor.x + 120, redpotion_coor.y + 25);
+                    ProcessHelper::programDelay(200);
+                    MSDriverPRO::mouseLeftClick();
+                    ProcessHelper::programDelay(50);
+                    MSDriverPRO::mouseLeftClick();
+                    ProcessHelper::programDelay(200);
+
+                    MatchTemp match_ok(":assets/templat/potion_shop/ok");
+                    cv::Point ok_coor;
+                    if(match_ok.match(ok_coor)){
+                        qDebug() << "点击输入框";
+                        MSKM::humanMove(500, 404);
+                        MSDriverPRO::mouseLeftClick();
+                        ProcessHelper::programDelay(500);
+
+                        qDebug() << "输入购买数量";
+                        MSDriverPRO::keyboardClick(MSKeyboard_1,1);
+                        ProcessHelper::programDelay(500);
+
+                        qDebug() << "确认购买";
+                        // MSDriverPRO::keyboardClick(MSKeyboard_ENTER,2);
+                        MSKM::humanMove(ok_coor.x + 30, ok_coor.y + 10);
+                        MSDriverPRO::mouseLeftClick();
+                        ProcessHelper::programDelay(200);
+                    }
+
+                }
+
+                qDebug() << "关闭商店";
+                MSKM::humanMove(leave_coor.x + 40, leave_coor.y + 11);
+                MSDriverPRO::mouseLeftClick();
+                // MSDriverPRO::keyboardClick(MSKeyboard_ESCAPE,1);
                 ProcessHelper::programDelay(3000);
                 QApplication::processEvents();
             }else{
@@ -1391,6 +1429,11 @@ void KillMonster::buyPotion()
                 QApplication::processEvents();
                 return;
             }
+
+            goto retryEnter;
+            ProcessHelper::programDelay(1500);
+            QApplication::processEvents();
+            return;
 
             ProcessHelper::programDelay(1500);
             QApplication::processEvents();

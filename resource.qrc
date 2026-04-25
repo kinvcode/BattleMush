@@ -24,5 +24,13 @@
         <file>assets/maps/room_node.json</file>
         <file>assets/templat/leave_shop.png</file>
         <file>assets/maps/map_d26fc64e-2ff3-4f66-978e-f606f286ddf9.json</file>
+        <file>assets/templat/potion_shop/blue_potion.png</file>
+        <file>assets/templat/potion_shop/leave_shop.png</file>
+        <file>assets/templat/potion_shop/orange_potion.png</file>
+        <file>assets/templat/potion_shop/red_potion.png</file>
+        <file>assets/templat/potion_shop/vitality_potion.png</file>
+        <file>assets/templat/potion_shop/white_potion.png</file>
+        <file>assets/templat/potion_shop/cancel.png</file>
+        <file>assets/templat/potion_shop/ok.png</file>
     </qresource>
 </RCC>
