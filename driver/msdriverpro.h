@@ -45,7 +45,7 @@ public:
     static BOOL hide(ULONG pid);
 
     // 恢复目标进程
-    void restore();
+    static void restore();
 
     // 获取进程ID
     static int getPid(QString name);

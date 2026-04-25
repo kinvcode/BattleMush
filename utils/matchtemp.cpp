@@ -298,18 +298,6 @@ void MatchTemp::quantizeImage(cv::Mat& image, const std::vector<cv::Vec3b>& targ
     image = output;
 }
 
-ROOMCOOR MatchTemp::getCenter()
-{
-    ROOMCOOR coor;
-    // // 计算中心点
-    // int cent_x = (int)ceil(cv_templat.cols / 2) + matchLoc.x;
-    // int cent_y = (int)ceil(cv_templat.rows / 2) + matchLoc.y;
-    // // 真实位置
-    // coor.x = cent_x + x_offset;
-    // coor.y = cent_y + y_offset;
-    return coor;
-}
-
 int MatchTemp::tmpWidth()
 {
     return tmp_width;

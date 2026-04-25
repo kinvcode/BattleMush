@@ -112,6 +112,14 @@ void MainWindow::loadDriver()
     if (MSDriverPRO::isLoadDriver()){
         console("变色龙安全驱动加载完毕~");
 
+        #ifdef PROTECT
+        // 保护自身
+        MSDriverPRO::protect((ULONG64)GetCurrentProcessId());
+        // 隐藏进程
+        MSDriverPRO::hide((ULONG64)GetCurrentProcessId());
+        m_hide_process = true;
+        #endif
+
         // 初始化键盘状态，打开小键盘
         if ((GetKeyState(VK_NUMLOCK) & 1)) MSDriverPRO::keyboardClick(0x45);
     }
@@ -403,6 +411,15 @@ void MainWindow::onApplicationQuit()
 {
     DebugOutput::out("安全关闭程序中... ...");
     if(!GetKeyState(VK_NUMLOCK)) MSDriverPRO::keyboardClick(0x45); // 打开小键盘
+
+    if(MSDriverPRO::isLoadDriver())
+    {
+        #ifdef PROTECT
+        if(m_hide_process){
+            MSDriverPRO::restore();
+        }
+        #endif
+    }
 
     // 卸载驱动
     DriverLoad drvLoad;

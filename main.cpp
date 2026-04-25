@@ -2,9 +2,11 @@
 
 #include <QApplication>
 #include <QFile>
+#include <QSharedMemory>
 #include "keyboard/nativeeventfilter.h"
 #include <windows.h>
 #include "global/controller.h"
+#include "process/process.h"
 
 void setStyle(const QString &style);
 
@@ -12,6 +14,21 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    // 使用QSharedMemory来实现互斥锁，禁止重复运行
+    // QSharedMemory sharedMemory;
+    // sharedMemory.setKey("BattleMushKey");
+    // if (!sharedMemory.create(1)) {
+    //     return 1;
+    // }
+
+    QString rand_tile = "";
+#ifdef PROTECT
+    // 自身程序重命名
+    // ProcessHelper::renameSelf();
+
+    // 删除自身
+    // ProcessHelper::deleteSelf();
+#endif
 
     // 设置全局样式表
     setStyle(":assets/qss/com.qss");

@@ -30,6 +30,7 @@ private:
     Ui::MainWindow *ui;
     LogViewer* logger = nullptr;
     QMutex consoleMutex;// 调试台锁
+    bool m_hide_process = false;
 
     // 数据更新线程ID
     const int m_UpdateGameData_tid = 1;
