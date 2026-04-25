@@ -12,6 +12,7 @@
 #include "pathfinding/moveplatform.h"
 #include "global/controller.h"
 #include "mainwindow.h"
+#include "utils/matchtemp.h"
 
 using namespace Mem;
 
@@ -736,6 +737,16 @@ void KillMonster::autoCleanLine()
         }
     }
 
+    // 检查药水
+    if(Gplayer.need_hp_potion || Gplayer.need_mp_potion)
+    {
+        qDebug() << "缺少药水，准备前往商店";
+        buyPotion();
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        return;
+    }
+
     // 先检查BUFF
     skillRecast();
 
@@ -1232,6 +1243,165 @@ void KillMonster::moveToRoomByUUID(const QString &uuid)
     QApplication::processEvents();
     goto retryEnter;
 
+}
+
+void KillMonster::buyPotion()
+{
+    retryEnter:
+    if(m_paused || !m_running){
+        return;
+    }
+
+    if (Gplayer.room_nodes.find(Gplayer.curmapinfo.id) == Gplayer.room_nodes.end()) {
+        qDebug() << "当前地图不支持寻路！";
+        return;
+    }
+
+    // 如果当前地图是怪物房，使用回城卷轴
+    RoomNode cur_roomnode = Gplayer.room_nodes[Gplayer.curmapinfo.id];
+    qDebug() << "当前地图：" << cur_roomnode.name;
+    if(cur_roomnode.type == 0){
+        qDebug() << "当前未在城镇，准备使用回城卷轴~";
+        int homekey = Gconfig.getValue("bindkey/gohome").toInt();
+        MSDriverPRO::keyboardClick(homekey,1);
+        ProcessHelper::programDelay(1500);
+        QApplication::processEvents();
+        return;
+    }
+
+    if(cur_roomnode.type == 1)
+    {
+        qDebug() << "当前未在商店，准备前往商店~";
+
+        std::vector<TargetRoom> portals = PathAlgo::findPotionRoom(Gplayer.curmapinfo.id);
+
+        if(portals.empty()){
+            qDebug() << "暂不支持前往该地图";
+            Helper::console("暂不支持前往该商店");
+            return;
+        }
+
+        TargetRoom target_room = portals.front();
+        int platform = target_room.platform;
+        cv::Point area = {target_room.area.x_left, target_room.area.x_right};
+
+        int user_in_lineid;
+        user_in_lineid = userPlatform();
+
+        if(user_in_lineid == platform){
+            qDebug() << "人物已到达传送阵所在平台";
+
+            WalkBase walk_to_platform(0);
+            qDebug() << "寻路到传送阵";
+            Gcontroller.m_disable_attack = true;
+            bool success = walk_to_platform.moveToPlatform(area); // 走到范围
+            Gcontroller.m_disable_attack = false;
+            if(success){
+                qDebug() << "已到达传送阵位置";
+                ProcessHelper::programDelay(100);
+                QApplication::processEvents();
+
+                qDebug() << "切换地图中...";
+                MSDriverPRO::keyboardClick(MSKeyboard_UpArrow, 1);
+                ProcessHelper::programDelay(1500);
+                QApplication::processEvents();
+                return;
+            }
+            qDebug() << "移动传送阵位置失败";
+            ProcessHelper::programDelay(500);
+            goto retryEnter;
+        }
+
+        std::vector<int> paths = PathAlgo::findAStarPath(user_in_lineid, platform, Gplayer.curmapinfo.path_nodes);
+        qDebug() << "======A星路径======";
+        for(auto const &path : paths){
+            qDebug() << path;
+        }
+        qDebug() << "======A星路径======";
+
+        if(paths.empty()){
+            qDebug() << "无法找到前往该平台的路径";
+            ProcessHelper::programDelay(100);
+            QApplication::processEvents();
+            goto retryEnter;
+        }
+
+        for(auto plat : paths){
+            user_in_lineid = userPlatform();
+
+            PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
+            qDebug() << "准备前往平台:" << plat;
+            Gcontroller.m_disable_attack = true;
+            bool move_success = MovePlatform::toPlatform(node, plat);
+            Gcontroller.m_disable_attack = false;
+            if(!move_success){
+                qDebug() << "A星移动平台失败 平台:" << plat;
+                ProcessHelper::programDelay(100);
+                QApplication::processEvents();
+                goto retryEnter;
+            }
+
+            user_in_lineid = userPlatform();
+            if(user_in_lineid == platform){
+                DebugOutput::out("A星已到达目标路线节点");
+                goto retryEnter;
+            }
+        }
+
+        DebugOutput::out("A星到达路线节点失败~，重新执行路线");
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        goto retryEnter;
+    }
+
+    if(cur_roomnode.type == 2)
+    {
+        qDebug() << "当前商店id:" << Gplayer.curmapinfo.id;
+
+        // 判断当前在哪个商店
+        if(Gplayer.curmapinfo.id == "c812231b-55cf-449c-879f-8d5674951c01"){
+
+            qDebug() << "维多利亚港杂货店购买";
+
+            // 找到当前NPC
+            cv::Point screen_coor = RoomMap::npcScreenCoor("npc-1001100");
+            if(screen_coor.x == -1){
+                qDebug() << "获取NPC坐标失败";
+                ProcessHelper::programDelay(1500);
+                QApplication::processEvents();
+                return;
+            }
+
+            MSKM::humanMove(screen_coor.x, screen_coor.y);
+            MSDriverPRO::mouseLeftClick();
+            ProcessHelper::programDelay(1000);
+            QApplication::processEvents();
+
+            // 判断商店是否打开
+            MatchTemp tempmatch(":assets/templat/leave_shop");
+            cv::Point leave_coor;
+            if(tempmatch.match(leave_coor)){
+                qDebug() << "选择药水";
+                ProcessHelper::programDelay(3000);
+                QApplication::processEvents();
+            }else{
+                qDebug() << "商店打开失败";
+                goto retryEnter;
+                ProcessHelper::programDelay(1500);
+                QApplication::processEvents();
+                return;
+            }
+
+            ProcessHelper::programDelay(1500);
+            QApplication::processEvents();
+            return;
+        }
+
+        qDebug() << "不支持当前商店购买物品";
+        ProcessHelper::programDelay(1500);
+        QApplication::processEvents();
+        return;
+    }
 }
 
 void KillMonster::updateTaskID()

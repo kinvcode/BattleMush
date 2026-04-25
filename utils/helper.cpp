@@ -904,6 +904,22 @@ QString Helper::timestampToHI(int timestamp)
         .arg(minutes, 2, 10, QChar('0'));
 }
 
+void Helper::updateGameWindow()
+{
+    HWND game_hwnd = FindWindow(NULL,TEXT("MapleStory Worlds-Artale (繁體中文版)"));
+    if(game_hwnd == NULL){
+        return;
+    }
+
+    RECT game_rect;
+    GetWindowRect(game_hwnd, &game_rect);
+
+    Gplayer.game_window.x          = game_rect.left;
+    Gplayer.game_window.y          = game_rect.top;
+    Gplayer.game_window.width      = game_rect.right - game_rect.left;
+    Gplayer.game_window.height     = game_rect.bottom - game_rect.top;
+}
+
 void Math::ComputeClimbRect(const ClimbOrigin *climb, FloatRect &climb_rect)
 {
     const float kHalf = 0.5f;
@@ -1408,6 +1424,10 @@ void ImageTool::screenshot()
     int game_width      = game_rect.right - game_rect.left;
     int game_height     = game_rect.bottom - game_rect.top;
     cur_capture         = cur_capture.copy(game_x,game_y,game_width,game_height);
+    Gplayer.game_window.x = game_x;
+    Gplayer.game_window.y = game_y;
+    Gplayer.game_window.width = game_width;
+    Gplayer.game_window.height = game_height;
 
     // 如果游戏窗口大小不是1296*759,调整至1296*759
     if (game_width != BASE::game_width || game_height != BASE::game_height) {
@@ -1428,6 +1448,10 @@ void ImageTool::screenshot()
         game_width      = game_rect.right - game_rect.left;
         game_height     = game_rect.bottom - game_rect.top;
         cur_capture     = cur_capture.copy(game_x,game_y,game_width,game_height);
+        Gplayer.game_window.x = game_x;
+        Gplayer.game_window.y = game_y;
+        Gplayer.game_window.width = game_width;
+        Gplayer.game_window.height = game_height;
     }
 
     qDebug() << "窗口大小：" << game_width << "," << game_height;
@@ -1578,6 +1602,66 @@ void RoomMap::loadLocalMap(const QString map_id)
 
 }
 
+cv::Point RoomMap::npcScreenCoor(QString npc_id)
+{
+    cv::Point npc_coor = {-1,-1};
+
+    quint64 p_curmapentity = readPointer(Gplayer.p_curmapentity,
+        BASE::MODEntity::children,
+        BASE::List::InternalArray,
+        BASE::InternalArray::Head + 0 * 8);
+
+    quint64 map_entity_count = readInt(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
+    quint64 entity_head = readLong(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::InternalArray) + BASE::InternalArray::Head;
+
+    MapBounding map_bounding = Gplayer.curmapinfo.map_bounding;
+
+    quint64 npc_entity = 0;
+    for(int i = 0; i < map_entity_count; i++){
+
+        quint64 cur_entity_address = entity_head + i * 8;
+        quint64 entity = readLong(cur_entity_address);
+
+        QString name = GameStruct::readEntityName(entity);
+
+        if(name == npc_id){
+            npc_entity = entity;
+        }
+    }
+
+    if(npc_entity == 0){
+        return npc_coor;
+    }
+
+    quint64 p_camera = readPointer(Gplayer.p_assemblybase,
+        BASE::Camera_base,
+        BASE::Camera_offset_lv1,
+        BASE::Camera_offset_lv2,
+        BASE::MODPlayerMain::CinemachineBrain,
+        BASE::CinemachineBrain::Camera, 0x10);
+
+    float npc_x = readFloat(readLong(npc_entity + BASE::MODEntity::TransformComponent)+BASE::TransformComponent::PositionX);
+    float npc_y = readFloat(readLong(npc_entity + BASE::MODEntity::TransformComponent)+BASE::TransformComponent::PositionY);
+
+    COORDINATE pos{npc_x, npc_y, 0.0f};
+    // qDebug() << "NPC坐标:" << npc_x << "," << npc_y;
+
+    cv::Point screen;
+
+    if (CameraTool::WorldToScreen(p_camera, pos, screen))
+    {
+        qDebug() << "屏幕坐标:" << screen.x << screen.y;
+        npc_coor.x = screen.x + 10;
+        npc_coor.y = screen.y - 10;
+    }
+    else
+    {
+        qDebug() << "相机转换错误~，可能在相机背面";
+    }
+
+    return npc_coor;
+}
+
 std::vector<int> PathAlgo::findAStarPath(int platformA, int platformB, std::unordered_map<int, PathNode> &path_nodes)
 {
     std::vector<int> path;
@@ -1698,6 +1782,57 @@ std::vector<TargetRoom> PathAlgo::findAstarRoom(const QString &roomA, const QStr
                 open_list.push(target.uuid);
                 came_from[target.uuid] = {current.uuid, target};
             }
+        }
+    }
+
+    return path;
+}
+
+std::vector<TargetRoom> PathAlgo::findPotionRoom(const QString &roomA)
+{
+    std::vector<TargetRoom> path;
+
+    if(Gplayer.room_nodes.empty()) return path;
+
+    if (Gplayer.room_nodes.find(roomA) == Gplayer.room_nodes.end()) {
+        return path;
+    }
+
+    if (Gplayer.room_nodes[roomA].type == 2) {
+        return path;
+    }
+
+    // BFS 使用普通队列（边权都为1时效率更高）
+    std::queue<QString> open_list;
+    std::unordered_map<QString, std::pair<QString, TargetRoom>> came_from;
+    std::unordered_set<QString> visited;
+
+    open_list.push(roomA);
+    visited.insert(roomA);
+
+    while (!open_list.empty()) {
+        QString current_uuid = open_list.front();
+        open_list.pop();
+
+        RoomNode& current_room = Gplayer.room_nodes[current_uuid];
+
+        if (current_room.type == 2) {
+            QString cur = current_uuid;
+            while (came_from.find(cur) != came_from.end()) {
+                path.push_back(came_from[cur].second);
+                cur = came_from[cur].first;
+            }
+            std::reverse(path.begin(), path.end());
+            return path;
+        }
+
+        for (const auto& target : current_room.targets) {
+            if (target.uuid.isEmpty()) continue;
+            if (visited.find(target.uuid) != visited.end()) continue;
+
+            visited.insert(target.uuid);
+            came_from[target.uuid] = {current_uuid, target};
+            open_list.push(target.uuid);
         }
     }
 
@@ -2534,4 +2669,68 @@ bool CameraTool::WorldToScreen(uintptr_t cam, const COORDINATE &pos, cv::Point &
     out.y = (1.0f - ndcY) * 0.5f * height;
 
     return true;
+}
+
+void MSKM::humanMove(int targetX, int targetY)
+{
+    targetX = Gplayer.game_window.x + targetX;
+    targetY = Gplayer.game_window.y + targetY;
+
+    QPoint currentPos = QCursor::pos();
+    int currentX = currentPos.x();
+    int currentY = currentPos.y();
+
+    // 计算直径
+    int length = qSqrt(qPow((currentX-targetX),2)+qPow((currentY-targetY),2));
+    int controllValue = 5;
+    int rand_value = 15;
+    if(length < 300)
+    {
+        // 控制弧度
+        controllValue = 5;
+        // 控制抖动
+        rand_value = 3;
+    }
+
+    // 随机化控制点1的偏移量
+    int control1OffsetX = QRandomGenerator::global()->bounded(-controllValue, controllValue);
+    int control1OffsetY = QRandomGenerator::global()->bounded(-controllValue, controllValue);
+
+    // 随机化控制点2的偏移量
+    int control2OffsetX = QRandomGenerator::global()->bounded(-controllValue, controllValue);
+    int control2OffsetY = QRandomGenerator::global()->bounded(-controllValue, controllValue);
+
+    // 控制点1坐标
+    int control1X = currentX + (targetX - currentX) / 3 + control1OffsetX;
+    int control1Y = currentY - qAbs(targetY - currentY) / 2 - controllValue + control1OffsetY; // 调整控制点1的Y坐标偏移量
+    control1X = targetX;
+    control1Y = targetY;
+
+    // 控制点2坐标
+    int control2X = currentX + 2 * (targetX - currentX) / 3 + control2OffsetX;
+    int control2Y = targetY + qAbs(targetY - currentY) / 2 + controllValue + control2OffsetY; // 调整控制点2的Y坐标偏移量
+    control2Y = targetY;
+
+    // 贝塞尔曲线轨迹
+    for (double t = 0; t <= 1; t += 0.03) {
+        // 计算当前点的坐标
+        qreal x = qPow(1 - t, 3) * currentX + 3 * qPow(1 - t, 2) * t * control1X + 3 * (1 - t) * qPow(t, 2) * control2X + qPow(t, 3) * targetX;
+        qreal y = qPow(1 - t, 3) * currentY + 3 * qPow(1 - t, 2) * t * control1Y + 3 * (1 - t) * qPow(t, 2) * control2Y + qPow(t, 3) * targetY;
+
+        // 添加较低频率的随机抖动效果
+        if (QRandomGenerator::global()->bounded(100) < rand_value) {
+            int jitterX = QRandomGenerator::global()->bounded(-5, 5);
+            int jitterY = QRandomGenerator::global()->bounded(-5, 5);
+            x += jitterX;
+            y += jitterY;
+        }
+
+        // 移动鼠标
+        MSDriverPRO::mouseMoveTo(qRound(x), qRound(y));
+
+        // 等待一段时间
+        QThread::msleep(QRandomGenerator::global()->bounded(5, 15));
+    }
+
+    MSDriverPRO::mouseMoveTo(targetX, targetY);
 }

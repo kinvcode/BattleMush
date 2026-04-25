@@ -99,6 +99,11 @@ public:
     float camera_width = 1296.0f;
     float camera_height = 759.0f;
 
+    // 药水数量
+    bool need_hp_potion = false;
+    bool need_mp_potion = false;
+
+    GameWindow game_window = {0,0,0,0};
 private:
 
 };

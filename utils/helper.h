@@ -48,6 +48,9 @@ public:
     // 时间戳转【时分】
     static QString timestampToHI(int timestamp);
 
+    // 更新窗口
+    static void updateGameWindow();
+
 signals:
     void sendWarning(QString msg);
 };
@@ -175,6 +178,9 @@ public:
 
     // 从缓存中加载地图
     static void loadLocalMap(const QString map_id);
+
+    // 获取NPC的屏幕坐标
+    static cv::Point npcScreenCoor(QString npc_id);
 };
 
 class PathAlgo{
@@ -184,6 +190,9 @@ public:
 
     // 搜索A*路径（地图之间连接）
     static std::vector<TargetRoom> findAstarRoom(const QString &roomA, const QString &roomB);
+
+    // 搜索路径（最近的药水商店）BFS算法
+    static std::vector<TargetRoom> findPotionRoom(const QString &roomA);
 
     static void walkToLeft(
         const std::vector<Platform> &platform_list,
@@ -259,7 +268,10 @@ public:
 };
 
 
-
+class MSKM{
+public:
+    static void humanMove(int targetX, int targetY);
+};
 
 
 

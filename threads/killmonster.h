@@ -144,6 +144,9 @@ private:
     // 前往指定地图
     void moveToRoomByUUID(const QString &uuid);
 
+    // 购买药水
+    void buyPotion();
+
 private:
     // 刷图计划
     void taskCleanRoom();

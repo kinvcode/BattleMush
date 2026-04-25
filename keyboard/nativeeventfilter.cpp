@@ -25,6 +25,9 @@ bool NativeEventFilter::nativeEventFilter(const QByteArray& eventType, void* mes
                 emit sendControleStatus(true);
                 main_win->m_threadManager->resumeAll();
                 m_is_stop = false;
+
+                // 更新游戏窗口
+                Helper::updateGameWindow();
             }else{
                 qDebug() << "自动模式已关闭~";
                 Helper::console("自动模式已关闭~");

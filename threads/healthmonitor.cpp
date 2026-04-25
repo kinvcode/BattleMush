@@ -134,27 +134,33 @@ void HealthMonitor::process()
             if(Gplayer.MAX_HP != 0 && Gplayer.MAX_MP != 0){
                 if(Gplayer.quick_slot_pageup_count < potion_num){
 
-                    if(!Gplayer.show_warning){
-                        Helper heler_tool;
-                        heler_tool.warning("血药数量不足"+QString::number(potion_num)+"个");
-                    }
+                    // if(!Gplayer.show_warning){
+                    //     Helper heler_tool;
+                    //     heler_tool.warning("血药数量不足"+QString::number(potion_num)+"个");
+                    // }
 
+                    Gplayer.need_hp_potion = true;
                     DebugOutput::out("血药数量不足10个！");
                     ProcessHelper::programDelay(1000);
                     QApplication::processEvents();
                     continue;
+                }else{
+                    Gplayer.need_hp_potion = false;
                 }
 
                 if(Gplayer.quick_slot_pagedown_count < potion_num){
-                    if(!Gplayer.show_warning){
-                        Helper heler_tool;
-                        heler_tool.warning("蓝药数量不足"+QString::number(potion_num)+"个");
-                    }
+                    // if(!Gplayer.show_warning){
+                    //     Helper heler_tool;
+                    //     heler_tool.warning("蓝药数量不足"+QString::number(potion_num)+"个");
+                    // }
 
+                    Gplayer.need_mp_potion = true;
                     DebugOutput::out("蓝药数量不足10个！");
                     ProcessHelper::programDelay(1000);
                     QApplication::processEvents();
                     continue;
+                }else{
+                    Gplayer.need_mp_potion = false;
                 }
             }
         }

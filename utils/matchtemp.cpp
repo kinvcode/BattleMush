@@ -1,4 +1,7 @@
 #include "matchtemp.h"
+#include "process/process.h"
+#include "global/globalplayer.h"
+
 MatchTemp::MatchTemp(QString tmp)
 {
     tmp_src = tmp;
@@ -12,22 +15,20 @@ MatchTemp::~MatchTemp()
 void MatchTemp::getScreenShot()
 {
     // 调试本地图片
-    QPixmap pixmap(QCoreApplication::applicationDirPath() + "/temp/game.png");
-    cur_capture = pixmap;
+    // QPixmap pixmap(QCoreApplication::applicationDirPath() + "/temp/game.png");
+    // cur_capture = pixmap;
 
-    // 判断缩放
+    QScreen* m_pScreen = QGuiApplication::primaryScreen();
+    cur_capture        = m_pScreen->grabWindow((WId)GetDesktopWindow());
+    cur_capture        = cur_capture.copy(
+        Gplayer.game_window.x,
+        Gplayer.game_window.y,
+        Gplayer.game_window.width,
+        Gplayer.game_window.height
+    );
+
     img_width = cur_capture.width();
     img_height = cur_capture.height();
-
-    // return;
-
-    // QScreen* m_pScreen = QGuiApplication::primaryScreen();
-    // cur_capture        = m_pScreen->grabWindow((WId)GetDesktopWindow());
-    // int game_x         = Global::game_rect.left;
-    // int game_y         = Global::game_rect.top;
-    // int game_width     = Global::game_rect.right - Global::game_rect.left;
-    // int game_height    = Global::game_rect.bottom - Global::game_rect.top;
-    // cur_capture        = cur_capture.copy(game_x,game_y,game_width,game_height);
 }
 
 void MatchTemp::cutPicture()

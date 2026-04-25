@@ -267,6 +267,7 @@ void Controller::initRoomNodes()
 
         room.uuid = roomObj["uuid"].toString();
         room.name = roomObj["name"].toString();
+        room.type = roomObj["type"].toInt();
 
         // 解析 targets
         if (roomObj.contains("targets") && roomObj["targets"].isArray()) {
@@ -280,6 +281,7 @@ void Controller::initRoomNodes()
 
                 target.uuid = targetObj["uuid"].toString();
                 target.name = targetObj["name"].toString();
+                target.type = targetObj["type"].toInt();
                 target.platform = targetObj["platform"].toInt();
 
                 if (targetObj.contains("area") && targetObj["area"].isArray()) {

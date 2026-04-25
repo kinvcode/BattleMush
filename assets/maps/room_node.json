@@ -1,89 +1,118 @@
 [{
     "uuid": "5624c829-11e1-4544-91b1-a9220c654f5a",
     "name": "菇菇山丘",
+    "type": 0,
     "targets": [{
         "uuid": "60d5d28d-7379-4af0-afc0-e1716d9ef474",
         "name": "弓箭手村西部小山",
+        "type": 0,
         "platform": 0,
         "area": [2107, 1845, 2208, 1987]
     }]
 },{
     "uuid": "60d5d28d-7379-4af0-afc0-e1716d9ef474",
     "name": "弓箭手村西部小山",
+    "type": 0,
     "targets": [{
         "uuid": "6cdea78a-77d3-4bb1-8dd8-196efcf905e5",
         "name": "弓箭手村西部森林",
+        "type": 0,
         "platform": 0,
         "area": [94, 2664, 195, 2806]
     },{
         "uuid": "a73c7664-2f12-4caf-be19-94f8b65175f2",
         "name": "弓箭手村訓練場1",
+        "type": 0,
         "platform": 43,
         "area": [3294, 2273, 3395, 2415]
     },{
         "uuid": "5624c829-11e1-4544-91b1-a9220c654f5a",
         "name": "菇菇山丘",
+        "type": 0,
         "platform": 31,
         "area": [2297, 1442, 2371, 1495]
     }]
 },{
     "uuid": "a73c7664-2f12-4caf-be19-94f8b65175f2",
     "name": "弓箭手村訓練場1",
+    "type": 0,
     "targets": [{
         "uuid": "60d5d28d-7379-4af0-afc0-e1716d9ef474",
         "name": "弓箭手村西部小山",
+        "type": 0,
         "platform": 0,
         "area": [92, 2624, 193, 2766]
     },{
         "uuid": "e6c47fb2-facd-4778-8bd7-5586c53ab3ea",
         "name": "弓箭手村",
+        "type": 1,
         "platform": 0,
         "area": [2041, 2626, 2142, 2768]
     }]
 },{
     "uuid": "6cdea78a-77d3-4bb1-8dd8-196efcf905e5",
     "name": "弓箭手村西部森林",
+    "type": 0,
     "targets": [{
         "uuid": "60d5d28d-7379-4af0-afc0-e1716d9ef474",
         "name": "弓箭手村西部小山",
+        "type": 0,
         "platform": 3,
         "area": [3904, 2502, 4005, 2644]
     }]
 },{
     "uuid": "e6c47fb2-facd-4778-8bd7-5586c53ab3ea",
     "name": "弓箭手村",
+    "type": 1,
     "targets": [{
         "uuid": "a73c7664-2f12-4caf-be19-94f8b65175f2",
         "name": "弓箭手村訓練場1",
+        "type": 0,
         "platform": 44,
         "area": [30, 1803, 131, 1945]
     },{
         "uuid": "57b263cd-2e24-40f5-9296-2e05ba56839d",
         "name": "弓箭手村市集",
+        "type": 1,
         "platform": 45,
         "area": [3537, 1865, 3636, 2003]
     }]
 },{
     "uuid": "57b263cd-2e24-40f5-9296-2e05ba56839d",
     "name": "弓箭手村市集",
+    "type": 1,
     "targets": [{
         "uuid": "e6c47fb2-facd-4778-8bd7-5586c53ab3ea",
         "name": "弓箭手村",
+        "type": 1,
         "platform": 8,
         "area": [229, 1768, 299, 1808]
     },{
         "uuid": "a6dd12a3-f252-4c7f-94c3-16457d084c24",
         "name": "弓箭手村雜貨店",
+        "type": 2,
         "platform": 4,
         "area": [3434, 1508, 3504, 1528]
     }]
 },{
     "uuid": "a6dd12a3-f252-4c7f-94c3-16457d084c24",
     "name": "弓箭手村雜貨店",
+    "type": 2,
     "targets": [{
         "uuid": "57b263cd-2e24-40f5-9296-2e05ba56839d",
         "name": "弓箭手村市集",
+        "type": 1,
         "platform": 21,
         "area": [643, 1727, 713, 1767]
+    }]
+},{
+    "uuid": "c812231b-55cf-449c-879f-8d5674951c01",
+    "name": "維多利亞港雜貨店",
+    "type": 2,
+    "targets": [{
+        "uuid": "111",
+        "name": "222",
+        "platform": 0,
+        "area": [5043, 1613, 5144, 1755]
     }]
 }]

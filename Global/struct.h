@@ -270,6 +270,7 @@ typedef struct{
 typedef struct{
     QString uuid;
     QString name;
+    int     type;
     int platform;
     IntRect area;
 }TargetRoom;
@@ -277,7 +278,22 @@ typedef struct{
 typedef struct{
     QString uuid;
     QString name;
+    int     type;
     std::vector<TargetRoom> targets;
 }RoomNode;
+
+enum RoomType
+{
+    RoomMonster = 0,  // 怪物房
+    RoomTown = 1,   // 城镇
+    RoomPotionShop = 2    // 药水店
+};
+
+typedef struct{
+    int x;
+    int y;
+    int width;
+    int height;
+}GameWindow;
 
 #endif // STRUCT_H
