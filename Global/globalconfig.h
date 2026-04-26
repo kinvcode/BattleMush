@@ -46,6 +46,15 @@ public:
         {"buff1",60}
         }
     },
+    {"potion_buy",QJsonObject{
+        {"hp_buy",true},
+        {"mp_buy",true},
+        {"hp_num",100},
+        {"mp_num",100},
+        {"hp_type",0},
+        {"mp_type",0},
+        }
+    },
     {"model","uplevel"}
 };
 

@@ -30,6 +30,9 @@ public:
     // 分割字符串
     static bool parseHPString(const QString& Text, int& left, int& right);
 
+    // 金币文本转整数
+    static int coinToInt(QString coid);
+
     static bool isSamePos(const std::pair<float,float>& a,
                                   const std::pair<float,float>& b);
     // 判断是否有相同的坐标
@@ -271,6 +274,8 @@ public:
 class MSKM{
 public:
     static void humanMove(int targetX, int targetY);
+
+    static void inputNum(int num);
 };
 
 

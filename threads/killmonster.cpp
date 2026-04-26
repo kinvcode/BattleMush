@@ -549,7 +549,7 @@ bool KillMonster::isExistsRune()
 
                 // 记录当前符文位置：平台坐标
                 m_rune_info.platform = line_id;
-                m_rune_info.area = {rune_x,rune_y};
+                m_rune_info.area = {rune_x - 10, rune_x + 10};
                 return true;
             }
         }
@@ -561,6 +561,9 @@ bool KillMonster::isExistsRune()
 void KillMonster::solveRune()
 {
 retryEnter:
+    if(m_paused || !m_running){
+        return;
+    }
     // DebugOutput::out("处理解除符文~，暂时没有相关解决方式");
 
     // 前往符文位置：平台坐标
@@ -570,9 +573,15 @@ retryEnter:
     int user_in_lineid;
     user_in_lineid = userPlatform();
 
+    if(user_in_lineid == -1){
+        qDebug() << "人物可能在空中~";
+        ProcessHelper::programDelay(500);
+        goto retryEnter;
+    }
+
     if(user_in_lineid == platform){
         WalkBase walk_to_platform(0);
-        qDebug() << "寻路到符文位置";
+        qDebug() << "寻路到符文位置:" << area.x << "," << area.y;
         Gcontroller.m_disable_attack = true;
         bool success = walk_to_platform.moveToPlatform(area); // 走到范围
         Gcontroller.m_disable_attack = false;
@@ -583,7 +592,7 @@ retryEnter:
                 qDebug() << "符文封印已解除！";
                 return;
             }
-            ProcessHelper::programDelay(3000);
+            ProcessHelper::programDelay(500);
             QApplication::processEvents();
             goto retryEnter;
         }
@@ -596,6 +605,10 @@ retryEnter:
     qDebug() << "======A星路径======";
     for(auto const &path : paths){
         qDebug() << path;
+        if(path == -1){
+            ProcessHelper::programDelay(500);
+            goto retryEnter;
+        }
     }
     qDebug() << "======A星路径======";
 
@@ -614,16 +627,17 @@ retryEnter:
         Gcontroller.m_disable_attack = true;
         bool move_success = MovePlatform::toPlatform(node, plat);
         Gcontroller.m_disable_attack = false;
-        if(!move_success){
-            qDebug() << "A星移动平台失败 平台:" << plat;
-            ProcessHelper::programDelay(100);
-            QApplication::processEvents();
-            goto retryEnter;
-        }
 
         user_in_lineid = userPlatform();
         if(user_in_lineid == platform){
             DebugOutput::out("A星已到达目标路线节点");
+            goto retryEnter;
+        }
+
+        if(!move_success){
+            qDebug() << "A星移动平台失败 平台:" << plat;
+            ProcessHelper::programDelay(100);
+            QApplication::processEvents();
             goto retryEnter;
         }
     }
@@ -644,7 +658,7 @@ void KillMonster::runneKeyboard()
 
     // 如果没有，则重新触发
     if(rune_ui == 0){
-        DebugOutput::out("不存在符文封印");
+        DebugOutput::out("未显示解除符文封印指令~");
         return;
     }
 
@@ -708,11 +722,11 @@ void KillMonster::runneKeyboard()
             MSDriverPRO::keyboardClick(MSKeyboard_DownArrow,1);
         }
 
-        ProcessHelper::randomDelay(800,1500);
+        ProcessHelper::randomDelay(300,500);
         QApplication::processEvents();
     }
 
-    ProcessHelper::programDelay(2000);
+    ProcessHelper::programDelay(500);
     QApplication::processEvents();
 }
 
@@ -1357,37 +1371,118 @@ void KillMonster::buyPotion()
     if(cur_roomnode.type == 2)
     {
         qDebug() << "当前商店id:" << Gplayer.curmapinfo.id;
+        QString npc_id;
 
         // 判断当前在哪个商店
+        if(Gplayer.curmapinfo.id == "a6dd12a3-f252-4c7f-94c3-16457d084c24"){
+            qDebug() << "弓箭手村杂货店购买";
+            npc_id = "npc-1011100";
+            potionShopBuyItem(npc_id);
+            return;
+        }
+
         if(Gplayer.curmapinfo.id == "c812231b-55cf-449c-879f-8d5674951c01"){
 
             qDebug() << "维多利亚港杂货店购买";
+            npc_id = "npc-1001100";
+            potionShopBuyItem(npc_id);
+            return;
+        }
 
-            // 找到当前NPC
-            cv::Point screen_coor = RoomMap::npcScreenCoor("npc-1001100");
-            if(screen_coor.x == -1){
-                qDebug() << "获取NPC坐标失败";
-                ProcessHelper::programDelay(1500);
-                QApplication::processEvents();
-                return;
+        qDebug() << "不支持当前商店购买物品";
+        ProcessHelper::programDelay(1500);
+        QApplication::processEvents();
+        return;
+    }
+}
+
+void KillMonster::potionShopBuyItem(QString npc)
+{
+    // 找到当前NPC
+    cv::Point screen_coor = RoomMap::npcScreenCoor(npc);
+    if(screen_coor.x == -1){
+        qDebug() << "获取NPC坐标失败";
+        ProcessHelper::programDelay(1500);
+        QApplication::processEvents();
+        return;
+    }
+
+    qDebug() << "选择NPC";
+    MSKM::humanMove(screen_coor.x, screen_coor.y);
+    MSDriverPRO::mouseLeftClick();
+    ProcessHelper::programDelay(1000);
+    QApplication::processEvents();
+
+    // 判断商店是否打开
+    MatchTemp tempmatch(":assets/templat/potion_shop/leave_shop");
+    cv::Point leave_coor;
+    if(tempmatch.match(leave_coor)){
+        qDebug() << "选择药水";
+        MSKM::humanMove(560, 400);
+        ProcessHelper::programDelay(500);
+
+        // 如果滚动条不在顶端
+        // float scrool_position = readFloat(readLong());
+
+        quint64 ui_entity = Gplayer.p_uientity;
+        quint64 npc_group = Helper::findChild(ui_entity, "NPCGroup");
+        quint64 shop_panel = Helper::findChild(npc_group,"ShopPanel");
+        quint64 meso = Helper::findChild(shop_panel,"Meso");
+        quint64 shop_scroll = Helper::findChild(shop_panel,"Scroll_전체");
+        qDebug() << "商店:" << QString::number(shop_scroll,16).toUpper();
+
+        float scroll_position = readFloat(readLong(shop_scroll + BASE::MODEntity::ScrollLayoutGroupComponent) + BASE::ScrollLayoutGroupComponent::Position + 4);
+        if(scroll_position > 0){
+            int position = scroll_position * 1000;
+            int up_times = position / 22 + 3;
+
+            for(int i = 0; i < up_times; i++){
+                MSDriverPRO::mouseWheel(1);
+                ProcessHelper::programDelay(300);
+            }
+        }
+
+
+        QString coin_text = readString(readLong(readLong(meso
+            + BASE::MODEntity::TextComponent)
+            +BASE::TextComponent::_text)
+            + BASE::String::text,100);
+
+        int coin_num = Helper::coinToInt(coin_text);
+        int potion_price = 99999;
+        qDebug() << "当前金币:" << coin_num;
+        // 商店滚动条Scroll_전체
+
+        int hp_type = Gconfig.getValue("potion_buy/hp_type").toInt();
+        int hp_num = Gconfig.getValue("potion_buy/hp_num").toInt();
+        hp_num = hp_num - Gplayer.quick_slot_pageup_count;
+        if(hp_num > 0){
+            QString hp_type_src;
+            switch (hp_type) {
+            case 0:
+                potion_price = 50;
+                hp_type_src = ":assets/templat/potion_shop/red_potion";
+                break;
+            case 1:
+                potion_price = 160;
+                hp_type_src = ":assets/templat/potion_shop/orange_potion";
+                break;
+            case 2:
+                potion_price = 320;
+                hp_type_src = ":assets/templat/potion_shop/white_potion";
+                break;
+            default:
+                potion_price = 50;
+                hp_type_src = ":assets/templat/potion_shop/red_potion";
+                break;
             }
 
-            qDebug() << "选择NPC";
-            MSKM::humanMove(screen_coor.x, screen_coor.y);
-            MSDriverPRO::mouseLeftClick();
-            ProcessHelper::programDelay(1000);
-            QApplication::processEvents();
-
-            // 判断商店是否打开
-            MatchTemp tempmatch(":assets/templat/potion_shop/leave_shop");
-            cv::Point leave_coor;
-            if(tempmatch.match(leave_coor)){
-                qDebug() << "选择药水";
-
-                MatchTemp match_redpotion(":assets/templat/potion_shop/red_potion");
+            if(hp_num * potion_price <= coin_num)
+            {
+                MatchTemp match_redpotion(hp_type_src);
                 cv::Point redpotion_coor;
                 if(match_redpotion.match(redpotion_coor)){
-                    qDebug() << "购买红色药水";
+                    qDebug() << "购买血药";
                     MSKM::humanMove(redpotion_coor.x + 120, redpotion_coor.y + 25);
                     ProcessHelper::programDelay(200);
                     MSDriverPRO::mouseLeftClick();
@@ -1404,47 +1499,116 @@ void KillMonster::buyPotion()
                         ProcessHelper::programDelay(500);
 
                         qDebug() << "输入购买数量";
-                        MSDriverPRO::keyboardClick(MSKeyboard_1,1);
+                        // MSDriverPRO::keyboardClick(MSKeyboard_1,1);
+                        MSKM::inputNum(hp_num);
                         ProcessHelper::programDelay(500);
 
                         qDebug() << "确认购买";
-                        // MSDriverPRO::keyboardClick(MSKeyboard_ENTER,2);
                         MSKM::humanMove(ok_coor.x + 30, ok_coor.y + 10);
                         MSDriverPRO::mouseLeftClick();
-                        ProcessHelper::programDelay(200);
+                        qDebug() << "购买动作执行完毕，等待1秒";
+                        ProcessHelper::programDelay(1000);
                     }
-
                 }
-
-                qDebug() << "关闭商店";
-                MSKM::humanMove(leave_coor.x + 40, leave_coor.y + 11);
-                MSDriverPRO::mouseLeftClick();
-                // MSDriverPRO::keyboardClick(MSKeyboard_ESCAPE,1);
-                ProcessHelper::programDelay(3000);
-                QApplication::processEvents();
             }else{
-                qDebug() << "商店打开失败";
-                goto retryEnter;
-                ProcessHelper::programDelay(1500);
-                QApplication::processEvents();
-                return;
+                qDebug() << "金币余额不足~";
+                ProcessHelper::programDelay(3000);
             }
-
-            goto retryEnter;
-            ProcessHelper::programDelay(1500);
-            QApplication::processEvents();
-            return;
-
-            ProcessHelper::programDelay(1500);
-            QApplication::processEvents();
-            return;
         }
 
-        qDebug() << "不支持当前商店购买物品";
-        ProcessHelper::programDelay(1500);
+        coin_text = readString(readLong(readLong(meso
+            + BASE::MODEntity::TextComponent)
+            +BASE::TextComponent::_text)
+            + BASE::String::text,100);
+
+        coin_num = Helper::coinToInt(coin_text);
+        qDebug() << "当前金币:" << coin_num;
+
+        int mp_type = Gconfig.getValue("potion_buy/mp_type").toInt();
+        int mp_num = Gconfig.getValue("potion_buy/mp_num").toInt();
+        mp_num = mp_num - Gplayer.quick_slot_pagedown_count;
+        if(mp_num > 0){
+            QString mp_type_src;
+            switch (mp_type) {
+            case 0:
+                potion_price = 200;
+                mp_type_src = ":assets/templat/potion_shop/blue_potion";
+                break;
+            case 1:
+                potion_price = 620;
+                mp_type_src = ":assets/templat/potion_shop/vitality_potion";
+                break;
+            default:
+                potion_price = 200;
+                mp_type_src = ":assets/templat/potion_shop/blue_potion";
+                break;
+            }
+
+            if(mp_num * potion_price <= coin_num)
+            {
+                MatchTemp match_redpotion(mp_type_src);
+                cv::Point redpotion_coor;
+                if(match_redpotion.match(redpotion_coor)){
+                    qDebug() << "购买蓝药";
+                    MSKM::humanMove(redpotion_coor.x + 120, redpotion_coor.y + 25);
+                    ProcessHelper::programDelay(200);
+                    MSDriverPRO::mouseLeftClick();
+                    ProcessHelper::programDelay(50);
+                    MSDriverPRO::mouseLeftClick();
+                    ProcessHelper::programDelay(200);
+
+                    MatchTemp match_ok(":assets/templat/potion_shop/ok");
+                    cv::Point ok_coor;
+                    if(match_ok.match(ok_coor)){
+                        qDebug() << "点击输入框";
+                        MSKM::humanMove(500, 404);
+                        MSDriverPRO::mouseLeftClick();
+                        ProcessHelper::programDelay(500);
+
+                        qDebug() << "输入购买数量";
+                        // MSDriverPRO::keyboardClick(MSKeyboard_1,1);
+                        MSKM::inputNum(mp_num);
+                        ProcessHelper::programDelay(500);
+
+                        qDebug() << "确认购买";
+                        MSKM::humanMove(ok_coor.x + 30, ok_coor.y + 10);
+                        MSDriverPRO::mouseLeftClick();
+                        qDebug() << "购买动作执行完毕，等待1秒";
+                        ProcessHelper::programDelay(1000);
+                    }
+                }
+            }else{
+                qDebug() << "金币余额不足~";
+               ProcessHelper::programDelay(3000);
+            }
+        }
+
+        // 如果有确认按钮
+        MatchTemp match_ok(":assets/templat/potion_shop/close_ok");
+        cv::Point ok_coor;
+        if(match_ok.match(ok_coor)){
+            ProcessHelper::programDelay(5000);
+            qDebug() << "关闭确认框";
+            MSKM::humanMove(ok_coor.x + 40, ok_coor.y + 15);
+            MSDriverPRO::mouseLeftClick();
+            ProcessHelper::programDelay(3000);
+        }
+
+        qDebug() << "关闭商店";
+        MSKM::humanMove(leave_coor.x + 40, leave_coor.y + 11);
+        MSDriverPRO::mouseLeftClick();
+        ProcessHelper::programDelay(1000);
+        QApplication::processEvents();
+    }else{
+        qDebug() << "商店打开失败";
+        ProcessHelper::programDelay(500);
         QApplication::processEvents();
         return;
     }
+
+    ProcessHelper::programDelay(500);
+    QApplication::processEvents();
+    return;
 }
 
 void KillMonster::updateTaskID()

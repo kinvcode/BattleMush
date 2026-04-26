@@ -81,6 +81,7 @@ namespace BASE {
         static int TransformComponent = 0x158;
         static int PlayerControllerComponent = 0x170;
         static int SpriteRendererComponent = 0x180;
+        static int ScrollLayoutGroupComponent = 0x188;
         static int PlayerComponent = 0x198;
         static int RigidbodyComponent = 0x1D8;
         static int TextComponent = 0x1F8;
@@ -141,6 +142,10 @@ namespace BASE {
 
     namespace SpriteGUIRendererComponent{
         static int MODDataRef = 0x168;
+    };
+
+    namespace ScrollLayoutGroupComponent{
+        static int Position = 0x178;
     };
 
     namespace MODDataRef{

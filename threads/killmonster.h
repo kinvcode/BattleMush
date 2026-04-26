@@ -147,6 +147,9 @@ private:
     // 购买药水
     void buyPotion();
 
+    // 药水商店购买
+    void potionShopBuyItem(QString npc);
+
 private:
     // 刷图计划
     void taskCleanRoom();

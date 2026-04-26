@@ -139,6 +139,18 @@ private slots:
 
     void on_pushButton_show_room_map_npc_clicked();
 
+    void on_checkBox_potion_hp_buy_stateChanged(int arg1);
+
+    void on_lineEdit_potion_hp_buy_num_editingFinished();
+
+    void on_checkBox_potion_mp_buy_stateChanged(int arg1);
+
+    void on_lineEdit_potion_mp_buy_num_editingFinished();
+
+    void on_comboBox_potion_hp_buy_type_activated(int index);
+
+    void on_comboBox_potion_mp_buy_type_activated(int index);
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

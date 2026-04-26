@@ -32,5 +32,6 @@
         <file>assets/templat/potion_shop/white_potion.png</file>
         <file>assets/templat/potion_shop/cancel.png</file>
         <file>assets/templat/potion_shop/ok.png</file>
+        <file>assets/templat/potion_shop/close_ok.png</file>
     </qresource>
 </RCC>

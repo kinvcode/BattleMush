@@ -107,6 +107,7 @@ bool MatchTemp::match(cv::Point &coor)
 
     // 载入模板图片
     QPixmap tmp_file(tmp_src);
+    qDebug() << "当前匹配模板：" << tmp_src;
 
     // 模板
     cv::Mat cv_templat = QPixmapToMat(tmp_file);

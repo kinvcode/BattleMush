@@ -753,6 +753,13 @@ bool Helper::parseHPString(const QString &Text, int &left, int &right) {
     return false;
 }
 
+int Helper::coinToInt(QString coid)
+{
+    QString cleanStr = coid;
+    cleanStr.remove(',');  // 移除所有逗号
+    return cleanStr.toInt();
+}
+
 bool Helper::isSamePos(const std::pair<float,float>& a,
                const std::pair<float,float>& b)
 {
@@ -2733,4 +2740,33 @@ void MSKM::humanMove(int targetX, int targetY)
     }
 
     MSDriverPRO::mouseMoveTo(targetX, targetY);
+}
+
+void MSKM::inputNum(int num)
+{
+    if(num <= 0){
+        return;
+    }
+
+    // 定义键盘枚举数组
+    const int keyboardKeys[] = {
+        MSKeyboard_0, MSKeyboard_1, MSKeyboard_2, MSKeyboard_3, MSKeyboard_4,
+        MSKeyboard_5, MSKeyboard_6, MSKeyboard_7, MSKeyboard_8, MSKeyboard_9
+    };
+
+    // 转换为QString并逐字符处理
+    QString numStr = QString::number(num);
+
+    for (int i = 0; i < numStr.length(); ++i) {
+        QChar ch = numStr.at(i);
+
+        if (ch == '-') {
+            continue;
+        }
+
+        int digit = ch.digitValue(); // QChar转数字，-1表示非数字
+        if (digit >= 0 && digit <= 9) {
+            MSDriverPRO::keyboardClick(keyboardKeys[digit], 1);
+        }
+    }
 }

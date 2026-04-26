@@ -87,6 +87,7 @@ void MainWindow::on_listWidget_clicked(const QModelIndex &index)
 
 void MainWindow::showNotice(const QString &message)
 {
+    qDebug() << message;
     auto* notice = new NoticeWidget(message,this);
     notice->setAutoClose(1500);  // 自动关闭
 
@@ -177,6 +178,18 @@ void MainWindow::initCompomentUI()
     ui->label_task_op2_text->setProperty("class","task-value");
     ui->label_task_time_text->setProperty("class","task-value");
 
+    // 血蓝药
+    ui->comboBox_potion_hp_buy_type->blockSignals(true);
+    ui->comboBox_potion_mp_buy_type->blockSignals(true);
+    ui->comboBox_potion_hp_buy_type->addItem("红色药水");
+    ui->comboBox_potion_hp_buy_type->addItem("橘色药水");
+    ui->comboBox_potion_hp_buy_type->addItem("白色药水");
+
+    ui->comboBox_potion_mp_buy_type->addItem("蓝色药水");
+    ui->comboBox_potion_mp_buy_type->addItem("活力药水");
+
+    ui->comboBox_potion_hp_buy_type->blockSignals(false);
+    ui->comboBox_potion_mp_buy_type->blockSignals(false);
 
     // 重新设置样式表
     qApp->setStyleSheet(qApp->styleSheet());
@@ -188,11 +201,23 @@ void MainWindow::initConfig()
     initTask();
 
     // 技能开关
+    ui->checkBox_atk_switch_general->blockSignals(true);
+    ui->checkBox_atk_switch_skill1->blockSignals(true);
+    ui->checkBox_atk_switch_buff1->blockSignals(true);
     ui->checkBox_atk_switch_general->setChecked(Gconfig.getValue("atk_swtich/general").toBool());
     ui->checkBox_atk_switch_skill1->setChecked(Gconfig.getValue("atk_swtich/skill1").toBool());
     ui->checkBox_atk_switch_buff1->setChecked(Gconfig.getValue("atk_swtich/buff1").toBool());
+    ui->checkBox_atk_switch_general->blockSignals(false);
+    ui->checkBox_atk_switch_skill1->blockSignals(false);
+    ui->checkBox_atk_switch_buff1->blockSignals(false);
 
     // 按键绑定
+    ui->lineEdit_bindkey_general_atk->blockSignals(true);
+    ui->lineEdit_bindkey_skill_atk1->blockSignals(true);
+    ui->lineEdit_bindkey_buff1->blockSignals(true);
+    ui->lineEdit_bindkey_jump->blockSignals(true);
+    ui->lineEdit_bindkey_gohome->blockSignals(true);
+
     ui->lineEdit_bindkey_general_atk->m_config_path = "bindkey/general_atk";
     ui->lineEdit_bindkey_general_atk->m_currentKey = Gconfig.getValue("bindkey/general_atk").toInt();
     ui->lineEdit_bindkey_general_atk->updateDisplay();
@@ -214,32 +239,84 @@ void MainWindow::initConfig()
     ui->lineEdit_bindkey_gohome->m_currentKey = Gconfig.getValue("bindkey/gohome").toInt();
     ui->lineEdit_bindkey_gohome->updateDisplay();
 
+    ui->lineEdit_bindkey_general_atk->blockSignals(false);
+    ui->lineEdit_bindkey_skill_atk1->blockSignals(false);
+    ui->lineEdit_bindkey_buff1->blockSignals(false);
+    ui->lineEdit_bindkey_jump->blockSignals(false);
+    ui->lineEdit_bindkey_gohome->blockSignals(false);
+
     // 攻击范围
+    ui->lineEdit_atk_range_general_x->blockSignals(true);
+    ui->lineEdit_atk_range_general_y->blockSignals(true);
+    ui->lineEdit_atk_range_skill1_x->blockSignals(true);
+    ui->lineEdit_atk_range_skill1_y->blockSignals(true);
     ui->lineEdit_atk_range_general_x->setText(Gconfig.getValue("atk_range/general_x").toString());
     ui->lineEdit_atk_range_general_y->setText(Gconfig.getValue("atk_range/general_y").toString());
     ui->lineEdit_atk_range_skill1_x->setText(Gconfig.getValue("atk_range/skill1_x").toString());
     ui->lineEdit_atk_range_skill1_y->setText(Gconfig.getValue("atk_range/skill1_y").toString());
+    ui->lineEdit_atk_range_general_x->blockSignals(false);
+    ui->lineEdit_atk_range_general_y->blockSignals(false);
+    ui->lineEdit_atk_range_skill1_x->blockSignals(false);
+    ui->lineEdit_atk_range_skill1_y->blockSignals(false);
 
     // 自动加血
+    ui->checkBox_auto_add_hp->blockSignals(true);
+    ui->lineEdit_auto_add_hp_rate->blockSignals(true);
+    ui->lineEdit_auto_add_hp_key->blockSignals(true);
     ui->checkBox_auto_add_hp->setChecked(Gconfig.getValue("auto_add_health/add_hp").toBool());
     ui->lineEdit_auto_add_hp_rate->setText(Gconfig.getValue("auto_add_health/hp_rate").toString());
     ui->lineEdit_auto_add_hp_key->m_config_path = "auto_add_health/hp_key";
     ui->lineEdit_auto_add_hp_key->m_currentKey = Gconfig.getValue("auto_add_health/hp_key").toInt();
     ui->lineEdit_auto_add_hp_key->updateDisplay();
+    ui->checkBox_auto_add_hp->blockSignals(false);
+    ui->lineEdit_auto_add_hp_rate->blockSignals(false);
+    ui->lineEdit_auto_add_hp_key->blockSignals(false);
 
     // 自动加蓝
+    ui->checkBox_auto_add_mp->blockSignals(true);
+    ui->lineEdit_auto_add_mp_rate->blockSignals(true);
+    ui->lineEdit_auto_add_mp_key->blockSignals(true);
     ui->checkBox_auto_add_mp->setChecked(Gconfig.getValue("auto_add_health/add_mp").toBool());
     ui->lineEdit_auto_add_mp_rate->setText(Gconfig.getValue("auto_add_health/mp_rate").toString());
     ui->lineEdit_auto_add_mp_key->m_config_path = "auto_add_health/mp_key";
     ui->lineEdit_auto_add_mp_key->m_currentKey = Gconfig.getValue("auto_add_health/mp_key").toInt();
     ui->lineEdit_auto_add_mp_key->updateDisplay();
+    ui->checkBox_auto_add_mp->blockSignals(false);
+    ui->lineEdit_auto_add_mp_rate->blockSignals(false);
+    ui->lineEdit_auto_add_mp_key->blockSignals(false);
 
     // 药水数量监控
+    ui->checkBox_potion_num->blockSignals(true);
+    ui->lineEdit_potion_num->blockSignals(true);
     ui->checkBox_potion_num->setChecked(Gconfig.getValue("auto_add_health/potion_num_switch").toBool());
     ui->lineEdit_potion_num->setText(Gconfig.getValue("auto_add_health/potion_num").toString());
+    ui->checkBox_potion_num->blockSignals(false);
+    ui->lineEdit_potion_num->blockSignals(false);
+
+    // 药水购买
+    ui->checkBox_potion_hp_buy->blockSignals(true);
+    ui->lineEdit_potion_hp_buy_num->blockSignals(true);
+    ui->comboBox_potion_hp_buy_type->blockSignals(true);
+    ui->checkBox_potion_mp_buy->blockSignals(true);
+    ui->lineEdit_potion_mp_buy_num->blockSignals(true);
+    ui->comboBox_potion_mp_buy_type->blockSignals(true);
+    ui->checkBox_potion_hp_buy->setChecked(Gconfig.getValue("potion_buy/hp_buy").toBool());
+    ui->lineEdit_potion_hp_buy_num->setText(Gconfig.getValue("potion_buy/hp_num").toString());
+    ui->comboBox_potion_hp_buy_type->setCurrentIndex(Gconfig.getValue("potion_buy/hp_type").toInt());
+    ui->checkBox_potion_mp_buy->setChecked(Gconfig.getValue("potion_buy/mp_buy").toBool());
+    ui->lineEdit_potion_mp_buy_num->setText(Gconfig.getValue("potion_buy/mp_num").toString());
+    ui->comboBox_potion_mp_buy_type->setCurrentIndex(Gconfig.getValue("potion_buy/mp_type").toInt());
+    ui->checkBox_potion_hp_buy->blockSignals(false);
+    ui->lineEdit_potion_hp_buy_num->blockSignals(false);
+    ui->comboBox_potion_hp_buy_type->blockSignals(false);
+    ui->checkBox_potion_mp_buy->blockSignals(false);
+    ui->lineEdit_potion_mp_buy_num->blockSignals(false);
+    ui->comboBox_potion_mp_buy_type->blockSignals(false);
 
     // 技能释放频率
+    ui->lineEdit_recast_buff1->blockSignals(true);
     ui->lineEdit_recast_buff1->setText(Gconfig.getValue("atk_recast/buff1").toString());
+    ui->lineEdit_recast_buff1->blockSignals(false);
 }
 
 void MainWindow::initDir()
@@ -517,7 +594,7 @@ void MainWindow::on_lineEdit_auto_add_mp_rate_editingFinished()
 
     if (is_number && value >= 1 && value <= 100) {
         // 校验通过
-        console("自动加蓝比例已保存");
+        showNotice("自动加蓝比例已保存");
         Gconfig.setValue("auto_add_health/mp_rate", value);
     } else {
         showNotice("无效数值，请输入1-100之间的数字");
@@ -545,10 +622,10 @@ void MainWindow::on_lineEdit_auto_add_hp_rate_editingFinished()
 void MainWindow::on_checkBox_auto_add_mp_stateChanged(int arg1)
 {
     if(ui->checkBox_auto_add_mp->isChecked()){
-        console("自动加蓝已开启");
+        showNotice("自动加蓝已开启");
         Gconfig.setValue("auto_add_health/add_mp", true);
     }else{
-        console("自动加蓝已关闭");
+        showNotice("自动加蓝已关闭");
         Gconfig.setValue("auto_add_health/add_mp", false);
     }
 }
@@ -557,10 +634,10 @@ void MainWindow::on_checkBox_auto_add_mp_stateChanged(int arg1)
 void MainWindow::on_checkBox_auto_add_hp_stateChanged(int arg1)
 {
     if(ui->checkBox_auto_add_hp->isChecked()){
-        console("自动加血已开启");
+        showNotice("自动加血已开启");
         Gconfig.setValue("auto_add_health/add_hp", true);
     }else{
-        console("自动加血已关闭");
+        showNotice("自动加血已关闭");
         Gconfig.setValue("auto_add_health/add_hp", false);
     }
 }
@@ -608,7 +685,7 @@ void MainWindow::on_lineEdit_atk_range_general_x_editingFinished()
 
     if (is_number && value >= 1 && value <= 10000) {
         // 校验通过
-        console("普通攻击X范围已保存");
+        showNotice("普通攻击X范围已保存");
         Gconfig.setValue("atk_range/general_x", value);
     } else {
         showNotice("无效数值，请输入1-10000之间的数字");
@@ -625,7 +702,7 @@ void MainWindow::on_lineEdit_atk_range_general_y_editingFinished()
 
     if (is_number && value >= 1 && value <= 10000) {
         // 校验通过
-        console("普通攻击Y范围已保存");
+        showNotice("普通攻击Y范围已保存");
         Gconfig.setValue("atk_range/general_y", value);
     } else {
         showNotice("无效数值，请输入1-10000之间的数字");
@@ -642,7 +719,7 @@ void MainWindow::on_lineEdit_atk_range_skill1_x_editingFinished()
 
     if (is_number && value >= 1 && value <= 10000) {
         // 校验通过
-        console("技能攻击X范围已保存");
+        showNotice("技能攻击X范围已保存");
         Gconfig.setValue("atk_range/skill1_x", value);
     } else {
         showNotice("无效数值，请输入1-10000之间的数字");
@@ -659,7 +736,7 @@ void MainWindow::on_lineEdit_atk_range_skill1_y_editingFinished()
 
     if (is_number && value >= 1 && value <= 10000) {
         // 校验通过
-        console("技能攻击Y范围已保存");
+        showNotice("技能攻击Y范围已保存");
         Gconfig.setValue("atk_range/skill1_y", value);
     } else {
         showNotice("无效数值，请输入1-10000之间的数字");
@@ -1095,5 +1172,87 @@ void MainWindow::on_pushButton_get_inrang_monster_clicked()
 void MainWindow::on_pushButton_show_room_map_npc_clicked()
 {
     Data::Game::NPCScreenCoor();
+}
+
+
+void MainWindow::on_checkBox_potion_hp_buy_stateChanged(int arg1)
+{
+    if(ui->checkBox_potion_hp_buy->isChecked()){
+        showNotice("血药购买已开启");
+        Gconfig.setValue("potion_buy/hp_buy", true);
+    }else{
+        showNotice("血药购买已关闭");
+        Gconfig.setValue("potion_buy/hp_buy", false);
+    }
+}
+
+
+void MainWindow::on_lineEdit_potion_hp_buy_num_editingFinished()
+{
+    QString text = ui->lineEdit_potion_hp_buy_num->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+    int potion_num = Gconfig.getValue("auto_add_health/potion_num").toInt();
+    if(value < potion_num){
+        showNotice("不能低于监控的药水数量");
+        ui->lineEdit_potion_hp_buy_num->setText("");  // 清空内容
+        return;
+    }
+    if (is_number && value >= 1 && value <= 10000) {
+        // 校验通过
+        showNotice("购买血药数量已保存");
+        Gconfig.setValue("potion_buy/hp_num", value);
+    } else {
+        showNotice("无效数值，请输入1-10000之间的数字");
+        ui->lineEdit_potion_hp_buy_num->setText("");  // 清空内容
+    }
+}
+
+void MainWindow::on_checkBox_potion_mp_buy_stateChanged(int arg1)
+{
+    if(ui->checkBox_potion_mp_buy->isChecked()){
+        showNotice("蓝药购买已开启");
+        Gconfig.setValue("potion_buy/mp_buy", true);
+    }else{
+        showNotice("蓝药购买已关闭");
+        Gconfig.setValue("potion_buy/mp_buy", false);
+    }
+}
+
+
+void MainWindow::on_lineEdit_potion_mp_buy_num_editingFinished()
+{
+    QString text = ui->lineEdit_potion_mp_buy_num->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    int potion_num = Gconfig.getValue("auto_add_health/potion_num").toInt();
+    if(value < potion_num){
+        showNotice("不能低于监控的药水数量");
+        ui->lineEdit_potion_mp_buy_num->setText("");  // 清空内容
+        return;
+    }
+
+    if (is_number && value >= 1 && value <= 10000) {
+        // 校验通过
+        showNotice("购买蓝药数量已保存");
+        Gconfig.setValue("potion_buy/mp_num", value);
+    } else {
+        showNotice("无效数值，请输入1-10000之间的数字");
+        ui->lineEdit_potion_mp_buy_num->setText("");  // 清空内容
+    }
+}
+
+void MainWindow::on_comboBox_potion_hp_buy_type_activated(int index)
+{
+    showNotice("购买血药类型已保存");
+    Gconfig.setValue("potion_buy/hp_type", index);
+}
+
+
+void MainWindow::on_comboBox_potion_mp_buy_type_activated(int index)
+{
+    showNotice("购买蓝药类型已保存");
+    Gconfig.setValue("potion_buy/mp_type", index);
 }
 

@@ -140,7 +140,7 @@ void HealthMonitor::process()
                     // }
 
                     Gplayer.need_hp_potion = true;
-                    DebugOutput::out("血药数量不足10个！");
+                    DebugOutput::out("血药数量不足！");
                     ProcessHelper::programDelay(1000);
                     QApplication::processEvents();
                     continue;
@@ -155,7 +155,7 @@ void HealthMonitor::process()
                     // }
 
                     Gplayer.need_mp_potion = true;
-                    DebugOutput::out("蓝药数量不足10个！");
+                    DebugOutput::out("蓝药数量不足！");
                     ProcessHelper::programDelay(1000);
                     QApplication::processEvents();
                     continue;

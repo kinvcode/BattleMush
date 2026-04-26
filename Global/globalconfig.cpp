@@ -45,6 +45,16 @@ void GlobalConfig::loadFromJson()
     healthConfig["potion_num"] = config->getValue("auto_add_health/potion_num", healthConfig["potion_num"].toVariant()).toInt();
     data["auto_add_health"] = healthConfig;
 
+    // 血蓝购买
+    QJsonObject potionBuyConfig = data["potion_buy"].toObject();
+    potionBuyConfig["hp_buy"] = config->getValue("potion_buy/hp_buy", healthConfig["hp_buy"].toVariant()).toBool();
+    potionBuyConfig["hp_num"] = config->getValue("potion_buy/hp_num", healthConfig["hp_num"].toVariant()).toInt();
+    potionBuyConfig["hp_type"] = config->getValue("potion_buy/hp_type", healthConfig["hp_type"].toVariant()).toInt();
+    potionBuyConfig["mp_buy"] = config->getValue("potion_buy/mp_buy", healthConfig["mp_buy"].toVariant()).toBool();
+    potionBuyConfig["mp_num"] = config->getValue("potion_buy/mp_num", healthConfig["mp_num"].toVariant()).toInt();
+    potionBuyConfig["mp_type"] = config->getValue("potion_buy/mp_type", healthConfig["mp_type"].toVariant()).toInt();
+    data["potion_buy"] = potionBuyConfig;
+
     // 快捷键绑定
     QJsonObject bindkeyConfig = data["bindkey"].toObject();
     bindkeyConfig["general_atk"] = config->getValue("bindkey/general_atk", bindkeyConfig["general_atk"].toVariant()).toInt();
