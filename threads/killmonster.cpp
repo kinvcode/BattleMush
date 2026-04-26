@@ -1477,7 +1477,11 @@ void KillMonster::potionShopBuyItem(QString npc)
                 break;
             }
 
-            if(hp_num * potion_price <= coin_num)
+            if(hp_num * potion_price > coin_num){
+                hp_num = coin_num / potion_price;
+            }
+
+            if(hp_num * potion_price <= coin_num && hp_num > 0)
             {
                 MatchTemp match_redpotion(hp_type_src);
                 cv::Point redpotion_coor;
@@ -1511,6 +1515,13 @@ void KillMonster::potionShopBuyItem(QString npc)
                     }
                 }
             }else{
+                Helper helper_tool;
+                helper_tool.warning("金币金额不足");
+                while(true){
+                    if(!Gplayer.show_warning){
+                        break;
+                    }
+                }
                 qDebug() << "金币余额不足~";
                 ProcessHelper::programDelay(3000);
             }
@@ -1544,7 +1555,11 @@ void KillMonster::potionShopBuyItem(QString npc)
                 break;
             }
 
-            if(mp_num * potion_price <= coin_num)
+            if(mp_num * potion_price > coin_num){
+                mp_num = coin_num / potion_price;
+            }
+
+            if(mp_num * potion_price <= coin_num && mp_num > 0)
             {
                 MatchTemp match_redpotion(mp_type_src);
                 cv::Point redpotion_coor;
@@ -1578,6 +1593,13 @@ void KillMonster::potionShopBuyItem(QString npc)
                     }
                 }
             }else{
+                Helper helper_tool;
+                helper_tool.warning("金币金额不足");
+                while(true){
+                    if(!Gplayer.show_warning){
+                        break;
+                    }
+                }
                 qDebug() << "金币余额不足~";
                ProcessHelper::programDelay(3000);
             }

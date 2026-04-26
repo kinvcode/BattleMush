@@ -4,10 +4,11 @@
 AlertWindow::AlertWindow(QString msg, QWidget *parent) : QWidget(parent)
 {
     // 暂停所有线程
-
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool);
     setAttribute(Qt::WA_TranslucentBackground);
-    setWindowFlags(windowFlags() | Qt::WindowTransparentForInput);
+    // setWindowFlags(windowFlags() | Qt::WindowTransparentForInput);
+    // 确保窗口可以接收鼠标事件
+    setAttribute(Qt::WA_TransparentForMouseEvents, false);  // 确保鼠标事件不穿透
 
     // 创建中央控件
     QWidget *centerWidget = new QWidget(this);
@@ -34,6 +35,12 @@ AlertWindow::AlertWindow(QString msg, QWidget *parent) : QWidget(parent)
 
     QVBoxLayout *centerLayout = new QVBoxLayout(centerWidget);
     centerLayout->addWidget(label);
+
+    // 创建按钮
+    QPushButton* button = new QPushButton("关闭警报");
+    // 添加到布局
+    centerLayout->addWidget(button);
+    connect(button, &QPushButton::clicked, this, &AlertWindow::closeWarning);
 
     // setFocusPolicy(Qt::StrongFocus);
 
@@ -76,8 +83,8 @@ AlertWindow::AlertWindow(QString msg, QWidget *parent) : QWidget(parent)
 
 void AlertWindow::keyPressEvent(QKeyEvent *event)
 {
-    // Gplayer.show_warning = false;
-    // close();
+    Gplayer.show_warning = false;
+    close();
 
     int sc = event->nativeScanCode();
     qDebug() << "当前sc按键：" << sc;
@@ -85,7 +92,13 @@ void AlertWindow::keyPressEvent(QKeyEvent *event)
 
 void AlertWindow::mousePressEvent(QMouseEvent *event)
 {
-    // Gplayer.show_warning = false;
-    // close();
+    Gplayer.show_warning = false;
+    close();
+}
+
+void AlertWindow::closeWarning()
+{
+    Gplayer.show_warning = false;
+    close();
 }
 

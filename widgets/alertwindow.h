@@ -12,6 +12,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QKeyEvent>
+#include <QPushButton>
 
 class AlertWindow : public QWidget
 {
@@ -21,6 +22,8 @@ public:
 private:
     void keyPressEvent(QKeyEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
+private slots:
+    void closeWarning();
 };
 
 #endif // ALERTWINDOW_H
