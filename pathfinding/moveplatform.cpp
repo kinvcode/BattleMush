@@ -284,6 +284,10 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
         return false;
     }
 
+    qDebug() << "延迟后向左跳跃";
+    ProcessHelper::programDelay(250);
+    QApplication::processEvents();
+
     // 这时候读人物的坐标
     if(is_climb){
         qDebug() << "向左跳跃到攀爬物体";
@@ -342,6 +346,10 @@ bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool 
     // qDebug() << "移动到范围:" << range.x << "," << range.y;
     bool arrived = walk_to_platform.moveToPlatform(range, self_climb); // 走到范围
     if(!arrived) return false;
+
+    qDebug() << "延迟后向右跳跃";
+    ProcessHelper::programDelay(250);
+    QApplication::processEvents();
 
     // 这时候读人物的坐标
     if(is_climb){
@@ -497,6 +505,10 @@ bool MovePlatform::up(cv::Point range, int platform, bool self_climb)
         WalkBase walk_to_platform(0);
         bool arrived = walk_to_platform.moveToPlatform(range, self_climb); // 走到范围
         if(!arrived) return false;
+
+        qDebug() << "延迟后向上攀爬";
+        ProcessHelper::programDelay(250);
+        QApplication::processEvents();
 
         // 到达地点之后按上键
         MSDriverPRO::keyboardClick(MSKeyboard_UpArrow);

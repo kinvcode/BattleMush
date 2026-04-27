@@ -2531,7 +2531,7 @@ void PathAlgo::up(
             cv::Point start(climb_x, platform.end.y); // 从下面的像素开始
 
             cv::Point end = start;
-            end.y = platform.start.y;
+            end.y = platform.start.y - 10; // 目前发现如果攀爬体距离地面有10的距离也可以到达地面
 
             cv::Point target_pos = {-1, -1};
             cv::LineIterator iterator(room_map, start, end, 8);
