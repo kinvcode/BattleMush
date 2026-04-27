@@ -384,33 +384,10 @@ void Data::Game::roomMapPortal()
 
             int platform = RoomMap::getRectPlatform(cur_rect, Gplayer.curmapinfo.platform_list);
 
-            qDebug() << "转换后rect：" << cur_rect.x_left << "," << cur_rect.y_top << " " << cur_rect.x_right << "," << cur_rect.y_bottom;
+            qDebug() << "转换后rect：" << cur_rect.x_left << "," << cur_rect.y_top << "," << cur_rect.x_right << "," << cur_rect.y_bottom;
             qDebug() << "平台：" << platform;
         }
     }
-/**
-[{
-    "id": "uuid",
-    "name": "地图1",
-    "target": [{
-        "id": "uuid",
-        "rect": [0, 1, 2, 3]
-    }， {
-        "id": "uuid",
-        "rect": [0, 1, 2, 3]
-    }]
-}， {
-    "id": "uuid",
-    "name": "地图2",
-    "target": [{
-        "id": "uuid",
-        "rect": [0, 1, 2, 3]
-    }， {
-        "id": "uuid",
-        "rect": [0, 1, 2, 3]
-    }]
-}]
-**/
 }
 
 void Data::Game::rangeMonster()
@@ -577,6 +554,52 @@ void Data::Game::NPCScreenCoor()
         }
     }
 
+}
+
+void Data::Game::platformMonsters()
+{
+    quint64 map_entity = mapEntity();
+
+    quint64 p_curmapentity = readPointer(map_entity,
+        BASE::MODEntity::children,
+        BASE::List::InternalArray,
+        BASE::InternalArray::Head + 0 * 8);
+
+    quint64 map_entity_count = readInt(readLong(p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
+    quint64 entity_head = readLong(readLong(p_curmapentity + BASE::MODEntity::children) + BASE::List::InternalArray) + BASE::InternalArray::Head;
+
+    bool is_item_start = false;
+    for(int i = 0; i < map_entity_count; i++){
+
+        quint64 cur_entity_address = entity_head + i * 8;
+        quint64 entity = readLong(cur_entity_address);
+
+        QString name = GameStruct::readEntityName(entity);
+        if(name == "EndObj"){
+            is_item_start = true;
+            continue;
+        }
+
+        if(!is_item_start){
+            continue;
+        }
+
+        if(name != "Monster"){
+            continue;
+        }
+
+        // 判断怪物是否存在
+        bool exists = readByte(readLong(entity + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::exists);
+        if(!exists){
+            continue;
+        }
+
+        QString status = readString( readLong( readLong(entity + BASE::MODEntity::StateComponent)
+            + BASE::StateComponent::_CurrentStateName) + BASE::String::text, 10);
+        if(status == "DEAD"){
+            continue;
+        }
+    }
 }
 
 

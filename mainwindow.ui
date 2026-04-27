@@ -51,7 +51,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="tab_main">
          <attribute name="title">
@@ -350,7 +350,7 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-513</y>
+             <y>0</y>
              <width>635</width>
              <height>1042</height>
             </rect>
@@ -1920,7 +1920,7 @@ color: #FF5500;</string>
            <rect>
             <x>230</x>
             <y>140</y>
-            <width>261</width>
+            <width>301</width>
             <height>111</height>
            </rect>
           </property>
@@ -2025,6 +2025,31 @@ color: #FF5500;</string>
            </property>
            <property name="text">
             <string>传送阵</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton_show_room_map_monster_num">
+           <property name="geometry">
+            <rect>
+             <x>210</x>
+             <y>30</y>
+             <width>80</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>31</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>31</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>怪物数量</string>
            </property>
           </widget>
          </widget>

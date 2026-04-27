@@ -24,7 +24,7 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform, bool is_town)
             if(target.first != platform){
                 continue;
             }
-            qDebug() << "当前位于地板，已找到到达该平台的方式";
+            // qDebug() << "当前位于地板，已找到到达该平台的方式";
             if(target.second.visit_list.empty()){
                 qDebug() << "访问方式为空？？？";
                 continue;
@@ -41,13 +41,13 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform, bool is_town)
                         distance = dist;
                         target_pos = cv::Point(segment.first, segment.second);
                         visit_type = visit.visit_type;
-                        qDebug() << "当前在地板，找到最近距离的区域" << " 访问类型:" << visit_type << " 距离人物:" << distance;
+                        // qDebug() << "当前在地板，找到最近距离的区域" << " 访问类型:" << visit_type << " 距离人物:" << distance;
                     }
                 }
             }
-            qDebug() << "移动区域:" << target_pos.x << "," << target_pos.y;
+            // qDebug() << "移动区域:" << target_pos.x << "," << target_pos.y;
             if(target.second.type == 0){
-                qDebug() << "目标平台为地平线";
+                // qDebug() << "目标平台为地平线";
                 switch (visit_type) {
                 case VISIT_TYPE::WALK_LEFT:
                     qDebug() << "步行到左边可以到达目标平台";
@@ -174,7 +174,7 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform, bool is_town)
             }
 
             if(target.second.type == 0){
-                qDebug() << "目标平台为地平线";
+                // qDebug() << "目标平台为地平线";
 
                 switch (visit_type) {
                 case VISIT_TYPE::JUMP_LEFT:

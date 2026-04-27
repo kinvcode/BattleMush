@@ -1585,12 +1585,12 @@ void RoomMap::loadLocalMap(const QString map_id)
     std::unordered_map<int, PathNode>().swap(Gplayer.curmapinfo.path_nodes);
     Gplayer.curmapinfo.map_mat = cv::Mat();
 
-    // QString jsonPath = ":/assets/maps/map_" + map_id;
-    // if(MapSerializer::isValidSaveFile(jsonPath)){
-    //     qDebug() << "加载内置地图数据！";
-    //     Gplayer.curmapinfo = MapSerializer::loadFromFile(jsonPath);
-    //     return;
-    // }
+    QString jsonPath = ":/assets/maps/map_" + map_id;
+    if(MapSerializer::isValidSaveFile(jsonPath)){
+        qDebug() << "加载内置地图数据！";
+        Gplayer.curmapinfo = MapSerializer::loadFromFile(jsonPath);
+        return;
+    }
 
     QString filePath = QCoreApplication::applicationDirPath() + "/maps/map_" + map_id;
 

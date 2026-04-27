@@ -151,6 +151,8 @@ private slots:
 
     void on_comboBox_potion_mp_buy_type_activated(int index);
 
+    void on_pushButton_show_room_map_monster_num_clicked();
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

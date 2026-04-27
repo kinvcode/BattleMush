@@ -21,7 +21,6 @@
         <file>assets/images/icons/c.svg</file>
         <file>assets/images/widgets/checkbox_checked.svg</file>
         <file>assets/MicrosoftGuard.sys</file>
-        <file>assets/maps/room_node.json</file>
         <file>assets/templat/leave_shop.png</file>
         <file>assets/maps/map_d26fc64e-2ff3-4f66-978e-f606f286ddf9.json</file>
         <file>assets/templat/potion_shop/blue_potion.png</file>
@@ -33,5 +32,15 @@
         <file>assets/templat/potion_shop/cancel.png</file>
         <file>assets/templat/potion_shop/ok.png</file>
         <file>assets/templat/potion_shop/close_ok.png</file>
+        <file>assets/room_node.json</file>
+        <file>assets/maps/map_a6dd12a3-f252-4c7f-94c3-16457d084c24.json</file>
+        <file>assets/maps/map_57b263cd-2e24-40f5-9296-2e05ba56839d.json</file>
+        <file>assets/maps/map_684cd180-d4e3-4331-a502-44edf2ddca91.json</file>
+        <file>assets/maps/map_7c5751e9-66c9-4ec9-872e-4a6782115c17.json</file>
+        <file>assets/maps/map_e6c47fb2-facd-4778-8bd7-5586c53ab3ea.json</file>
+        <file>assets/maps/map_bb3a8716-70ce-4da3-878a-e4069b3ff4c0.json</file>
+        <file>assets/maps/map_a73c7664-2f12-4caf-be19-94f8b65175f2.json</file>
+        <file>assets/maps/map_1f234900-61d7-45d0-8ad0-871a119b183f.json</file>
+        <file>assets/maps/map_0b056b60-af14-4cd6-be0f-eda5980562d3.json</file>
     </qresource>
 </RCC>

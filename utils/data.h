@@ -37,6 +37,9 @@ public:
 
     // NPC屏幕坐标
     static void NPCScreenCoor();
+
+    // 打印怪物数量
+    static void platformMonsters();
 };
 
 };

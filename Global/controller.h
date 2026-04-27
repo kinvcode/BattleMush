@@ -37,6 +37,8 @@ public:
 
     static bool m_disable_attack;
 
+    static bool m_disable_recive;
+
 // ====== 便捷函数 ======
 public:
     static void updateAttackInfo();

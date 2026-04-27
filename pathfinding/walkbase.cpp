@@ -165,14 +165,14 @@ void WalkBase::clearMonster(const Monster &monster)
     // 跑动按键判断
     int direction_x;
     bool is_left = false;
-    qDebug() << "清理怪物,人物" << user_pos.x << "," << user_pos.y << "怪物"  << monster.pos.x << "," << monster.pos.y;
+    // qDebug() << "清理怪物,人物" << user_pos.x << "," << user_pos.y << "怪物"  << monster.pos.x << "," << monster.pos.y;
     if (monster.pos.x > user_pos.x) {
         // 向右
-        qDebug() << "向右走~";
+        // qDebug() << "向右走~";
         direction_x = MSKeyboard_RightArrow;
     } else {
         // 向左
-        qDebug() << "向左走~";
+        // qDebug() << "向左走~";
         is_left = true;
         direction_x = MSKeyboard_LeftArrow;
     }
@@ -207,7 +207,7 @@ void WalkBase::clearMonster(const Monster &monster)
     Monster new_monster;
     new_monster = monsterInRange(is_left, map_start);
     if(new_monster.pos.x != -1){
-        DebugOutput::out("范围内存在怪物，无需寻路即可攻击。攻击中~");
+        // DebugOutput::out("范围内存在怪物，无需寻路即可攻击。攻击中~");
         user_pos = getUserPos();
         attackMonster(user_pos, new_monster);
         return;
@@ -380,18 +380,18 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
 
     int user_pos;
     if(self_climb){
-        qDebug() << "攀爬体寻路到连接点";
+        // qDebug() << "攀爬体寻路到连接点";
         user_pos = getUserY();
     }else{
-        qDebug() << "地板寻路到连接点";
+        // qDebug() << "地板寻路到连接点";
         user_pos = getUserX();
     }
 
-    qDebug() << "移动平台连接点开始 人物X：" << user_pos;
+    // qDebug() << "移动平台连接点开始 人物X：" << user_pos;
 
     if(user_pos >= range.x && user_pos <= range.y)
     {
-        qDebug() << "已在平台连接点范围，无需移动平台连接点~";
+        // qDebug() << "已在平台连接点范围，无需移动平台连接点~";
         return true;
     }
 
@@ -481,9 +481,11 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
                     last_time = cur_time;
 
                     // 存在物品直接退出
-                    if(itemExists(map_start)){
-                        DebugOutput::out("存在物品，退出平台移动");
-                        return false;
+                    if(!Gcontroller.m_disable_recive){
+                        if(itemExists(map_start)){
+                            DebugOutput::out("存在物品，退出平台移动");
+                            return false;
+                        }
                     }
 
                     new_monster = monsterInRange(is_left, map_start);
@@ -727,24 +729,24 @@ void WalkBase::attackMonster(cv::Point user_pos, const Monster &monster)
     // 攻击之前再次检查怪物存在状态和是否在范围内
     bool face_left = isFaceLeft();
     if(face_left && user_pos.x < monster.pos.x){
-        qDebug() << "调整人物方向，向右";
+        // qDebug() << "调整人物方向，向右";
         MSDriverPRO::keyboardClick(MSKeyboard_RightArrow);
     }else if(!face_left && user_pos.x > monster.pos.x){
-        qDebug() << "调整人物方向，向左";
+        // qDebug() << "调整人物方向，向左";
         MSDriverPRO::keyboardClick(MSKeyboard_LeftArrow);
     }
 
     // 检查怪物是否存在
     if(!monsterExists(monster)){
-        qDebug() << "怪物已经消失，取消攻击";
+        // qDebug() << "怪物已经消失，取消攻击";
         return;
     }
 
     if(Gcontroller.m_attack_info.type == 0){
-        qDebug() << "使用普通攻击";
+        // qDebug() << "使用普通攻击";
         MSDriverPRO::keyboardClick(Gplayer.m_bindkey.general_atk, 1);
     }else{
-        qDebug() << "使用技能攻击";
+        // qDebug() << "使用技能攻击";
         MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skill_atk1, 1);
     }
 

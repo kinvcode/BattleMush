@@ -457,19 +457,25 @@ void MainWindow::onAllThreadsFinished()
 
 void MainWindow::console(QString msg)
 {
-    QMutexLocker locker(&consoleMutex);  // 自动加锁/解锁
-    int cursor = ui->textEdit_log->textCursor().blockNumber();
-    if(cursor > 50000){
-        ui->textEdit_log->clear();
+    try{
+        QMutexLocker locker(&consoleMutex);  // 自动加锁/解锁
+        int cursor = ui->textEdit_log->textCursor().blockNumber();
+        if(cursor > 50000){
+            ui->textEdit_log->clear();
+            return;
+        }
+        // 获取当前日期时间
+        QDateTime currentDateTime = QDateTime::currentDateTime();
+        // 格式化为字符串
+        QString formattedDateTime = currentDateTime.toString("HH:mm:ss ");
+        msg = formattedDateTime + msg;
+        ui->textEdit_log->append(msg);
+        // ui->textEdit_log->moveCursor(QTextCursor::End);
+        ui->textEdit_log->ensureCursorVisible();
+    }catch (...) {
+        // 捕获所有标准异常
+        qDebug() << "控制台异常，Exception";
     }
-    // 获取当前日期时间
-    QDateTime currentDateTime = QDateTime::currentDateTime();
-    // 格式化为字符串
-    QString formattedDateTime = currentDateTime.toString("HH:mm:ss ");
-    msg = formattedDateTime + msg;
-    ui->textEdit_log->append(msg);
-    // ui->textEdit_log->moveCursor(QTextCursor::End);
-    ui->textEdit_log->ensureCursorVisible();
 }
 
 void MainWindow::warning(QString msg)
@@ -1254,5 +1260,11 @@ void MainWindow::on_comboBox_potion_mp_buy_type_activated(int index)
 {
     showNotice("购买蓝药类型已保存");
     Gconfig.setValue("potion_buy/mp_type", index);
+}
+
+
+void MainWindow::on_pushButton_show_room_map_monster_num_clicked()
+{
+
 }
 

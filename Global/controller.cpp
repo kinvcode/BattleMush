@@ -23,6 +23,8 @@ std::vector<Task> Controller::m_tasks = {};
 
 bool Controller::m_disable_attack = false;
 
+bool Controller::m_disable_recive = false;
+
 void Controller::updateAttackInfo()
 {
     cv::Point atk_range;
@@ -203,16 +205,44 @@ void Controller::initTaskList()
 
     map0002.rests.push_back(map0002_rest00);
 
+    /* ============【 弓 箭 手 村 訓 練 場 2 】============= */
+    MapRoomPath map0003;
+    map0003.id = 3;
+    map0003.name = "弓箭手村訓練場2";
+    map0003.uuid = "1f234900-61d7-45d0-8ad0-871a119b183f";
+
+    RoomRest map0003_rest00;
+    map0003_rest00.id = 0;
+    map0003_rest00.name = "【休息点A】地图左下角平台";
+    map0003_rest00.platform = 1;
+
+    RoomPath map0003_path00;
+    map0003_path00.id = 0;
+    map0003_path00.name = "自动规划路线";
+
+    RoomPath map0003_path01;
+    map0003_path01.id = 1;
+    map0003_path01.name = "【路线A】刷全图";
+    // map0003_path01.platforms = {0,20,2,1,3,14,15,23,4,21,8,7,11,18,19,30,12};
+    map0003_path01.platforms = {0,3,4,11,12};
+
+    map0003.paths.push_back(map0003_path00);
+    map0003.paths.push_back(map0003_path01);
+
+    map0003.rests.push_back(map0003_rest00);
+
     /* ============【 加 入 刷 图 列 表】============= */
     m_clean_room_list.push_back(map0000);
     m_clean_room_list.push_back(map0001);
     m_clean_room_list.push_back(map0002);
+    m_clean_room_list.push_back(map0003);
 
 
     /* ============【 加 入 休 息 列 表】============= */
     m_rest_point_list.push_back(map0000);
     m_rest_point_list.push_back(map0001);
     m_rest_point_list.push_back(map0002);
+    m_rest_point_list.push_back(map0003);
 
 
     // 初始化NPC任务列表
@@ -237,7 +267,7 @@ void Controller::initRoomNodes()
     std::unordered_map<QString, RoomNode> roomMap;
 
     // 读取地图文件
-    QString json_file = ":/assets/maps/room_node.json";
+    QString json_file = ":/assets/room_node.json";
     QFile file(json_file);
     if (!file.open(QIODevice::ReadOnly)) {
         qDebug() << "Failed to open file for reading:" << json_file;
