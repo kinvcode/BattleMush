@@ -161,6 +161,14 @@ private slots:
 
     void on_checkBox_atk_switch_buff5_stateChanged(int arg1);
 
+    void on_lineEdit_recast_buff2_editingFinished();
+
+    void on_lineEdit_recast_buff3_editingFinished();
+
+    void on_lineEdit_recast_buff4_editingFinished();
+
+    void on_lineEdit_recast_buff5_editingFinished();
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

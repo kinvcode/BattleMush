@@ -211,10 +211,10 @@ void MainWindow::initConfig()
     ui->checkBox_atk_switch_general->setChecked(Gconfig.getValue("atk_swtich/general").toBool());
     ui->checkBox_atk_switch_skill1->setChecked(Gconfig.getValue("atk_swtich/skill1").toBool());
     ui->checkBox_atk_switch_buff1->setChecked(Gconfig.getValue("atk_swtich/buff1").toBool());
-    ui->checkBox_atk_switch_buff2->setChecked(Gconfig.getValue("atk_swtich/buff1").toBool());
-    ui->checkBox_atk_switch_buff3->setChecked(Gconfig.getValue("atk_swtich/buff1").toBool());
-    ui->checkBox_atk_switch_buff4->setChecked(Gconfig.getValue("atk_swtich/buff1").toBool());
-    ui->checkBox_atk_switch_buff5->setChecked(Gconfig.getValue("atk_swtich/buff1").toBool());
+    ui->checkBox_atk_switch_buff2->setChecked(Gconfig.getValue("atk_swtich/buff2").toBool());
+    ui->checkBox_atk_switch_buff3->setChecked(Gconfig.getValue("atk_swtich/buff3").toBool());
+    ui->checkBox_atk_switch_buff4->setChecked(Gconfig.getValue("atk_swtich/buff4").toBool());
+    ui->checkBox_atk_switch_buff5->setChecked(Gconfig.getValue("atk_swtich/buff5").toBool());
     ui->checkBox_atk_switch_general->blockSignals(false);
     ui->checkBox_atk_switch_skill1->blockSignals(false);
     ui->checkBox_atk_switch_buff1->blockSignals(false);
@@ -1351,3 +1351,71 @@ void MainWindow::on_checkBox_atk_switch_buff5_stateChanged(int arg1)
         Gconfig.setValue("atk_swtich/buff5", false);
     }
 }
+
+void MainWindow::on_lineEdit_recast_buff2_editingFinished()
+{
+    QString text = ui->lineEdit_recast_buff2->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 3600) {
+        // 校验通过
+        showNotice("BUFF1释放频率已保存");
+        Gconfig.setValue("atk_recast/buff2", value);
+    } else {
+        showNotice("无效数值，请输入1-3600之间的数字");
+        ui->lineEdit_recast_buff2->setText("");  // 清空内容
+    }
+}
+
+
+void MainWindow::on_lineEdit_recast_buff3_editingFinished()
+{
+    QString text = ui->lineEdit_recast_buff3->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 3600) {
+        // 校验通过
+        showNotice("BUFF1释放频率已保存");
+        Gconfig.setValue("atk_recast/buff3", value);
+    } else {
+        showNotice("无效数值，请输入1-3600之间的数字");
+        ui->lineEdit_recast_buff3->setText("");  // 清空内容
+    }
+}
+
+
+void MainWindow::on_lineEdit_recast_buff4_editingFinished()
+{
+    QString text = ui->lineEdit_recast_buff4->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 3600) {
+        // 校验通过
+        showNotice("BUFF1释放频率已保存");
+        Gconfig.setValue("atk_recast/buff4", value);
+    } else {
+        showNotice("无效数值，请输入1-3600之间的数字");
+        ui->lineEdit_recast_buff4->setText("");  // 清空内容
+    }
+}
+
+
+void MainWindow::on_lineEdit_recast_buff5_editingFinished()
+{
+    QString text = ui->lineEdit_recast_buff5->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 3600) {
+        // 校验通过
+        showNotice("BUFF1释放频率已保存");
+        Gconfig.setValue("atk_recast/buff5", value);
+    } else {
+        showNotice("无效数值，请输入1-3600之间的数字");
+        ui->lineEdit_recast_buff5->setText("");  // 清空内容
+    }
+}
+
