@@ -513,6 +513,7 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
 
         if(user_pos >= range.x && user_pos <= range.y) {
             if(self_climb){
+                qDebug() << "到达指定攀爬范围:" << user_pos;
                 clearYkey();
             }else{
                 clearXkey();

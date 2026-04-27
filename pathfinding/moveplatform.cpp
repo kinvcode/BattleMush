@@ -400,7 +400,7 @@ bool MovePlatform::jumpUP(cv::Point range, int platform, bool is_climb)
     // 这时候读人物的坐标
     if(is_climb){
         qDebug() << "延迟后跳跃";
-        ProcessHelper::programDelay(500);
+        ProcessHelper::programDelay(250);
         QApplication::processEvents();
 
         // 到达地点之后进行跳跃操作

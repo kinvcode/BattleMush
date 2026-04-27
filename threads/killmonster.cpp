@@ -653,6 +653,10 @@ void KillMonster::runneKeyboard()
     // 按上键触发指令
     MSDriverPRO::keyboardClick(MSKeyboard_UpArrow,1);
 
+    ProcessHelper::programDelay(300);
+    QApplication::processEvents();
+    ImageTool::screenshot();
+
     quint64 alarm_group = Helper::findChild(Gplayer.p_uientity, "LocalUserAlarmGroup");
     quint64 rune_ui = Helper::findChild(alarm_group,"RuneUI");
 
@@ -932,6 +936,16 @@ void KillMonster::excutePlatformSequence()
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
         goto retryEnter;
+    }
+
+    // 检查药水
+    if(Gplayer.need_hp_potion || Gplayer.need_mp_potion)
+    {
+        qDebug() << "缺少药水，准备前往商店";
+        buyPotion();
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        return;
     }
 
     // 先检查BUFF
@@ -1599,8 +1613,14 @@ void KillMonster::buyPotion()
             return;
         }
 
-        if(Gplayer.curmapinfo.id == "c812231b-55cf-449c-879f-8d5674951c01"){
+        if(Gplayer.curmapinfo.id == "45681289-4726-447f-9aa6-d690072a3291"){
+            qDebug() << "勇士之村杂货店购买";
+            npc_id = "npc-1021100";
+            potionShopBuyItem(npc_id);
+            return;
+        }
 
+        if(Gplayer.curmapinfo.id == "c812231b-55cf-449c-879f-8d5674951c01"){
             qDebug() << "维多利亚港杂货店购买";
             npc_id = "npc-1001100";
             potionShopBuyItem(npc_id);
@@ -1869,6 +1889,17 @@ void KillMonster::sendTaskInfo(const TaskInfo &task)
 void KillMonster::taskCleanRoom()
 {
     qDebug() << "当前执行计划：刷图";
+
+    // 检查药水
+    if(Gplayer.need_hp_potion || Gplayer.need_mp_potion)
+    {
+        qDebug() << "缺少药水，准备前往商店";
+        buyPotion();
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        return;
+    }
+
     m_task_info.type = "刷图";
     m_task_info.option1_label = "地图";
 

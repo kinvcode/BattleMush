@@ -28,7 +28,10 @@ Helper::Helper()
 
 void Helper::console(const QString &msg)
 {
-    MainWindow::getInstance()->console(msg);
+    // MainWindow::getInstance()->console(msg);
+    QMetaObject::invokeMethod(MainWindow::getInstance(), [msg]() {
+        MainWindow::getInstance()->console(msg);
+    }, Qt::QueuedConnection);
 }
 
 void Helper::warning(QString msg)
@@ -1671,52 +1674,104 @@ cv::Point RoomMap::npcScreenCoor(QString npc_id)
 
 std::vector<int> PathAlgo::findAStarPath(int platformA, int platformB, std::unordered_map<int, PathNode> &path_nodes)
 {
+    // std::vector<int> path;
+
+    // // 开启列表(最小堆)
+    // std::priority_queue<int, std::vector<int>, std::greater<int>> open_list;
+
+    // // 平台map
+    // std::unordered_map<int, PathNode> came_from;
+
+    // // 用于记录已经访问过的节点
+    // std::unordered_set<int> closed_list;
+
+    // // 初始化起始平台
+    // PathNode start_node = path_nodes[platformA];
+    // open_list.push(start_node.id);
+
+
+    // while (!open_list.empty()) {
+    //     int cur_plat = open_list.top();
+    //     PathNode current = path_nodes[cur_plat]; // 获取第一个节点
+    //     open_list.pop(); // 从堆中删除
+
+    //     // 如果找到目标平台，生成路径
+    //     if (current.id == platformB) {
+    //         while (came_from.find(current.id) != came_from.end()) {
+    //             path.push_back(current.id);
+    //             current = came_from[current.id];
+    //         }
+    //         path.push_back(platformA);
+    //         std::reverse(path.begin(), path.end());
+    //         return path; // 可以返回路径信息了
+    //     }
+
+    //     // 记录当前节点（如果没到终点，把当前节点放入到关闭列表中）
+    //     closed_list.insert(current.id);
+
+    //     // 遍历当前节点的所有目标平台
+    //     for (const auto& target : current.targets) {
+    //         if (closed_list.find(target.first) != closed_list.end()) {
+    //             continue;  // 如果目标已在关闭列表中，跳过
+    //         }
+
+    //         // 如果目标平台不在开启列表中，加入
+    //         if (came_from.find(target.first) == came_from.end()) {
+    //             open_list.push(target.first);
+    //             came_from[target.first] = current;
+    //         }
+    //     }
+    // }
+
+    // return path;
+
     std::vector<int> path;
 
-    // 开启列表(最小堆)
-    std::priority_queue<int, std::vector<int>, std::greater<int>> open_list;
+    if (path_nodes.find(platformA) == path_nodes.end() ||
+        path_nodes.find(platformB) == path_nodes.end()) {
+        return path;
+    }
 
-    // 平台map
-    std::unordered_map<int, PathNode> came_from;
+    if (platformA == platformB) {
+        path.push_back(platformA);
+        return path;
+    }
 
-    // 用于记录已经访问过的节点
-    std::unordered_set<int> closed_list;
+    // BFS 使用普通队列（更简单，边权为1时效率一样）
+    std::queue<int> open_list;
+    std::unordered_map<int, int> came_from;
+    std::unordered_set<int> visited;
 
-    // 初始化起始平台
-    PathNode start_node = path_nodes[platformA];
-    open_list.push(start_node.id);
-
+    open_list.push(platformA);
+    visited.insert(platformA);
 
     while (!open_list.empty()) {
-        int cur_plat = open_list.top();
-        PathNode current = path_nodes[cur_plat]; // 获取第一个节点
-        open_list.pop(); // 从堆中删除
+        int current_id = open_list.front();
+        open_list.pop();
 
-        // 如果找到目标平台，生成路径
-        if (current.id == platformB) {
-            while (came_from.find(current.id) != came_from.end()) {
-                path.push_back(current.id);
-                current = came_from[current.id];
+        if (current_id == platformB) {
+            int cur = platformB;
+            while (came_from.find(cur) != came_from.end()) {
+                path.push_back(cur);
+                cur = came_from[cur];
             }
             path.push_back(platformA);
             std::reverse(path.begin(), path.end());
-            return path; // 可以返回路径信息了
+            return path;
         }
 
-        // 记录当前节点（如果没到终点，把当前节点放入到关闭列表中）
-        closed_list.insert(current.id);
+        PathNode& current_node = path_nodes[current_id];
 
-        // 遍历当前节点的所有目标平台
-        for (const auto& target : current.targets) {
-            if (closed_list.find(target.first) != closed_list.end()) {
-                continue;  // 如果目标已在关闭列表中，跳过
+        for (const auto& target : current_node.targets) {
+            int target_id = target.first;
+
+            if (visited.find(target_id) != visited.end()) {
+                continue;
             }
 
-            // 如果目标平台不在开启列表中，加入
-            if (came_from.find(target.first) == came_from.end()) {
-                open_list.push(target.first);
-                came_from[target.first] = current;
-            }
+            visited.insert(target_id);
+            came_from[target_id] = current_id;
+            open_list.push(target_id);
         }
     }
 
