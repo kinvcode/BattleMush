@@ -153,6 +153,14 @@ private slots:
 
     void on_pushButton_show_room_map_monster_num_clicked();
 
+    void on_checkBox_atk_switch_buff2_stateChanged(int arg1);
+
+    void on_checkBox_atk_switch_buff3_stateChanged(int arg1);
+
+    void on_checkBox_atk_switch_buff4_stateChanged(int arg1);
+
+    void on_checkBox_atk_switch_buff5_stateChanged(int arg1);
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

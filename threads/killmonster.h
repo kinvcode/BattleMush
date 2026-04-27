@@ -48,9 +48,25 @@ private:
     // 定时释放技能
     QElapsedTimer m_timer; // 当前线程计时器
     bool m_recast_buff1_enable = false;
+    bool m_recast_buff2_enable = false;
+    bool m_recast_buff3_enable = false;
+    bool m_recast_buff4_enable = false;
+    bool m_recast_buff5_enable = false;
     int m_recast_buff1_time;
+    int m_recast_buff2_time;
+    int m_recast_buff3_time;
+    int m_recast_buff4_time;
+    int m_recast_buff5_time;
     int m_recast_buff1_lasttime = 0;
+    int m_recast_buff2_lasttime = 0;
+    int m_recast_buff3_lasttime = 0;
+    int m_recast_buff4_lasttime = 0;
+    int m_recast_buff5_lasttime = 0;
     int m_recast_buff1_keycode;
+    int m_recast_buff2_keycode;
+    int m_recast_buff3_keycode;
+    int m_recast_buff4_keycode;
+    int m_recast_buff5_keycode;
 
     // 符文信息
     struct{

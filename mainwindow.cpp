@@ -204,12 +204,24 @@ void MainWindow::initConfig()
     ui->checkBox_atk_switch_general->blockSignals(true);
     ui->checkBox_atk_switch_skill1->blockSignals(true);
     ui->checkBox_atk_switch_buff1->blockSignals(true);
+    ui->checkBox_atk_switch_buff2->blockSignals(true);
+    ui->checkBox_atk_switch_buff3->blockSignals(true);
+    ui->checkBox_atk_switch_buff4->blockSignals(true);
+    ui->checkBox_atk_switch_buff5->blockSignals(true);
     ui->checkBox_atk_switch_general->setChecked(Gconfig.getValue("atk_swtich/general").toBool());
     ui->checkBox_atk_switch_skill1->setChecked(Gconfig.getValue("atk_swtich/skill1").toBool());
     ui->checkBox_atk_switch_buff1->setChecked(Gconfig.getValue("atk_swtich/buff1").toBool());
+    ui->checkBox_atk_switch_buff2->setChecked(Gconfig.getValue("atk_swtich/buff1").toBool());
+    ui->checkBox_atk_switch_buff3->setChecked(Gconfig.getValue("atk_swtich/buff1").toBool());
+    ui->checkBox_atk_switch_buff4->setChecked(Gconfig.getValue("atk_swtich/buff1").toBool());
+    ui->checkBox_atk_switch_buff5->setChecked(Gconfig.getValue("atk_swtich/buff1").toBool());
     ui->checkBox_atk_switch_general->blockSignals(false);
     ui->checkBox_atk_switch_skill1->blockSignals(false);
     ui->checkBox_atk_switch_buff1->blockSignals(false);
+    ui->checkBox_atk_switch_buff2->blockSignals(false);
+    ui->checkBox_atk_switch_buff3->blockSignals(false);
+    ui->checkBox_atk_switch_buff4->blockSignals(false);
+    ui->checkBox_atk_switch_buff5->blockSignals(false);
 
     // 按键绑定
     ui->lineEdit_bindkey_general_atk->blockSignals(true);
@@ -227,8 +239,20 @@ void MainWindow::initConfig()
     ui->lineEdit_bindkey_skill_atk1->updateDisplay();
 
     ui->lineEdit_bindkey_buff1->m_config_path = "bindkey/buff1";
+    ui->lineEdit_bindkey_buff2->m_config_path = "bindkey/buff2";
+    ui->lineEdit_bindkey_buff3->m_config_path = "bindkey/buff3";
+    ui->lineEdit_bindkey_buff4->m_config_path = "bindkey/buff4";
+    ui->lineEdit_bindkey_buff5->m_config_path = "bindkey/buff5";
     ui->lineEdit_bindkey_buff1->m_currentKey = Gconfig.getValue("bindkey/buff1").toInt();
+    ui->lineEdit_bindkey_buff2->m_currentKey = Gconfig.getValue("bindkey/buff2").toInt();
+    ui->lineEdit_bindkey_buff3->m_currentKey = Gconfig.getValue("bindkey/buff3").toInt();
+    ui->lineEdit_bindkey_buff4->m_currentKey = Gconfig.getValue("bindkey/buff4").toInt();
+    ui->lineEdit_bindkey_buff5->m_currentKey = Gconfig.getValue("bindkey/buff5").toInt();
     ui->lineEdit_bindkey_buff1->updateDisplay();
+    ui->lineEdit_bindkey_buff2->updateDisplay();
+    ui->lineEdit_bindkey_buff3->updateDisplay();
+    ui->lineEdit_bindkey_buff4->updateDisplay();
+    ui->lineEdit_bindkey_buff5->updateDisplay();
 
 
     ui->lineEdit_bindkey_jump->m_config_path = "bindkey/jump";
@@ -315,8 +339,20 @@ void MainWindow::initConfig()
 
     // 技能释放频率
     ui->lineEdit_recast_buff1->blockSignals(true);
+    ui->lineEdit_recast_buff2->blockSignals(true);
+    ui->lineEdit_recast_buff3->blockSignals(true);
+    ui->lineEdit_recast_buff4->blockSignals(true);
+    ui->lineEdit_recast_buff5->blockSignals(true);
     ui->lineEdit_recast_buff1->setText(Gconfig.getValue("atk_recast/buff1").toString());
+    ui->lineEdit_recast_buff2->setText(Gconfig.getValue("atk_recast/buff2").toString());
+    ui->lineEdit_recast_buff3->setText(Gconfig.getValue("atk_recast/buff3").toString());
+    ui->lineEdit_recast_buff4->setText(Gconfig.getValue("atk_recast/buff4").toString());
+    ui->lineEdit_recast_buff5->setText(Gconfig.getValue("atk_recast/buff5").toString());
     ui->lineEdit_recast_buff1->blockSignals(false);
+    ui->lineEdit_recast_buff2->blockSignals(false);
+    ui->lineEdit_recast_buff3->blockSignals(false);
+    ui->lineEdit_recast_buff4->blockSignals(false);
+    ui->lineEdit_recast_buff5->blockSignals(false);
 }
 
 void MainWindow::initDir()
@@ -1268,3 +1304,50 @@ void MainWindow::on_pushButton_show_room_map_monster_num_clicked()
 
 }
 
+
+void MainWindow::on_checkBox_atk_switch_buff2_stateChanged(int arg1)
+{
+    if(ui->checkBox_atk_switch_buff2->isChecked()){
+        showNotice("BUFF2已开启");
+        Gconfig.setValue("atk_swtich/buff2", true);
+    }else{
+        showNotice("BUFF2已关闭");
+        Gconfig.setValue("atk_swtich/buff2", false);
+    }
+}
+
+
+void MainWindow::on_checkBox_atk_switch_buff3_stateChanged(int arg1)
+{
+    if(ui->checkBox_atk_switch_buff3->isChecked()){
+        showNotice("BUFF3已开启");
+        Gconfig.setValue("atk_swtich/buff3", true);
+    }else{
+        showNotice("BUFF3已关闭");
+        Gconfig.setValue("atk_swtich/buff3", false);
+    }
+}
+
+
+void MainWindow::on_checkBox_atk_switch_buff4_stateChanged(int arg1)
+{
+    if(ui->checkBox_atk_switch_buff4->isChecked()){
+        showNotice("BUFF4已开启");
+        Gconfig.setValue("atk_swtich/buff4", true);
+    }else{
+        showNotice("BUFF4已关闭");
+        Gconfig.setValue("atk_swtich/buff4", false);
+    }
+}
+
+
+void MainWindow::on_checkBox_atk_switch_buff5_stateChanged(int arg1)
+{
+    if(ui->checkBox_atk_switch_buff5->isChecked()){
+        showNotice("BUFF4已开启");
+        Gconfig.setValue("atk_swtich/buff5", true);
+    }else{
+        showNotice("BUFF4已关闭");
+        Gconfig.setValue("atk_swtich/buff5", false);
+    }
+}

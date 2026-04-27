@@ -31,6 +31,10 @@ void GlobalConfig::loadFromJson()
     atkSwitchConfig["general"] = config->getValue("atk_swtich/general", atkSwitchConfig["general"].toVariant()).toBool();
     atkSwitchConfig["skill1"] = config->getValue("atk_swtich/skill1", atkSwitchConfig["skill1"].toVariant()).toBool();
     atkSwitchConfig["buff1"] = config->getValue("atk_swtich/buff1", atkSwitchConfig["buff1"].toVariant()).toBool();
+    atkSwitchConfig["buff2"] = config->getValue("atk_swtich/buff2", atkSwitchConfig["buff2"].toVariant()).toBool();
+    atkSwitchConfig["buff3"] = config->getValue("atk_swtich/buff3", atkSwitchConfig["buff3"].toVariant()).toBool();
+    atkSwitchConfig["buff4"] = config->getValue("atk_swtich/buff4", atkSwitchConfig["buff4"].toVariant()).toBool();
+    atkSwitchConfig["buff5"] = config->getValue("atk_swtich/buff5", atkSwitchConfig["buff5"].toVariant()).toBool();
     data["atk_swtich"] = atkSwitchConfig;
 
     // 监控血蓝
@@ -60,6 +64,10 @@ void GlobalConfig::loadFromJson()
     bindkeyConfig["general_atk"] = config->getValue("bindkey/general_atk", bindkeyConfig["general_atk"].toVariant()).toInt();
     bindkeyConfig["skill_atk1"] = config->getValue("bindkey/skill_atk1", bindkeyConfig["skill_atk1"].toVariant()).toInt();
     bindkeyConfig["buff1"] = config->getValue("bindkey/buff1", bindkeyConfig["buff1"].toVariant()).toInt();
+    bindkeyConfig["buff2"] = config->getValue("bindkey/buff2", bindkeyConfig["buff2"].toVariant()).toInt();
+    bindkeyConfig["buff3"] = config->getValue("bindkey/buff3", bindkeyConfig["buff3"].toVariant()).toInt();
+    bindkeyConfig["buff4"] = config->getValue("bindkey/buff4", bindkeyConfig["buff4"].toVariant()).toInt();
+    bindkeyConfig["buff5"] = config->getValue("bindkey/buff5", bindkeyConfig["buff5"].toVariant()).toInt();
     bindkeyConfig["jump"] = config->getValue("bindkey/jump", bindkeyConfig["jump"].toVariant()).toInt();
     bindkeyConfig["gohome"] = config->getValue("bindkey/gohome", bindkeyConfig["gohome"].toVariant()).toInt();
     data["bindkey"] = bindkeyConfig;
@@ -75,6 +83,10 @@ void GlobalConfig::loadFromJson()
     // 技能频率
     QJsonObject atkRecast = data["atk_recast"].toObject();
     atkRecast["buff1"] = config->getValue("atk_recast/buff1", atkrangeConfig["buff1"].toVariant()).toInt();
+    atkRecast["buff2"] = config->getValue("atk_recast/buff2", atkrangeConfig["buff2"].toVariant()).toInt();
+    atkRecast["buff3"] = config->getValue("atk_recast/buff3", atkrangeConfig["buff3"].toVariant()).toInt();
+    atkRecast["buff4"] = config->getValue("atk_recast/buff4", atkrangeConfig["buff4"].toVariant()).toInt();
+    atkRecast["buff5"] = config->getValue("atk_recast/buff5", atkrangeConfig["buff5"].toVariant()).toInt();
     data["atk_recast"] = atkRecast;
 }
 

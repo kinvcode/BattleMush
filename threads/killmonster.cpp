@@ -71,8 +71,20 @@ void KillMonster::resume()
     Gcontroller.m_attack_range_skill1 = {atk_skill1_range_x, atk_skill1_range_y};
 
     m_recast_buff1_keycode = Gconfig.getValue("bindkey/buff1").toInt();
+    m_recast_buff2_keycode = Gconfig.getValue("bindkey/buff2").toInt();
+    m_recast_buff3_keycode = Gconfig.getValue("bindkey/buff3").toInt();
+    m_recast_buff4_keycode = Gconfig.getValue("bindkey/buff4").toInt();
+    m_recast_buff5_keycode = Gconfig.getValue("bindkey/buff5").toInt();
     m_recast_buff1_enable = Gconfig.getValue("atk_swtich/buff1").toBool();
+    m_recast_buff2_enable = Gconfig.getValue("atk_swtich/buff2").toBool();
+    m_recast_buff3_enable = Gconfig.getValue("atk_swtich/buff3").toBool();
+    m_recast_buff4_enable = Gconfig.getValue("atk_swtich/buff4").toBool();
+    m_recast_buff5_enable = Gconfig.getValue("atk_swtich/buff5").toBool();
     m_recast_buff1_time = Gconfig.getValue("atk_recast/buff1").toInt();
+    m_recast_buff2_time = Gconfig.getValue("atk_recast/buff2").toInt();
+    m_recast_buff3_time = Gconfig.getValue("atk_recast/buff3").toInt();
+    m_recast_buff4_time = Gconfig.getValue("atk_recast/buff4").toInt();
+    m_recast_buff5_time = Gconfig.getValue("atk_recast/buff5").toInt();
 
 
     m_paused = false;
@@ -95,7 +107,20 @@ void KillMonster::process()
     Gcontroller.m_attack_range_skill1 = {atk_skill1_range_x, atk_skill1_range_y};
 
     m_recast_buff1_keycode = Gconfig.getValue("bindkey/buff1").toInt();
+    m_recast_buff2_keycode = Gconfig.getValue("bindkey/buff2").toInt();
+    m_recast_buff3_keycode = Gconfig.getValue("bindkey/buff3").toInt();
+    m_recast_buff4_keycode = Gconfig.getValue("bindkey/buff4").toInt();
+    m_recast_buff5_keycode = Gconfig.getValue("bindkey/buff5").toInt();
     m_recast_buff1_enable = Gconfig.getValue("atk_swtich/buff1").toBool();
+    m_recast_buff2_enable = Gconfig.getValue("atk_swtich/buff2").toBool();
+    m_recast_buff3_enable = Gconfig.getValue("atk_swtich/buff3").toBool();
+    m_recast_buff4_enable = Gconfig.getValue("atk_swtich/buff4").toBool();
+    m_recast_buff5_enable = Gconfig.getValue("atk_swtich/buff5").toBool();
+    m_recast_buff1_time = Gconfig.getValue("atk_recast/buff1").toInt();
+    m_recast_buff2_time = Gconfig.getValue("atk_recast/buff2").toInt();
+    m_recast_buff3_time = Gconfig.getValue("atk_recast/buff3").toInt();
+    m_recast_buff4_time = Gconfig.getValue("atk_recast/buff4").toInt();
+    m_recast_buff5_time = Gconfig.getValue("atk_recast/buff5").toInt();
 
     // 初始化任务
     m_task_id = 0;
@@ -495,6 +520,78 @@ void KillMonster::skillRecast()
 
             m_recast_buff1_lasttime = m_timer.elapsed() / 1000;
             // ProcessHelper::programDelay(1000);
+        }
+    }
+
+    if(m_recast_buff2_enable){
+        if((now_time - m_recast_buff2_lasttime) > m_recast_buff2_time || m_recast_buff2_lasttime == 0){
+
+            DebugOutput::out("BUFF2已到释放时间，自动释放BUFF2");
+            Helper::console("BUFF2已到释放时间，自动释放BUFF2");
+
+            while(isAttaking()){
+                ProcessHelper::programDelay(50);
+                QApplication::processEvents();
+            }
+
+            MSDriverPRO::keyboardClick(m_recast_buff2_keycode, 1);
+            Helper::console("BUFF1已按");
+
+            m_recast_buff2_lasttime = m_timer.elapsed() / 1000;
+        }
+    }
+
+    if(m_recast_buff3_enable){
+        if((now_time - m_recast_buff3_lasttime) > m_recast_buff3_time || m_recast_buff3_lasttime == 0){
+
+            DebugOutput::out("BUFF3已到释放时间，自动释放BUFF3");
+            Helper::console("BUFF3已到释放时间，自动释放BUFF3");
+
+            while(isAttaking()){
+                ProcessHelper::programDelay(50);
+                QApplication::processEvents();
+            }
+
+            MSDriverPRO::keyboardClick(m_recast_buff3_keycode, 1);
+            Helper::console("BUFF1已按");
+
+            m_recast_buff3_lasttime = m_timer.elapsed() / 1000;
+        }
+    }
+
+    if(m_recast_buff4_enable){
+        if((now_time - m_recast_buff4_lasttime) > m_recast_buff4_time || m_recast_buff4_lasttime == 0){
+
+            DebugOutput::out("BUFF4已到释放时间，自动释放BUFF4");
+            Helper::console("BUFF4已到释放时间，自动释放BUFF4");
+
+            while(isAttaking()){
+                ProcessHelper::programDelay(50);
+                QApplication::processEvents();
+            }
+
+            MSDriverPRO::keyboardClick(m_recast_buff4_keycode, 1);
+            Helper::console("BUFF4已按");
+
+            m_recast_buff4_lasttime = m_timer.elapsed() / 1000;
+        }
+    }
+
+    if(m_recast_buff5_enable){
+        if((now_time - m_recast_buff5_lasttime) > m_recast_buff5_time || m_recast_buff5_lasttime == 0){
+
+            DebugOutput::out("BUFF5已到释放时间，自动释放BUFF5");
+            Helper::console("BUFF5已到释放时间，自动释放BUFF5");
+
+            while(isAttaking()){
+                ProcessHelper::programDelay(50);
+                QApplication::processEvents();
+            }
+
+            MSDriverPRO::keyboardClick(m_recast_buff5_keycode, 1);
+            Helper::console("BUFF1已按");
+
+            m_recast_buff5_lasttime = m_timer.elapsed() / 1000;
         }
     }
 }

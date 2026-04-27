@@ -13,7 +13,11 @@ public:
     {"atk_swtich",QJsonObject{
         {"general", true},
         {"skill1", true},
-        {"buff1", true}
+        {"buff1", true},
+        {"buff2", false},
+        {"buff3", false},
+        {"buff4", false},
+        {"buff5", false},
         }
     },
     {"auto_add_health",QJsonObject{
@@ -30,7 +34,11 @@ public:
     {"bindkey",QJsonObject{
         {"general_atk",MSKeyboard_x},
         {"skill_atk1",MSKeyboard_LeftControl},
-        {"buff1",MSKeyboard_LeftShift},
+        {"buff1",MSKeyboard_1},
+        {"buff2",MSKeyboard_2},
+        {"buff3",MSKeyboard_3},
+        {"buff4",MSKeyboard_4},
+        {"buff5",MSKeyboard_5},
         {"jump",MSKeyboard_c},
         {"gohome",MSKeyboard_LeftControl}
         }
@@ -43,7 +51,11 @@ public:
         }
     },
     {"atk_recast",QJsonObject{
-        {"buff1",60}
+        {"buff1",60},
+        {"buff2",60},
+        {"buff3",60},
+        {"buff4",60},
+        {"buff5",60},
         }
     },
     {"potion_buy",QJsonObject{
