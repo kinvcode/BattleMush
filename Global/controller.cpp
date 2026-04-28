@@ -280,6 +280,31 @@ void Controller::initTaskList()
 
     map0005.rests.push_back(map0005_rest00);
 
+    /* ============【 火 焰 之 地 1 】============= */
+    MapRoomPath map0006;
+    map0006.id = 6;
+    map0006.name = "火焰之地1";
+    map0006.uuid = "c9349a80-5a2d-401d-8cdb-8e5ff414de71";
+
+    RoomRest map0006_rest00;
+    map0006_rest00.id = 0;
+    map0006_rest00.name = "【休息点A】地图右边平台";
+    map0006_rest00.platform = 18;
+
+    RoomPath map0006_path00;
+    map0006_path00.id = 0;
+    map0006_path00.name = "自动规划路线";
+
+    RoomPath map0006_path01;
+    map0006_path01.id = 1;
+    map0006_path01.name = "【路线A】刷下面";
+    map0006_path01.platforms = {13,0,12};
+
+    map0006.paths.push_back(map0006_path00);
+    map0006.paths.push_back(map0006_path01);
+
+    map0006.rests.push_back(map0006_rest00);
+
     /* ============【 加 入 刷 图 列 表】============= */
     m_clean_room_list.push_back(map0000);
     m_clean_room_list.push_back(map0001);
@@ -287,6 +312,7 @@ void Controller::initTaskList()
     m_clean_room_list.push_back(map0003);
     m_clean_room_list.push_back(map0004);
     m_clean_room_list.push_back(map0005);
+    m_clean_room_list.push_back(map0006);
 
 
     /* ============【 加 入 休 息 列 表】============= */
@@ -296,6 +322,7 @@ void Controller::initTaskList()
     m_rest_point_list.push_back(map0003);
     m_rest_point_list.push_back(map0004);
     m_rest_point_list.push_back(map0005);
+    m_rest_point_list.push_back(map0006);
 
 
     // 初始化NPC任务列表

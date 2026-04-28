@@ -241,4 +241,14 @@
         "platform": 0,
         "area": [2, 2, 2, 2]
     }]
+},{
+    "uuid": "c9349a80-5a2d-401d-8cdb-8e5ff414de71",
+    "name": "火焰之地1",
+    "type": 0,
+    "targets": [{
+        "uuid": "33",
+        "name": "33",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
 }]

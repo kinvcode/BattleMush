@@ -1,0 +1,6488 @@
+{
+    "climbs": [
+        {
+            "x_left": 2109,
+            "x_right": 2159,
+            "y_bottom": 1935,
+            "y_top": 1639
+        },
+        {
+            "x_left": 2753,
+            "x_right": 2803,
+            "y_bottom": 2316,
+            "y_top": 2141
+        },
+        {
+            "x_left": 1642,
+            "x_right": 1692,
+            "y_bottom": 2436,
+            "y_top": 2142
+        },
+        {
+            "x_left": 1177,
+            "x_right": 1227,
+            "y_bottom": 1897,
+            "y_top": 1603
+        },
+        {
+            "x_left": 311,
+            "x_right": 361,
+            "y_bottom": 2320,
+            "y_top": 1965
+        }
+    ],
+    "footholds": [
+        {
+            "id": 1,
+            "x_left": 566,
+            "x_right": 633,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 2,
+            "x_left": 633,
+            "x_right": 723,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 3,
+            "x_left": 723,
+            "x_right": 813,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 4,
+            "x_left": 813,
+            "x_right": 903,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 5,
+            "x_left": 903,
+            "x_right": 993,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 6,
+            "x_left": 993,
+            "x_right": 1083,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 7,
+            "x_left": 1083,
+            "x_right": 1173,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 8,
+            "x_left": 1173,
+            "x_right": 1263,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 9,
+            "x_left": 1263,
+            "x_right": 1353,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 10,
+            "x_left": 1353,
+            "x_right": 1443,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 11,
+            "x_left": 1443,
+            "x_right": 1533,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 12,
+            "x_left": 1533,
+            "x_right": 1623,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 13,
+            "x_left": 1623,
+            "x_right": 1713,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 14,
+            "x_left": 1713,
+            "x_right": 1803,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 15,
+            "x_left": 1803,
+            "x_right": 1893,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 16,
+            "x_left": 1893,
+            "x_right": 1983,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 17,
+            "x_left": 1983,
+            "x_right": 2073,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 18,
+            "x_left": 2073,
+            "x_right": 2163,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 19,
+            "x_left": 2163,
+            "x_right": 2253,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 20,
+            "x_left": 2253,
+            "x_right": 2343,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 21,
+            "x_left": 2343,
+            "x_right": 2410,
+            "y_left": 2503,
+            "y_right": 2503
+        },
+        {
+            "id": 22,
+            "x_left": 1780,
+            "x_right": 1916,
+            "y_left": 2023,
+            "y_right": 2023
+        },
+        {
+            "id": 23,
+            "x_left": 1690,
+            "x_right": 1826,
+            "y_left": 2083,
+            "y_right": 2083
+        },
+        {
+            "id": 24,
+            "x_left": 1600,
+            "x_right": 1736,
+            "y_left": 2143,
+            "y_right": 2143
+        },
+        {
+            "id": 25,
+            "x_left": 1690,
+            "x_right": 1826,
+            "y_left": 1963,
+            "y_right": 1963
+        },
+        {
+            "id": 26,
+            "x_left": 1600,
+            "x_right": 1736,
+            "y_left": 1903,
+            "y_right": 1903
+        },
+        {
+            "id": 27,
+            "x_left": 1510,
+            "x_right": 1646,
+            "y_left": 1843,
+            "y_right": 1843
+        },
+        {
+            "id": 28,
+            "x_left": 1420,
+            "x_right": 1556,
+            "y_left": 1783,
+            "y_right": 1783
+        },
+        {
+            "id": 29,
+            "x_left": 1330,
+            "x_right": 1466,
+            "y_left": 1723,
+            "y_right": 1723
+        },
+        {
+            "id": 30,
+            "x_left": 1240,
+            "x_right": 1376,
+            "y_left": 1663,
+            "y_right": 1663
+        },
+        {
+            "id": 31,
+            "x_left": 1150,
+            "x_right": 1286,
+            "y_left": 1603,
+            "y_right": 1603
+        },
+        {
+            "id": 32,
+            "x_left": 2410,
+            "x_right": 2500,
+            "y_left": 2443,
+            "y_right": 2443
+        },
+        {
+            "id": 33,
+            "x_left": 2500,
+            "x_right": 2613,
+            "y_left": 2383,
+            "y_right": 2383
+        },
+        {
+            "id": 34,
+            "x_left": 2613,
+            "x_right": 2703,
+            "y_left": 2383,
+            "y_right": 2383
+        },
+        {
+            "id": 35,
+            "x_left": 2703,
+            "x_right": 2793,
+            "y_left": 2383,
+            "y_right": 2383
+        },
+        {
+            "id": 36,
+            "x_left": 2793,
+            "x_right": 2883,
+            "y_left": 2383,
+            "y_right": 2383
+        },
+        {
+            "id": 37,
+            "x_left": 2883,
+            "x_right": 2976,
+            "y_left": 2383,
+            "y_right": 2383
+        },
+        {
+            "id": 38,
+            "x_left": 0,
+            "x_right": 93,
+            "y_left": 2383,
+            "y_right": 2383
+        },
+        {
+            "id": 39,
+            "x_left": 93,
+            "x_right": 183,
+            "y_left": 2383,
+            "y_right": 2383
+        },
+        {
+            "id": 40,
+            "x_left": 183,
+            "x_right": 273,
+            "y_left": 2383,
+            "y_right": 2383
+        },
+        {
+            "id": 41,
+            "x_left": 273,
+            "x_right": 363,
+            "y_left": 2383,
+            "y_right": 2383
+        },
+        {
+            "id": 42,
+            "x_left": 363,
+            "x_right": 476,
+            "y_left": 2383,
+            "y_right": 2383
+        },
+        {
+            "id": 43,
+            "x_left": 476,
+            "x_right": 566,
+            "y_left": 2443,
+            "y_right": 2443
+        },
+        {
+            "id": 44,
+            "x_left": 2410,
+            "x_right": 2546,
+            "y_left": 1963,
+            "y_right": 1963
+        },
+        {
+            "id": 45,
+            "x_left": 2500,
+            "x_right": 2636,
+            "y_left": 2023,
+            "y_right": 2023
+        },
+        {
+            "id": 46,
+            "x_left": 2590,
+            "x_right": 2726,
+            "y_left": 2083,
+            "y_right": 2083
+        },
+        {
+            "id": 47,
+            "x_left": 2680,
+            "x_right": 2816,
+            "y_left": 2143,
+            "y_right": 2143
+        },
+        {
+            "id": 48,
+            "x_left": 1916,
+            "x_right": 1916,
+            "y_left": 2023,
+            "y_right": 2038
+        },
+        {
+            "id": 49,
+            "x_left": 1780,
+            "x_right": 1780,
+            "y_left": 2038,
+            "y_right": 2023
+        },
+        {
+            "id": 50,
+            "x_left": 1826,
+            "x_right": 1826,
+            "y_left": 2083,
+            "y_right": 2098
+        },
+        {
+            "id": 51,
+            "x_left": 1690,
+            "x_right": 1690,
+            "y_left": 2098,
+            "y_right": 2083
+        },
+        {
+            "id": 52,
+            "x_left": 1600,
+            "x_right": 1600,
+            "y_left": 2158,
+            "y_right": 2143
+        },
+        {
+            "id": 53,
+            "x_left": 1736,
+            "x_right": 1736,
+            "y_left": 2143,
+            "y_right": 2158
+        },
+        {
+            "id": 54,
+            "x_left": 1690,
+            "x_right": 1690,
+            "y_left": 1978,
+            "y_right": 1963
+        },
+        {
+            "id": 55,
+            "x_left": 1826,
+            "x_right": 1826,
+            "y_left": 1963,
+            "y_right": 1978
+        },
+        {
+            "id": 56,
+            "x_left": 1600,
+            "x_right": 1600,
+            "y_left": 1918,
+            "y_right": 1903
+        },
+        {
+            "id": 57,
+            "x_left": 1736,
+            "x_right": 1736,
+            "y_left": 1903,
+            "y_right": 1918
+        },
+        {
+            "id": 58,
+            "x_left": 1510,
+            "x_right": 1510,
+            "y_left": 1858,
+            "y_right": 1843
+        },
+        {
+            "id": 59,
+            "x_left": 1646,
+            "x_right": 1646,
+            "y_left": 1843,
+            "y_right": 1858
+        },
+        {
+            "id": 60,
+            "x_left": 1420,
+            "x_right": 1420,
+            "y_left": 1798,
+            "y_right": 1783
+        },
+        {
+            "id": 61,
+            "x_left": 1556,
+            "x_right": 1556,
+            "y_left": 1783,
+            "y_right": 1798
+        },
+        {
+            "id": 62,
+            "x_left": 1330,
+            "x_right": 1330,
+            "y_left": 1738,
+            "y_right": 1723
+        },
+        {
+            "id": 63,
+            "x_left": 1466,
+            "x_right": 1466,
+            "y_left": 1723,
+            "y_right": 1738
+        },
+        {
+            "id": 64,
+            "x_left": 1376,
+            "x_right": 1376,
+            "y_left": 1663,
+            "y_right": 1678
+        },
+        {
+            "id": 65,
+            "x_left": 1240,
+            "x_right": 1240,
+            "y_left": 1678,
+            "y_right": 1663
+        },
+        {
+            "id": 66,
+            "x_left": 1150,
+            "x_right": 1150,
+            "y_left": 1618,
+            "y_right": 1603
+        },
+        {
+            "id": 67,
+            "x_left": 1286,
+            "x_right": 1286,
+            "y_left": 1603,
+            "y_right": 1618
+        },
+        {
+            "id": 68,
+            "x_left": 2410,
+            "x_right": 2410,
+            "y_left": 2503,
+            "y_right": 2443
+        },
+        {
+            "id": 69,
+            "x_left": 2500,
+            "x_right": 2500,
+            "y_left": 2443,
+            "y_right": 2383
+        },
+        {
+            "id": 70,
+            "x_left": 2976,
+            "x_right": 2976,
+            "y_left": 2383,
+            "y_right": 2458
+        },
+        {
+            "id": 71,
+            "x_left": 2976,
+            "x_right": 2976,
+            "y_left": 2458,
+            "y_right": 2518
+        },
+        {
+            "id": 72,
+            "x_left": 2976,
+            "x_right": 2976,
+            "y_left": 2518,
+            "y_right": 2578
+        },
+        {
+            "id": 73,
+            "x_left": 2976,
+            "x_right": 2976,
+            "y_left": 2578,
+            "y_right": 2638
+        },
+        {
+            "id": 74,
+            "x_left": 2976,
+            "x_right": 2976,
+            "y_left": 2638,
+            "y_right": 2698
+        },
+        {
+            "id": 75,
+            "x_left": 2976,
+            "x_right": 2976,
+            "y_left": 2698,
+            "y_right": 2724
+        },
+        {
+            "id": 76,
+            "x_left": 2976,
+            "x_right": 2976,
+            "y_left": 2724,
+            "y_right": 2724
+        },
+        {
+            "id": 77,
+            "x_left": 2976,
+            "x_right": 2976,
+            "y_left": 2724,
+            "y_right": 2724
+        },
+        {
+            "id": 78,
+            "x_left": 0,
+            "x_right": 0,
+            "y_left": 2458,
+            "y_right": 2383
+        },
+        {
+            "id": 79,
+            "x_left": 0,
+            "x_right": 0,
+            "y_left": 2518,
+            "y_right": 2458
+        },
+        {
+            "id": 80,
+            "x_left": 0,
+            "x_right": 0,
+            "y_left": 2578,
+            "y_right": 2518
+        },
+        {
+            "id": 81,
+            "x_left": 0,
+            "x_right": 0,
+            "y_left": 2638,
+            "y_right": 2578
+        },
+        {
+            "id": 82,
+            "x_left": 0,
+            "x_right": 0,
+            "y_left": 2698,
+            "y_right": 2638
+        },
+        {
+            "id": 83,
+            "x_left": 0,
+            "x_right": 0,
+            "y_left": 2724,
+            "y_right": 2698
+        },
+        {
+            "id": 84,
+            "x_left": 0,
+            "x_right": 0,
+            "y_left": 2724,
+            "y_right": 2724
+        },
+        {
+            "id": 85,
+            "x_left": 0,
+            "x_right": 0,
+            "y_left": 2724,
+            "y_right": 2724
+        },
+        {
+            "id": 86,
+            "x_left": 476,
+            "x_right": 476,
+            "y_left": 2383,
+            "y_right": 2443
+        },
+        {
+            "id": 87,
+            "x_left": 566,
+            "x_right": 566,
+            "y_left": 2443,
+            "y_right": 2503
+        },
+        {
+            "id": 88,
+            "x_left": 2546,
+            "x_right": 2546,
+            "y_left": 1963,
+            "y_right": 1978
+        },
+        {
+            "id": 89,
+            "x_left": 2410,
+            "x_right": 2410,
+            "y_left": 1978,
+            "y_right": 1963
+        },
+        {
+            "id": 90,
+            "x_left": 2500,
+            "x_right": 2500,
+            "y_left": 2038,
+            "y_right": 2023
+        },
+        {
+            "id": 91,
+            "x_left": 2636,
+            "x_right": 2636,
+            "y_left": 2023,
+            "y_right": 2038
+        },
+        {
+            "id": 92,
+            "x_left": 2590,
+            "x_right": 2590,
+            "y_left": 2098,
+            "y_right": 2083
+        },
+        {
+            "id": 93,
+            "x_left": 2726,
+            "x_right": 2726,
+            "y_left": 2083,
+            "y_right": 2098
+        },
+        {
+            "id": 94,
+            "x_left": 2680,
+            "x_right": 2680,
+            "y_left": 2158,
+            "y_right": 2143
+        },
+        {
+            "id": 95,
+            "x_left": 2816,
+            "x_right": 2816,
+            "y_left": 2143,
+            "y_right": 2158
+        },
+        {
+            "id": 96,
+            "x_left": 73,
+            "x_right": 108,
+            "y_left": 2017,
+            "y_right": 1984
+        },
+        {
+            "id": 97,
+            "x_left": 108,
+            "x_right": 219,
+            "y_left": 1984,
+            "y_right": 1978
+        },
+        {
+            "id": 98,
+            "x_left": 219,
+            "x_right": 246,
+            "y_left": 1978,
+            "y_right": 1969
+        },
+        {
+            "id": 99,
+            "x_left": 246,
+            "x_right": 309,
+            "y_left": 1969,
+            "y_right": 1967
+        },
+        {
+            "id": 100,
+            "x_left": 309,
+            "x_right": 491,
+            "y_left": 1967,
+            "y_right": 1963
+        },
+        {
+            "id": 101,
+            "x_left": 491,
+            "x_right": 513,
+            "y_left": 1963,
+            "y_right": 1956
+        },
+        {
+            "id": 102,
+            "x_left": 513,
+            "x_right": 601,
+            "y_left": 1956,
+            "y_right": 1954
+        },
+        {
+            "id": 103,
+            "x_left": 601,
+            "x_right": 618,
+            "y_left": 1954,
+            "y_right": 1951
+        },
+        {
+            "id": 104,
+            "x_left": 618,
+            "x_right": 692,
+            "y_left": 1951,
+            "y_right": 1950
+        },
+        {
+            "id": 105,
+            "x_left": 692,
+            "x_right": 774,
+            "y_left": 1950,
+            "y_right": 1950
+        },
+        {
+            "id": 106,
+            "x_left": 774,
+            "x_right": 848,
+            "y_left": 1950,
+            "y_right": 1953
+        },
+        {
+            "id": 107,
+            "x_left": 848,
+            "x_right": 896,
+            "y_left": 1953,
+            "y_right": 1957
+        },
+        {
+            "id": 108,
+            "x_left": 896,
+            "x_right": 987,
+            "y_left": 1957,
+            "y_right": 1963
+        },
+        {
+            "id": 109,
+            "x_left": 987,
+            "x_right": 1099,
+            "y_left": 1963,
+            "y_right": 1960
+        },
+        {
+            "id": 110,
+            "x_left": 1099,
+            "x_right": 1218,
+            "y_left": 1960,
+            "y_right": 1962
+        },
+        {
+            "id": 111,
+            "x_left": 1218,
+            "x_right": 1272,
+            "y_left": 1962,
+            "y_right": 1965
+        },
+        {
+            "id": 112,
+            "x_left": 1272,
+            "x_right": 1327,
+            "y_left": 1965,
+            "y_right": 1986
+        },
+        {
+            "id": 113,
+            "x_left": 2167,
+            "x_right": 2202,
+            "y_left": 1962,
+            "y_right": 1928
+        },
+        {
+            "id": 114,
+            "x_left": 2202,
+            "x_right": 2299,
+            "y_left": 1928,
+            "y_right": 1926
+        },
+        {
+            "id": 115,
+            "x_left": 2299,
+            "x_right": 2365,
+            "y_left": 1926,
+            "y_right": 1917
+        },
+        {
+            "id": 116,
+            "x_left": 2365,
+            "x_right": 2429,
+            "y_left": 1917,
+            "y_right": 1917
+        },
+        {
+            "id": 117,
+            "x_left": 2429,
+            "x_right": 2442,
+            "y_left": 1917,
+            "y_right": 1933
+        },
+        {
+            "id": 118,
+            "x_left": 1896,
+            "x_right": 1907,
+            "y_left": 1984,
+            "y_right": 1980
+        },
+        {
+            "id": 119,
+            "x_left": 1907,
+            "x_right": 1972,
+            "y_left": 1980,
+            "y_right": 1981
+        },
+        {
+            "id": 120,
+            "x_left": 1972,
+            "x_right": 1987,
+            "y_left": 1981,
+            "y_right": 1985
+        },
+        {
+            "id": 121,
+            "x_left": 1987,
+            "x_right": 2143,
+            "y_left": 1985,
+            "y_right": 1990
+        },
+        {
+            "id": 122,
+            "x_left": 2143,
+            "x_right": 2233,
+            "y_left": 1990,
+            "y_right": 1997
+        },
+        {
+            "id": 123,
+            "x_left": 1896,
+            "x_right": 1921,
+            "y_left": 1455,
+            "y_right": 1451
+        },
+        {
+            "id": 124,
+            "x_left": 1921,
+            "x_right": 1944,
+            "y_left": 1451,
+            "y_right": 1451
+        },
+        {
+            "id": 125,
+            "x_left": 1944,
+            "x_right": 1956,
+            "y_left": 1451,
+            "y_right": 1438
+        },
+        {
+            "id": 126,
+            "x_left": 1956,
+            "x_right": 2078,
+            "y_left": 1438,
+            "y_right": 1444
+        },
+        {
+            "id": 127,
+            "x_left": 2078,
+            "x_right": 2090,
+            "y_left": 1444,
+            "y_right": 1447
+        },
+        {
+            "id": 128,
+            "x_left": 2090,
+            "x_right": 2150,
+            "y_left": 1447,
+            "y_right": 1447
+        },
+        {
+            "id": 129,
+            "x_left": 2150,
+            "x_right": 2242,
+            "y_left": 1447,
+            "y_right": 1447
+        },
+        {
+            "id": 130,
+            "x_left": 2242,
+            "x_right": 2379,
+            "y_left": 1447,
+            "y_right": 1468
+        },
+        {
+            "id": 131,
+            "x_left": 2347,
+            "x_right": 2401,
+            "y_left": 1485,
+            "y_right": 1486
+        },
+        {
+            "id": 132,
+            "x_left": 2401,
+            "x_right": 2452,
+            "y_left": 1486,
+            "y_right": 1484
+        },
+        {
+            "id": 133,
+            "x_left": 2452,
+            "x_right": 2462,
+            "y_left": 1484,
+            "y_right": 1492
+        },
+        {
+            "id": 134,
+            "x_left": 2307,
+            "x_right": 2328,
+            "y_left": 1513,
+            "y_right": 1510
+        },
+        {
+            "id": 135,
+            "x_left": 2328,
+            "x_right": 2384,
+            "y_left": 1510,
+            "y_right": 1512
+        },
+        {
+            "id": 136,
+            "x_left": 2384,
+            "x_right": 2392,
+            "y_left": 1512,
+            "y_right": 1519
+        },
+        {
+            "id": 137,
+            "x_left": 2258,
+            "x_right": 2384,
+            "y_left": 1546,
+            "y_right": 1547
+        },
+        {
+            "id": 138,
+            "x_left": 2217,
+            "x_right": 2322,
+            "y_left": 1582,
+            "y_right": 1586
+        },
+        {
+            "id": 139,
+            "x_left": 2322,
+            "x_right": 2357,
+            "y_left": 1586,
+            "y_right": 1583
+        },
+        {
+            "id": 140,
+            "x_left": 1965,
+            "x_right": 2027,
+            "y_left": 1626,
+            "y_right": 1633
+        },
+        {
+            "id": 141,
+            "x_left": 2027,
+            "x_right": 2045,
+            "y_left": 1633,
+            "y_right": 1641
+        },
+        {
+            "id": 142,
+            "x_left": 2045,
+            "x_right": 2118,
+            "y_left": 1641,
+            "y_right": 1641
+        },
+        {
+            "id": 143,
+            "x_left": 2118,
+            "x_right": 2192,
+            "y_left": 1641,
+            "y_right": 1647
+        }
+    ],
+    "id": "c9349a80-5a2d-401d-8cdb-8e5ff414de71",
+    "map_bounding": {
+        "height": 3269,
+        "width": 2977,
+        "x_left": 0,
+        "x_offset": 1038,
+        "x_right": 2976,
+        "y_bottom": 2724,
+        "y_offset": 0,
+        "y_top": -1
+    },
+    "name": "火焰之地1",
+    "path_nodes": {
+        "0": {
+            "id": 0,
+            "targets": {
+                "11": {
+                    "id": 11,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2346,
+                                    2387
+                                ]
+                            ],
+                            "visit_type": 4
+                        }
+                    ]
+                },
+                "14": {
+                    "id": 14,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    589,
+                                    630
+                                ]
+                            ],
+                            "visit_type": 3
+                        }
+                    ]
+                },
+                "32": {
+                    "id": 32,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1642,
+                                    1691
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "1": {
+            "id": 1,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1916,
+                                    1916
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    1826,
+                                    1916
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "2": {
+                    "id": 2,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1780,
+                                    1780
+                                ]
+                            ],
+                            "visit_type": 0
+                        },
+                        {
+                            "area": [
+                                [
+                                    1780,
+                                    1825
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "23": {
+                    "id": 23,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1896,
+                                    1908
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "4": {
+                    "id": 4,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1780,
+                                    1825
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "10": {
+            "id": 10,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1160,
+                                    1188
+                                ],
+                                [
+                                    1220,
+                                    1227
+                                ],
+                                [
+                                    1238,
+                                    1240
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "21": {
+                    "id": 21,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1150,
+                                    1150
+                                ]
+                            ],
+                            "visit_type": 0
+                        },
+                        {
+                            "area": [
+                                [
+                                    1150,
+                                    1159
+                                ],
+                                [
+                                    1189,
+                                    1219
+                                ],
+                                [
+                                    1228,
+                                    1237
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "33": {
+                    "id": 33,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1177,
+                                    1226
+                                ]
+                            ],
+                            "visit_type": 8
+                        }
+                    ]
+                },
+                "8": {
+                    "id": 8,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1276,
+                                    1285
+                                ]
+                            ],
+                            "visit_type": 4
+                        }
+                    ]
+                },
+                "9": {
+                    "id": 9,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1286,
+                                    1286
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    1241,
+                                    1286
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "11": {
+            "id": 11,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2410,
+                                    2410
+                                ]
+                            ],
+                            "visit_type": 0
+                        }
+                    ]
+                },
+                "12": {
+                    "id": 12,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2436,
+                                    2477
+                                ]
+                            ],
+                            "visit_type": 4
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "12": {
+            "id": 12,
+            "targets": {
+                "11": {
+                    "id": 11,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2500,
+                                    2500
+                                ]
+                            ],
+                            "visit_type": 0
+                        }
+                    ]
+                },
+                "31": {
+                    "id": 31,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2753,
+                                    2802
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "13": {
+            "id": 13,
+            "targets": {
+                "14": {
+                    "id": 14,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    476,
+                                    476
+                                ]
+                            ],
+                            "visit_type": 1
+                        }
+                    ]
+                },
+                "34": {
+                    "id": 34,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    311,
+                                    360
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "14": {
+            "id": 14,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    566,
+                                    566
+                                ]
+                            ],
+                            "visit_type": 1
+                        }
+                    ]
+                },
+                "13": {
+                    "id": 13,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    499,
+                                    540
+                                ]
+                            ],
+                            "visit_type": 3
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "15": {
+            "id": 15,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2410,
+                                    2410
+                                ]
+                            ],
+                            "visit_type": 0
+                        }
+                    ]
+                },
+                "11": {
+                    "id": 11,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2411,
+                                    2499
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "16": {
+                    "id": 16,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2546,
+                                    2546
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    2501,
+                                    2546
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "17": {
+                    "id": 17,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2536,
+                                    2545
+                                ]
+                            ],
+                            "visit_type": 4
+                        }
+                    ]
+                },
+                "22": {
+                    "id": 22,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2410,
+                                    2442
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "16": {
+            "id": 16,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2500,
+                                    2500
+                                ]
+                            ],
+                            "visit_type": 0
+                        }
+                    ]
+                },
+                "12": {
+                    "id": 12,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2501,
+                                    2590
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "15": {
+                    "id": 15,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2500,
+                                    2545
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "17": {
+                    "id": 17,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2636,
+                                    2636
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    2591,
+                                    2636
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "18": {
+                    "id": 18,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2626,
+                                    2635
+                                ]
+                            ],
+                            "visit_type": 4
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "17": {
+            "id": 17,
+            "targets": {
+                "12": {
+                    "id": 12,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2590,
+                                    2590
+                                ]
+                            ],
+                            "visit_type": 0
+                        },
+                        {
+                            "area": [
+                                [
+                                    2590,
+                                    2680
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "16": {
+                    "id": 16,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2590,
+                                    2635
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "18": {
+                    "id": 18,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2681,
+                                    2726
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "31": {
+                    "id": 31,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2726,
+                                    2726
+                                ]
+                            ],
+                            "visit_type": 1
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "18": {
+            "id": 18,
+            "targets": {
+                "12": {
+                    "id": 12,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2680,
+                                    2680
+                                ]
+                            ],
+                            "visit_type": 0
+                        },
+                        {
+                            "area": [
+                                [
+                                    2816,
+                                    2816
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    2680,
+                                    2816
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "17": {
+                    "id": 17,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2680,
+                                    2725
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "31": {
+                    "id": 31,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2753,
+                                    2802
+                                ]
+                            ],
+                            "visit_type": 8
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "19": {
+            "id": 19,
+            "targets": {
+            },
+            "type": 0
+        },
+        "2": {
+            "id": 2,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1826,
+                                    1826
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    1736,
+                                    1826
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "1": {
+                    "id": 1,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1781,
+                                    1826
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "3": {
+                    "id": 3,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1690,
+                                    1735
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "32": {
+                    "id": 32,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1690,
+                                    1690
+                                ]
+                            ],
+                            "visit_type": 0
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "20": {
+            "id": 20,
+            "targets": {
+            },
+            "type": 0
+        },
+        "21": {
+            "id": 21,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1327,
+                                    1327
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    567,
+                                    1327
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "13": {
+                    "id": 13,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    73,
+                                    475
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "14": {
+                    "id": 14,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    477,
+                                    565
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "33": {
+                    "id": 33,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1177,
+                                    1226
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "34": {
+                    "id": 34,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    311,
+                                    360
+                                ]
+                            ],
+                            "visit_type": 8
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "22": {
+            "id": 22,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2170,
+                                    2175
+                                ],
+                                [
+                                    2183,
+                                    2188
+                                ],
+                                [
+                                    2196,
+                                    2200
+                                ],
+                                [
+                                    2209,
+                                    2213
+                                ],
+                                [
+                                    2222,
+                                    2226
+                                ],
+                                [
+                                    2234,
+                                    2409
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "15": {
+                    "id": 15,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2442,
+                                    2442
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    2411,
+                                    2442
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "23": {
+                    "id": 23,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2167,
+                                    2167
+                                ]
+                            ],
+                            "visit_type": 0
+                        },
+                        {
+                            "area": [
+                                [
+                                    2167,
+                                    2169
+                                ],
+                                [
+                                    2176,
+                                    2182
+                                ],
+                                [
+                                    2189,
+                                    2195
+                                ],
+                                [
+                                    2201,
+                                    2208
+                                ],
+                                [
+                                    2214,
+                                    2221
+                                ],
+                                [
+                                    2227,
+                                    2233
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "30": {
+                    "id": 30,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2167,
+                                    2245
+                                ]
+                            ],
+                            "visit_type": 3
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "23": {
+            "id": 23,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2233,
+                                    2233
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    1916,
+                                    2233
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "1": {
+                    "id": 1,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1896,
+                                    1896
+                                ]
+                            ],
+                            "visit_type": 0
+                        },
+                        {
+                            "area": [
+                                [
+                                    1896,
+                                    1915
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "22": {
+                    "id": 22,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2167,
+                                    2203
+                                ],
+                                [
+                                    2227,
+                                    2233
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "30": {
+                    "id": 30,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2109,
+                                    2158
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "4": {
+                    "id": 4,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1896,
+                                    1908
+                                ]
+                            ],
+                            "visit_type": 3
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "24": {
+            "id": 24,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1916,
+                                    1939
+                                ],
+                                [
+                                    1977,
+                                    1977
+                                ],
+                                [
+                                    1985,
+                                    1985
+                                ],
+                                [
+                                    1993,
+                                    1996
+                                ],
+                                [
+                                    2002,
+                                    2002
+                                ],
+                                [
+                                    2020,
+                                    2022
+                                ],
+                                [
+                                    2160,
+                                    2161
+                                ],
+                                [
+                                    2209,
+                                    2213
+                                ],
+                                [
+                                    2222,
+                                    2226
+                                ],
+                                [
+                                    2252,
+                                    2256
+                                ],
+                                [
+                                    2271,
+                                    2274
+                                ],
+                                [
+                                    2301,
+                                    2302
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "1": {
+                    "id": 1,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1900,
+                                    1900
+                                ],
+                                [
+                                    1909,
+                                    1915
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "15": {
+                    "id": 15,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2369,
+                                    2379
+                                ]
+                            ],
+                            "visit_type": 4
+                        }
+                    ]
+                },
+                "22": {
+                    "id": 22,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2169,
+                                    2173
+                                ],
+                                [
+                                    2181,
+                                    2185
+                                ],
+                                [
+                                    2193,
+                                    2203
+                                ],
+                                [
+                                    2227,
+                                    2230
+                                ],
+                                [
+                                    2245,
+                                    2251
+                                ],
+                                [
+                                    2275,
+                                    2282
+                                ],
+                                [
+                                    2297,
+                                    2306
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "23": {
+                    "id": 23,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1896,
+                                    1908
+                                ],
+                                [
+                                    1940,
+                                    1969
+                                ],
+                                [
+                                    1975,
+                                    1978
+                                ],
+                                [
+                                    1984,
+                                    1987
+                                ],
+                                [
+                                    2003,
+                                    2004
+                                ],
+                                [
+                                    2011,
+                                    2013
+                                ],
+                                [
+                                    2204,
+                                    2208
+                                ],
+                                [
+                                    2214,
+                                    2221
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "25": {
+                    "id": 25,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2379,
+                                    2379
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    2347,
+                                    2348
+                                ],
+                                [
+                                    2375,
+                                    2379
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "26": {
+                    "id": 26,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2307,
+                                    2329
+                                ],
+                                [
+                                    2343,
+                                    2357
+                                ],
+                                [
+                                    2371,
+                                    2374
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "27": {
+                    "id": 27,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2258,
+                                    2259
+                                ],
+                                [
+                                    2323,
+                                    2324
+                                ],
+                                [
+                                    2330,
+                                    2342
+                                ],
+                                [
+                                    2358,
+                                    2370
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "28": {
+                    "id": 28,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2217,
+                                    2218
+                                ],
+                                [
+                                    2231,
+                                    2244
+                                ],
+                                [
+                                    2257,
+                                    2270
+                                ],
+                                [
+                                    2283,
+                                    2296
+                                ],
+                                [
+                                    2309,
+                                    2310
+                                ],
+                                [
+                                    2316,
+                                    2317
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "29": {
+                    "id": 29,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1965,
+                                    1966
+                                ],
+                                [
+                                    1970,
+                                    1974
+                                ],
+                                [
+                                    1979,
+                                    1983
+                                ],
+                                [
+                                    1988,
+                                    1992
+                                ],
+                                [
+                                    1997,
+                                    2001
+                                ],
+                                [
+                                    2005,
+                                    2010
+                                ],
+                                [
+                                    2014,
+                                    2019
+                                ],
+                                [
+                                    2023,
+                                    2119
+                                ],
+                                [
+                                    2125,
+                                    2131
+                                ],
+                                [
+                                    2137,
+                                    2143
+                                ],
+                                [
+                                    2149,
+                                    2156
+                                ],
+                                [
+                                    2162,
+                                    2168
+                                ],
+                                [
+                                    2174,
+                                    2180
+                                ],
+                                [
+                                    2186,
+                                    2192
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "30": {
+                    "id": 30,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2120,
+                                    2124
+                                ],
+                                [
+                                    2132,
+                                    2136
+                                ],
+                                [
+                                    2144,
+                                    2148
+                                ],
+                                [
+                                    2157,
+                                    2159
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "4": {
+                    "id": 4,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1896,
+                                    1896
+                                ]
+                            ],
+                            "visit_type": 0
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "25": {
+            "id": 25,
+            "targets": {
+                "15": {
+                    "id": 15,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2443,
+                                    2462
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "16": {
+                    "id": 16,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2462,
+                                    2462
+                                ]
+                            ],
+                            "visit_type": 1
+                        }
+                    ]
+                },
+                "22": {
+                    "id": 22,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2393,
+                                    2442
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "24": {
+                    "id": 24,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2347,
+                                    2353
+                                ],
+                                [
+                                    2357,
+                                    2366
+                                ],
+                                [
+                                    2370,
+                                    2379
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "26": {
+                    "id": 26,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2347,
+                                    2357
+                                ],
+                                [
+                                    2371,
+                                    2392
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "27": {
+                    "id": 27,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2358,
+                                    2370
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "26": {
+            "id": 26,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2308,
+                                    2308
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "15": {
+                    "id": 15,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2392,
+                                    2392
+                                ]
+                            ],
+                            "visit_type": 1
+                        }
+                    ]
+                },
+                "22": {
+                    "id": 22,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2307,
+                                    2307
+                                ],
+                                [
+                                    2385,
+                                    2392
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "24": {
+                    "id": 24,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2307,
+                                    2314
+                                ],
+                                [
+                                    2318,
+                                    2327
+                                ],
+                                [
+                                    2331,
+                                    2340
+                                ],
+                                [
+                                    2344,
+                                    2353
+                                ],
+                                [
+                                    2357,
+                                    2366
+                                ],
+                                [
+                                    2370,
+                                    2379
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "25": {
+                    "id": 25,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2347,
+                                    2348
+                                ],
+                                [
+                                    2375,
+                                    2392
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "27": {
+                    "id": 27,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2322,
+                                    2384
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "28": {
+                    "id": 28,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2309,
+                                    2321
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "27": {
+            "id": 27,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2271,
+                                    2274
+                                ],
+                                [
+                                    2301,
+                                    2302
+                                ],
+                                [
+                                    2308,
+                                    2308
+                                ],
+                                [
+                                    2324,
+                                    2324
+                                ],
+                                [
+                                    2337,
+                                    2339
+                                ],
+                                [
+                                    2359,
+                                    2361
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "15": {
+                    "id": 15,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2384,
+                                    2384
+                                ]
+                            ],
+                            "visit_type": 1
+                        }
+                    ]
+                },
+                "22": {
+                    "id": 22,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2275,
+                                    2282
+                                ],
+                                [
+                                    2297,
+                                    2307
+                                ],
+                                [
+                                    2325,
+                                    2327
+                                ],
+                                [
+                                    2335,
+                                    2336
+                                ],
+                                [
+                                    2347,
+                                    2351
+                                ],
+                                [
+                                    2358,
+                                    2358
+                                ],
+                                [
+                                    2362,
+                                    2384
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "23": {
+                    "id": 23,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2306,
+                                    2312
+                                ]
+                            ],
+                            "visit_type": 3
+                        }
+                    ]
+                },
+                "24": {
+                    "id": 24,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2259,
+                                    2314
+                                ],
+                                [
+                                    2318,
+                                    2327
+                                ],
+                                [
+                                    2331,
+                                    2340
+                                ],
+                                [
+                                    2344,
+                                    2353
+                                ],
+                                [
+                                    2357,
+                                    2366
+                                ],
+                                [
+                                    2370,
+                                    2379
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "25": {
+                    "id": 25,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2347,
+                                    2348
+                                ],
+                                [
+                                    2375,
+                                    2384
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "26": {
+                    "id": 26,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2307,
+                                    2329
+                                ],
+                                [
+                                    2343,
+                                    2357
+                                ],
+                                [
+                                    2371,
+                                    2384
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "28": {
+                    "id": 28,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2258,
+                                    2270
+                                ],
+                                [
+                                    2283,
+                                    2296
+                                ],
+                                [
+                                    2309,
+                                    2323
+                                ],
+                                [
+                                    2328,
+                                    2334
+                                ],
+                                [
+                                    2340,
+                                    2346
+                                ],
+                                [
+                                    2352,
+                                    2357
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "29": {
+                    "id": 29,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2259,
+                                    2266
+                                ],
+                                [
+                                    2272,
+                                    2278
+                                ],
+                                [
+                                    2284,
+                                    2290
+                                ],
+                                [
+                                    2296,
+                                    2302
+                                ]
+                            ],
+                            "visit_type": 3
+                        }
+                    ]
+                },
+                "30": {
+                    "id": 30,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2258,
+                                    2258
+                                ],
+                                [
+                                    2267,
+                                    2269
+                                ]
+                            ],
+                            "visit_type": 3
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "28": {
+            "id": 28,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2222,
+                                    2226
+                                ],
+                                [
+                                    2252,
+                                    2274
+                                ],
+                                [
+                                    2301,
+                                    2302
+                                ],
+                                [
+                                    2308,
+                                    2310
+                                ],
+                                [
+                                    2315,
+                                    2317
+                                ],
+                                [
+                                    2323,
+                                    2324
+                                ],
+                                [
+                                    2330,
+                                    2332
+                                ],
+                                [
+                                    2337,
+                                    2339
+                                ],
+                                [
+                                    2345,
+                                    2346
+                                ],
+                                [
+                                    2352,
+                                    2354
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "15": {
+                    "id": 15,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2357,
+                                    2357
+                                ]
+                            ],
+                            "visit_type": 1
+                        }
+                    ]
+                },
+                "22": {
+                    "id": 22,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2227,
+                                    2251
+                                ],
+                                [
+                                    2275,
+                                    2307
+                                ],
+                                [
+                                    2311,
+                                    2314
+                                ],
+                                [
+                                    2318,
+                                    2329
+                                ],
+                                [
+                                    2333,
+                                    2336
+                                ],
+                                [
+                                    2340,
+                                    2351
+                                ],
+                                [
+                                    2355,
+                                    2357
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "23": {
+                    "id": 23,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2217,
+                                    2221
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "25": {
+                    "id": 25,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2347,
+                                    2348
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "26": {
+                    "id": 26,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2307,
+                                    2329
+                                ],
+                                [
+                                    2343,
+                                    2357
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "27": {
+                    "id": 27,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2258,
+                                    2259
+                                ],
+                                [
+                                    2322,
+                                    2357
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "29": {
+                    "id": 29,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2217,
+                                    2217
+                                ]
+                            ],
+                            "visit_type": 0
+                        }
+                    ]
+                },
+                "30": {
+                    "id": 30,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2221,
+                                    2225
+                                ],
+                                [
+                                    2233,
+                                    2237
+                                ],
+                                [
+                                    2245,
+                                    2250
+                                ],
+                                [
+                                    2258,
+                                    2261
+                                ]
+                            ],
+                            "visit_type": 3
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "29": {
+            "id": 29,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1977,
+                                    1977
+                                ],
+                                [
+                                    1981,
+                                    1981
+                                ],
+                                [
+                                    1985,
+                                    1985
+                                ],
+                                [
+                                    1989,
+                                    2002
+                                ],
+                                [
+                                    2020,
+                                    2033
+                                ],
+                                [
+                                    2051,
+                                    2065
+                                ],
+                                [
+                                    2082,
+                                    2096
+                                ],
+                                [
+                                    2113,
+                                    2127
+                                ],
+                                [
+                                    2145,
+                                    2149
+                                ],
+                                [
+                                    2157,
+                                    2162
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "1": {
+                    "id": 1,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1965,
+                                    1965
+                                ]
+                            ],
+                            "visit_type": 0
+                        }
+                    ]
+                },
+                "22": {
+                    "id": 22,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2167,
+                                    2192
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "23": {
+                    "id": 23,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1965,
+                                    1988
+                                ],
+                                [
+                                    2003,
+                                    2019
+                                ],
+                                [
+                                    2034,
+                                    2050
+                                ],
+                                [
+                                    2066,
+                                    2081
+                                ],
+                                [
+                                    2097,
+                                    2112
+                                ],
+                                [
+                                    2128,
+                                    2144
+                                ],
+                                [
+                                    2150,
+                                    2156
+                                ],
+                                [
+                                    2163,
+                                    2166
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "28": {
+                    "id": 28,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2153,
+                                    2154
+                                ],
+                                [
+                                    2167,
+                                    2180
+                                ],
+                                [
+                                    2192,
+                                    2192
+                                ]
+                            ],
+                            "visit_type": 4
+                        }
+                    ]
+                },
+                "30": {
+                    "id": 30,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2109,
+                                    2158
+                                ]
+                            ],
+                            "visit_type": 8
+                        }
+                    ]
+                },
+                "4": {
+                    "id": 4,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1965,
+                                    1969
+                                ]
+                            ],
+                            "visit_type": 3
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "3": {
+            "id": 3,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1600,
+                                    1600
+                                ]
+                            ],
+                            "visit_type": 0
+                        },
+                        {
+                            "area": [
+                                [
+                                    1736,
+                                    1736
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    1600,
+                                    1736
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "2": {
+                    "id": 2,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1691,
+                                    1736
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "32": {
+                    "id": 32,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1642,
+                                    1691
+                                ]
+                            ],
+                            "visit_type": 8
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "30": {
+            "id": 30,
+            "targets": {
+                "22": {
+                    "id": 22,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1668,
+                                    1746
+                                ],
+                                [
+                                    1861,
+                                    1865
+                                ],
+                                [
+                                    1870,
+                                    1870
+                                ],
+                                [
+                                    1875,
+                                    1875
+                                ],
+                                [
+                                    1879,
+                                    1879
+                                ],
+                                [
+                                    1884,
+                                    1884
+                                ],
+                                [
+                                    1889,
+                                    1889
+                                ],
+                                [
+                                    1893,
+                                    1893
+                                ],
+                                [
+                                    1897,
+                                    1897
+                                ],
+                                [
+                                    1902,
+                                    1902
+                                ],
+                                [
+                                    1906,
+                                    1906
+                                ],
+                                [
+                                    1910,
+                                    1910
+                                ],
+                                [
+                                    1914,
+                                    1914
+                                ],
+                                [
+                                    1918,
+                                    1921
+                                ],
+                                [
+                                    1925,
+                                    1925
+                                ],
+                                [
+                                    1929,
+                                    1935
+                                ]
+                            ],
+                            "visit_type": 4
+                        }
+                    ]
+                },
+                "23": {
+                    "id": 23,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1990,
+                                    1990
+                                ]
+                            ],
+                            "visit_type": 8
+                        }
+                    ]
+                },
+                "29": {
+                    "id": 29,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1642,
+                                    1656
+                                ],
+                                [
+                                    1661,
+                                    1663
+                                ]
+                            ],
+                            "visit_type": 3
+                        },
+                        {
+                            "area": [
+                                [
+                                    1645,
+                                    1657
+                                ],
+                                [
+                                    1663,
+                                    1666
+                                ]
+                            ],
+                            "visit_type": 4
+                        }
+                    ]
+                },
+                "30": {
+                    "id": 30,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1643,
+                                    1643
+                                ]
+                            ],
+                            "visit_type": 7
+                        }
+                    ]
+                }
+            },
+            "type": 1
+        },
+        "31": {
+            "id": 31,
+            "targets": {
+                "12": {
+                    "id": 12,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2383,
+                                    2383
+                                ]
+                            ],
+                            "visit_type": 8
+                        }
+                    ]
+                },
+                "18": {
+                    "id": 18,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2143,
+                                    2143
+                                ]
+                            ],
+                            "visit_type": 7
+                        }
+                    ]
+                }
+            },
+            "type": 1
+        },
+        "32": {
+            "id": 32,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2503,
+                                    2503
+                                ]
+                            ],
+                            "visit_type": 8
+                        }
+                    ]
+                },
+                "3": {
+                    "id": 3,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2143,
+                                    2143
+                                ]
+                            ],
+                            "visit_type": 7
+                        }
+                    ]
+                }
+            },
+            "type": 1
+        },
+        "33": {
+            "id": 33,
+            "targets": {
+                "10": {
+                    "id": 10,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1603,
+                                    1603
+                                ]
+                            ],
+                            "visit_type": 7
+                        }
+                    ]
+                },
+                "21": {
+                    "id": 21,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1962,
+                                    1962
+                                ]
+                            ],
+                            "visit_type": 8
+                        }
+                    ]
+                },
+                "9": {
+                    "id": 9,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1626,
+                                    1673
+                                ]
+                            ],
+                            "visit_type": 4
+                        }
+                    ]
+                }
+            },
+            "type": 1
+        },
+        "34": {
+            "id": 34,
+            "targets": {
+                "13": {
+                    "id": 13,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    2383,
+                                    2383
+                                ]
+                            ],
+                            "visit_type": 8
+                        }
+                    ]
+                },
+                "21": {
+                    "id": 21,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1966,
+                                    1966
+                                ]
+                            ],
+                            "visit_type": 7
+                        }
+                    ]
+                }
+            },
+            "type": 1
+        },
+        "4": {
+            "id": 4,
+            "targets": {
+                "1": {
+                    "id": 1,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1826,
+                                    1826
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    1781,
+                                    1826
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "2": {
+                    "id": 2,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1691,
+                                    1780
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "23": {
+                    "id": 23,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1803,
+                                    1816
+                                ]
+                            ],
+                            "visit_type": 4
+                        }
+                    ]
+                },
+                "3": {
+                    "id": 3,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1690,
+                                    1690
+                                ]
+                            ],
+                            "visit_type": 0
+                        },
+                        {
+                            "area": [
+                                [
+                                    1690,
+                                    1690
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "5": {
+                    "id": 5,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1690,
+                                    1735
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "5": {
+            "id": 5,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1600,
+                                    1600
+                                ]
+                            ],
+                            "visit_type": 0
+                        },
+                        {
+                            "area": [
+                                [
+                                    1600,
+                                    1600
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "1": {
+                    "id": 1,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1726,
+                                    1735
+                                ]
+                            ],
+                            "visit_type": 4
+                        }
+                    ]
+                },
+                "3": {
+                    "id": 3,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1601,
+                                    1690
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "4": {
+                    "id": 4,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1736,
+                                    1736
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    1691,
+                                    1736
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "6": {
+                    "id": 6,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1600,
+                                    1645
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "6": {
+            "id": 6,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1510,
+                                    1510
+                                ]
+                            ],
+                            "visit_type": 0
+                        },
+                        {
+                            "area": [
+                                [
+                                    1510,
+                                    1600
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "4": {
+                    "id": 4,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1636,
+                                    1645
+                                ]
+                            ],
+                            "visit_type": 4
+                        }
+                    ]
+                },
+                "5": {
+                    "id": 5,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1646,
+                                    1646
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    1601,
+                                    1646
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "7": {
+                    "id": 7,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1510,
+                                    1555
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "7": {
+            "id": 7,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1420,
+                                    1420
+                                ]
+                            ],
+                            "visit_type": 0
+                        },
+                        {
+                            "area": [
+                                [
+                                    1420,
+                                    1510
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "5": {
+                    "id": 5,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1546,
+                                    1555
+                                ]
+                            ],
+                            "visit_type": 4
+                        }
+                    ]
+                },
+                "6": {
+                    "id": 6,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1556,
+                                    1556
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    1511,
+                                    1556
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "8": {
+                    "id": 8,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1420,
+                                    1465
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "8": {
+            "id": 8,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1330,
+                                    1420
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "21": {
+                    "id": 21,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1330,
+                                    1330
+                                ]
+                            ],
+                            "visit_type": 0
+                        }
+                    ]
+                },
+                "6": {
+                    "id": 6,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1456,
+                                    1465
+                                ]
+                            ],
+                            "visit_type": 4
+                        }
+                    ]
+                },
+                "7": {
+                    "id": 7,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1466,
+                                    1466
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    1421,
+                                    1466
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "9": {
+                    "id": 9,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1330,
+                                    1375
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        },
+        "9": {
+            "id": 9,
+            "targets": {
+                "0": {
+                    "id": 0,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1240,
+                                    1245
+                                ],
+                                [
+                                    1256,
+                                    1263
+                                ],
+                                [
+                                    1281,
+                                    1281
+                                ],
+                                [
+                                    1289,
+                                    1289
+                                ],
+                                [
+                                    1294,
+                                    1294
+                                ],
+                                [
+                                    1302,
+                                    1302
+                                ],
+                                [
+                                    1315,
+                                    1315
+                                ],
+                                [
+                                    1323,
+                                    1323
+                                ],
+                                [
+                                    1328,
+                                    1330
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "10": {
+                    "id": 10,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1240,
+                                    1285
+                                ]
+                            ],
+                            "visit_type": 5
+                        }
+                    ]
+                },
+                "21": {
+                    "id": 21,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1246,
+                                    1255
+                                ],
+                                [
+                                    1264,
+                                    1327
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                },
+                "33": {
+                    "id": 33,
+                    "type": 1,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1240,
+                                    1240
+                                ]
+                            ],
+                            "visit_type": 0
+                        },
+                        {
+                            "area": [
+                                [
+                                    1241,
+                                    1248
+                                ]
+                            ],
+                            "visit_type": 3
+                        }
+                    ]
+                },
+                "7": {
+                    "id": 7,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1366,
+                                    1375
+                                ]
+                            ],
+                            "visit_type": 4
+                        }
+                    ]
+                },
+                "8": {
+                    "id": 8,
+                    "type": 0,
+                    "visit_list": [
+                        {
+                            "area": [
+                                [
+                                    1376,
+                                    1376
+                                ]
+                            ],
+                            "visit_type": 1
+                        },
+                        {
+                            "area": [
+                                [
+                                    1331,
+                                    1376
+                                ]
+                            ],
+                            "visit_type": 6
+                        }
+                    ]
+                }
+            },
+            "type": 0
+        }
+    },
+    "platform_list": [
+        {
+            "end": {
+                "x": 2410,
+                "y": 2503
+            },
+            "hasLeftWall": true,
+            "hasRightWall": true,
+            "id": 0,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 633,
+                        "y": 2503
+                    },
+                    "foot_id": 1,
+                    "length": 67,
+                    "start": {
+                        "x": 566,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 723,
+                        "y": 2503
+                    },
+                    "foot_id": 2,
+                    "length": 90,
+                    "start": {
+                        "x": 633,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 813,
+                        "y": 2503
+                    },
+                    "foot_id": 3,
+                    "length": 90,
+                    "start": {
+                        "x": 723,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 903,
+                        "y": 2503
+                    },
+                    "foot_id": 4,
+                    "length": 90,
+                    "start": {
+                        "x": 813,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 993,
+                        "y": 2503
+                    },
+                    "foot_id": 5,
+                    "length": 90,
+                    "start": {
+                        "x": 903,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1083,
+                        "y": 2503
+                    },
+                    "foot_id": 6,
+                    "length": 90,
+                    "start": {
+                        "x": 993,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1173,
+                        "y": 2503
+                    },
+                    "foot_id": 7,
+                    "length": 90,
+                    "start": {
+                        "x": 1083,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1263,
+                        "y": 2503
+                    },
+                    "foot_id": 8,
+                    "length": 90,
+                    "start": {
+                        "x": 1173,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1353,
+                        "y": 2503
+                    },
+                    "foot_id": 9,
+                    "length": 90,
+                    "start": {
+                        "x": 1263,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1443,
+                        "y": 2503
+                    },
+                    "foot_id": 10,
+                    "length": 90,
+                    "start": {
+                        "x": 1353,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1533,
+                        "y": 2503
+                    },
+                    "foot_id": 11,
+                    "length": 90,
+                    "start": {
+                        "x": 1443,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1623,
+                        "y": 2503
+                    },
+                    "foot_id": 12,
+                    "length": 90,
+                    "start": {
+                        "x": 1533,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1713,
+                        "y": 2503
+                    },
+                    "foot_id": 13,
+                    "length": 90,
+                    "start": {
+                        "x": 1623,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1803,
+                        "y": 2503
+                    },
+                    "foot_id": 14,
+                    "length": 90,
+                    "start": {
+                        "x": 1713,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1893,
+                        "y": 2503
+                    },
+                    "foot_id": 15,
+                    "length": 90,
+                    "start": {
+                        "x": 1803,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1983,
+                        "y": 2503
+                    },
+                    "foot_id": 16,
+                    "length": 90,
+                    "start": {
+                        "x": 1893,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2073,
+                        "y": 2503
+                    },
+                    "foot_id": 17,
+                    "length": 90,
+                    "start": {
+                        "x": 1983,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2163,
+                        "y": 2503
+                    },
+                    "foot_id": 18,
+                    "length": 90,
+                    "start": {
+                        "x": 2073,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2253,
+                        "y": 2503
+                    },
+                    "foot_id": 19,
+                    "length": 90,
+                    "start": {
+                        "x": 2163,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2343,
+                        "y": 2503
+                    },
+                    "foot_id": 20,
+                    "length": 90,
+                    "start": {
+                        "x": 2253,
+                        "y": 2503
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2410,
+                        "y": 2503
+                    },
+                    "foot_id": 21,
+                    "length": 67,
+                    "start": {
+                        "x": 2343,
+                        "y": 2503
+                    }
+                }
+            ],
+            "start": {
+                "x": 566,
+                "y": 2503
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 1916,
+                "y": 2023
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 1,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 1916,
+                        "y": 2023
+                    },
+                    "foot_id": 22,
+                    "length": 136,
+                    "start": {
+                        "x": 1780,
+                        "y": 2023
+                    }
+                }
+            ],
+            "start": {
+                "x": 1780,
+                "y": 2023
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 1826,
+                "y": 2083
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 2,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 1826,
+                        "y": 2083
+                    },
+                    "foot_id": 23,
+                    "length": 136,
+                    "start": {
+                        "x": 1690,
+                        "y": 2083
+                    }
+                }
+            ],
+            "start": {
+                "x": 1690,
+                "y": 2083
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 1736,
+                "y": 2143
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 3,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 1736,
+                        "y": 2143
+                    },
+                    "foot_id": 24,
+                    "length": 136,
+                    "start": {
+                        "x": 1600,
+                        "y": 2143
+                    }
+                }
+            ],
+            "start": {
+                "x": 1600,
+                "y": 2143
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 1826,
+                "y": 1963
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 4,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 1826,
+                        "y": 1963
+                    },
+                    "foot_id": 25,
+                    "length": 136,
+                    "start": {
+                        "x": 1690,
+                        "y": 1963
+                    }
+                }
+            ],
+            "start": {
+                "x": 1690,
+                "y": 1963
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 1736,
+                "y": 1903
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 5,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 1736,
+                        "y": 1903
+                    },
+                    "foot_id": 26,
+                    "length": 136,
+                    "start": {
+                        "x": 1600,
+                        "y": 1903
+                    }
+                }
+            ],
+            "start": {
+                "x": 1600,
+                "y": 1903
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 1646,
+                "y": 1843
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 6,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 1646,
+                        "y": 1843
+                    },
+                    "foot_id": 27,
+                    "length": 136,
+                    "start": {
+                        "x": 1510,
+                        "y": 1843
+                    }
+                }
+            ],
+            "start": {
+                "x": 1510,
+                "y": 1843
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 1556,
+                "y": 1783
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 7,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 1556,
+                        "y": 1783
+                    },
+                    "foot_id": 28,
+                    "length": 136,
+                    "start": {
+                        "x": 1420,
+                        "y": 1783
+                    }
+                }
+            ],
+            "start": {
+                "x": 1420,
+                "y": 1783
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 1466,
+                "y": 1723
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 8,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 1466,
+                        "y": 1723
+                    },
+                    "foot_id": 29,
+                    "length": 136,
+                    "start": {
+                        "x": 1330,
+                        "y": 1723
+                    }
+                }
+            ],
+            "start": {
+                "x": 1330,
+                "y": 1723
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 1376,
+                "y": 1663
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 9,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 1376,
+                        "y": 1663
+                    },
+                    "foot_id": 30,
+                    "length": 136,
+                    "start": {
+                        "x": 1240,
+                        "y": 1663
+                    }
+                }
+            ],
+            "start": {
+                "x": 1240,
+                "y": 1663
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 1286,
+                "y": 1603
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 10,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 1286,
+                        "y": 1603
+                    },
+                    "foot_id": 31,
+                    "length": 136,
+                    "start": {
+                        "x": 1150,
+                        "y": 1603
+                    }
+                }
+            ],
+            "start": {
+                "x": 1150,
+                "y": 1603
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 2500,
+                "y": 2443
+            },
+            "hasLeftWall": false,
+            "hasRightWall": true,
+            "id": 11,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 2500,
+                        "y": 2443
+                    },
+                    "foot_id": 32,
+                    "length": 90,
+                    "start": {
+                        "x": 2410,
+                        "y": 2443
+                    }
+                }
+            ],
+            "start": {
+                "x": 2410,
+                "y": 2443
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 2976,
+                "y": 2383
+            },
+            "hasLeftWall": false,
+            "hasRightWall": true,
+            "id": 12,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 2613,
+                        "y": 2383
+                    },
+                    "foot_id": 33,
+                    "length": 113,
+                    "start": {
+                        "x": 2500,
+                        "y": 2383
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2703,
+                        "y": 2383
+                    },
+                    "foot_id": 34,
+                    "length": 90,
+                    "start": {
+                        "x": 2613,
+                        "y": 2383
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2793,
+                        "y": 2383
+                    },
+                    "foot_id": 35,
+                    "length": 90,
+                    "start": {
+                        "x": 2703,
+                        "y": 2383
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2883,
+                        "y": 2383
+                    },
+                    "foot_id": 36,
+                    "length": 90,
+                    "start": {
+                        "x": 2793,
+                        "y": 2383
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2976,
+                        "y": 2383
+                    },
+                    "foot_id": 37,
+                    "length": 93,
+                    "start": {
+                        "x": 2883,
+                        "y": 2383
+                    }
+                }
+            ],
+            "start": {
+                "x": 2500,
+                "y": 2383
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 476,
+                "y": 2383
+            },
+            "hasLeftWall": true,
+            "hasRightWall": false,
+            "id": 13,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 93,
+                        "y": 2383
+                    },
+                    "foot_id": 38,
+                    "length": 93,
+                    "start": {
+                        "x": 0,
+                        "y": 2383
+                    }
+                },
+                {
+                    "end": {
+                        "x": 183,
+                        "y": 2383
+                    },
+                    "foot_id": 39,
+                    "length": 90,
+                    "start": {
+                        "x": 93,
+                        "y": 2383
+                    }
+                },
+                {
+                    "end": {
+                        "x": 273,
+                        "y": 2383
+                    },
+                    "foot_id": 40,
+                    "length": 90,
+                    "start": {
+                        "x": 183,
+                        "y": 2383
+                    }
+                },
+                {
+                    "end": {
+                        "x": 363,
+                        "y": 2383
+                    },
+                    "foot_id": 41,
+                    "length": 90,
+                    "start": {
+                        "x": 273,
+                        "y": 2383
+                    }
+                },
+                {
+                    "end": {
+                        "x": 476,
+                        "y": 2383
+                    },
+                    "foot_id": 42,
+                    "length": 113,
+                    "start": {
+                        "x": 363,
+                        "y": 2383
+                    }
+                }
+            ],
+            "start": {
+                "x": 0,
+                "y": 2383
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 566,
+                "y": 2443
+            },
+            "hasLeftWall": true,
+            "hasRightWall": false,
+            "id": 14,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 566,
+                        "y": 2443
+                    },
+                    "foot_id": 43,
+                    "length": 90,
+                    "start": {
+                        "x": 476,
+                        "y": 2443
+                    }
+                }
+            ],
+            "start": {
+                "x": 476,
+                "y": 2443
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 2546,
+                "y": 1963
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 15,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 2546,
+                        "y": 1963
+                    },
+                    "foot_id": 44,
+                    "length": 136,
+                    "start": {
+                        "x": 2410,
+                        "y": 1963
+                    }
+                }
+            ],
+            "start": {
+                "x": 2410,
+                "y": 1963
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 2636,
+                "y": 2023
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 16,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 2636,
+                        "y": 2023
+                    },
+                    "foot_id": 45,
+                    "length": 136,
+                    "start": {
+                        "x": 2500,
+                        "y": 2023
+                    }
+                }
+            ],
+            "start": {
+                "x": 2500,
+                "y": 2023
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 2726,
+                "y": 2083
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 17,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 2726,
+                        "y": 2083
+                    },
+                    "foot_id": 46,
+                    "length": 136,
+                    "start": {
+                        "x": 2590,
+                        "y": 2083
+                    }
+                }
+            ],
+            "start": {
+                "x": 2590,
+                "y": 2083
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 2816,
+                "y": 2143
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 18,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 2816,
+                        "y": 2143
+                    },
+                    "foot_id": 47,
+                    "length": 136,
+                    "start": {
+                        "x": 2680,
+                        "y": 2143
+                    }
+                }
+            ],
+            "start": {
+                "x": 2680,
+                "y": 2143
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 2976,
+                "y": 2724
+            },
+            "hasLeftWall": true,
+            "hasRightWall": true,
+            "id": 19,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 2976,
+                        "y": 2724
+                    },
+                    "foot_id": 77,
+                    "length": 0,
+                    "start": {
+                        "x": 2976,
+                        "y": 2724
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2976,
+                        "y": 2724
+                    },
+                    "foot_id": 76,
+                    "length": 0,
+                    "start": {
+                        "x": 2976,
+                        "y": 2724
+                    }
+                }
+            ],
+            "start": {
+                "x": 2976,
+                "y": 2724
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 0,
+                "y": 2724
+            },
+            "hasLeftWall": true,
+            "hasRightWall": true,
+            "id": 20,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 0,
+                        "y": 2724
+                    },
+                    "foot_id": 85,
+                    "length": 0,
+                    "start": {
+                        "x": 0,
+                        "y": 2724
+                    }
+                },
+                {
+                    "end": {
+                        "x": 0,
+                        "y": 2724
+                    },
+                    "foot_id": 84,
+                    "length": 0,
+                    "start": {
+                        "x": 0,
+                        "y": 2724
+                    }
+                }
+            ],
+            "start": {
+                "x": 0,
+                "y": 2724
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 1327,
+                "y": 1986
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 21,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 108,
+                        "y": 1984
+                    },
+                    "foot_id": 96,
+                    "length": 48,
+                    "start": {
+                        "x": 73,
+                        "y": 2017
+                    }
+                },
+                {
+                    "end": {
+                        "x": 219,
+                        "y": 1978
+                    },
+                    "foot_id": 97,
+                    "length": 113,
+                    "start": {
+                        "x": 108,
+                        "y": 1984
+                    }
+                },
+                {
+                    "end": {
+                        "x": 246,
+                        "y": 1969
+                    },
+                    "foot_id": 98,
+                    "length": 113,
+                    "start": {
+                        "x": 219,
+                        "y": 1978
+                    }
+                },
+                {
+                    "end": {
+                        "x": 309,
+                        "y": 1967
+                    },
+                    "foot_id": 99,
+                    "length": 113,
+                    "start": {
+                        "x": 246,
+                        "y": 1969
+                    }
+                },
+                {
+                    "end": {
+                        "x": 491,
+                        "y": 1963
+                    },
+                    "foot_id": 100,
+                    "length": 113,
+                    "start": {
+                        "x": 309,
+                        "y": 1967
+                    }
+                },
+                {
+                    "end": {
+                        "x": 513,
+                        "y": 1956
+                    },
+                    "foot_id": 101,
+                    "length": 113,
+                    "start": {
+                        "x": 491,
+                        "y": 1963
+                    }
+                },
+                {
+                    "end": {
+                        "x": 601,
+                        "y": 1954
+                    },
+                    "foot_id": 102,
+                    "length": 113,
+                    "start": {
+                        "x": 513,
+                        "y": 1956
+                    }
+                },
+                {
+                    "end": {
+                        "x": 618,
+                        "y": 1951
+                    },
+                    "foot_id": 103,
+                    "length": 113,
+                    "start": {
+                        "x": 601,
+                        "y": 1954
+                    }
+                },
+                {
+                    "end": {
+                        "x": 692,
+                        "y": 1950
+                    },
+                    "foot_id": 104,
+                    "length": 113,
+                    "start": {
+                        "x": 618,
+                        "y": 1951
+                    }
+                },
+                {
+                    "end": {
+                        "x": 774,
+                        "y": 1950
+                    },
+                    "foot_id": 105,
+                    "length": 82,
+                    "start": {
+                        "x": 692,
+                        "y": 1950
+                    }
+                },
+                {
+                    "end": {
+                        "x": 848,
+                        "y": 1953
+                    },
+                    "foot_id": 106,
+                    "length": 82,
+                    "start": {
+                        "x": 774,
+                        "y": 1950
+                    }
+                },
+                {
+                    "end": {
+                        "x": 896,
+                        "y": 1957
+                    },
+                    "foot_id": 107,
+                    "length": 82,
+                    "start": {
+                        "x": 848,
+                        "y": 1953
+                    }
+                },
+                {
+                    "end": {
+                        "x": 987,
+                        "y": 1963
+                    },
+                    "foot_id": 108,
+                    "length": 82,
+                    "start": {
+                        "x": 896,
+                        "y": 1957
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1099,
+                        "y": 1960
+                    },
+                    "foot_id": 109,
+                    "length": 82,
+                    "start": {
+                        "x": 987,
+                        "y": 1963
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1218,
+                        "y": 1962
+                    },
+                    "foot_id": 110,
+                    "length": 82,
+                    "start": {
+                        "x": 1099,
+                        "y": 1960
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1272,
+                        "y": 1965
+                    },
+                    "foot_id": 111,
+                    "length": 82,
+                    "start": {
+                        "x": 1218,
+                        "y": 1962
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1327,
+                        "y": 1986
+                    },
+                    "foot_id": 112,
+                    "length": 82,
+                    "start": {
+                        "x": 1272,
+                        "y": 1965
+                    }
+                }
+            ],
+            "start": {
+                "x": 73,
+                "y": 2017
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 2442,
+                "y": 1933
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 22,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 2202,
+                        "y": 1928
+                    },
+                    "foot_id": 113,
+                    "length": 48,
+                    "start": {
+                        "x": 2167,
+                        "y": 1962
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2299,
+                        "y": 1926
+                    },
+                    "foot_id": 114,
+                    "length": 82,
+                    "start": {
+                        "x": 2202,
+                        "y": 1928
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2365,
+                        "y": 1917
+                    },
+                    "foot_id": 115,
+                    "length": 82,
+                    "start": {
+                        "x": 2299,
+                        "y": 1926
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2429,
+                        "y": 1917
+                    },
+                    "foot_id": 116,
+                    "length": 64,
+                    "start": {
+                        "x": 2365,
+                        "y": 1917
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2442,
+                        "y": 1933
+                    },
+                    "foot_id": 117,
+                    "length": 64,
+                    "start": {
+                        "x": 2429,
+                        "y": 1917
+                    }
+                }
+            ],
+            "start": {
+                "x": 2167,
+                "y": 1962
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 2233,
+                "y": 1997
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 23,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 1907,
+                        "y": 1980
+                    },
+                    "foot_id": 118,
+                    "length": 11,
+                    "start": {
+                        "x": 1896,
+                        "y": 1984
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1972,
+                        "y": 1981
+                    },
+                    "foot_id": 119,
+                    "length": 64,
+                    "start": {
+                        "x": 1907,
+                        "y": 1980
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1987,
+                        "y": 1985
+                    },
+                    "foot_id": 120,
+                    "length": 64,
+                    "start": {
+                        "x": 1972,
+                        "y": 1981
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2143,
+                        "y": 1990
+                    },
+                    "foot_id": 121,
+                    "length": 64,
+                    "start": {
+                        "x": 1987,
+                        "y": 1985
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2233,
+                        "y": 1997
+                    },
+                    "foot_id": 122,
+                    "length": 64,
+                    "start": {
+                        "x": 2143,
+                        "y": 1990
+                    }
+                }
+            ],
+            "start": {
+                "x": 1896,
+                "y": 1984
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 2379,
+                "y": 1468
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 24,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 1921,
+                        "y": 1451
+                    },
+                    "foot_id": 123,
+                    "length": 25,
+                    "start": {
+                        "x": 1896,
+                        "y": 1455
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1944,
+                        "y": 1451
+                    },
+                    "foot_id": 124,
+                    "length": 23,
+                    "start": {
+                        "x": 1921,
+                        "y": 1451
+                    }
+                },
+                {
+                    "end": {
+                        "x": 1956,
+                        "y": 1438
+                    },
+                    "foot_id": 125,
+                    "length": 23,
+                    "start": {
+                        "x": 1944,
+                        "y": 1451
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2078,
+                        "y": 1444
+                    },
+                    "foot_id": 126,
+                    "length": 23,
+                    "start": {
+                        "x": 1956,
+                        "y": 1438
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2090,
+                        "y": 1447
+                    },
+                    "foot_id": 127,
+                    "length": 23,
+                    "start": {
+                        "x": 2078,
+                        "y": 1444
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2150,
+                        "y": 1447
+                    },
+                    "foot_id": 128,
+                    "length": 60,
+                    "start": {
+                        "x": 2090,
+                        "y": 1447
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2242,
+                        "y": 1447
+                    },
+                    "foot_id": 129,
+                    "length": 92,
+                    "start": {
+                        "x": 2150,
+                        "y": 1447
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2379,
+                        "y": 1468
+                    },
+                    "foot_id": 130,
+                    "length": 92,
+                    "start": {
+                        "x": 2242,
+                        "y": 1447
+                    }
+                }
+            ],
+            "start": {
+                "x": 1896,
+                "y": 1455
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 2462,
+                "y": 1492
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 25,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 2401,
+                        "y": 1486
+                    },
+                    "foot_id": 131,
+                    "length": 54,
+                    "start": {
+                        "x": 2347,
+                        "y": 1485
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2452,
+                        "y": 1484
+                    },
+                    "foot_id": 132,
+                    "length": 92,
+                    "start": {
+                        "x": 2401,
+                        "y": 1486
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2462,
+                        "y": 1492
+                    },
+                    "foot_id": 133,
+                    "length": 92,
+                    "start": {
+                        "x": 2452,
+                        "y": 1484
+                    }
+                }
+            ],
+            "start": {
+                "x": 2347,
+                "y": 1485
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 2392,
+                "y": 1519
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 26,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 2328,
+                        "y": 1510
+                    },
+                    "foot_id": 134,
+                    "length": 21,
+                    "start": {
+                        "x": 2307,
+                        "y": 1513
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2384,
+                        "y": 1512
+                    },
+                    "foot_id": 135,
+                    "length": 92,
+                    "start": {
+                        "x": 2328,
+                        "y": 1510
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2392,
+                        "y": 1519
+                    },
+                    "foot_id": 136,
+                    "length": 92,
+                    "start": {
+                        "x": 2384,
+                        "y": 1512
+                    }
+                }
+            ],
+            "start": {
+                "x": 2307,
+                "y": 1513
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 2384,
+                "y": 1547
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 27,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 2384,
+                        "y": 1547
+                    },
+                    "foot_id": 137,
+                    "length": 126,
+                    "start": {
+                        "x": 2258,
+                        "y": 1546
+                    }
+                }
+            ],
+            "start": {
+                "x": 2258,
+                "y": 1546
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 2357,
+                "y": 1583
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 28,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 2322,
+                        "y": 1586
+                    },
+                    "foot_id": 138,
+                    "length": 105,
+                    "start": {
+                        "x": 2217,
+                        "y": 1582
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2357,
+                        "y": 1583
+                    },
+                    "foot_id": 139,
+                    "length": 92,
+                    "start": {
+                        "x": 2322,
+                        "y": 1586
+                    }
+                }
+            ],
+            "start": {
+                "x": 2217,
+                "y": 1582
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 2192,
+                "y": 1647
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 29,
+            "line_child": [
+                {
+                    "end": {
+                        "x": 2027,
+                        "y": 1633
+                    },
+                    "foot_id": 140,
+                    "length": 62,
+                    "start": {
+                        "x": 1965,
+                        "y": 1626
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2045,
+                        "y": 1641
+                    },
+                    "foot_id": 141,
+                    "length": 92,
+                    "start": {
+                        "x": 2027,
+                        "y": 1633
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2118,
+                        "y": 1641
+                    },
+                    "foot_id": 142,
+                    "length": 73,
+                    "start": {
+                        "x": 2045,
+                        "y": 1641
+                    }
+                },
+                {
+                    "end": {
+                        "x": 2192,
+                        "y": 1647
+                    },
+                    "foot_id": 143,
+                    "length": 73,
+                    "start": {
+                        "x": 2118,
+                        "y": 1641
+                    }
+                }
+            ],
+            "start": {
+                "x": 1965,
+                "y": 1626
+            },
+            "type": 0
+        },
+        {
+            "end": {
+                "x": 2159,
+                "y": 1935
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 30,
+            "line_child": [
+            ],
+            "start": {
+                "x": 2109,
+                "y": 1639
+            },
+            "type": 1
+        },
+        {
+            "end": {
+                "x": 2803,
+                "y": 2316
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 31,
+            "line_child": [
+            ],
+            "start": {
+                "x": 2753,
+                "y": 2141
+            },
+            "type": 1
+        },
+        {
+            "end": {
+                "x": 1692,
+                "y": 2436
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 32,
+            "line_child": [
+            ],
+            "start": {
+                "x": 1642,
+                "y": 2142
+            },
+            "type": 1
+        },
+        {
+            "end": {
+                "x": 1227,
+                "y": 1897
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 33,
+            "line_child": [
+            ],
+            "start": {
+                "x": 1177,
+                "y": 1603
+            },
+            "type": 1
+        },
+        {
+            "end": {
+                "x": 361,
+                "y": 2320
+            },
+            "hasLeftWall": false,
+            "hasRightWall": false,
+            "id": 34,
+            "line_child": [
+            ],
+            "start": {
+                "x": 311,
+                "y": 1965
+            },
+            "type": 1
+        }
+    ],
+    "wall_list": [
+        {
+            "bottom": 2038,
+            "foot_id": 48,
+            "top": 2023,
+            "x": 1916
+        },
+        {
+            "bottom": 2038,
+            "foot_id": 49,
+            "top": 2023,
+            "x": 1780
+        },
+        {
+            "bottom": 2098,
+            "foot_id": 50,
+            "top": 2083,
+            "x": 1826
+        },
+        {
+            "bottom": 2098,
+            "foot_id": 51,
+            "top": 2083,
+            "x": 1690
+        },
+        {
+            "bottom": 2158,
+            "foot_id": 52,
+            "top": 2143,
+            "x": 1600
+        },
+        {
+            "bottom": 2158,
+            "foot_id": 53,
+            "top": 2143,
+            "x": 1736
+        },
+        {
+            "bottom": 1978,
+            "foot_id": 54,
+            "top": 1963,
+            "x": 1690
+        },
+        {
+            "bottom": 1978,
+            "foot_id": 55,
+            "top": 1963,
+            "x": 1826
+        },
+        {
+            "bottom": 1918,
+            "foot_id": 56,
+            "top": 1903,
+            "x": 1600
+        },
+        {
+            "bottom": 1918,
+            "foot_id": 57,
+            "top": 1903,
+            "x": 1736
+        },
+        {
+            "bottom": 1858,
+            "foot_id": 58,
+            "top": 1843,
+            "x": 1510
+        },
+        {
+            "bottom": 1858,
+            "foot_id": 59,
+            "top": 1843,
+            "x": 1646
+        },
+        {
+            "bottom": 1798,
+            "foot_id": 60,
+            "top": 1783,
+            "x": 1420
+        },
+        {
+            "bottom": 1798,
+            "foot_id": 61,
+            "top": 1783,
+            "x": 1556
+        },
+        {
+            "bottom": 1738,
+            "foot_id": 62,
+            "top": 1723,
+            "x": 1330
+        },
+        {
+            "bottom": 1738,
+            "foot_id": 63,
+            "top": 1723,
+            "x": 1466
+        },
+        {
+            "bottom": 1678,
+            "foot_id": 64,
+            "top": 1663,
+            "x": 1376
+        },
+        {
+            "bottom": 1678,
+            "foot_id": 65,
+            "top": 1663,
+            "x": 1240
+        },
+        {
+            "bottom": 1618,
+            "foot_id": 66,
+            "top": 1603,
+            "x": 1150
+        },
+        {
+            "bottom": 1618,
+            "foot_id": 67,
+            "top": 1603,
+            "x": 1286
+        },
+        {
+            "bottom": 2503,
+            "foot_id": 68,
+            "top": 2443,
+            "x": 2410
+        },
+        {
+            "bottom": 2443,
+            "foot_id": 69,
+            "top": 2383,
+            "x": 2500
+        },
+        {
+            "bottom": 2458,
+            "foot_id": 70,
+            "top": 2383,
+            "x": 2976
+        },
+        {
+            "bottom": 2518,
+            "foot_id": 71,
+            "top": 2458,
+            "x": 2976
+        },
+        {
+            "bottom": 2578,
+            "foot_id": 72,
+            "top": 2518,
+            "x": 2976
+        },
+        {
+            "bottom": 2638,
+            "foot_id": 73,
+            "top": 2578,
+            "x": 2976
+        },
+        {
+            "bottom": 2698,
+            "foot_id": 74,
+            "top": 2638,
+            "x": 2976
+        },
+        {
+            "bottom": 2724,
+            "foot_id": 75,
+            "top": 2698,
+            "x": 2976
+        },
+        {
+            "bottom": 2458,
+            "foot_id": 78,
+            "top": 2383,
+            "x": 0
+        },
+        {
+            "bottom": 2518,
+            "foot_id": 79,
+            "top": 2458,
+            "x": 0
+        },
+        {
+            "bottom": 2578,
+            "foot_id": 80,
+            "top": 2518,
+            "x": 0
+        },
+        {
+            "bottom": 2638,
+            "foot_id": 81,
+            "top": 2578,
+            "x": 0
+        },
+        {
+            "bottom": 2698,
+            "foot_id": 82,
+            "top": 2638,
+            "x": 0
+        },
+        {
+            "bottom": 2724,
+            "foot_id": 83,
+            "top": 2698,
+            "x": 0
+        },
+        {
+            "bottom": 2443,
+            "foot_id": 86,
+            "top": 2383,
+            "x": 476
+        },
+        {
+            "bottom": 2503,
+            "foot_id": 87,
+            "top": 2443,
+            "x": 566
+        },
+        {
+            "bottom": 1978,
+            "foot_id": 88,
+            "top": 1963,
+            "x": 2546
+        },
+        {
+            "bottom": 1978,
+            "foot_id": 89,
+            "top": 1963,
+            "x": 2410
+        },
+        {
+            "bottom": 2038,
+            "foot_id": 90,
+            "top": 2023,
+            "x": 2500
+        },
+        {
+            "bottom": 2038,
+            "foot_id": 91,
+            "top": 2023,
+            "x": 2636
+        },
+        {
+            "bottom": 2098,
+            "foot_id": 92,
+            "top": 2083,
+            "x": 2590
+        },
+        {
+            "bottom": 2098,
+            "foot_id": 93,
+            "top": 2083,
+            "x": 2726
+        },
+        {
+            "bottom": 2158,
+            "foot_id": 94,
+            "top": 2143,
+            "x": 2680
+        },
+        {
+            "bottom": 2158,
+            "foot_id": 95,
+            "top": 2143,
+            "x": 2816
+        }
+    ]
+}

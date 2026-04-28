@@ -191,6 +191,22 @@ void MainWindow::initCompomentUI()
     ui->comboBox_potion_hp_buy_type->blockSignals(false);
     ui->comboBox_potion_mp_buy_type->blockSignals(false);
 
+    // 禁用的组件
+    ui->checkBox_atk_switch_skill2->setDisabled(true);
+    ui->checkBox_atk_switch_partybuff1->setDisabled(true);
+    ui->lineEdit_atk_range_skill2_x->setDisabled(true);
+    ui->lineEdit_atk_range_skill2_y->setDisabled(true);
+    ui->lineEdit_atk_range_partybuff1_x->setDisabled(true);
+    ui->lineEdit_atk_range_partybuff1_y->setDisabled(true);
+    ui->lineEdit_atk_range_partybuff2_x->setDisabled(true);
+    ui->lineEdit_atk_range_partybuff2_y->setDisabled(true);
+    ui->lineEdit_atk_range_partybuff3_x->setDisabled(true);
+    ui->lineEdit_atk_range_partybuff3_y->setDisabled(true);
+    ui->lineEdit_bindkey_skill_atk2->setDisabled(true);
+    ui->lineEdit_bindkey_partybuff1->setDisabled(true);
+    ui->lineEdit_recast_skill2->setDisabled(true);
+    ui->lineEdit_recast_partybuff1->setDisabled(true);
+
     // 重新设置样式表
     qApp->setStyleSheet(qApp->styleSheet());
 }
