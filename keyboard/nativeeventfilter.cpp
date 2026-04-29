@@ -32,6 +32,10 @@ bool NativeEventFilter::nativeEventFilter(const QByteArray& eventType, void* mes
                 qDebug() << "自动模式已关闭~";
                 Helper::console("自动模式已关闭~");
 
+                // 清理状态
+                Gplayer.need_hp_potion = false;
+                Gplayer.need_mp_potion = false;
+
                 emit sendControleStatus(false);
 
                 // 关闭警报

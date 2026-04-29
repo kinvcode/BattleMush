@@ -44,6 +44,8 @@ void HealthMonitor::pause()
 {
     qDebug() << "HealthMonitor" << m_id << "paused";
     m_paused = true;
+    Gplayer.need_hp_potion = false;
+    Gplayer.need_mp_potion = false;
 }
 
 void HealthMonitor::resume()
