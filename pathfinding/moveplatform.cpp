@@ -278,6 +278,9 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
     int jump_key = Gplayer.m_bindkey.jump;
 
     WalkBase walk_to_platform(0);
+    if(!is_climb && range.y - range.x > 15){
+        range.y = range.x + 15;
+    }
     bool arrived = walk_to_platform.moveToPlatform(range, self_climb); // 走到范围
     if(!arrived) {
         qDebug() << "到达区域失败，取消向左跳跃";
@@ -318,7 +321,6 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
         // 到达地点之后进行跳跃操作
         MSDriverPRO::keyboardDown(MSKeyboard_LeftArrow);
         MSDriverPRO::keyboardClick(jump_key);
-        MSDriverPRO::keyboardUp(MSKeyboard_LeftArrow);
 
         quint64 foothold_p = getUserFootholdP();
         while(foothold_p == 0){
@@ -326,6 +328,7 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
             QApplication::processEvents();
             foothold_p = getUserFootholdP();
         }
+        MSDriverPRO::keyboardUp(MSKeyboard_LeftArrow);
 
         if(platform == getUserPlatform()){
             qDebug() << "向左跳跃已到达指定平台";
@@ -344,6 +347,9 @@ bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool 
 
     WalkBase walk_to_platform(0);
     // qDebug() << "移动到范围:" << range.x << "," << range.y;
+    if(!is_climb && range.y - range.x > 15){
+        range.x = range.y - 15;
+    }
     bool arrived = walk_to_platform.moveToPlatform(range, self_climb); // 走到范围
     if(!arrived) return false;
 
@@ -379,8 +385,6 @@ bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool 
         // 到达地点之后进行跳跃操作
         MSDriverPRO::keyboardDown(MSKeyboard_RightArrow);
         MSDriverPRO::keyboardClick(jump_key);
-        MSDriverPRO::keyboardUp(MSKeyboard_RightArrow);
-
 
         quint64 foothold_p = getUserFootholdP();
         while(foothold_p == 0){
@@ -388,6 +392,7 @@ bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool 
             QApplication::processEvents();
             foothold_p = getUserFootholdP();
         }
+        MSDriverPRO::keyboardUp(MSKeyboard_RightArrow);
 
         if(platform == getUserPlatform()){
             qDebug() << "向右跳跃已到达指定平台";
