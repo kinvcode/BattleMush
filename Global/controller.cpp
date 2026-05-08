@@ -330,6 +330,31 @@ void Controller::initTaskList()
 
     map0007.rests.push_back(map0007_rest00);
 
+    /* ============【 遺 跡 發 掘 地 3 】============= */
+    MapRoomPath map0008;
+    map0008.id = 8;
+    map0008.name = "遺跡發掘地3";
+    map0008.uuid = "258b9b4d-dd3f-4147-8aae-b31272c57e91";
+
+    RoomRest map0008_rest00;
+    map0008_rest00.id = 0;
+    map0008_rest00.name = "【休息点A】地图顶部平台";
+    map0008_rest00.platform = 19;
+
+    RoomPath map0008_path00;
+    map0008_path00.id = 0;
+    map0008_path00.name = "自动规划路线";
+
+    RoomPath map0008_path01;
+    map0008_path01.id = 1;
+    map0008_path01.name = "【路线A】刷全图";
+    map0008_path01.platforms = {0,4,8,11,13,6,5};
+
+    map0008.paths.push_back(map0008_path00);
+    map0008.paths.push_back(map0008_path01);
+
+    map0008.rests.push_back(map0008_rest00);
+
     /* ============【 加 入 刷 图 列 表】============= */
     m_clean_room_list.push_back(map0000);
     m_clean_room_list.push_back(map0001);
@@ -339,6 +364,7 @@ void Controller::initTaskList()
     m_clean_room_list.push_back(map0005);
     m_clean_room_list.push_back(map0006);
     m_clean_room_list.push_back(map0007);
+    m_clean_room_list.push_back(map0008);
 
 
     /* ============【 加 入 休 息 列 表】============= */
@@ -350,6 +376,7 @@ void Controller::initTaskList()
     m_rest_point_list.push_back(map0005);
     m_rest_point_list.push_back(map0006);
     m_rest_point_list.push_back(map0007);
+    m_rest_point_list.push_back(map0008);
 
 
     // 初始化NPC任务列表

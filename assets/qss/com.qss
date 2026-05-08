@@ -81,6 +81,10 @@ QSpinBox:focus {
   background-color: #F0F7FF;
 }
 
+QLineEdit:disabled {
+    background-color: #f0f0f0;
+}
+
 QPlainTextEdit,
 QTextEdit {
   font-size: 16px;
@@ -348,6 +352,10 @@ QCheckBox::indicator:checked {
   background: #0078D4;
   border-radius: 4px;
   image: url(:assets/images/widgets/checkbox_checked.svg);
+}
+
+QCheckBox::indicator:disabled {
+    background-color: #f0f0f0;
 }
 
 QRadioButton::indicator:unchecked {

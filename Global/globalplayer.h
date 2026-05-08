@@ -76,6 +76,9 @@ public:
     // 角色蓝量
     quint64 p_user_mp = 0;
 
+    // 角色是否死亡
+    bool DIED = false;
+
     // 属性
     int HP = 0;
     int MAX_HP = 0;

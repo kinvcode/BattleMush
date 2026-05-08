@@ -54,6 +54,8 @@ public:
     // 更新窗口
     static void updateGameWindow();
 
+    // 调整窗口大小
+
 signals:
     void sendWarning(QString msg);
 };

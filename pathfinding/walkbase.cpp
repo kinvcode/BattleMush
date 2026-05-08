@@ -330,6 +330,8 @@ bool WalkBase::moveToItem()
         int cur_time = begin_timer.elapsed();
         if (cur_time > m_walk_timeout) {
             DebugOutput::out("拾取物品寻路超时~");
+            user_x = getUserX();
+            qDebug() << "目标X：" << m_target_x << " 人物X：" << user_x << " 误差大小:" << m_deviation;
             clearXkey();
             return false;
         }
@@ -356,13 +358,21 @@ bool WalkBase::moveToItem()
         user_x = getUserX();
 
         if(is_left){
-            if(m_target_x - user_x >= m_deviation){
+            if(user_x - m_target_x < m_deviation){
                 arrived = true;
+                continue;
             }
+            // if(m_target_x - user_x >= 0){
+            //     arrived = true;
+            // }
         }else{
-            if(user_x - m_target_x >= m_deviation){
+            if(m_target_x - user_x < m_deviation){
                 arrived = true;
+                continue;
             }
+            // if(user_x - m_target_x >= m_deviation){
+            //     arrived = true;
+            // }
         }
         // if (abs(m_target_x - user_x) <= m_deviation) {
         //     arrived = true;
@@ -472,6 +482,17 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
                 clearXkey();
             }
             return false;
+        }
+
+        if(self_climb){
+            quint64 climb_p = readLong(readLong(Gplayer.p_localplayer
+                + BASE::MODEntity::RigidbodyComponent)
+                + BASE::RigidbodyComponent::attachEntity);
+            if(climb_p == 0){
+                clearYkey();
+                qDebug() << "已经脱离攀爬物体~";
+                return true;
+            }
         }
 
         // 每0.1秒检测一次怪物和物品

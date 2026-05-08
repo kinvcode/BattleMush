@@ -57,6 +57,11 @@ private:
     int m_recast_buff3_time;
     int m_recast_buff4_time;
     int m_recast_buff5_time;
+    int m_recast_buff1_max_time;
+    int m_recast_buff2_max_time;
+    int m_recast_buff3_max_time;
+    int m_recast_buff4_max_time;
+    int m_recast_buff5_max_time;
     int m_recast_buff1_lasttime = 0;
     int m_recast_buff2_lasttime = 0;
     int m_recast_buff3_lasttime = 0;
@@ -166,6 +171,8 @@ private:
     // 药水商店购买
     void potionShopBuyItem(QString npc);
 
+    // 死亡返回城镇
+    void handleDied();
 private:
     // 刷图计划
     void taskCleanRoom();

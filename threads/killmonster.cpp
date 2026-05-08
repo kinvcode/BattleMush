@@ -85,6 +85,11 @@ void KillMonster::resume()
     m_recast_buff3_time = Gconfig.getValue("atk_recast/buff3").toInt();
     m_recast_buff4_time = Gconfig.getValue("atk_recast/buff4").toInt();
     m_recast_buff5_time = Gconfig.getValue("atk_recast/buff5").toInt();
+    m_recast_buff1_max_time = Gconfig.getValue("atk_recast/buff1_max").toInt();
+    m_recast_buff2_max_time = Gconfig.getValue("atk_recast/buff2_max").toInt();
+    m_recast_buff3_max_time = Gconfig.getValue("atk_recast/buff3_max").toInt();
+    m_recast_buff4_max_time = Gconfig.getValue("atk_recast/buff4_max").toInt();
+    m_recast_buff5_max_time = Gconfig.getValue("atk_recast/buff5_max").toInt();
 
 
     m_paused = false;
@@ -121,6 +126,11 @@ void KillMonster::process()
     m_recast_buff3_time = Gconfig.getValue("atk_recast/buff3").toInt();
     m_recast_buff4_time = Gconfig.getValue("atk_recast/buff4").toInt();
     m_recast_buff5_time = Gconfig.getValue("atk_recast/buff5").toInt();
+    m_recast_buff1_max_time = Gconfig.getValue("atk_recast/buff1_max").toInt();
+    m_recast_buff2_max_time = Gconfig.getValue("atk_recast/buff2_max").toInt();
+    m_recast_buff3_max_time = Gconfig.getValue("atk_recast/buff3_max").toInt();
+    m_recast_buff4_max_time = Gconfig.getValue("atk_recast/buff4_max").toInt();
+    m_recast_buff5_max_time = Gconfig.getValue("atk_recast/buff5_max").toInt();
 
     // 初始化任务
     m_task_id = 0;
@@ -180,6 +190,11 @@ void KillMonster::process()
 
         // 检查键盘
         if ((GetKeyState(VK_NUMLOCK) & 1)) MSDriverPRO::keyboardClick(0x45);
+
+        if(Gplayer.DIED){
+            // 处理死亡
+            handleDied();
+        }
 
         // 获取当前的任务
         if(Gcontroller.m_tasks.empty())
@@ -482,7 +497,7 @@ void KillMonster::reciveItem(const Item &target_item)
     // qDebug() << "人物坐标：" << user_pos.x << "," << user_pos.y;
 
 
-    // qDebug() << "目标物品：" << target_item.line_id << "->" << QString::number(target_item.entity,16).toUpper() << ":" << target_item.pos.x << "," << target_item.pos.y;
+    qDebug() << "目标物品：" << target_item.line_id << "->" << QString::number(target_item.entity,16).toUpper() << ":" << target_item.pos.x << "," << target_item.pos.y;
     // qDebug() << "UUID:" << GameStruct::readEntityID(target_item.entity);
     // qDebug() << "开始寻路拾取~";
 
@@ -504,8 +519,13 @@ void KillMonster::skillRecast()
     // qDebug() << "释放频率" << m_recast_buff1_time;
     // qDebug() << "释放技能已过去" << (now_time - m_recast_buff1_lasttime);
 
+    int compare_time = 999999;
     if(m_recast_buff1_enable){
-        if((now_time - m_recast_buff1_lasttime) > m_recast_buff1_time || m_recast_buff1_lasttime == 0){
+        now_time = m_timer.elapsed() / 1000;
+        if (m_recast_buff1_time > 0 && m_recast_buff1_max_time > m_recast_buff1_time) {
+            compare_time = QRandomGenerator::global()->bounded(m_recast_buff1_time, m_recast_buff1_max_time + 1);
+        }
+        if((now_time - m_recast_buff1_lasttime) > compare_time || m_recast_buff1_lasttime == 0){
 
             DebugOutput::out("BUFF1已到释放时间，自动释放BUFF1");
             Helper::console("BUFF1已到释放时间，自动释放BUFF1");
@@ -519,12 +539,17 @@ void KillMonster::skillRecast()
             Helper::console("BUFF1已按");
 
             m_recast_buff1_lasttime = m_timer.elapsed() / 1000;
-            // ProcessHelper::programDelay(1000);
+            ProcessHelper::programDelay(1000);
+            QApplication::processEvents();
         }
     }
 
     if(m_recast_buff2_enable){
-        if((now_time - m_recast_buff2_lasttime) > m_recast_buff2_time || m_recast_buff2_lasttime == 0){
+        now_time = m_timer.elapsed() / 1000;
+        if (m_recast_buff2_time > 0 && m_recast_buff2_max_time > m_recast_buff2_time) {
+            compare_time = QRandomGenerator::global()->bounded(m_recast_buff2_time, m_recast_buff2_max_time + 1);
+        }
+        if((now_time - m_recast_buff2_lasttime) > compare_time || m_recast_buff2_lasttime == 0){
 
             DebugOutput::out("BUFF2已到释放时间，自动释放BUFF2");
             Helper::console("BUFF2已到释放时间，自动释放BUFF2");
@@ -538,11 +563,17 @@ void KillMonster::skillRecast()
             Helper::console("BUFF1已按");
 
             m_recast_buff2_lasttime = m_timer.elapsed() / 1000;
+            ProcessHelper::programDelay(1000);
+            QApplication::processEvents();
         }
     }
 
     if(m_recast_buff3_enable){
-        if((now_time - m_recast_buff3_lasttime) > m_recast_buff3_time || m_recast_buff3_lasttime == 0){
+        now_time = m_timer.elapsed() / 1000;
+        if (m_recast_buff3_time > 0 && m_recast_buff3_max_time > m_recast_buff3_time) {
+            compare_time = QRandomGenerator::global()->bounded(m_recast_buff3_time, m_recast_buff3_max_time + 1);
+        }
+        if((now_time - m_recast_buff3_lasttime) > compare_time || m_recast_buff3_lasttime == 0){
 
             DebugOutput::out("BUFF3已到释放时间，自动释放BUFF3");
             Helper::console("BUFF3已到释放时间，自动释放BUFF3");
@@ -556,11 +587,17 @@ void KillMonster::skillRecast()
             Helper::console("BUFF1已按");
 
             m_recast_buff3_lasttime = m_timer.elapsed() / 1000;
+            ProcessHelper::programDelay(1000);
+            QApplication::processEvents();
         }
     }
 
     if(m_recast_buff4_enable){
-        if((now_time - m_recast_buff4_lasttime) > m_recast_buff4_time || m_recast_buff4_lasttime == 0){
+        now_time = m_timer.elapsed() / 1000;
+        if (m_recast_buff4_time > 0 && m_recast_buff4_max_time > m_recast_buff4_time) {
+            compare_time = QRandomGenerator::global()->bounded(m_recast_buff4_time, m_recast_buff4_max_time + 1);
+        }
+        if((now_time - m_recast_buff4_lasttime) > compare_time || m_recast_buff4_lasttime == 0){
 
             DebugOutput::out("BUFF4已到释放时间，自动释放BUFF4");
             Helper::console("BUFF4已到释放时间，自动释放BUFF4");
@@ -574,11 +611,17 @@ void KillMonster::skillRecast()
             Helper::console("BUFF4已按");
 
             m_recast_buff4_lasttime = m_timer.elapsed() / 1000;
+            ProcessHelper::programDelay(1000);
+            QApplication::processEvents();
         }
     }
 
     if(m_recast_buff5_enable){
-        if((now_time - m_recast_buff5_lasttime) > m_recast_buff5_time || m_recast_buff5_lasttime == 0){
+        now_time = m_timer.elapsed() / 1000;
+        if (m_recast_buff5_time > 0 && m_recast_buff5_max_time > m_recast_buff5_time) {
+            compare_time = QRandomGenerator::global()->bounded(m_recast_buff5_time, m_recast_buff5_max_time + 1);
+        }
+        if((now_time - m_recast_buff5_lasttime) > compare_time || m_recast_buff5_lasttime == 0){
 
             DebugOutput::out("BUFF5已到释放时间，自动释放BUFF5");
             Helper::console("BUFF5已到释放时间，自动释放BUFF5");
@@ -592,6 +635,8 @@ void KillMonster::skillRecast()
             Helper::console("BUFF1已按");
 
             m_recast_buff5_lasttime = m_timer.elapsed() / 1000;
+            ProcessHelper::programDelay(1000);
+            QApplication::processEvents();
         }
     }
 }
@@ -1966,6 +2011,25 @@ void KillMonster::potionShopBuyItem(QString npc)
     ProcessHelper::programDelay(500);
     QApplication::processEvents();
     return;
+}
+
+void KillMonster::handleDied()
+{
+    if(!Gplayer.DIED){
+        return;
+    }
+
+    qDebug() << "角色已死亡即将返回城镇";
+
+    MatchTemp tempmatch(":assets/templat/main_pannel/user_died/died_ok");
+    cv::Point died_ok;
+    if(tempmatch.match(died_ok)){
+        qDebug() << "点击确定";
+        MSKM::humanMove(died_ok.x + 27, died_ok.y + 10);
+        ProcessHelper::programDelay(500);
+        MSDriverPRO::mouseLeftClick();
+        ProcessHelper::programDelay(1500);
+    }
 }
 
 void KillMonster::updateTaskID()

@@ -354,21 +354,36 @@ void MainWindow::initConfig()
     ui->comboBox_potion_mp_buy_type->blockSignals(false);
 
     // 技能释放频率
-    ui->lineEdit_recast_buff1->blockSignals(true);
-    ui->lineEdit_recast_buff2->blockSignals(true);
-    ui->lineEdit_recast_buff3->blockSignals(true);
-    ui->lineEdit_recast_buff4->blockSignals(true);
-    ui->lineEdit_recast_buff5->blockSignals(true);
+    // ui->lineEdit_recast_buff1->blockSignals(true);
+    // ui->lineEdit_recast_buff2->blockSignals(true);
+    // ui->lineEdit_recast_buff3->blockSignals(true);
+    // ui->lineEdit_recast_buff4->blockSignals(true);
+    // ui->lineEdit_recast_buff5->blockSignals(true);
+    // ui->lineEdit_recast_buff1_max->blockSignals(true);
+    // ui->lineEdit_recast_buff2_max->blockSignals(true);
+    // ui->lineEdit_recast_buff3_max->blockSignals(true);
+    // ui->lineEdit_recast_buff4_max->blockSignals(true);
+    // ui->lineEdit_recast_buff5_max->blockSignals(true);
     ui->lineEdit_recast_buff1->setText(Gconfig.getValue("atk_recast/buff1").toString());
     ui->lineEdit_recast_buff2->setText(Gconfig.getValue("atk_recast/buff2").toString());
     ui->lineEdit_recast_buff3->setText(Gconfig.getValue("atk_recast/buff3").toString());
     ui->lineEdit_recast_buff4->setText(Gconfig.getValue("atk_recast/buff4").toString());
     ui->lineEdit_recast_buff5->setText(Gconfig.getValue("atk_recast/buff5").toString());
+    ui->lineEdit_recast_buff1_max->setText(Gconfig.getValue("atk_recast/buff1_max").toString());
+    ui->lineEdit_recast_buff2_max->setText(Gconfig.getValue("atk_recast/buff2_max").toString());
+    ui->lineEdit_recast_buff3_max->setText(Gconfig.getValue("atk_recast/buff3_max").toString());
+    ui->lineEdit_recast_buff4_max->setText(Gconfig.getValue("atk_recast/buff4_max").toString());
+    ui->lineEdit_recast_buff5_max->setText(Gconfig.getValue("atk_recast/buff5_max").toString());
     ui->lineEdit_recast_buff1->blockSignals(false);
     ui->lineEdit_recast_buff2->blockSignals(false);
     ui->lineEdit_recast_buff3->blockSignals(false);
     ui->lineEdit_recast_buff4->blockSignals(false);
     ui->lineEdit_recast_buff5->blockSignals(false);
+    ui->lineEdit_recast_buff1_max->blockSignals(false);
+    ui->lineEdit_recast_buff2_max->blockSignals(false);
+    ui->lineEdit_recast_buff3_max->blockSignals(false);
+    ui->lineEdit_recast_buff4_max->blockSignals(false);
+    ui->lineEdit_recast_buff5_max->blockSignals(false);
 }
 
 void MainWindow::initDir()
@@ -1376,7 +1391,7 @@ void MainWindow::on_lineEdit_recast_buff2_editingFinished()
 
     if (is_number && value >= 1 && value <= 3600) {
         // 校验通过
-        showNotice("BUFF1释放频率已保存");
+        showNotice("BUFF2释放频率已保存");
         Gconfig.setValue("atk_recast/buff2", value);
     } else {
         showNotice("无效数值，请输入1-3600之间的数字");
@@ -1393,7 +1408,7 @@ void MainWindow::on_lineEdit_recast_buff3_editingFinished()
 
     if (is_number && value >= 1 && value <= 3600) {
         // 校验通过
-        showNotice("BUFF1释放频率已保存");
+        showNotice("BUFF3释放频率已保存");
         Gconfig.setValue("atk_recast/buff3", value);
     } else {
         showNotice("无效数值，请输入1-3600之间的数字");
@@ -1410,7 +1425,7 @@ void MainWindow::on_lineEdit_recast_buff4_editingFinished()
 
     if (is_number && value >= 1 && value <= 3600) {
         // 校验通过
-        showNotice("BUFF1释放频率已保存");
+        showNotice("BUFF4释放频率已保存");
         Gconfig.setValue("atk_recast/buff4", value);
     } else {
         showNotice("无效数值，请输入1-3600之间的数字");
@@ -1427,11 +1442,126 @@ void MainWindow::on_lineEdit_recast_buff5_editingFinished()
 
     if (is_number && value >= 1 && value <= 3600) {
         // 校验通过
-        showNotice("BUFF1释放频率已保存");
+        showNotice("BUFF5释放频率已保存");
         Gconfig.setValue("atk_recast/buff5", value);
     } else {
         showNotice("无效数值，请输入1-3600之间的数字");
         ui->lineEdit_recast_buff5->setText("");  // 清空内容
+    }
+}
+
+
+void MainWindow::on_lineEdit_recast_buff1_max_editingFinished()
+{
+    int min = ui->lineEdit_recast_buff1->text().toInt();
+    QString text = ui->lineEdit_recast_buff1_max->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 3600) {
+        if(value > min){
+            // 校验通过
+            showNotice("BUFF1释放频率最大时间已保存");
+            Gconfig.setValue("atk_recast/buff1_max", value);
+        }else{
+            showNotice("无效数值，必须大于释放最小时间");
+            ui->lineEdit_recast_buff1_max->setText("");  // 清空内容
+        }
+    } else {
+        showNotice("无效数值，请输入1-3600之间的数字");
+        ui->lineEdit_recast_buff1_max->setText("");  // 清空内容
+    }
+}
+
+
+void MainWindow::on_lineEdit_recast_buff2_max_editingFinished()
+{
+    int min = ui->lineEdit_recast_buff2->text().toInt();
+    QString text = ui->lineEdit_recast_buff2_max->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 3600) {
+        if(value > min){
+            // 校验通过
+            showNotice("BUFF2释放频率最大时间已保存");
+            Gconfig.setValue("atk_recast/buff2_max", value);
+        }else{
+            showNotice("无效数值，必须大于释放最小时间");
+            ui->lineEdit_recast_buff2_max->setText("");  // 清空内容
+        }
+    } else {
+        showNotice("无效数值，请输入1-3600之间的数字");
+        ui->lineEdit_recast_buff2_max->setText("");  // 清空内容
+    }
+}
+
+
+void MainWindow::on_lineEdit_recast_buff3_max_editingFinished()
+{
+    int min = ui->lineEdit_recast_buff3->text().toInt();
+    QString text = ui->lineEdit_recast_buff3_max->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 3600) {
+        if(value > min){
+            // 校验通过
+            showNotice("BUFF3释放频率最大时间已保存");
+            Gconfig.setValue("atk_recast/buff3_max", value);
+        }else{
+            showNotice("无效数值，必须大于释放最小时间");
+            ui->lineEdit_recast_buff3_max->setText("");  // 清空内容
+        }
+    } else {
+        showNotice("无效数值，请输入1-3600之间的数字");
+        ui->lineEdit_recast_buff3_max->setText("");  // 清空内容
+    }
+}
+
+
+void MainWindow::on_lineEdit_recast_buff4_max_editingFinished()
+{
+    int min = ui->lineEdit_recast_buff4->text().toInt();
+    QString text = ui->lineEdit_recast_buff4_max->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 3600) {
+        if(value > min){
+            // 校验通过
+            showNotice("BUFF4释放频率最大时间已保存");
+            Gconfig.setValue("atk_recast/buff4_max", value);
+        }else{
+            showNotice("无效数值，必须大于释放最小时间");
+            ui->lineEdit_recast_buff4_max->setText("");  // 清空内容
+        }
+    } else {
+        showNotice("无效数值，请输入1-3600之间的数字");
+        ui->lineEdit_recast_buff4_max->setText("");  // 清空内容
+    }
+}
+
+
+void MainWindow::on_lineEdit_recast_buff5_max_editingFinished()
+{
+    int min = ui->lineEdit_recast_buff5->text().toInt();
+    QString text = ui->lineEdit_recast_buff5_max->text();
+    bool is_number;
+    int value = text.toInt(&is_number);
+
+    if (is_number && value >= 1 && value <= 3600) {
+        if(value > min){
+            // 校验通过
+            showNotice("BUFF5释放频率最大时间已保存");
+            Gconfig.setValue("atk_recast/buff5_max", value);
+        }else{
+            showNotice("无效数值，必须大于释放最小时间");
+            ui->lineEdit_recast_buff5_max->setText("");  // 清空内容
+        }
+    } else {
+        showNotice("无效数值，请输入1-3600之间的数字");
+        ui->lineEdit_recast_buff5_max->setText("");  // 清空内容
     }
 }
 

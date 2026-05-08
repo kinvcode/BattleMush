@@ -51,12 +51,12 @@ void GlobalConfig::loadFromJson()
 
     // 血蓝购买
     QJsonObject potionBuyConfig = data["potion_buy"].toObject();
-    potionBuyConfig["hp_buy"] = config->getValue("potion_buy/hp_buy", healthConfig["hp_buy"].toVariant()).toBool();
-    potionBuyConfig["hp_num"] = config->getValue("potion_buy/hp_num", healthConfig["hp_num"].toVariant()).toInt();
-    potionBuyConfig["hp_type"] = config->getValue("potion_buy/hp_type", healthConfig["hp_type"].toVariant()).toInt();
-    potionBuyConfig["mp_buy"] = config->getValue("potion_buy/mp_buy", healthConfig["mp_buy"].toVariant()).toBool();
-    potionBuyConfig["mp_num"] = config->getValue("potion_buy/mp_num", healthConfig["mp_num"].toVariant()).toInt();
-    potionBuyConfig["mp_type"] = config->getValue("potion_buy/mp_type", healthConfig["mp_type"].toVariant()).toInt();
+    potionBuyConfig["hp_buy"] = config->getValue("potion_buy/hp_buy", potionBuyConfig["hp_buy"].toVariant()).toBool();
+    potionBuyConfig["hp_num"] = config->getValue("potion_buy/hp_num", potionBuyConfig["hp_num"].toVariant()).toInt();
+    potionBuyConfig["hp_type"] = config->getValue("potion_buy/hp_type", potionBuyConfig["hp_type"].toVariant()).toInt();
+    potionBuyConfig["mp_buy"] = config->getValue("potion_buy/mp_buy", potionBuyConfig["mp_buy"].toVariant()).toBool();
+    potionBuyConfig["mp_num"] = config->getValue("potion_buy/mp_num", potionBuyConfig["mp_num"].toVariant()).toInt();
+    potionBuyConfig["mp_type"] = config->getValue("potion_buy/mp_type", potionBuyConfig["mp_type"].toVariant()).toInt();
     data["potion_buy"] = potionBuyConfig;
 
     // 快捷键绑定
@@ -82,11 +82,16 @@ void GlobalConfig::loadFromJson()
 
     // 技能频率
     QJsonObject atkRecast = data["atk_recast"].toObject();
-    atkRecast["buff1"] = config->getValue("atk_recast/buff1", atkrangeConfig["buff1"].toVariant()).toInt();
-    atkRecast["buff2"] = config->getValue("atk_recast/buff2", atkrangeConfig["buff2"].toVariant()).toInt();
-    atkRecast["buff3"] = config->getValue("atk_recast/buff3", atkrangeConfig["buff3"].toVariant()).toInt();
-    atkRecast["buff4"] = config->getValue("atk_recast/buff4", atkrangeConfig["buff4"].toVariant()).toInt();
-    atkRecast["buff5"] = config->getValue("atk_recast/buff5", atkrangeConfig["buff5"].toVariant()).toInt();
+    atkRecast["buff1"] = config->getValue("atk_recast/buff1", atkRecast["buff1"].toVariant()).toInt();
+    atkRecast["buff2"] = config->getValue("atk_recast/buff2", atkRecast["buff2"].toVariant()).toInt();
+    atkRecast["buff3"] = config->getValue("atk_recast/buff3", atkRecast["buff3"].toVariant()).toInt();
+    atkRecast["buff4"] = config->getValue("atk_recast/buff4", atkRecast["buff4"].toVariant()).toInt();
+    atkRecast["buff5"] = config->getValue("atk_recast/buff5", atkRecast["buff5"].toVariant()).toInt();
+    atkRecast["buff1_max"] = config->getValue("atk_recast/buff1_max", atkRecast["buff1_max"].toVariant()).toInt();
+    atkRecast["buff2_max"] = config->getValue("atk_recast/buff2_max", atkRecast["buff2_max"].toVariant()).toInt();
+    atkRecast["buff3_max"] = config->getValue("atk_recast/buff3_max", atkRecast["buff3_max"].toVariant()).toInt();
+    atkRecast["buff4_max"] = config->getValue("atk_recast/buff4_max", atkRecast["buff4_max"].toVariant()).toInt();
+    atkRecast["buff5_max"] = config->getValue("atk_recast/buff5_max", atkRecast["buff5_max"].toVariant()).toInt();
     data["atk_recast"] = atkRecast;
 }
 

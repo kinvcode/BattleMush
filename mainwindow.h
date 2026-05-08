@@ -169,6 +169,16 @@ private slots:
 
     void on_lineEdit_recast_buff5_editingFinished();
 
+    void on_lineEdit_recast_buff1_max_editingFinished();
+
+    void on_lineEdit_recast_buff2_max_editingFinished();
+
+    void on_lineEdit_recast_buff3_max_editingFinished();
+
+    void on_lineEdit_recast_buff4_max_editingFinished();
+
+    void on_lineEdit_recast_buff5_max_editingFinished();
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

@@ -89,6 +89,14 @@ void HealthMonitor::process()
             continue;
         }
 
+        if(Gplayer.DIED){
+            DebugOutput::out("角色已死亡~");
+            Helper::console("角色已死亡~");
+            ProcessHelper::programDelay(3000);
+            QApplication::processEvents();
+            continue;
+        }
+
         // 检测血量
         bool add_hp = Gconfig.getValue("auto_add_health/add_hp").toBool();
         bool add_mp = Gconfig.getValue("auto_add_health/add_mp").toBool();

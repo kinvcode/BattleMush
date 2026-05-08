@@ -220,6 +220,15 @@ void UpdateGameData::HandleLogin()
 
 void UpdateGameData::UpdateUserStatus(quint64 statuspanel)
 {
+
+    // 检查人物是否死亡
+    QString status = readString( readLong( readLong(
+        Gplayer.p_localplayer + BASE::MODEntity::StateComponent) +
+        BASE::StateComponent::_CurrentStateName) +
+        BASE::String::text, 10);
+
+    bool is_died = status == "DEAD";
+
     // quint64 p_playername = Helper::findChild(statuspanel,"Playername");
     // quint64 p_job = Helper::findChild(statuspanel,"job");
     // quint64 p_Level = Helper::findChild(statuspanel,"Level");
@@ -240,6 +249,11 @@ void UpdateGameData::UpdateUserStatus(quint64 statuspanel)
     QString player_mp = Helper::getEntityTextComponentString(p_MP);
     Helper::parseHPString(player_hp, Gplayer.HP, Gplayer.MAX_HP);
     Helper::parseHPString(player_mp, Gplayer.MP, Gplayer.MAX_MP);
+
+    if(is_died){
+        Gplayer.DIED = true;
+        Gplayer.HP = 0;
+    }
 
     ProcessHelper::programDelay(500);
     QApplication::processEvents();

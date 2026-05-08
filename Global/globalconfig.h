@@ -56,6 +56,11 @@ public:
         {"buff3",60},
         {"buff4",60},
         {"buff5",60},
+        {"buff1_max",60},
+        {"buff2_max",60},
+        {"buff3_max",60},
+        {"buff4_max",60},
+        {"buff5_max",60},
         }
     },
     {"potion_buy",QJsonObject{

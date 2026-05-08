@@ -928,6 +928,26 @@ void Helper::updateGameWindow()
     Gplayer.game_window.y          = game_rect.top;
     Gplayer.game_window.width      = game_rect.right - game_rect.left;
     Gplayer.game_window.height     = game_rect.bottom - game_rect.top;
+
+    // 如果游戏窗口大小不是1296*759,调整至1296*759
+    int game_width      = game_rect.right - game_rect.left;
+    int game_height     = game_rect.bottom - game_rect.top;
+    if (game_width != BASE::game_width || game_height != BASE::game_height) {
+        // 调整窗口大小和位置（可选保持原位置）
+        SetWindowPos(game_hwnd,  // 窗口句柄
+            NULL,                // 不改变Z顺序
+            game_rect.left,      // X位置（保持不变）
+            game_rect.top,       // Y位置（保持不变）
+            BASE::game_width,    // 新宽度
+            BASE::game_height,   // 新高度
+            SWP_NOZORDER | SWP_NOACTIVATE);  // 标志位
+
+        GetWindowRect(game_hwnd, &game_rect);
+        Gplayer.game_window.x          = game_rect.left;
+        Gplayer.game_window.y          = game_rect.top;
+        Gplayer.game_window.width      = game_rect.right - game_rect.left;
+        Gplayer.game_window.height     = game_rect.bottom - game_rect.top;
+    }
 }
 
 void Math::ComputeClimbRect(const ClimbOrigin *climb, FloatRect &climb_rect)
