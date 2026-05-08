@@ -907,6 +907,11 @@ void KillMonster::autoCleanLine()
         return;
     }
 
+    if(Gplayer.DIED){
+        // 处理死亡
+        handleDied();
+    }
+
     // 先检查BUFF
     skillRecast();
 
@@ -1069,6 +1074,11 @@ void KillMonster::excutePlatformSequence()
         DebugOutput::out("本次计划任务已执行完毕，即将进行下一个计划");
         m_task_id = (m_task_id == Gcontroller.m_tasks.size() - 1) ? 0 : m_task_id + 1;
         return;
+    }
+
+    if(Gplayer.DIED){
+        // 处理死亡
+        handleDied();
     }
 
     // 符文检测

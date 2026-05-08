@@ -355,6 +355,56 @@ void Controller::initTaskList()
 
     map0008.rests.push_back(map0008_rest00);
 
+    /* ============【 玩 具 工 廠 < 主 工 程 A > 】============= */
+    MapRoomPath map0009;
+    map0009.id = 9;
+    map0009.name = "玩具工廠<主工程A>";
+    map0009.uuid = "2c865a87-555b-4302-a328-f8d7b07ecc23";
+
+    RoomRest map0009_rest00;
+    map0009_rest00.id = 0;
+    map0009_rest00.name = "【休息点A】地图入口右侧平台";
+    map0009_rest00.platform = 11;
+
+    RoomPath map0009_path00;
+    map0009_path00.id = 0;
+    map0009_path00.name = "自动规划路线";
+
+    RoomPath map0009_path01;
+    map0009_path01.id = 1;
+    map0009_path01.name = "【路线A】只刷下面一层";
+    map0009_path01.platforms = {25};
+
+    map0009.paths.push_back(map0009_path00);
+    map0009.paths.push_back(map0009_path01);
+
+    map0009.rests.push_back(map0009_rest00);
+
+    /* ============【 時間分岔道 】============= */
+    MapRoomPath map0010;
+    map0010.id = 10;
+    map0010.name = "時間分岔道";
+    map0010.uuid = "3150a2a0-128c-42c6-bbc9-d2305546fd18";
+
+    RoomRest map0010_rest00;
+    map0010_rest00.id = 0;
+    map0010_rest00.name = "【休息点A】地图顶部平台";
+    map0010_rest00.platform = 15;
+
+    RoomPath map0010_path00;
+    map0010_path00.id = 0;
+    map0010_path00.name = "自动规划路线";
+
+    RoomPath map0010_path01;
+    map0010_path01.id = 1;
+    map0010_path01.name = "【路线A】刷全图";
+    map0010_path01.platforms = {11,2,1,9,8,0,4,5,6};
+
+    map0010.paths.push_back(map0010_path00);
+    map0010.paths.push_back(map0010_path01);
+
+    map0010.rests.push_back(map0010_rest00);
+
     /* ============【 加 入 刷 图 列 表】============= */
     m_clean_room_list.push_back(map0000);
     m_clean_room_list.push_back(map0001);
@@ -365,6 +415,8 @@ void Controller::initTaskList()
     m_clean_room_list.push_back(map0006);
     m_clean_room_list.push_back(map0007);
     m_clean_room_list.push_back(map0008);
+    m_clean_room_list.push_back(map0009);
+    m_clean_room_list.push_back(map0010);
 
 
     /* ============【 加 入 休 息 列 表】============= */
@@ -377,6 +429,8 @@ void Controller::initTaskList()
     m_rest_point_list.push_back(map0006);
     m_rest_point_list.push_back(map0007);
     m_rest_point_list.push_back(map0008);
+    m_rest_point_list.push_back(map0009);
+    m_rest_point_list.push_back(map0010);
 
 
     // 初始化NPC任务列表
