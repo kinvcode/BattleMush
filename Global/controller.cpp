@@ -380,7 +380,7 @@ void Controller::initTaskList()
 
     map0009.rests.push_back(map0009_rest00);
 
-    /* ============【 時間分岔道 】============= */
+    /* ============【 時 間 分 岔 道 】============= */
     MapRoomPath map0010;
     map0010.id = 10;
     map0010.name = "時間分岔道";
@@ -405,6 +405,31 @@ void Controller::initTaskList()
 
     map0010.rests.push_back(map0010_rest00);
 
+    /* ============【 雲 彩 公 園 3 】============= */
+    MapRoomPath map0011;
+    map0011.id = 11;
+    map0011.name = "雲彩公園3";
+    map0011.uuid = "3f0fd016-a8b8-4d85-a06b-cfe30eebc336";
+
+    RoomRest map0011_rest00;
+    map0011_rest00.id = 0;
+    map0011_rest00.name = "【休息点A】地图左下角平台";
+    map0011_rest00.platform = 13;
+
+    RoomPath map0011_path00;
+    map0011_path00.id = 0;
+    map0011_path00.name = "自动规划路线";
+
+    RoomPath map0011_path01;
+    map0011_path01.id = 1;
+    map0011_path01.name = "【路线A】刷全图";
+    map0011_path01.platforms = {22,24,19,20,21};
+
+    map0011.paths.push_back(map0011_path00);
+    map0011.paths.push_back(map0011_path01);
+
+    map0011.rests.push_back(map0011_rest00);
+
     /* ============【 加 入 刷 图 列 表】============= */
     m_clean_room_list.push_back(map0000);
     m_clean_room_list.push_back(map0001);
@@ -417,6 +442,7 @@ void Controller::initTaskList()
     m_clean_room_list.push_back(map0008);
     m_clean_room_list.push_back(map0009);
     m_clean_room_list.push_back(map0010);
+    m_clean_room_list.push_back(map0011);
 
 
     /* ============【 加 入 休 息 列 表】============= */
@@ -431,6 +457,7 @@ void Controller::initTaskList()
     m_rest_point_list.push_back(map0008);
     m_rest_point_list.push_back(map0009);
     m_rest_point_list.push_back(map0010);
+    m_rest_point_list.push_back(map0011);
 
 
     // 初始化NPC任务列表

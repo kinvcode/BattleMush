@@ -14,7 +14,11 @@ public:
         return &instance;
     }
 
+    // 警报
     bool show_warning = false;
+
+    // 出现滑鼠验证
+    bool mousecheck_exists = false;
 
     // 游戏进程PID
     quint64 p_gamepid = 0;

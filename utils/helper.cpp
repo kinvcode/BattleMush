@@ -45,6 +45,11 @@ void Helper::warning(QString msg)
     // }
 }
 
+void Helper::warningSound()
+{
+    Beep(800, 500); // 播放 800Hz 的声音，持续 0.5 秒
+}
+
 quint64 Helper::findChild(quint64 parent, QString name)
 {
     quint64 child_entity = 0;

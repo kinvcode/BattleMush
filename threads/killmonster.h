@@ -173,6 +173,9 @@ private:
 
     // 死亡返回城镇
     void handleDied();
+
+    // 滑鼠验证
+    void handleMousemove();
 private:
     // 刷图计划
     void taskCleanRoom();

@@ -179,6 +179,8 @@ private slots:
 
     void on_lineEdit_recast_buff5_max_editingFinished();
 
+    void on_pushButton_play_alarm_sound_clicked();
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

@@ -18,6 +18,8 @@ public:
 
     void warning(QString msg);
 
+    static void warningSound();
+
     // 搜索Entity的子组件
     static quint64 findChild(quint64 parent, QString name);
 

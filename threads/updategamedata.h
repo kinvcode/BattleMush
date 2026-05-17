@@ -33,6 +33,8 @@ private:
     void UpdateMonsters();
     // 更新快捷栏信息
     void updateQuickSlot(quint64 ui_entity);
+    // 检测滑鼠
+    void checkMouseMove();
 };
 
 #endif // UPDATEGAMEDATA_H

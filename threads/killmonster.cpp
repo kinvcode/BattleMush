@@ -196,6 +196,14 @@ void KillMonster::process()
             handleDied();
         }
 
+        if(Gplayer.mousecheck_exists){
+            DebugOutput::out("出现滑鼠验证");
+            handleMousemove();
+            ProcessHelper::programDelay(100);
+            QApplication::processEvents();
+            continue;
+        }
+
         // 获取当前的任务
         if(Gcontroller.m_tasks.empty())
         {
@@ -912,6 +920,14 @@ void KillMonster::autoCleanLine()
         handleDied();
     }
 
+    if(Gplayer.mousecheck_exists){
+        DebugOutput::out("出现滑鼠验证");
+        handleMousemove();
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        goto continue_recive;
+    }
+
     // 先检查BUFF
     skillRecast();
 
@@ -1079,6 +1095,14 @@ void KillMonster::excutePlatformSequence()
     if(Gplayer.DIED){
         // 处理死亡
         handleDied();
+    }
+
+    if(Gplayer.mousecheck_exists){
+        DebugOutput::out("出现滑鼠验证");
+        handleMousemove();
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        goto retryEnter;
     }
 
     // 符文检测
@@ -2040,6 +2064,12 @@ void KillMonster::handleDied()
         MSDriverPRO::mouseLeftClick();
         ProcessHelper::programDelay(1500);
     }
+}
+
+void KillMonster::handleMousemove()
+{
+    Helper::warningSound();
+    ProcessHelper::programDelay(3000);
 }
 
 void KillMonster::updateTaskID()

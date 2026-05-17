@@ -3,6 +3,7 @@
 #include <iostream>
 #include "utils/helper.h"
 #include "global/globalplayer.h"
+#include "utils/gamestruct.h"
 
 NativeEventFilter::NativeEventFilter(MainWindow* window)
 {
@@ -51,6 +52,13 @@ bool NativeEventFilter::nativeEventFilter(const QByteArray& eventType, void* mes
         case VK_F2:
             qDebug() << "F2";
             ImageTool::screenshot();
+            break;
+        case VK_F3:
+            qDebug() << "F3";
+            // ImageTool::screenshot();
+            if(Gplayer.p_uientity){
+                GameStruct::printEntityChild(Gplayer.p_uientity);
+            }
             break;
         default:
             qDebug() << "未知快捷键触发:" + QString::number(keycode);

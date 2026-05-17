@@ -436,6 +436,9 @@ bool MovePlatform::jumpUP(cv::Point range, int platform, bool is_climb)
             return true;
         }
     }else{
+        ProcessHelper::programDelay(250);
+        QApplication::processEvents();
+
         // 到达地点之后进行跳跃操作
         MSDriverPRO::keyboardClick(jump_key);
 
@@ -461,6 +464,9 @@ bool MovePlatform::jumpDown(cv::Point range, int platform)
     WalkBase walk_to_platform(0);
     bool arrived = walk_to_platform.moveToPlatform(range); // 走到范围
     if(!arrived) return false;
+
+    ProcessHelper::programDelay(250);
+    QApplication::processEvents();
 
     // 到达地点之后进行跳跃操作
     MSDriverPRO::keyboardDown(MSKeyboard_DownArrow);

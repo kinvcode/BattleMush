@@ -66,6 +66,11 @@ bool WalkBase::run()
             return false;
         }
 
+        if(Gplayer.mousecheck_exists){
+            DebugOutput::out("出现滑鼠验证，退出寻路");
+            return false;
+        }
+
         // 到达
         if (arrived) {
             clearXkey();
@@ -130,6 +135,11 @@ bool WalkBase::runY()
             user_y = getUserY();
             qDebug() << m_target_y << user_y;
             clearYkey();
+            return false;
+        }
+
+        if(Gplayer.mousecheck_exists){
+            DebugOutput::out("出现滑鼠验证，退出寻路");
             return false;
         }
 
@@ -219,6 +229,11 @@ void WalkBase::clearMonster(const Monster &monster)
         if (cur_time > m_walk_timeout) {
             DebugOutput::out("寻路超时~");
             clearXkey();
+            return;
+        }
+
+        if(Gplayer.mousecheck_exists){
+            DebugOutput::out("出现滑鼠验证，退出寻路");
             return;
         }
 
@@ -327,6 +342,12 @@ bool WalkBase::moveToItem()
     }
 
     while(true){
+
+        if(Gplayer.mousecheck_exists){
+            DebugOutput::out("出现滑鼠验证，退出寻路");
+            return false;
+        }
+
         int cur_time = begin_timer.elapsed();
         if (cur_time > m_walk_timeout) {
             DebugOutput::out("拾取物品寻路超时~");
@@ -472,6 +493,11 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
     }
 
     while(true){
+
+        if(Gplayer.mousecheck_exists){
+            DebugOutput::out("出现滑鼠验证，退出寻路");
+            return false;
+        }
 
         int cur_time = begin_timer.elapsed();
         if (cur_time > m_walk_timeout) {

@@ -1565,3 +1565,11 @@ void MainWindow::on_lineEdit_recast_buff5_max_editingFinished()
     }
 }
 
+
+
+
+void MainWindow::on_pushButton_play_alarm_sound_clicked()
+{
+    Helper::warningSound();
+}
+

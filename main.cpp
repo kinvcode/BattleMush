@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
     a.installNativeEventFilter(&filter);
     RegisterHotKey(NULL, VK_F1, NULL, VK_F1);
     RegisterHotKey(NULL, VK_F2, NULL, VK_F2);
+    RegisterHotKey(NULL, VK_F3, NULL, VK_F3);
 
     // 连接 aboutToQuit 信号到槽函数
     QObject::connect(&a, &QApplication::aboutToQuit, [mainWindow]() {

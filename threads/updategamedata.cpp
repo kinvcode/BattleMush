@@ -9,6 +9,7 @@
 #include "utils/gamestruct.h"
 #include "utils/mapserializer.h"
 #include "driver/msdriverpro.h"
+#include "utils/matchtemp.h"
 
 using namespace Mem;
 
@@ -177,6 +178,9 @@ void UpdateGameData::process()
                 DebugOutput::out("切换到了登录界面");
                 break;
             }
+
+            // 检测鼠标验证
+            checkMouseMove();
 
             // 更新用户信息
             UpdateUserStatus(statuspanel);
@@ -380,6 +384,16 @@ void UpdateGameData::updateQuickSlot(quint64 ui_entity)
 
     Gplayer.quick_slot_pageup_count = hp_count;
     Gplayer.quick_slot_pagedown_count = mp_count;
+}
+
+void UpdateGameData::checkMouseMove()
+{
+    // 判断商店是否打开
+    MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
+    cv::Point title_coor;
+    if(tempmatch.match(title_coor)){
+        Gplayer.mousecheck_exists = true;
+    }
 }
 
 
