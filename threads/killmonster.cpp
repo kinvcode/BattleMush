@@ -894,35 +894,35 @@ void KillMonster::autoCleanLine()
     continue_recive:
     if(m_paused || !m_running) return;
 
-    bool test_func = true;
-    if(test_func){
+    // bool test_func = false;
+    // if(test_func){
 
-        int user_in_lineid = userPlatform();
-        int plat = 0;
-        if(user_in_lineid == 2){
-            plat = 3;
-        }else if(user_in_lineid == 3){
-            plat = 2;
-        }else{
-            qDebug() << "无法传送~";
-            ProcessHelper::programDelay(1500);
-            QApplication::processEvents();
-            return;
-        }
+    //     int user_in_lineid = userPlatform();
+    //     int plat = 0;
+    //     if(user_in_lineid == 2){
+    //         plat = 3;
+    //     }else if(user_in_lineid == 3){
+    //         plat = 2;
+    //     }else{
+    //         qDebug() << "无法传送~";
+    //         ProcessHelper::programDelay(1500);
+    //         QApplication::processEvents();
+    //         return;
+    //     }
 
-        PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
-        qDebug() << "准备前往平台:" << plat;
-        Gcontroller.m_disable_attack = true;
-        bool move_success = MovePlatform::toPlatform(node, plat);
-        if(move_success){
-            qDebug() << "移动成功！！！";
-        }
+    //     PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
+    //     qDebug() << "准备前往平台:" << plat;
+    //     Gcontroller.m_disable_attack = true;
+    //     bool move_success = MovePlatform::toPlatform(node, plat);
+    //     if(move_success){
+    //         qDebug() << "移动成功！！！";
+    //     }
 
-        qDebug() << "测试完成~";
-        ProcessHelper::programDelay(1500);
-        QApplication::processEvents();
-        return;
-    }
+    //     qDebug() << "测试完成~";
+    //     ProcessHelper::programDelay(1500);
+    //     QApplication::processEvents();
+    //     return;
+    // }
 
     if(!Gcontroller.m_tasks.empty())
     {

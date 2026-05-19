@@ -618,6 +618,7 @@ std::vector<Platform> RoomMap::makePlatformList(
         tmp_platform.end = {item.rect.x_right, item.rect.y_bottom};
         tmp_platform.id = platform_id;
 
+        retryCombine:
         for (auto& other_item : climbplat_list) {
 
             if (climb_set.find(other_item.id) == climb_set.end()) {
@@ -649,6 +650,9 @@ std::vector<Platform> RoomMap::makePlatformList(
                 {
                     tmp_platform.end = cv::Point(other_item.rect.x_right,other_item.rect.y_bottom);
                 }
+
+                // 重新检测一遍
+                goto retryCombine;
             }
         }
 

@@ -87,11 +87,11 @@ bool WalkBase::run()
                 // 如果目标距离自己大于150，使用瞬移
                 if(abs(user_x - m_target_x) > 150){
                     use_skill = true;
-                }
-                if(direction_x == MSKeyboard_LeftArrow){
-                    qDebug() << "可以使用瞬移:左";
-                }else if(direction_x == MSKeyboard_RightArrow){
-                    qDebug() << "可以使用瞬移:右";
+                    if(direction_x == MSKeyboard_LeftArrow){
+                        qDebug() << "可以使用瞬移:左";
+                    }else if(direction_x == MSKeyboard_RightArrow){
+                        qDebug() << "可以使用瞬移:右";
+                    }
                 }
                 if(use_skill){
                     MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skillteleport);
@@ -294,11 +294,11 @@ void WalkBase::clearMonster(const Monster &monster)
                 // 如果目标距离自己大于150，使用瞬移
                 if(abs(user_pos.x - monster.pos.x) > 150){
                     use_skill = true;
-                }
-                if(direction_x == MSKeyboard_LeftArrow){
-                    qDebug() << "可以使用瞬移:左";
-                }else if(direction_x == MSKeyboard_RightArrow){
-                    qDebug() << "可以使用瞬移:右";
+                    if(direction_x == MSKeyboard_LeftArrow){
+                        qDebug() << "可以使用瞬移:左";
+                    }else if(direction_x == MSKeyboard_RightArrow){
+                        qDebug() << "可以使用瞬移:右";
+                    }
                 }
                 if(use_skill){
                     MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skillteleport);
@@ -429,12 +429,13 @@ bool WalkBase::moveToItem()
                 // 如果目标距离自己大于150，使用瞬移
                 if(abs(user_x - m_target_x) > 150){
                     use_skill = true;
+                    if(direction_x == MSKeyboard_LeftArrow){
+                        qDebug() << "可以使用瞬移:左";
+                    }else if(direction_x == MSKeyboard_RightArrow){
+                        qDebug() << "可以使用瞬移:右";
+                    }
                 }
-                if(direction_x == MSKeyboard_LeftArrow){
-                    qDebug() << "可以使用瞬移:左";
-                }else if(direction_x == MSKeyboard_RightArrow){
-                    qDebug() << "可以使用瞬移:右";
-                }
+
                 if(use_skill){
                     MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skillteleport);
                     Gplayer.last_useskillteleport = nowtime;
