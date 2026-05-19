@@ -255,6 +255,13 @@ public:
         std::unordered_map<int, PathNode> &path_nodes
     );
 
+    static void skillteleport(
+        const std::vector<Platform> &platform_list,
+        const cv::Mat &room_map,
+        const MapBounding &map_bounding,
+        std::unordered_map<int, PathNode> &path_nodes
+    );
+
     static void teleport();
 
     static void skill();

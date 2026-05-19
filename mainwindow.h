@@ -183,6 +183,8 @@ private slots:
 
     void on_pushButton_get_user_foot_clicked();
 
+    void on_checkBox_atk_switch_skillteleport_stateChanged(int arg1);
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

@@ -62,6 +62,7 @@ void KillMonster::resume()
     Gplayer.m_bindkey.skill_atk1 = Gconfig.getValue("bindkey/skill_atk1").toInt();
     Gplayer.m_bindkey.jump = Gconfig.getValue("bindkey/jump").toInt();
     Gplayer.m_bindkey.gohome = Gconfig.getValue("bindkey/gohome").toInt();
+    Gplayer.m_bindkey.skillteleport = Gconfig.getValue("bindkey/skillteleport").toInt();
 
     int atk_general_range_x = Gconfig.getValue("atk_range/general_x").toInt();
     int atk_general_range_y = Gconfig.getValue("atk_range/general_y").toInt();
@@ -91,6 +92,7 @@ void KillMonster::resume()
     m_recast_buff4_max_time = Gconfig.getValue("atk_recast/buff4_max").toInt();
     m_recast_buff5_max_time = Gconfig.getValue("atk_recast/buff5_max").toInt();
 
+    Gplayer.use_skillteleport = Gconfig.getValue("atk_swtich/skillteleport").toBool();
 
     m_paused = false;
 }
@@ -103,6 +105,7 @@ void KillMonster::process()
     Gplayer.m_bindkey.skill_atk1 = Gconfig.getValue("bindkey/skill_atk1").toInt();
     Gplayer.m_bindkey.jump = Gconfig.getValue("bindkey/jump").toInt();
     Gplayer.m_bindkey.gohome = Gconfig.getValue("bindkey/gohome").toInt();
+    Gplayer.m_bindkey.skillteleport = Gconfig.getValue("bindkey/skillteleport").toInt();
 
     int atk_general_range_x = Gconfig.getValue("atk_range/general_x").toInt();
     int atk_general_range_y = Gconfig.getValue("atk_range/general_y").toInt();
@@ -131,6 +134,8 @@ void KillMonster::process()
     m_recast_buff3_max_time = Gconfig.getValue("atk_recast/buff3_max").toInt();
     m_recast_buff4_max_time = Gconfig.getValue("atk_recast/buff4_max").toInt();
     m_recast_buff5_max_time = Gconfig.getValue("atk_recast/buff5_max").toInt();
+
+    Gplayer.use_skillteleport = Gconfig.getValue("atk_swtich/skillteleport").toBool();
 
     // 初始化任务
     m_task_id = 0;

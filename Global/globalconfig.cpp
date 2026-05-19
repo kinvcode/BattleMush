@@ -35,6 +35,7 @@ void GlobalConfig::loadFromJson()
     atkSwitchConfig["buff3"] = config->getValue("atk_swtich/buff3", atkSwitchConfig["buff3"].toVariant()).toBool();
     atkSwitchConfig["buff4"] = config->getValue("atk_swtich/buff4", atkSwitchConfig["buff4"].toVariant()).toBool();
     atkSwitchConfig["buff5"] = config->getValue("atk_swtich/buff5", atkSwitchConfig["buff5"].toVariant()).toBool();
+    atkSwitchConfig["skillteleport"] = config->getValue("atk_swtich/skillteleport", atkSwitchConfig["skillteleport"].toVariant()).toBool();
     data["atk_swtich"] = atkSwitchConfig;
 
     // 监控血蓝
@@ -70,6 +71,7 @@ void GlobalConfig::loadFromJson()
     bindkeyConfig["buff5"] = config->getValue("bindkey/buff5", bindkeyConfig["buff5"].toVariant()).toInt();
     bindkeyConfig["jump"] = config->getValue("bindkey/jump", bindkeyConfig["jump"].toVariant()).toInt();
     bindkeyConfig["gohome"] = config->getValue("bindkey/gohome", bindkeyConfig["gohome"].toVariant()).toInt();
+    bindkeyConfig["skillteleport"] = config->getValue("bindkey/skillteleport", bindkeyConfig["skillteleport"].toVariant()).toInt();
     data["bindkey"] = bindkeyConfig;
 
     // 技能范围

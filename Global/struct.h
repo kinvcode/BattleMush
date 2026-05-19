@@ -201,6 +201,7 @@ typedef struct {
     int skill_atk1;
     int jump;
     int gohome;
+    int skillteleport;
 }BindKey;
 
 typedef struct {

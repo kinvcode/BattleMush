@@ -22,7 +22,6 @@
         <file>assets/images/widgets/checkbox_checked.svg</file>
         <file>assets/MicrosoftGuard.sys</file>
         <file>assets/templat/leave_shop.png</file>
-        <file>assets/maps/map_d26fc64e-2ff3-4f66-978e-f606f286ddf9.json</file>
         <file>assets/templat/potion_shop/blue_potion.png</file>
         <file>assets/templat/potion_shop/leave_shop.png</file>
         <file>assets/templat/potion_shop/orange_potion.png</file>
@@ -33,27 +32,28 @@
         <file>assets/templat/potion_shop/ok.png</file>
         <file>assets/templat/potion_shop/close_ok.png</file>
         <file>assets/room_node.json</file>
-        <file>assets/maps/map_a6dd12a3-f252-4c7f-94c3-16457d084c24.json</file>
-        <file>assets/maps/map_57b263cd-2e24-40f5-9296-2e05ba56839d.json</file>
-        <file>assets/maps/map_684cd180-d4e3-4331-a502-44edf2ddca91.json</file>
-        <file>assets/maps/map_7c5751e9-66c9-4ec9-872e-4a6782115c17.json</file>
-        <file>assets/maps/map_e6c47fb2-facd-4778-8bd7-5586c53ab3ea.json</file>
-        <file>assets/maps/map_bb3a8716-70ce-4da3-878a-e4069b3ff4c0.json</file>
-        <file>assets/maps/map_a73c7664-2f12-4caf-be19-94f8b65175f2.json</file>
-        <file>assets/maps/map_1f234900-61d7-45d0-8ad0-871a119b183f.json</file>
-        <file>assets/maps/map_0b056b60-af14-4cd6-be0f-eda5980562d3.json</file>
-        <file>assets/maps/map_60d5d28d-7379-4af0-afc0-e1716d9ef474.json</file>
-        <file>assets/maps/map_618f79dd-e5c1-4159-9e77-187ab61454f7.json</file>
-        <file>assets/maps/map_45681289-4726-447f-9aa6-d690072a3291.json</file>
-        <file>assets/maps/map_dc87557c-2165-4962-bcbb-370e9a1f38a8.json</file>
-        <file>assets/maps/map_ccbb98d2-61f6-4b4a-8e88-67cfa921fc32.json</file>
-        <file>assets/maps/map_c9349a80-5a2d-401d-8cdb-8e5ff414de71.json</file>
-        <file>assets/maps/map_e1b1a71f-0a41-4657-9579-7f90807c00bc.json</file>
-        <file>assets/maps/map_258b9b4d-dd3f-4147-8aae-b31272c57e91.json</file>
         <file>assets/templat/main_pannel/user_died/died_ok.png</file>
-        <file>assets/maps/map_2c865a87-555b-4302-a328-f8d7b07ecc23.json</file>
-        <file>assets/maps/map_3150a2a0-128c-42c6-bbc9-d2305546fd18.json</file>
-        <file>assets/maps/map_3f0fd016-a8b8-4d85-a06b-cfe30eebc336.json</file>
         <file>assets/templat/main_pannel/mouse_move.png</file>
+        <file>assets/maps/map_1f234900-61d7-45d0-8ad0-871a119b183f.json</file>
+        <file>assets/maps/map_2c865a87-555b-4302-a328-f8d7b07ecc23.json</file>
+        <file>assets/maps/map_3f0fd016-a8b8-4d85-a06b-cfe30eebc336.json</file>
+        <file>assets/maps/map_7c5751e9-66c9-4ec9-872e-4a6782115c17.json</file>
+        <file>assets/maps/map_57b263cd-2e24-40f5-9296-2e05ba56839d.json</file>
+        <file>assets/maps/map_60d5d28d-7379-4af0-afc0-e1716d9ef474.json</file>
+        <file>assets/maps/map_258b9b4d-dd3f-4147-8aae-b31272c57e91.json</file>
+        <file>assets/maps/map_618f79dd-e5c1-4159-9e77-187ab61454f7.json</file>
+        <file>assets/maps/map_684cd180-d4e3-4331-a502-44edf2ddca91.json</file>
+        <file>assets/maps/map_3150a2a0-128c-42c6-bbc9-d2305546fd18.json</file>
+        <file>assets/maps/map_45681289-4726-447f-9aa6-d690072a3291.json</file>
+        <file>assets/maps/map_a6dd12a3-f252-4c7f-94c3-16457d084c24.json</file>
+        <file>assets/maps/map_a73c7664-2f12-4caf-be19-94f8b65175f2.json</file>
+        <file>assets/maps/map_bb3a8716-70ce-4da3-878a-e4069b3ff4c0.json</file>
+        <file>assets/maps/map_c9349a80-5a2d-401d-8cdb-8e5ff414de71.json</file>
+        <file>assets/maps/map_ccbb98d2-61f6-4b4a-8e88-67cfa921fc32.json</file>
+        <file>assets/maps/map_d26fc64e-2ff3-4f66-978e-f606f286ddf9.json</file>
+        <file>assets/maps/map_dc87557c-2165-4962-bcbb-370e9a1f38a8.json</file>
+        <file>assets/maps/map_e1b1a71f-0a41-4657-9579-7f90807c00bc.json</file>
+        <file>assets/maps/map_e6c47fb2-facd-4778-8bd7-5586c53ab3ea.json</file>
+        <file>assets/maps/map_0b056b60-af14-4cd6-be0f-eda5980562d3.json</file>
     </qresource>
 </RCC>

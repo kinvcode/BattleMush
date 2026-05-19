@@ -79,6 +79,27 @@ bool WalkBase::run()
 
         user_x = getUserX();
 
+        // 使用瞬移
+        if(Gplayer.use_skillteleport){
+            int nowtime = QDateTime::currentMSecsSinceEpoch();
+            if(nowtime - Gplayer.last_useskillteleport >= 1000){
+                bool use_skill = false;
+                // 如果目标距离自己大于150，使用瞬移
+                if(abs(user_x - m_target_x) > 150){
+                    use_skill = true;
+                }
+                if(direction_x == MSKeyboard_LeftArrow){
+                    qDebug() << "可以使用瞬移:左";
+                }else if(direction_x == MSKeyboard_RightArrow){
+                    qDebug() << "可以使用瞬移:右";
+                }
+                if(use_skill){
+                    MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skillteleport);
+                    Gplayer.last_useskillteleport = nowtime;
+                }
+            }
+        }
+
         if (abs(m_target_x - user_x) <= m_deviation) {
             arrived = true;
         }
@@ -264,6 +285,28 @@ void WalkBase::clearMonster(const Monster &monster)
         }
 
         user_pos = getUserPos();
+
+        // 使用瞬移
+        if(Gplayer.use_skillteleport){
+            int nowtime = QDateTime::currentMSecsSinceEpoch();
+            if(nowtime - Gplayer.last_useskillteleport >= 1000){
+                bool use_skill = false;
+                // 如果目标距离自己大于150，使用瞬移
+                if(abs(user_pos.x - monster.pos.x) > 150){
+                    use_skill = true;
+                }
+                if(direction_x == MSKeyboard_LeftArrow){
+                    qDebug() << "可以使用瞬移:左";
+                }else if(direction_x == MSKeyboard_RightArrow){
+                    qDebug() << "可以使用瞬移:右";
+                }
+                if(use_skill){
+                    MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skillteleport);
+                    Gplayer.last_useskillteleport = nowtime;
+                }
+            }
+        }
+
         // 判断怪物原始位置为目标地点
         if(Math::posInRange(is_left, user_pos, monster.pos, Gcontroller.m_attack_info.range)){
             qDebug() << "寻怪目标坐标在人物攻击范围，判定到达~";
@@ -377,6 +420,27 @@ bool WalkBase::moveToItem()
         }
 
         user_x = getUserX();
+
+        // 使用瞬移
+        if(Gplayer.use_skillteleport){
+            int nowtime = QDateTime::currentMSecsSinceEpoch();
+            if(nowtime - Gplayer.last_useskillteleport >= 1000){
+                bool use_skill = false;
+                // 如果目标距离自己大于150，使用瞬移
+                if(abs(user_x - m_target_x) > 150){
+                    use_skill = true;
+                }
+                if(direction_x == MSKeyboard_LeftArrow){
+                    qDebug() << "可以使用瞬移:左";
+                }else if(direction_x == MSKeyboard_RightArrow){
+                    qDebug() << "可以使用瞬移:右";
+                }
+                if(use_skill){
+                    MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skillteleport);
+                    Gplayer.last_useskillteleport = nowtime;
+                }
+            }
+        }
 
         if(is_left){
             if(user_x - m_target_x < m_deviation){
@@ -556,6 +620,31 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
             user_pos = getUserY();
         }else{
             user_pos = getUserX();
+        }
+
+        // 使用瞬移
+        if(Gplayer.use_skillteleport){
+            int nowtime = QDateTime::currentMSecsSinceEpoch();
+            if(nowtime - Gplayer.last_useskillteleport >= 1000){
+                bool use_skill = false;
+                // 如果目标距离自己大于150，使用瞬移
+                if(direction_arrow == MSKeyboard_LeftArrow)
+                {
+                    if(abs(user_pos - range.y) > 150){
+                        use_skill = true;
+                        qDebug() << "可以使用瞬移:左";
+                    }
+                }else if(direction_arrow == MSKeyboard_RightArrow){
+                    if(abs(user_pos - range.x) > 150){
+                        use_skill = true;
+                        qDebug() << "可以使用瞬移:右";
+                    }
+                }
+                if(use_skill){
+                    MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skillteleport);
+                    Gplayer.last_useskillteleport = nowtime;
+                }
+            }
         }
 
         if(user_pos >= range.x && user_pos <= range.y) {

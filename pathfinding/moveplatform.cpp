@@ -35,6 +35,13 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform, bool is_town)
             cv::Point target_pos = {-1,-1};
             VISIT_TYPE visit_type;
             for(const auto &visit : target.second.visit_list){
+                if(!Gplayer.use_skillteleport){
+                    if(visit.visit_type == VISIT_TYPE::SKILL)
+                    {
+                        continue;
+                    }
+                }
+
                 for(const auto &segment : visit.area){
                     int dist = (user_x < segment.first) ? (segment.first - user_x) : (user_x > segment.second) ? (user_x - segment.second) : segment.first;
                     if(dist < distance){
@@ -45,6 +52,7 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform, bool is_town)
                     }
                 }
             }
+
             // qDebug() << "移动区域:" << target_pos.x << "," << target_pos.y;
             if(target.second.type == 0){
                 // qDebug() << "目标平台为地平线";

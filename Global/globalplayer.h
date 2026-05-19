@@ -20,6 +20,12 @@ public:
     // 出现滑鼠验证
     bool mousecheck_exists = false;
 
+    // 法师使用瞬移
+    bool use_skillteleport = false;
+
+    // 上次使用瞬移时间
+    quint64 last_useskillteleport = 0;
+
     // 游戏进程PID
     quint64 p_gamepid = 0;
 

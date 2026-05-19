@@ -18,6 +18,7 @@ public:
         {"buff3", false},
         {"buff4", false},
         {"buff5", false},
+        {"skillteleport",false},
         }
     },
     {"auto_add_health",QJsonObject{
@@ -40,7 +41,8 @@ public:
         {"buff4",MSKeyboard_4},
         {"buff5",MSKeyboard_5},
         {"jump",MSKeyboard_c},
-        {"gohome",MSKeyboard_LeftControl}
+        {"gohome",MSKeyboard_LeftControl},
+        {"skillteleport",MSKeyboard_f}
         }
     },
     {"atk_range",QJsonObject{

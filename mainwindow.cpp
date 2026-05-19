@@ -224,6 +224,7 @@ void MainWindow::initConfig()
     ui->checkBox_atk_switch_buff3->blockSignals(true);
     ui->checkBox_atk_switch_buff4->blockSignals(true);
     ui->checkBox_atk_switch_buff5->blockSignals(true);
+    ui->checkBox_atk_switch_skillteleport->blockSignals(true);
     ui->checkBox_atk_switch_general->setChecked(Gconfig.getValue("atk_swtich/general").toBool());
     ui->checkBox_atk_switch_skill1->setChecked(Gconfig.getValue("atk_swtich/skill1").toBool());
     ui->checkBox_atk_switch_buff1->setChecked(Gconfig.getValue("atk_swtich/buff1").toBool());
@@ -231,6 +232,7 @@ void MainWindow::initConfig()
     ui->checkBox_atk_switch_buff3->setChecked(Gconfig.getValue("atk_swtich/buff3").toBool());
     ui->checkBox_atk_switch_buff4->setChecked(Gconfig.getValue("atk_swtich/buff4").toBool());
     ui->checkBox_atk_switch_buff5->setChecked(Gconfig.getValue("atk_swtich/buff5").toBool());
+    ui->checkBox_atk_switch_skillteleport->setChecked(Gconfig.getValue("atk_swtich/skillteleport").toBool());
     ui->checkBox_atk_switch_general->blockSignals(false);
     ui->checkBox_atk_switch_skill1->blockSignals(false);
     ui->checkBox_atk_switch_buff1->blockSignals(false);
@@ -238,6 +240,7 @@ void MainWindow::initConfig()
     ui->checkBox_atk_switch_buff3->blockSignals(false);
     ui->checkBox_atk_switch_buff4->blockSignals(false);
     ui->checkBox_atk_switch_buff5->blockSignals(false);
+    ui->checkBox_atk_switch_skillteleport->blockSignals(false);
 
     // 按键绑定
     ui->lineEdit_bindkey_general_atk->blockSignals(true);
@@ -245,6 +248,7 @@ void MainWindow::initConfig()
     ui->lineEdit_bindkey_buff1->blockSignals(true);
     ui->lineEdit_bindkey_jump->blockSignals(true);
     ui->lineEdit_bindkey_gohome->blockSignals(true);
+    ui->lineEdit_bindkey_skillteleport->blockSignals(true);
 
     ui->lineEdit_bindkey_general_atk->m_config_path = "bindkey/general_atk";
     ui->lineEdit_bindkey_general_atk->m_currentKey = Gconfig.getValue("bindkey/general_atk").toInt();
@@ -279,11 +283,16 @@ void MainWindow::initConfig()
     ui->lineEdit_bindkey_gohome->m_currentKey = Gconfig.getValue("bindkey/gohome").toInt();
     ui->lineEdit_bindkey_gohome->updateDisplay();
 
+    ui->lineEdit_bindkey_skillteleport->m_config_path = "bindkey/skillteleport";
+    ui->lineEdit_bindkey_skillteleport->m_currentKey = Gconfig.getValue("bindkey/skillteleport").toInt();
+    ui->lineEdit_bindkey_skillteleport->updateDisplay();
+
     ui->lineEdit_bindkey_general_atk->blockSignals(false);
     ui->lineEdit_bindkey_skill_atk1->blockSignals(false);
     ui->lineEdit_bindkey_buff1->blockSignals(false);
     ui->lineEdit_bindkey_jump->blockSignals(false);
     ui->lineEdit_bindkey_gohome->blockSignals(false);
+    ui->lineEdit_bindkey_skillteleport->blockSignals(false);
 
     // 攻击范围
     ui->lineEdit_atk_range_general_x->blockSignals(true);
@@ -1582,5 +1591,17 @@ void MainWindow::on_pushButton_get_user_foot_clicked()
     }
     int foot_id = readInt(user_foothold_p + BASE::Foothold::ID);
     qDebug() << "地板ID：" << foot_id;
+}
+
+
+void MainWindow::on_checkBox_atk_switch_skillteleport_stateChanged(int arg1)
+{
+    if(ui->checkBox_atk_switch_skillteleport->isChecked()){
+        showNotice("法师瞬移已开启");
+        Gconfig.setValue("atk_swtich/skillteleport", true);
+    }else{
+        showNotice("法师瞬移已关闭");
+        Gconfig.setValue("atk_swtich/skillteleport", false);
+    }
 }
 
