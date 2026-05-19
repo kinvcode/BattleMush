@@ -107,7 +107,7 @@ bool MatchTemp::match(cv::Point &coor)
 
     // 载入模板图片
     QPixmap tmp_file(tmp_src);
-    qDebug() << "当前匹配模板：" << tmp_src;
+    // qDebug() << "当前匹配模板：" << tmp_src;
 
     // 模板
     cv::Mat cv_templat = QPixmapToMat(tmp_file);
@@ -118,7 +118,7 @@ bool MatchTemp::match(cv::Point &coor)
 
     tmp_width = cv_templat.cols;
     tmp_height = cv_templat.rows;
-    qDebug() << "模板大小:" << tmp_width << "," << tmp_height;
+    // qDebug() << "模板大小:" << tmp_width << "," << tmp_height;
 
     // 截图
     cv::Mat cv_capture = QPixmapToMat(cur_capture);
@@ -153,7 +153,7 @@ bool MatchTemp::match(cv::Point &coor)
     double minVal;
     cv::Point matchLoc;
     cv::minMaxLoc(cv_result, &minVal, NULL, &matchLoc);
-    qDebug() <<("当前匹配系数：" + QString::number(minVal) + " 坐标:" + QString::number(matchLoc.x + x_offset) + "," + QString::number(matchLoc.y + y_offset));
+    // qDebug() <<("当前匹配系数：" + QString::number(minVal) + " 坐标:" + QString::number(matchLoc.x + x_offset) + "," + QString::number(matchLoc.y + y_offset));
 
 
     if(minVal > 1000000)
@@ -164,7 +164,7 @@ bool MatchTemp::match(cv::Point &coor)
             goto begin;
         }
         // 匹配失败
-        qDebug() <<("匹配系数太低，匹配失败");
+        // qDebug() <<("匹配系数太低，匹配失败");
         return false;
     }
 

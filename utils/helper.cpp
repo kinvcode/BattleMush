@@ -488,7 +488,11 @@ std::vector<Platform> RoomMap::makePlatformList(
             }
 
             // 拼接当前平台左边的地板
-            if (cv::Point(other_item.x_right,other_item.y_right) == tmp_platform.start) {
+            // if (cv::Point(other_item.x_right,other_item.y_right) == tmp_platform.start) {
+            if (other_item.y_right == tmp_platform.start.y
+                && other_item.x_left < tmp_platform.start.x
+                && other_item.x_right >= tmp_platform.start.x
+            ) {
                 id_set.erase(other_item.id);
 
                 LineChild child;
@@ -510,7 +514,11 @@ std::vector<Platform> RoomMap::makePlatformList(
             }
 
             // 拼接当前平台右边的地板
-            if (cv::Point(other_item.x_left,other_item.y_left) == tmp_platform.end) {
+            // if (cv::Point(other_item.x_left,other_item.y_left) == tmp_platform.end) {
+            if (other_item.y_left == tmp_platform.end.y
+                && other_item.x_right > tmp_platform.end.x
+                && other_item.x_left <= tmp_platform.end.x
+                ) {
                 id_set.erase(other_item.id);
 
                 LineChild child;
@@ -557,16 +565,93 @@ std::vector<Platform> RoomMap::makePlatformList(
 
     }
 
-    for (auto item : climb_list) {
+    // for (auto item : climb_list) {
+    //     Platform tmp_platform;
+    //     tmp_platform.type = 1; // 攀爬体
+    //     tmp_platform.hasLeftWall = false;
+    //     tmp_platform.hasRightWall = false;
+
+    //     tmp_platform.start = {item.x_left, item.y_top};
+    //     tmp_platform.end = {item.x_right, item.y_bottom};
+
+    //     tmp_platform.id = platform_id;
+    //     platform_id++;
+    //     platform_list.push_back(tmp_platform);
+    // }
+
+    // 1. 将所有地板ID放入到容器 footid_set里面
+    struct ClimbPlat{
+        int id;
+        ClimbRect rect;
+    };
+
+    std::vector<ClimbPlat> climbplat_list;
+    std::unordered_set<int> climb_set;
+    int climbplat_index = 0;
+    for (auto const item : climb_list) {
+        climbplat_list.push_back({climbplat_index,item});
+        climb_set.insert(climbplat_index);
+        climbplat_index++;
+    }
+
+    for (auto item : climbplat_list) {
+        if (climb_set.find(item.id) == climb_set.end()) {
+            continue;
+        }
+
+        climb_set.erase(item.id);
+
         Platform tmp_platform;
         tmp_platform.type = 1; // 攀爬体
         tmp_platform.hasLeftWall = false;
         tmp_platform.hasRightWall = false;
 
-        tmp_platform.start = {item.x_left, item.y_top};
-        tmp_platform.end = {item.x_right, item.y_bottom};
+        // 创建第一个line_child
+        LineChild first_child;
+        first_child.foot_id = -1;
+        first_child.start = cv::Point(item.rect.x_left,item.rect.y_top);
+        first_child.end = cv::Point(item.rect.x_right,item.rect.y_bottom);
+        first_child.length = qAbs(item.rect.y_bottom - item.rect.y_top);
+        tmp_platform.line_child.push_back(first_child);
 
+        tmp_platform.start = {item.rect.x_left, item.rect.y_top};
+        tmp_platform.end = {item.rect.x_right, item.rect.y_bottom};
         tmp_platform.id = platform_id;
+
+        for (auto& other_item : climbplat_list) {
+
+            if (climb_set.find(other_item.id) == climb_set.end()) {
+                continue;
+            }
+
+            // 如果梯子重叠
+            if( Math::hasIntersection(tmp_platform.start.x,tmp_platform.end.x,other_item.rect.x_left,other_item.rect.x_right) &&
+                Math::hasIntersection(tmp_platform.start.y,tmp_platform.end.y,other_item.rect.y_top,other_item.rect.y_bottom)
+            )
+            {
+                climb_set.erase(other_item.id);
+
+                LineChild child;
+                child.foot_id = -1;
+                child.start = cv::Point(other_item.rect.x_left,other_item.rect.y_top);
+                child.end = cv::Point(other_item.rect.x_right,other_item.rect.y_bottom);
+                child.length = qAbs(other_item.rect.y_bottom - other_item.rect.y_top);
+                tmp_platform.line_child.push_back(child);
+
+                // 拼接上面的梯子
+                if(other_item.rect.y_top < tmp_platform.start.y && other_item.rect.y_bottom >= tmp_platform.start.y)
+                {
+                    tmp_platform.start = cv::Point(other_item.rect.x_left,other_item.rect.y_top);
+                }
+
+                // 拼接下面的梯子
+                if(other_item.rect.y_bottom > tmp_platform.end.y && other_item.rect.y_top <= tmp_platform.end.y)
+                {
+                    tmp_platform.end = cv::Point(other_item.rect.x_right,other_item.rect.y_bottom);
+                }
+            }
+        }
+
         platform_id++;
         platform_list.push_back(tmp_platform);
     }
@@ -1071,6 +1156,15 @@ bool Math::posInRange(bool to_left,cv::Point posA, cv::Point posB, cv::Point ran
     }
     // qDebug() << "====== 范围内是否有怪物 没有 ======";
     return false;
+}
+
+bool Math::hasIntersection(float a1, float a2, float b1, float b2)
+{
+    // 确保区间正确（如果传入可能未排序）
+    if (a1 > a2) std::swap(a1, a2);
+    if (b1 > b2) std::swap(b1, b2);
+
+    return a1 <= b2 && b1 <= a2;
 }
 
 

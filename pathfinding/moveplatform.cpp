@@ -91,6 +91,20 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform, bool is_town)
                     }
                     qDebug() << "向下跳跃未到目的平台，即将尝试其他方式";
                     break;
+                case VISIT_TYPE::TELEPORT:
+                    qDebug() << "通过传送阵可以到达目标平台";
+                    if(teleport(target_pos, platform)){
+                        return true;
+                    }
+                    qDebug() << "通过传送阵未到目的平台，即将尝试其他方式";
+                    break;
+                case VISIT_TYPE::SKILL:
+                    qDebug() << "使用技能可以到达目标平台";
+                    if(skillMove(target_pos, platform)){
+                        return true;
+                    }
+                    qDebug() << "使用技能未到目的平台，即将尝试其他方式";
+                    break;
                 default:
                     break;
                 }
@@ -590,6 +604,40 @@ bool MovePlatform::down(cv::Point range, int platform, bool self_climb)
         return true;
     }
 
+    return false;
+}
+
+bool MovePlatform::teleport(cv::Point range, int platform)
+{
+    WalkBase walk_to_platform(0);
+    bool arrived = walk_to_platform.moveToPlatform(range); // 走到范围
+    if(!arrived) return false;
+
+    // 到达地点之后按向上方向键
+    MSDriverPRO::keyboardClick(MSKeyboard_UpArrow);
+
+    ProcessHelper::programDelay(100);
+
+    quint64 foothold_p = getUserFootholdP();
+    while(foothold_p == 0){
+        if(getUserClimbP() != 0){
+            break;
+        }
+        ProcessHelper::programDelay(50);
+        QApplication::processEvents();
+        foothold_p = getUserFootholdP();
+    }
+
+    if(platform == getUserPlatform()){
+        qDebug() << "通过传送已到达指定平台";
+        return true;
+    }
+
+    return false;
+}
+
+bool MovePlatform::skillMove(cv::Point range, int platform)
+{
     return false;
 }
 

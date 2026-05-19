@@ -181,6 +181,8 @@ private slots:
 
     void on_pushButton_play_alarm_sound_clicked();
 
+    void on_pushButton_get_user_foot_clicked();
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

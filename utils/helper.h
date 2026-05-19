@@ -82,6 +82,9 @@ public:
 
     // 计算坐标是否在范围内（用于找怪）
     static bool posInRange(bool to_left, cv::Point posA, cv::Point posB, cv::Point range);
+
+    // 判断两个直线是否有交集
+    static bool hasIntersection(float a1, float a2, float b1, float b2);
 };
 
 class ImageTool{

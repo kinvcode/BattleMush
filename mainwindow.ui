@@ -2150,6 +2150,31 @@ color: #FF5500;</string>
             <string>范围怪物</string>
            </property>
           </widget>
+          <widget class="QPushButton" name="pushButton_get_user_foot">
+           <property name="geometry">
+            <rect>
+             <x>100</x>
+             <y>30</y>
+             <width>80</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>所在地板</string>
+           </property>
+          </widget>
          </widget>
          <widget class="QGroupBox" name="groupBox_2">
           <property name="geometry">

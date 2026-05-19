@@ -23,6 +23,10 @@ public:
 
     static bool down(cv::Point range, int platform, bool self_climb = false);
 
+    static bool teleport(cv::Point range, int platform);
+
+    static bool skillMove(cv::Point range, int platform);
+
 private :
     static quint64 getUserFootholdP();
 

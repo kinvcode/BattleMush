@@ -1573,3 +1573,14 @@ void MainWindow::on_pushButton_play_alarm_sound_clicked()
     Helper::warningSound();
 }
 
+
+void MainWindow::on_pushButton_get_user_foot_clicked()
+{
+    quint64 user_foothold_p = readLong(readLong(Gplayer.p_localplayer + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::currentFoothold);
+    if(!user_foothold_p){
+        return;
+    }
+    int foot_id = readInt(user_foothold_p + BASE::Foothold::ID);
+    qDebug() << "地板ID：" << foot_id;
+}
+
