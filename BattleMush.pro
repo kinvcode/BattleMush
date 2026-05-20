@@ -18,6 +18,7 @@ ONNXRUNTIME_DIR = D:/CodeRepos/3th/onnxruntime-win-x64-1.23.2/ #onnxruntime v1.2
 
 INCLUDEPATH +=  $${OPENCV_PATH}/include \
                 $$ONNXRUNTIME_DIR/include \
+                $$PYTHON_BASE/include \
 
 CONFIG(debug, debug|release) {
     LIBS += $${OPENCV_PATH}/x64/vc16/lib/opencv_core460d.lib \
@@ -25,6 +26,7 @@ CONFIG(debug, debug|release) {
             $${OPENCV_PATH}/x64/vc16/lib/opencv_imgcodecs460d.lib \
             $${OPENCV_PATH}/x64/vc16/lib/opencv_videoio460d.lib \
             $${OPENCV_PATH}/x64/vc16/lib/opencv_dnn460d.lib \
+            $${OPENCV_PATH}/x64/vc16/lib/opencv_video460d.lib \
             -L$$ONNXRUNTIME_DIR/lib -lonnxruntime
 }
 
@@ -35,6 +37,7 @@ CONFIG(release, debug|release) {
             $${OPENCV_PATH}/x64/vc16/lib/opencv_imgcodecs460.lib \
             $${OPENCV_PATH}/x64/vc16/lib/opencv_videoio460.lib \
             $${OPENCV_PATH}/x64/vc16/lib/opencv_dnn460.lib \
+            $${OPENCV_PATH}/x64/vc16/lib/opencv_video460.lib \
             -L$$ONNXRUNTIME_DIR/lib -lonnxruntime
 }
 

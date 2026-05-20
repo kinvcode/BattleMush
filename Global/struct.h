@@ -305,4 +305,17 @@ struct Detection {
     int track_id;  // 用于跟踪
 };
 
+// 跟踪器状态结构体
+struct TrackState {
+    int id;
+    cv::Rect box;
+    cv::KalmanFilter kf;
+    int missed_frames;
+    int age;
+    bool active;
+    float confidence;
+
+    TrackState() : id(-1), missed_frames(0), age(0), active(true), confidence(0) {}
+};
+
 #endif // STRUCT_H

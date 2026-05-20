@@ -5,6 +5,30 @@
 #include <onnxruntime_cxx_api.h>
 #include <global/struct.h>
 
+class ByteTracker {
+public:
+    ByteTracker(float iou_threshold = 0.3,
+                int max_missed_frames = 30,
+                float conf_threshold_low = 0.1,
+                float conf_threshold_high = 0.5);
+
+    std::vector<Detection> update(const std::vector<Detection>& detections);
+
+private:
+    void initKalmanFilter(TrackState& track, const cv::Rect& box);
+    cv::Rect predictKalman(TrackState& track);
+    void updateKalman(TrackState& track, const cv::Rect& box);
+    double calculateIoU(const cv::Rect& box1, const cv::Rect& box2);
+
+    float m_iou_threshold;
+    int m_max_missed_frames;
+    float m_conf_threshold_low;
+    float m_conf_threshold_high;
+    int m_next_id;
+
+    std::vector<TrackState> m_tracks;
+};
+
 class YOLOv8Inference
 {
 public:
@@ -12,9 +36,7 @@ public:
 
     Ort::Env m_env{nullptr};
     Ort::Session* m_session;
-    // Ort::AllocatedStringPtr m_input_name;   // 使用这个类型
-    // Ort::AllocatedStringPtr m_output_name;  // 使用这个类型
-
+    ByteTracker m_tracker;
     char* m_input_name;       // 使用原始指针
     char* m_output_name;      // 使用原始指针
 
@@ -34,6 +56,7 @@ double calculateIoU(const cv::Rect& box1, const cv::Rect& box2);
 void drawDetections(cv::Mat& frame, const std::vector<Detection>& detections);
 
 };
+
 
 class MouseTrack{
 public:
