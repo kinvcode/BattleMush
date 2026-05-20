@@ -20,21 +20,58 @@ YOLOv8Inference::YOLOv8Inference(const QString &model_path)
     session_options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
 
     // 加载模型
-    // m_session = Ort::Session(m_env, model_path.c_str(), session_options);
     m_session = new Ort::Session(m_env, data, dataSize, session_options);
 
     // 获取输入/输出名称（保存为成员变量）
     Ort::AllocatorWithDefaultOptions allocator;
 
-    auto input_name_ptr = m_session->GetInputNameAllocated(0, allocator);
-    auto output_name_ptr = m_session->GetOutputNameAllocated(0, allocator);
-    m_input_name = input_name_ptr.get();
-    m_output_name = output_name_ptr.get();
+    // auto input_name_ptr = m_session->GetInputNameAllocated(0, allocator);
+    // auto output_name_ptr = m_session->GetOutputNameAllocated(0, allocator);
+    // m_input_name = input_name_ptr.get();
+    // m_output_name = output_name_ptr.get();
+
+    // // 获取输入形状
+    // Ort::TypeInfo input_type_info = m_session->GetInputTypeInfo(0);
+    // auto input_tensor_info = input_type_info.GetTensorTypeAndShapeInfo();
+    // m_input_shape = input_tensor_info.GetShape();
+
+    try {
+        auto input_name_ptr = m_session->GetInputNameAllocated(0, allocator);
+        auto output_name_ptr = m_session->GetOutputNameAllocated(0, allocator);
+
+        // 拷贝到成员变量（char*）
+        size_t input_len = strlen(input_name_ptr.get()) + 1;
+        m_input_name = new char[input_len];
+        strcpy_s(m_input_name, input_len, input_name_ptr.get());
+
+        size_t output_len = strlen(output_name_ptr.get()) + 1;
+        m_output_name = new char[output_len];
+        strcpy_s(m_output_name, output_len, output_name_ptr.get());
+
+        qDebug() << "输入节点名称:" << m_input_name;
+        qDebug() << "输出节点名称:" << m_output_name;
+    } catch (const Ort::Exception& e) {
+        qCritical() << "获取节点名称失败:" << e.what();
+        throw;
+    }
 
     // 获取输入形状
-    Ort::TypeInfo input_type_info = m_session->GetInputTypeInfo(0);
-    auto input_tensor_info = input_type_info.GetTensorTypeAndShapeInfo();
-    m_input_shape = input_tensor_info.GetShape();
+    try {
+        Ort::TypeInfo input_type_info = m_session->GetInputTypeInfo(0);
+        auto input_tensor_info = input_type_info.GetTensorTypeAndShapeInfo();
+        m_input_shape = input_tensor_info.GetShape();
+
+        QString shapeStr;
+        for (auto dim : m_input_shape) {
+            shapeStr += QString::number(dim) + " ";
+        }
+        qDebug() << "模型期望输入形状:" << shapeStr;
+    } catch (const Ort::Exception& e) {
+        qCritical() << "获取输入形状失败:" << e.what();
+        throw;
+    }
+
+    qDebug() << "模型加载成功!";
 }
 
 std::vector<Detection> YOLOv8Inference::detect(const cv::Mat &frame, float conf_threshold, float iou_threshold)
@@ -61,10 +98,29 @@ std::vector<Detection> YOLOv8Inference::detect(const cv::Mat &frame, float conf_
     // 3. 运行推理
     auto start_time = std::chrono::high_resolution_clock::now();
 
-    // const char* input_name_ptr = m_input_name.get();
-    // const char* output_name_ptr = m_output_name.get();
     const char* input_name_ptr = m_input_name;   // char* 直接赋值给 const char*
     const char* output_name_ptr = m_output_name; // char* 直接赋值给 const char*
+
+    // 在 m_session->Run 之前添加
+    qDebug() << "===";
+    qDebug() << "=== detect 函数中 ===";
+    qDebug() << "输入节点名称:" << m_input_name;
+    qDebug() << "输出节点名称:" << m_output_name;
+    qDebug() << "输入形状: 1 3" << m_input_shape[2] << m_input_shape[3];
+    qDebug() << "输入数据大小:" << input_data.size();
+
+    try {
+        auto output_tensors = m_session->Run(
+            Ort::RunOptions{nullptr},
+            &input_name_ptr, &input_tensor, 1,
+            &output_name_ptr, 1
+            );
+        qDebug() << "推理成功!";
+    } catch (const Ort::Exception& e) {
+        // qCritical() << "ORT 错误码:" << e.code();
+        qCritical() << "ORT 错误信息:" << e.what();
+        throw;
+    }
 
     auto output_tensors = m_session->Run(
         Ort::RunOptions{nullptr},
@@ -95,11 +151,38 @@ std::vector<Detection> YOLOv8Inference::detect(const cv::Mat &frame, float conf_
         float w = detection_ptr[2];
         float h = detection_ptr[3];
 
+        // 确保宽度和高度为正数
+        if (w <= 0 || h <= 0) {
+            continue;
+        }
+
         // 转换为绝对坐标
         int x = static_cast<int>((cx - w / 2) * frame.cols);
         int y = static_cast<int>((cy - h / 2) * frame.rows);
         int width = static_cast<int>(w * frame.cols);
         int height = static_cast<int>(h * frame.rows);
+
+        // 确保宽度和高度为正数
+        if (width <= 0 || height <= 0) {
+            continue;
+        }
+
+        // 边界修正（防止越界）
+        x = std::max(0, x);
+        y = std::max(0, y);
+
+        // 确保框不超出图像边界
+        if (x + width > frame.cols) {
+            width = frame.cols - x;
+        }
+        if (y + height > frame.rows) {
+            height = frame.rows - y;
+        }
+
+        // 再次检查宽度和高度有效性
+        if (width <= 0 || height <= 0) {
+            continue;
+        }
 
         // 获取类别置信度
         float* class_scores = detection_ptr + 4;
@@ -289,15 +372,6 @@ void MouseTrack::test()
         cv::putText(frame, "Frame: " + std::to_string(frame_count) + "/" + std::to_string(total_frames),
                     cv::Point(10, 60), cv::FONT_HERSHEY_SIMPLEX, 0.7, cv::Scalar(0, 255, 0), 2);
 
-        // 显示图像
-        // cv::imshow("YOLOv8 Detection", frame);
-
-        // 按 ESC 或 'q' 退出
-        // char key = cv::waitKey(static_cast<int>(1000.0 / fps));
-        // if (key == 27 || key == 'q') {
-        //     break;
-        // }
-
         // 每100帧输出一次进度
         if (frame_count % 100 == 0) {
             double progress = frame_count * 100.0 / total_frames;
@@ -317,44 +391,4 @@ void MouseTrack::test()
     qDebug() << "总耗时: " << total_elapsed << " 秒" ;
     qDebug() << "平均 FPS: " << frame_count / total_elapsed ;
 
-    // // 从 Qt 资源读取模型文件
-    // QResource resource(":/assets/best.onnx");
-
-    // if (!resource.isValid()) {
-    //     qCritical() << "Failed to load resource :/assets/best.onnx";
-    //     return;
-    // }
-
-    // // 获取资源数据（直接指向内存，无需拷贝）
-    // const uchar* data = resource.data();
-    // size_t dataSize = resource.size();
-
-    // // 从内存字节流加载模型
-    // Ort::Env env(ORT_LOGGING_LEVEL_WARNING, "YOLO");
-    // Ort::SessionOptions sessionOptions;
-    // sessionOptions.SetIntraOpNumThreads(1);
-
-    // // 使用内存字节流创建 Session
-    // Ort::Session session(env, data, dataSize, sessionOptions);
-
-    // // 2. 读取和预处理视频帧 (用 OpenCV)
-    // cv::VideoCapture cap("D:\\CodeRepos\\Pythons\\mousemove\\2.mp4");
-    // cv::Mat frame;
-    // while (cap.read(frame)) {
-    //     // 缩放图像到 640x640 (与模型导出时一致)
-    //     cv::Mat resized_frame;
-    //     cv::resize(frame, resized_frame, cv::Size(640, 640));
-
-    //     // 转换为模型需要的 RGB 格式和 blob 数据
-    //     // ... (这一步比较复杂，需要进行数据类型转换和归一化)
-
-    //     // 3. 运行推理
-    //     // auto output_tensors = session.Run(...);
-
-    //     // 4. 后处理 (解析输出结果，得到坐标和类别)
-    //     // ... (这是整个过程中最复杂的部分，需要你根据模型输出结构编写解析代码)
-
-    //     // 5. 在 Qt 中显示 (将坐标画在原图上，并通过 Qt 的显示组件展示)
-    //     // ...
-    // }
 }
