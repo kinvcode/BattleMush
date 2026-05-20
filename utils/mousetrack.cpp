@@ -33,16 +33,6 @@ YOLOv8Inference::YOLOv8Inference(const QString &model_path)
     // 获取输入/输出名称（保存为成员变量）
     Ort::AllocatorWithDefaultOptions allocator;
 
-    // auto input_name_ptr = m_session->GetInputNameAllocated(0, allocator);
-    // auto output_name_ptr = m_session->GetOutputNameAllocated(0, allocator);
-    // m_input_name = input_name_ptr.get();
-    // m_output_name = output_name_ptr.get();
-
-    // // 获取输入形状
-    // Ort::TypeInfo input_type_info = m_session->GetInputTypeInfo(0);
-    // auto input_tensor_info = input_type_info.GetTensorTypeAndShapeInfo();
-    // m_input_shape = input_tensor_info.GetShape();
-
     try {
         auto input_name_ptr = m_session->GetInputNameAllocated(0, allocator);
         auto output_name_ptr = m_session->GetOutputNameAllocated(0, allocator);
@@ -81,145 +71,6 @@ YOLOv8Inference::YOLOv8Inference(const QString &model_path)
 
     qDebug() << "模型加载成功!";
 }
-
-// std::vector<Detection> YOLOv8Inference::detect(const cv::Mat &frame, float conf_threshold, float iou_threshold)
-// {
-//     // 1. 预处理
-//     cv::Mat resized_frame;
-//     cv::resize(frame, resized_frame, cv::Size(m_input_shape[3], m_input_shape[2]));
-
-//     cv::Mat blob;
-//     cv::dnn::blobFromImage(resized_frame, blob, 1.0 / 255.0,
-//                            cv::Size(m_input_shape[3], m_input_shape[2]),
-//                            cv::Scalar(), true, false);
-
-//     // 2. 准备输入数据
-//     std::vector<float> input_data(blob.begin<float>(), blob.end<float>());
-
-//     std::vector<int64_t> input_shape = {1, 3, m_input_shape[2], m_input_shape[3]};
-//     Ort::MemoryInfo memory_info = Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
-//     Ort::Value input_tensor = Ort::Value::CreateTensor<float>(
-//         memory_info, input_data.data(), input_data.size(),
-//         input_shape.data(), input_shape.size()
-//         );
-
-//     // 3. 运行推理
-//     auto start_time = std::chrono::high_resolution_clock::now();
-
-//     const char* input_name_ptr = m_input_name;   // char* 直接赋值给 const char*
-//     const char* output_name_ptr = m_output_name; // char* 直接赋值给 const char*
-
-//     // 在 m_session->Run 之前添加
-//     // qDebug() << "=== detect 函数中 ===";
-//     // qDebug() << "输入节点名称:" << m_input_name;
-//     // qDebug() << "输出节点名称:" << m_output_name;
-//     // qDebug() << "输入形状: 1 3" << m_input_shape[2] << m_input_shape[3];
-//     // qDebug() << "输入数据大小:" << input_data.size();
-
-//     auto output_tensors = m_session->Run(
-//         Ort::RunOptions{nullptr},
-//         &input_name_ptr, &input_tensor, 1,
-//         &output_name_ptr, 1
-//         );
-
-//     auto end_time = std::chrono::high_resolution_clock::now();
-//     auto inference_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-//     // qDebug() << "推理时间: " << inference_time << " ms";
-
-//     // 4. 后处理
-//     float* output_data = output_tensors[0].GetTensorMutableData<float>();
-//     std::vector<int64_t> output_shape = output_tensors[0].GetTensorTypeAndShapeInfo().GetShape();
-
-//     // YOLOv8 输出格式: [batch, 84, num_detections]
-//     int num_detections = output_shape[2];  // 通常是 8400
-//     int num_classes = output_shape[1] - 4; // 84 - 4 = 80
-
-//     std::vector<Detection> detections;
-
-//     for (int i = 0; i < num_detections; ++i) {
-//         float* detection_ptr = output_data + i * (num_classes + 4);
-
-//         // 获取边界框坐标 (中心x, 中心y, 宽度, 高度) - 归一化坐标
-//         float cx = detection_ptr[0];
-//         float cy = detection_ptr[1];
-//         float w = detection_ptr[2];
-//         float h = detection_ptr[3];
-
-//         // 确保宽度和高度为正数
-//         if (w <= 0 || h <= 0) {
-//             continue;
-//         }
-
-//         // 转换为绝对坐标
-//         int x = static_cast<int>((cx - w / 2) * frame.cols);
-//         int y = static_cast<int>((cy - h / 2) * frame.rows);
-//         int width = static_cast<int>(w * frame.cols);
-//         int height = static_cast<int>(h * frame.rows);
-
-//         // 确保宽度和高度为正数
-//         if (width <= 0 || height <= 0) {
-//             continue;
-//         }
-
-//         // 边界修正（防止越界）
-//         x = std::max(0, x);
-//         y = std::max(0, y);
-
-//         // 确保框不超出图像边界
-//         if (x + width > frame.cols) {
-//             width = frame.cols - x;
-//         }
-//         if (y + height > frame.rows) {
-//             height = frame.rows - y;
-//         }
-
-//         // 再次检查宽度和高度有效性
-//         if (width <= 0 || height <= 0) {
-//             continue;
-//         }
-
-//         // 获取类别置信度
-//         float* class_scores = detection_ptr + 4;
-
-//         // 找到最大置信度的类别
-//         int class_id = 0;
-//         float max_score = class_scores[0];
-//         for (int j = 1; j < num_classes; ++j) {
-//             if (class_scores[j] > max_score) {
-//                 max_score = class_scores[j];
-//                 class_id = j;
-//             }
-//         }
-
-//         // 应用置信度阈值
-//         if (max_score > conf_threshold) {
-//             Detection det;
-//             det.class_id = class_id;
-//             det.confidence = max_score;
-//             det.box = cv::Rect(x, y, width, height);
-//             detections.push_back(det);
-//         }
-//     }
-
-//     // 5. NMS 过滤重叠框
-//     std::vector<Detection> filtered_detections;
-//     std::vector<int> indices;
-//     std::vector<cv::Rect> boxes;
-//     std::vector<float> scores;
-
-//     for (const auto& det : detections) {
-//         boxes.push_back(det.box);
-//         scores.push_back(det.confidence);
-//     }
-
-//     cv::dnn::NMSBoxes(boxes, scores, conf_threshold, iou_threshold, indices);
-
-//     for (int idx : indices) {
-//         filtered_detections.push_back(detections[idx]);
-//     }
-
-//     return filtered_detections;
-// }
 
 std::vector<Detection> YOLOv8Inference::detect(const cv::Mat &frame, float conf_threshold, float iou_threshold)
 {
@@ -673,27 +524,35 @@ void MouseTrack::test()
     int game_width = game_rect.right - game_rect.left;
     int game_height = game_rect.bottom - game_rect.top;
     int gamewindow_title_height = 32;
+    int gamewindow_x_offset = 8;
+    int box_width = 383;
+    int box_height = 258;
+
+    Gplayer.game_window.x = game_x;
+    Gplayer.game_window.y = game_y;
+    Gplayer.game_window.width = game_width;
+    Gplayer.game_window.height = game_height;
 
     qDebug() << "游戏窗口信息:";
     qDebug() << "  位置:(" << game_x << "," << game_y << ")";
     qDebug() << "  尺寸:" << game_width << "x" << game_height;
+    qDebug() << "游戏窗口X：" << Gplayer.game_window.x;
+    qDebug() << "游戏窗口Y：" << Gplayer.game_window.y;
+
+    // 创建保存图片的目录
+    QString save_dir = "detection_results";
+    QDir dir;
+    if (!dir.exists(save_dir)) {
+        dir.mkpath(save_dir);
+        qDebug() << "创建目录:" << save_dir;
+    }
 
     // 获取主屏幕
     QScreen* m_pScreen = QGuiApplication::primaryScreen();
 
     int frame_count = 0;
-    int target_fps = 2;  // 限制处理帧率
-    auto last_time = std::chrono::steady_clock::now();
 
     while (true) {
-        // 限制处理帧率
-        auto current_time = std::chrono::steady_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - last_time).count();
-        if (elapsed < 1000 / target_fps) {
-            // 等待到下一帧的处理时间
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000 / target_fps - elapsed));
-        }
-        last_time = std::chrono::steady_clock::now();
 
         // 截取屏幕
         QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
@@ -720,19 +579,40 @@ void MouseTrack::test()
             }
         }
 
+        // 绘制检测结果（会在 bgr_frame 上绘制）
+        yolo.drawDetections(bgr_frame, detections);
+
         // 打印结果
         if (found) {
             // 计算中心点坐标
             int center_x = circle_true_det.box.x + circle_true_det.box.width / 2;
             int center_y = circle_true_det.box.y + circle_true_det.box.height / 2;
+
             qDebug() << "帧" << frame_count << "circle_true:"
                      << "ID:" << circle_true_det.track_id
                      << "置信度:" << circle_true_det.confidence
                      << "坐标:(" << circle_true_det.box.x << "," << circle_true_det.box.y
                      << ")-(" << circle_true_det.box.x + circle_true_det.box.width
-                     << "," << circle_true_det.box.y + circle_true_det.box.height << ")";
+                     << "," << circle_true_det.box.y + circle_true_det.box.height << ")"
+                     << "中心点:(" << center_x << "," << center_y << ")";
+
+            // 在图像上绘制中心点
+            cv::circle(bgr_frame, cv::Point(center_x, center_y), 5, cv::Scalar(0, 0, 255), -1);
+
+            // 添加追踪信息
+            cv::putText(bgr_frame,
+                        "Tracking ID: " + std::to_string(circle_true_det.track_id),
+                        cv::Point(10, 60),
+                        cv::FONT_HERSHEY_SIMPLEX,
+                        0.7,
+                        cv::Scalar(0, 255, 0),
+                        2);
             // 中心点
-            MSKM::humanMove(center_x, center_y + gamewindow_title_height);
+            MSKM::humanMove(center_x, center_y);
+
+            // 保存识别结果图片
+            QString save_path = QString("%1/frame_%2.jpg").arg(save_dir).arg(frame_count, 6, 10, QChar('0'));
+            cv::imwrite(save_path.toStdString(), bgr_frame);
         }
 
         frame_count++;
