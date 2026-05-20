@@ -4,6 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include <onnxruntime_cxx_api.h>
 #include <global/struct.h>
+#include <chrono>
 
 class ByteTracker {
 public:
@@ -57,6 +58,52 @@ void drawDetections(cv::Mat& frame, const std::vector<Detection>& detections);
 
 };
 
+class MousePredictor
+{
+public:
+    MousePredictor();
+    ~MousePredictor();
+
+    /**
+     * @brief 更新卡尔曼滤波器（有新的检测结果时调用）
+     * @param x 检测到的目标 X 坐标
+     * @param y 检测到的目标 Y 坐标
+     */
+    void update(float x, float y);
+
+    /**
+     * @brief 预测目标位置（无新检测时调用）
+     * @param dt_ms 距离上次预测的时间（毫秒）
+     */
+    void predict(float dt_ms);
+
+    /**
+     * @brief 获取预测的 X 坐标
+     */
+    float getPredictedX() const;
+
+    /**
+     * @brief 获取预测的 Y 坐标
+     */
+    float getPredictedY() const;
+
+    /**
+     * @brief 检查是否已初始化
+     */
+    bool isInitialized() const;
+
+    /**
+     * @brief 重置预测器
+     */
+    void reset();
+
+private:
+    cv::KalmanFilter m_kalman;
+    bool m_has_initialized;
+    float m_predicted_x;
+    float m_predicted_y;
+    std::chrono::high_resolution_clock::time_point m_last_time;
+};
 
 class MouseTrack{
 public:
