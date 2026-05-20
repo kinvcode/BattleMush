@@ -1,7 +1,14 @@
 #include "mousetrack.h"
 #include <QResource>
+#include <QScreen>
 #include <opencv2/dnn.hpp>
 #include <opencv2/video/tracking.hpp>
+#include "utils/gamestruct.h"
+#include "global/gameoffset.h"
+#include "global/globalplayer.h"
+#include "driver/msdriverpro.h"
+#include "driver/mskeycode.h"
+#include "utils/helper.h"
 
 YOLOv8Inference::YOLOv8Inference(const QString &model_path)
 : m_tracker(0.3, 30, 0.1, 0.5)  // IoU阈值, 最大丢失帧数, 低置信度阈值, 高置信度阈值
@@ -651,43 +658,57 @@ void MouseTrack::test()
 {
     YOLOv8Inference yolo(":/assets/best.onnx");
 
-    std::string video_path = "D:\\CodeRepos\\Pythons\\mousemove\\2.mp4";
-    cv::VideoCapture cap(video_path);
-
-    if (!cap.isOpened()) {
-        qCritical() << "无法打开视频文件:" << QString::fromStdString(video_path);
+    // 查找游戏窗口
+    HWND game_hwnd = FindWindow(NULL, TEXT("MapleStory Worlds-Artale (繁體中文版)"));
+    if (game_hwnd == NULL) {
+        qCritical() << "游戏窗口不存在！";
         return;
     }
 
-    cv::Mat frame;
+    // 获取窗口位置和大小
+    RECT game_rect;
+    GetWindowRect(game_hwnd, &game_rect);
+    int game_x = game_rect.left;
+    int game_y = game_rect.top;
+    int game_width = game_rect.right - game_rect.left;
+    int game_height = game_rect.bottom - game_rect.top;
+    int gamewindow_title_height = 32;
+
+    qDebug() << "游戏窗口信息:";
+    qDebug() << "  位置:(" << game_x << "," << game_y << ")";
+    qDebug() << "  尺寸:" << game_width << "x" << game_height;
+
+    // 获取主屏幕
+    QScreen* m_pScreen = QGuiApplication::primaryScreen();
+
     int frame_count = 0;
+    int target_fps = 2;  // 限制处理帧率
+    auto last_time = std::chrono::steady_clock::now();
 
-    double fps = cap.get(cv::CAP_PROP_FPS);
-    int frame_width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
-    int frame_height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
-    int total_frames = cap.get(cv::CAP_PROP_FRAME_COUNT);
-
-    qDebug() << "FPS" << fps << "视频总帧数：" << total_frames;
-
-    cv::VideoWriter writer("output_tracked.mp4",
-                           cv::VideoWriter::fourcc('m', 'p', '4', 'v'),
-                           fps,
-                           cv::Size(frame_width, frame_height));
-
-    int frame_interval = static_cast<int>(fps / 2);  // 计算采样间隔
-    while (cap.read(frame)) {
-        frame_count++;
-
-        if (frame_count % frame_interval != 0){
-            continue;
+    while (true) {
+        // 限制处理帧率
+        auto current_time = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - last_time).count();
+        if (elapsed < 1000 / target_fps) {
+            // 等待到下一帧的处理时间
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000 / target_fps - elapsed));
         }
+        last_time = std::chrono::steady_clock::now();
 
-        auto detections = yolo.track(frame, 0.25);
+        // 截取屏幕
+        QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
+        cur_capture = cur_capture.copy(game_x, game_y, game_width, game_height);
 
-        // 写入视频
-        yolo.drawDetections(frame, detections);  // 这里直接在 frame 上绘制矩形框和文字
-        writer.write(frame);
+        // 转换为 OpenCV Mat 格式
+        QImage image = cur_capture.toImage();
+        cv::Mat frame(image.height(), image.width(), CV_8UC4, image.bits(), image.bytesPerLine());
+        cv::Mat bgr_frame;
+        cv::cvtColor(frame, bgr_frame, cv::COLOR_BGRA2BGR);
 
+        // 追踪检测
+        auto detections = yolo.track(bgr_frame, 0.25);
+
+        // 查找 circle_true (class_id == 0)
         bool found = false;
         Detection circle_true_det;
 
@@ -699,18 +720,26 @@ void MouseTrack::test()
             }
         }
 
+        // 打印结果
         if (found) {
+            // 计算中心点坐标
+            int center_x = circle_true_det.box.x + circle_true_det.box.width / 2;
+            int center_y = circle_true_det.box.y + circle_true_det.box.height / 2;
             qDebug() << "帧" << frame_count << "circle_true:"
                      << "ID:" << circle_true_det.track_id
                      << "置信度:" << circle_true_det.confidence
                      << "坐标:(" << circle_true_det.box.x << "," << circle_true_det.box.y
                      << ")-(" << circle_true_det.box.x + circle_true_det.box.width
                      << "," << circle_true_det.box.y + circle_true_det.box.height << ")";
-        } else if (frame_count <= 5) {
-            qDebug() << "帧" << frame_count << "未检测到 circle_true";
+            // 中心点
+            MSKM::humanMove(center_x, center_y + gamewindow_title_height);
+        }
+
+        frame_count++;
+
+        // 每100帧输出进度
+        if (frame_count % 100 == 0) {
+            qDebug() << "已处理" << frame_count << "帧";
         }
     }
-
-    qDebug() << "处理完毕！";
-    cap.release();
 }
