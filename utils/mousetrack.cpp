@@ -27,6 +27,17 @@ YOLOv8Inference::YOLOv8Inference(const QString &model_path)
     session_options.SetIntraOpNumThreads(1);
     session_options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
 
+    // // CPU 核心优化关键设置
+    // int num_cores = std::thread::hardware_concurrency();  // 获取CPU核心数
+    // session_options.SetIntraOpNumThreads(num_cores);      // 内部操作线程数
+    // session_options.SetInterOpNumThreads(num_cores / 2);   // 间操作线程数
+    // // 启用 CPU 优化
+    // session_options.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_ALL);
+    // session_options.EnableCpuMemArena();      // 启用 CPU 内存池
+    // session_options.EnableMemPattern();       // 启用内存模式优化
+    // // 设置执行模式为并行
+    // session_options.SetExecutionMode(ExecutionMode::ORT_PARALLEL);
+
     // 加载模型
     m_session = new Ort::Session(m_env, data, dataSize, session_options);
 
@@ -193,8 +204,23 @@ std::vector<Detection> YOLOv8Inference::detect(const cv::Mat &frame, float conf_
 
 std::vector<Detection> YOLOv8Inference::track(const cv::Mat &frame, float conf_threshold)
 {
+    // auto detections = detect(frame, conf_threshold);
+    // return m_tracker.update(detections);
+
+    auto t1 = std::chrono::high_resolution_clock::now();
     auto detections = detect(frame, conf_threshold);
-    return m_tracker.update(detections);
+    auto t2 = std::chrono::high_resolution_clock::now();
+
+    std::vector<Detection> results = m_tracker.update(detections);
+
+    auto t3 = std::chrono::high_resolution_clock::now();
+
+    qDebug() << QString("detect: %1ms  track: %2ms  total: %3ms")
+                    .arg(std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count())
+                    .arg(std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count())
+                    .arg(std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t1).count());
+
+    return results;
 }
 
 double YOLOv8Inference::calculateIoU(const cv::Rect &box1, const cv::Rect &box2)
@@ -525,8 +551,17 @@ void MouseTrack::test()
     int game_height = game_rect.bottom - game_rect.top;
     int gamewindow_title_height = 32;
     int gamewindow_x_offset = 8;
-    int box_width = 383;
-    int box_height = 258;
+    int box_pos_x = 399;
+    int box_pos_y = 218;
+    int box_width = 500;
+    int box_height = 335;
+
+    int pos_x = game_x + box_pos_x;
+    int pos_y = game_y + box_pos_y;
+    int detect_width = box_width;
+    int detect_height = box_height;
+
+    qDebug() << "识别区域:" << pos_x << pos_y << detect_width << detect_height;
 
     Gplayer.game_window.x = game_x;
     Gplayer.game_window.y = game_y;
@@ -552,17 +587,25 @@ void MouseTrack::test()
 
     int frame_count = 0;
 
+    auto last_time = std::chrono::high_resolution_clock::now();
     while (true) {
+        auto t1_time = std::chrono::high_resolution_clock::now();
 
         // 截取屏幕
         QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
-        cur_capture = cur_capture.copy(game_x, game_y, game_width, game_height);
+        // cur_capture = cur_capture.copy(game_x, game_y, game_width, game_height);
+        cur_capture = cur_capture.copy(pos_x, pos_y, detect_width, detect_height);
 
         // 转换为 OpenCV Mat 格式
         QImage image = cur_capture.toImage();
         cv::Mat frame(image.height(), image.width(), CV_8UC4, image.bits(), image.bytesPerLine());
         cv::Mat bgr_frame;
         cv::cvtColor(frame, bgr_frame, cv::COLOR_BGRA2BGR);
+
+        auto t2_time = std::chrono::high_resolution_clock::now();
+
+        auto t2_duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2_time - t1_time).count();
+        qDebug() << "t2_duration用时:" << t2_duration;
 
         // 追踪检测
         auto detections = yolo.track(bgr_frame, 0.25);
@@ -608,11 +651,21 @@ void MouseTrack::test()
                         cv::Scalar(0, 255, 0),
                         2);
             // 中心点
-            MSKM::humanMove(center_x, center_y);
+            MSDriverPRO::mouseMoveTo(Gplayer.game_window.x + box_pos_x + center_x, Gplayer.game_window.y + box_pos_y + center_y);
 
             // 保存识别结果图片
             QString save_path = QString("%1/frame_%2.jpg").arg(save_dir).arg(frame_count, 6, 10, QChar('0'));
             cv::imwrite(save_path.toStdString(), bgr_frame);
+
+            auto t3_time = std::chrono::high_resolution_clock::now();
+            auto t3_duration = std::chrono::duration_cast<std::chrono::milliseconds>(t3_time - t2_time).count();
+            qDebug() << "t3_duration用时:" << t3_duration;
+
+            auto now_time = std::chrono::high_resolution_clock::now();
+            auto use_time = now_time - last_time;
+            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(use_time).count();
+            qDebug() << "帧处理用时:" << duration;
+            last_time = now_time;
         }
 
         frame_count++;
