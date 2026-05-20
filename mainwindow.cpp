@@ -23,6 +23,7 @@
 #include <QGraphicsScene>
 #include "widgets/taskeditdialog.h"
 #include "utils/data.h"
+#include "utils/mousetrack.h"
 
 // 测试头文件
 #include "global/globalplayer.h"
@@ -1603,5 +1604,12 @@ void MainWindow::on_checkBox_atk_switch_skillteleport_stateChanged(int arg1)
         showNotice("法师瞬移已关闭");
         Gconfig.setValue("atk_swtich/skillteleport", false);
     }
+}
+
+
+void MainWindow::on_pushButton_mousetrack_clicked()
+{
+    MouseTrack tracktest;
+    tracktest.test();
 }
 

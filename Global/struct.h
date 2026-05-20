@@ -297,4 +297,12 @@ typedef struct{
     int height;
 }GameWindow;
 
+// 检测结果结构体
+struct Detection {
+    int class_id;
+    float confidence;
+    cv::Rect box;
+    int track_id;  // 用于跟踪
+};
+
 #endif // STRUCT_H

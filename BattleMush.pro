@@ -14,13 +14,18 @@ CONFIG += c++17
 # DEFINES += PROTECT=TRUE
 
 OPENCV_PATH = D:/CodeRepos/3th/opencv/           #opencv目录
+ONNXRUNTIME_DIR = D:/CodeRepos/3th/onnxruntime-win-x64-1.23.2/ #onnxruntime v1.23.2 https://github.com/microsoft/onnxruntime/releases
 
-INCLUDEPATH +=  $${OPENCV_PATH}/include
+INCLUDEPATH +=  $${OPENCV_PATH}/include \
+                $$ONNXRUNTIME_DIR/include \
 
 CONFIG(debug, debug|release) {
     LIBS += $${OPENCV_PATH}/x64/vc16/lib/opencv_core460d.lib \
             $${OPENCV_PATH}/x64/vc16/lib/opencv_imgproc460d.lib \
             $${OPENCV_PATH}/x64/vc16/lib/opencv_imgcodecs460d.lib \
+            $${OPENCV_PATH}/x64/vc16/lib/opencv_videoio460d.lib \
+            $${OPENCV_PATH}/x64/vc16/lib/opencv_dnn460d.lib \
+            -L$$ONNXRUNTIME_DIR/lib -lonnxruntime
 }
 
 # Release 模式下的配置
@@ -28,6 +33,9 @@ CONFIG(release, debug|release) {
     LIBS += $${OPENCV_PATH}/x64/vc16/lib/opencv_core460.lib \
             $${OPENCV_PATH}/x64/vc16/lib/opencv_imgproc460.lib \
             $${OPENCV_PATH}/x64/vc16/lib/opencv_imgcodecs460.lib \
+            $${OPENCV_PATH}/x64/vc16/lib/opencv_videoio460.lib \
+            $${OPENCV_PATH}/x64/vc16/lib/opencv_dnn460.lib \
+            -L$$ONNXRUNTIME_DIR/lib -lonnxruntime
 }
 
 CONFIG(debug, debug|release) {
@@ -68,6 +76,7 @@ SOURCES += \
     utils/helper.cpp \
     utils/mapserializer.cpp \
     utils/matchtemp.cpp \
+    utils/mousetrack.cpp \
     widgets/alertwindow.cpp \
     widgets/hotkeyedit.cpp \
     widgets/noticewidget.cpp \
@@ -103,6 +112,7 @@ HEADERS += \
     utils/helper.h \
     utils/mapserializer.h \
     utils/matchtemp.h \
+    utils/mousetrack.h \
     vmp/VMProtectSDK.h \
     widgets/alertwindow.h \
     widgets/hotkeyedit.h \

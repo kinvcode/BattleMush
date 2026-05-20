@@ -185,6 +185,8 @@ private slots:
 
     void on_checkBox_atk_switch_skillteleport_stateChanged(int arg1);
 
+    void on_pushButton_mousetrack_clicked();
+
 public slots:
     void console(QString msg);
     void warning(QString msg);
