@@ -2103,6 +2103,7 @@ void KillMonster::handleDied()
 
 void KillMonster::handleMousemove()
 {
+
     Helper::warningSound();
     ProcessHelper::programDelay(3000);
 }

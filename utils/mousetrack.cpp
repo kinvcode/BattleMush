@@ -9,6 +9,7 @@
 #include "driver/msdriverpro.h"
 #include "driver/mskeycode.h"
 #include "utils/helper.h"
+#include "utils/matchtemp.h"
 
 YOLOv8Inference::YOLOv8Inference(const QString &model_path)
 : m_tracker(0.3, 30, 0.1, 0.5)  // IoU阈值, 最大丢失帧数, 低置信度阈值, 高置信度阈值
@@ -207,18 +208,18 @@ std::vector<Detection> YOLOv8Inference::track(const cv::Mat &frame, float conf_t
     // auto detections = detect(frame, conf_threshold);
     // return m_tracker.update(detections);
 
-    auto t1 = std::chrono::high_resolution_clock::now();
+    // auto t1 = std::chrono::high_resolution_clock::now();
     auto detections = detect(frame, conf_threshold);
-    auto t2 = std::chrono::high_resolution_clock::now();
+    // auto t2 = std::chrono::high_resolution_clock::now();
 
     std::vector<Detection> results = m_tracker.update(detections);
 
-    auto t3 = std::chrono::high_resolution_clock::now();
+    // auto t3 = std::chrono::high_resolution_clock::now();
 
-    qDebug() << QString("detect: %1ms  track: %2ms  total: %3ms")
-                    .arg(std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count())
-                    .arg(std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count())
-                    .arg(std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t1).count());
+    // qDebug() << QString("detect: %1ms  track: %2ms  total: %3ms")
+    //                 .arg(std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count())
+    //                 .arg(std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count())
+    //                 .arg(std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t1).count());
 
     return results;
 }
@@ -733,6 +734,11 @@ void MouseTrack::test()
         auto last_move_time = std::chrono::high_resolution_clock::now();
 
         while (running) {
+            if(!Gplayer.mousecheck_exists){
+                qDebug() << "滑鼠界面不存在，退出线程~";
+                break;
+            }
+
             auto now = std::chrono::high_resolution_clock::now();
             float dt = std::chrono::duration<float, std::milli>(now - last_move_time).count();
             last_move_time = now;
@@ -784,16 +790,18 @@ void MouseTrack::test()
 
                     MSDriverPRO::mouseMoveTo(target_x, target_y);
                 } else {
-                    qDebug() << "鼠标目标超出范围: (" << target_x << "," << target_y << ")";
+                    // qDebug() << "鼠标目标超出范围: (" << target_x << "," << target_y << ")";
                 }
             } else {
-                qDebug() << "预测点超出识别区域: (" << current_x << "," << current_y << ")";
+                // qDebug() << "预测点超出识别区域: (" << current_x << "," << current_y << ")";
             }
         }
     });
 
     // 获取主屏幕
     QScreen* m_pScreen = QGuiApplication::primaryScreen();
+
+    int last_timestamp = QDateTime::currentMSecsSinceEpoch();
 
     int frame_count = 0;
     while (true) {
@@ -831,22 +839,22 @@ void MouseTrack::test()
                 target_updated = true;
                 has_target = true;
                 // qDebug() << "帧" << frame_count << "检测到目标，中心点:(" << center_x << "," << center_y << ")";
-                auto t2_time = std::chrono::high_resolution_clock::now();
-                auto t2_duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2_time - t1_time).count();
-                qDebug() << "帧"<< frame_count <<"用时:" << t2_duration;
+                // auto t2_time = std::chrono::high_resolution_clock::now();
+                // auto t2_duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2_time - t1_time).count();
+                // qDebug() << "帧"<< frame_count <<"用时:" << t2_duration;
 
                 break;
             }
         }
 
         // 绘制检测结果（会在 bgr_frame 上绘制）
-        // yolo.drawDetections(bgr_frame, detections);
+        yolo.drawDetections(bgr_frame, detections);
 
         // // 打印结果
-        // if (found) {
+        if (found) {
         //     // 计算中心点坐标
-        //     int center_x = circle_true_det.box.x + circle_true_det.box.width / 2;
-        //     int center_y = circle_true_det.box.y + circle_true_det.box.height / 2;
+            int center_x = circle_true_det.box.x + circle_true_det.box.width / 2;
+            int center_y = circle_true_det.box.y + circle_true_det.box.height / 2;
 
         //     qDebug() << "帧" << frame_count << "circle_true:"
         //              << "ID:" << circle_true_det.track_id
@@ -856,35 +864,49 @@ void MouseTrack::test()
         //              << "," << circle_true_det.box.y + circle_true_det.box.height << ")"
         //              << "中心点:(" << center_x << "," << center_y << ")";
 
-        //     // 在图像上绘制中心点
-        //     cv::circle(bgr_frame, cv::Point(center_x, center_y), 5, cv::Scalar(0, 0, 255), -1);
+            // 在图像上绘制中心点
+            cv::circle(bgr_frame, cv::Point(center_x, center_y), 5, cv::Scalar(0, 0, 255), -1);
 
-        //     // 添加追踪信息
-        //     cv::putText(bgr_frame,
-        //                 "Tracking ID: " + std::to_string(circle_true_det.track_id),
-        //                 cv::Point(10, 60),
-        //                 cv::FONT_HERSHEY_SIMPLEX,
-        //                 0.7,
-        //                 cv::Scalar(0, 255, 0),
-        //                 2);
+            // 添加追踪信息
+            cv::putText(bgr_frame,
+                        "Tracking ID: " + std::to_string(circle_true_det.track_id),
+                        cv::Point(10, 60),
+                        cv::FONT_HERSHEY_SIMPLEX,
+                        0.7,
+                        cv::Scalar(0, 255, 0),
+                        2);
 
         //     // 中心点
         //     MSDriverPRO::mouseMoveTo(Gplayer.game_window.x + box_pos_x + center_x, Gplayer.game_window.y + box_pos_y + center_y);
 
-        //     // 保存识别结果图片
-        //     QString save_path = QString("%1/frame_%2.jpg").arg(save_dir).arg(frame_count, 6, 10, QChar('0'));
-        //     cv::imwrite(save_path.toStdString(), bgr_frame);
+            // auto t3_time = std::chrono::high_resolution_clock::now();
+            // auto t3_duration = std::chrono::duration_cast<std::chrono::milliseconds>(t3_time - t2_time).count();
+            //     qDebug() << "t3_duration用时:" << t3_duration;
 
-        //     auto t3_time = std::chrono::high_resolution_clock::now();
-        //     auto t3_duration = std::chrono::duration_cast<std::chrono::milliseconds>(t3_time - t2_time).count();
-        //     qDebug() << "t3_duration用时:" << t3_duration;
+            // 保存识别结果图片
+            int now_timestamp = QDateTime::currentMSecsSinceEpoch();
+            QString save_path = QString("%1/frame_%2.jpg").arg(save_dir).arg(now_timestamp, 6, 10, QChar('0'));
+            cv::imwrite(save_path.toStdString(), bgr_frame);
 
         //     auto now_time = std::chrono::high_resolution_clock::now();
         //     auto use_time = now_time - last_time;
         //     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(use_time).count();
         //     qDebug() << "帧处理用时:" << duration;
         //     last_time = now_time;
-        // }
+        }else{
+            // 判断商店是否打开
+            int now_timestamp = QDateTime::currentMSecsSinceEpoch();
+            if(now_timestamp - last_timestamp > 500){
+                MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
+                cv::Point title_coor;
+                if(!tempmatch.match(title_coor)){
+                    Gplayer.mousecheck_exists = false;
+                    qDebug() << "滑鼠验证界面已消失~";
+                    break;
+                }
+                last_timestamp = QDateTime::currentMSecsSinceEpoch();
+            }
+        }
 
         frame_count++;
 

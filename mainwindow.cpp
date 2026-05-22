@@ -1609,7 +1609,9 @@ void MainWindow::on_checkBox_atk_switch_skillteleport_stateChanged(int arg1)
 
 void MainWindow::on_pushButton_mousetrack_clicked()
 {
+    Gplayer.mousecheck_exists = true;
     MouseTrack tracktest;
     tracktest.test();
+    qDebug() << "滑鼠验证结束~";
 }
 

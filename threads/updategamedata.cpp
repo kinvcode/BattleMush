@@ -388,7 +388,11 @@ void UpdateGameData::updateQuickSlot(quint64 ui_entity)
 
 void UpdateGameData::checkMouseMove()
 {
-    // 判断商店是否打开
+    if(Gplayer.mousecheck_exists){
+        return;
+    }
+
+    // 判断是否存在
     MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
     cv::Point title_coor;
     if(tempmatch.match(title_coor)){
