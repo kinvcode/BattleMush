@@ -13,6 +13,7 @@
 #include "global/controller.h"
 #include "mainwindow.h"
 #include "utils/matchtemp.h"
+#include "utils/mousetrack.h"
 
 using namespace Mem;
 
@@ -202,7 +203,7 @@ void KillMonster::process()
         }
 
         if(Gplayer.mousecheck_exists){
-            DebugOutput::out("出现滑鼠验证");
+            DebugOutput::out("主线程出现滑鼠验证");
             handleMousemove();
             ProcessHelper::programDelay(100);
             QApplication::processEvents();
@@ -891,7 +892,7 @@ void KillMonster::runneKeyboard()
 
 void KillMonster::autoCleanLine()
 {
-    continue_recive:
+    continue_tryEnter:
     if(m_paused || !m_running) return;
 
     // bool test_func = false;
@@ -956,11 +957,11 @@ void KillMonster::autoCleanLine()
     }
 
     if(Gplayer.mousecheck_exists){
-        DebugOutput::out("出现滑鼠验证");
+        DebugOutput::out("自动线路出现滑鼠验证");
         handleMousemove();
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
-        goto continue_recive;
+        goto continue_tryEnter;
     }
 
     // 先检查BUFF
@@ -972,7 +973,7 @@ void KillMonster::autoCleanLine()
         solveRune();
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
-        goto continue_recive;
+        goto continue_tryEnter;
     }
 
     // 智能线路
@@ -1023,7 +1024,7 @@ void KillMonster::autoCleanLine()
             DebugOutput::out("拾取物品中...");
             ProcessHelper::programDelay(100);
             QApplication::processEvents();
-            goto continue_recive;
+            goto continue_tryEnter;
         }
         // return;
     }
@@ -1133,7 +1134,7 @@ void KillMonster::excutePlatformSequence()
     }
 
     if(Gplayer.mousecheck_exists){
-        DebugOutput::out("出现滑鼠验证");
+        DebugOutput::out("任务线程出现滑鼠验证");
         handleMousemove();
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
@@ -2103,9 +2104,11 @@ void KillMonster::handleDied()
 
 void KillMonster::handleMousemove()
 {
-
     Helper::warningSound();
-    ProcessHelper::programDelay(3000);
+    // MouseTrack tracktest;
+    // tracktest.test();
+    // qDebug() << "滑鼠验证结束~";
+    // ProcessHelper::programDelay(1500);
 }
 
 void KillMonster::updateTaskID()

@@ -434,6 +434,8 @@ void MainWindow::initThreads()
     m_threadManager->addThread(m_HealthMonitor_tid, "HealthMonitor");
     // 自动线程（寻路，攻击怪物）
     m_threadManager->addThread(m_KillMonster_tid, "KillMonster");
+    // 滑鼠验证线程
+    m_threadManager->addThread(m_MouseMoveHandle_tid, "MouseMoveHandle");
 
     // m_threadManager->addThread(m_MonitorToolTest_tid, "MonitorToolTest");
     m_threadManager->startAll();

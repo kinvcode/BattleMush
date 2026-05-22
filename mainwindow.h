@@ -40,6 +40,8 @@ private:
     const int m_MonitorToolTest_tid = 3;
     // 击杀怪物线程
     const int m_KillMonster_tid = 4;
+    // 滑鼠验证线程
+    const int m_MouseMoveHandle_tid = 5;
 
     // 提示框
     void showNotice(const QString& message);

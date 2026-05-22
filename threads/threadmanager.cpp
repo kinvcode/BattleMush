@@ -5,6 +5,7 @@
 #include "threads/updategamedata.h"
 #include "threads/monitortooltest.h"
 #include "threads/killmonster.h"
+#include "threads/mousemovehandle.h"
 
 ThreadManager::ThreadManager(QObject *parent)
     : QObject(parent)
@@ -91,6 +92,8 @@ IWorker* ThreadManager::createWorker(const QString& workerType, int id)
         return new MonitorToolTest(id);
     } else if(workerType == "KillMonster"){
         return new KillMonster(id);
+    } else if(workerType == "MouseMoveHandle"){
+        return new MouseMoveHandle(id);
     }
     return nullptr;
 }

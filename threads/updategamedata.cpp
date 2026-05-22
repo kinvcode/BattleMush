@@ -180,7 +180,7 @@ void UpdateGameData::process()
             }
 
             // 检测鼠标验证
-            checkMouseMove();
+            // checkMouseMove();
 
             // 更新用户信息
             UpdateUserStatus(statuspanel);
@@ -241,8 +241,8 @@ void UpdateGameData::UpdateUserStatus(quint64 statuspanel)
 
     if(!p_HP || !p_MP){
         DebugOutput::out("找不到用户信息");
-        ProcessHelper::programDelay(3000);
-        QApplication::processEvents();
+        // ProcessHelper::programDelay(3000);
+        // QApplication::processEvents();
         return;
     }
 
@@ -259,8 +259,8 @@ void UpdateGameData::UpdateUserStatus(quint64 statuspanel)
         Gplayer.HP = 0;
     }
 
-    ProcessHelper::programDelay(500);
-    QApplication::processEvents();
+    // ProcessHelper::programDelay(500);
+    // QApplication::processEvents();
 }
 
 void UpdateGameData::UpdateRoomMap()

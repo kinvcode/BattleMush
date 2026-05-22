@@ -71,6 +71,7 @@ SOURCES += \
     threads/iworker.cpp \
     threads/killmonster.cpp \
     threads/monitortooltest.cpp \
+    threads/mousemovehandle.cpp \
     threads/threadmanager.cpp \
     threads/updategamedata.cpp \
     utils/config.cpp \
@@ -107,6 +108,7 @@ HEADERS += \
     threads/iworker.h \
     threads/killmonster.h \
     threads/monitortooltest.h \
+    threads/mousemovehandle.h \
     threads/threadmanager.h \
     threads/updategamedata.h \
     utils/config.h \
