@@ -39,6 +39,8 @@ bool NativeEventFilter::nativeEventFilter(const QByteArray& eventType, void* mes
 
                 emit sendControleStatus(false);
 
+                Gplayer.mousecheck_exists = false;
+
                 // 关闭警报
                 if(main_win->m_alert){
                     Gplayer.show_warning = false;

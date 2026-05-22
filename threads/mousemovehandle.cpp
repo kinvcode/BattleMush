@@ -92,6 +92,7 @@ void MouseMoveHandle::checkMouseMove()
     MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
     cv::Point title_coor;
     if(tempmatch.match(title_coor)){
+        qDebug() << "发现滑鼠验证界面！！！";
         Gplayer.mousecheck_exists = true;
     }
 }

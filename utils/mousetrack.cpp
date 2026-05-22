@@ -241,17 +241,42 @@ double YOLOv8Inference::calculateIoU(const cv::Rect &box1, const cv::Rect &box2)
 
 void YOLOv8Inference::drawDetections(cv::Mat &frame, const std::vector<Detection> &detections)
 {
-    // 类别名称（根据你的 dataset.yaml 修改）
-    std::vector<std::string> class_names = {"circle_true", "circle_false"};
+    // 更新为8个类别名称（根据你的 dataset.yaml）
+    std::vector<std::string> class_names = {
+        "circle_true",
+        "circle_false",
+        "rect_true",
+        "rect_false",
+        "star_true",
+        "star_false",
+        "triangle_true",
+        "triangle_false"
+    };
+
+    // 为8个类别定义不同的颜色
     std::vector<cv::Scalar> colors = {
-        cv::Scalar(0, 255, 0),   // green for circle_true
-        cv::Scalar(0, 0, 255)    // red for circle_false
+        cv::Scalar(0, 255, 0),
+        cv::Scalar(0, 0, 255),
+        cv::Scalar(0, 255, 0),
+        cv::Scalar(0, 0, 255),
+        cv::Scalar(0, 255, 0),
+        cv::Scalar(0, 0, 255),
+        cv::Scalar(0, 255, 0),
+        cv::Scalar(0, 0, 255)
     };
 
     for (const auto& det : detections) {
-        if(det.class_id == 1){
+        if(det.class_id == 1 || det.class_id == 3 || det.class_id == 5 || det.class_id == 7){
             continue;
         }
+
+        // 检查 class_id 是否有效
+        if (det.class_id < 0 || det.class_id >= colors.size()) {
+            qDebug() << "警告：无效的 class_id:" << det.class_id
+                     << "，有效范围: 0-" << colors.size() - 1;
+            continue;  // 跳过这个检测
+        }
+
         // 绘制边界框
         cv::rectangle(frame, det.box, colors[det.class_id], 2);
 
@@ -673,16 +698,13 @@ void MouseTrack::test()
     int game_y = game_rect.top;
     int game_width = game_rect.right - game_rect.left;
     int game_height = game_rect.bottom - game_rect.top;
-    int gamewindow_title_height = 32;
-    int gamewindow_x_offset = 8;
     int box_pos_x = 399;
     int box_pos_y = 218;
     int box_width = 500;
     int box_height = 335;
 
     // 鼠标允许的移动范围
-    cv::Rect allow_rect = {game_x + box_pos_x,game_y + box_pos_y,box_width,box_height};
-
+    cv::Rect allow_rect = {game_x + box_pos_x, game_y + box_pos_y, box_width, box_height};
 
     int pos_x = game_x + box_pos_x;
     int pos_y = game_y + box_pos_y;
@@ -691,16 +713,21 @@ void MouseTrack::test()
 
     qDebug() << "识别区域:" << pos_x << pos_y << detect_width << detect_height;
 
-    Gplayer.game_window.x = game_x;
-    Gplayer.game_window.y = game_y;
-    Gplayer.game_window.width = game_width;
-    Gplayer.game_window.height = game_height;
+    // 需要检测的分类列表 (0, 2, 4, 6)
+    const std::vector<int> target_classes = {0, 2, 4, 6};
 
-    qDebug() << "游戏窗口信息:";
-    qDebug() << "  位置:(" << game_x << "," << game_y << ")";
-    qDebug() << "  尺寸:" << game_width << "x" << game_height;
-    qDebug() << "游戏窗口X：" << Gplayer.game_window.x;
-    qDebug() << "游戏窗口Y：" << Gplayer.game_window.y;
+    // 锁定的分类（首次检测到的分类）
+    std::atomic<int> locked_class(-1);
+
+    // 分类名称映射
+    std::map<int, QString> class_names = {
+        {0, "circle_true"},
+        {2, "rect_true"},
+        {4, "star_true"},
+        {6, "triangle_true"}
+    };
+
+    qDebug() << "等待检测目标分类: circle_true(0), rect_true(2), star_true(4), triangle_true(6)";
 
     // 创建保存图片的目录
     QString save_dir = "detection_results";
@@ -713,28 +740,23 @@ void MouseTrack::test()
     // 鼠标预测器
     MousePredictor mouse_predictor;
 
-    // 当前目标位置
-    float target_x = 0;
-    float target_y = 0;
-
     // 线程控制
-    // 当前目标位置
     std::atomic<bool> has_target(false);
     std::atomic<float> latest_target_x(0);
     std::atomic<float> latest_target_y(0);
     std::atomic<bool> target_updated(false);
     std::atomic<bool> running(true);
 
-    // 平滑移动的当前值（在鼠标线程中使用）
+    // 平滑移动的当前值
     float current_x = 0;
     float current_y = 0;
 
-    // 鼠标移动线程（独立运行，不等待检测结果）
+    // 鼠标移动线程
     std::thread mouse_thread([&]() {
         auto last_move_time = std::chrono::high_resolution_clock::now();
 
         while (running) {
-            if(!Gplayer.mousecheck_exists){
+            if (!Gplayer.mousecheck_exists) {
                 qDebug() << "滑鼠界面不存在，退出线程~";
                 break;
             }
@@ -743,29 +765,23 @@ void MouseTrack::test()
             float dt = std::chrono::duration<float, std::milli>(now - last_move_time).count();
             last_move_time = now;
 
-            // 限制 dt 最大值，避免跳跃过大
             if (dt > 100) dt = 16;
 
             float move_x, move_y;
 
             if (target_updated) {
-                // 有新的检测结果，更新预测器
                 mouse_predictor.update(latest_target_x, latest_target_y);
                 move_x = latest_target_x;
                 move_y = latest_target_y;
                 target_updated = false;
                 has_target = true;
-
-                // 直接更新当前值到新目标
                 current_x = move_x;
                 current_y = move_y;
             } else if (has_target) {
-                // 没有新检测，使用预测位置
                 mouse_predictor.predict(dt);
                 move_x = mouse_predictor.getPredictedX();
                 move_y = mouse_predictor.getPredictedY();
 
-                // 平滑移动（线性插值）
                 float step = std::min(1.0f, dt / 16.0f);
                 current_x = current_x * (1 - step) + move_x * step;
                 current_y = current_y * (1 - step) + move_y * step;
@@ -774,26 +790,19 @@ void MouseTrack::test()
                 continue;
             }
 
-            // 检查当前坐标是否在识别区域内（相对于识别区域）
             if (current_x >= 0 && current_x <= box_width &&
                 current_y >= 0 && current_y <= box_height) {
 
-                // 计算实际屏幕坐标
                 int target_x = allow_rect.x + static_cast<int>(current_x);
                 int target_y = allow_rect.y + static_cast<int>(current_y);
 
-                // 再次检查实际屏幕坐标是否在允许范围内
                 if (target_x >= allow_rect.x &&
                     target_x <= allow_rect.x + allow_rect.width &&
                     target_y >= allow_rect.y &&
                     target_y <= allow_rect.y + allow_rect.height) {
 
                     MSDriverPRO::mouseMoveTo(target_x, target_y);
-                } else {
-                    // qDebug() << "鼠标目标超出范围: (" << target_x << "," << target_y << ")";
                 }
-            } else {
-                // qDebug() << "预测点超出识别区域: (" << current_x << "," << current_y << ")";
             }
         }
     });
@@ -802,13 +811,13 @@ void MouseTrack::test()
     QScreen* m_pScreen = QGuiApplication::primaryScreen();
 
     int last_timestamp = QDateTime::currentMSecsSinceEpoch();
-
     int frame_count = 0;
+
+    qDebug() << "开始检测目标...";
+
     while (true) {
-        auto t1_time = std::chrono::high_resolution_clock::now();
         // 截取屏幕
         QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
-        // cur_capture = cur_capture.copy(game_x, game_y, game_width, game_height);
         cur_capture = cur_capture.copy(pos_x, pos_y, detect_width, detect_height);
 
         // 转换为 OpenCV Mat 格式
@@ -820,102 +829,120 @@ void MouseTrack::test()
         // 追踪检测
         auto detections = yolo.track(bgr_frame, 0.25);
 
-        // 查找 circle_true (class_id == 0)
+        // 查找目标
         bool found = false;
-        Detection circle_true_det;
+        Detection target_det;
+        int current_class = -1;
 
-        for (const auto& det : detections) {
-            if (det.class_id == 0) {
-                circle_true_det = det;
-                found = true;
-
-                // 计算中心点
-                int center_x = det.box.x + det.box.width / 2;
-                int center_y = det.box.y + det.box.height / 2;
-
-                // 更新最新目标位置
-                latest_target_x = static_cast<float>(center_x);
-                latest_target_y = static_cast<float>(center_y);
-                target_updated = true;
-                has_target = true;
-                // qDebug() << "帧" << frame_count << "检测到目标，中心点:(" << center_x << "," << center_y << ")";
-                // auto t2_time = std::chrono::high_resolution_clock::now();
-                // auto t2_duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2_time - t1_time).count();
-                // qDebug() << "帧"<< frame_count <<"用时:" << t2_duration;
-
-                break;
+        // 如果已经锁定了分类，只查找该分类
+        if (locked_class >= 0) {
+            for (const auto& det : detections) {
+                if (det.class_id == locked_class) {
+                    target_det = det;
+                    found = true;
+                    current_class = locked_class;
+                    break;
+                }
+            }
+        } else {
+            // 未锁定时，按优先级查找目标分类 (0, 2, 4, 6)
+            // 优先级顺序: circle_true(0) > rect_true(2) > star_true(4) > triangle_true(6)
+            for (int target_class : target_classes) {
+                for (const auto& det : detections) {
+                    if (det.class_id == target_class) {
+                        target_det = det;
+                        found = true;
+                        current_class = target_class;
+                        locked_class = target_class;  // 锁定分类
+                        qDebug() << "锁定目标分类:" << class_names[target_class] << "(ID:" << target_class << ")";
+                        break;
+                    }
+                }
+                if (found) break;
             }
         }
 
-        // 绘制检测结果（会在 bgr_frame 上绘制）
-        yolo.drawDetections(bgr_frame, detections);
-
-        // // 打印结果
+        // 处理检测结果
         if (found) {
-        //     // 计算中心点坐标
-            int center_x = circle_true_det.box.x + circle_true_det.box.width / 2;
-            int center_y = circle_true_det.box.y + circle_true_det.box.height / 2;
+            int center_x = target_det.box.x + target_det.box.width / 2;
+            int center_y = target_det.box.y + target_det.box.height / 2;
 
-        //     qDebug() << "帧" << frame_count << "circle_true:"
-        //              << "ID:" << circle_true_det.track_id
-        //              << "置信度:" << circle_true_det.confidence
-        //              << "坐标:(" << circle_true_det.box.x << "," << circle_true_det.box.y
-        //              << ")-(" << circle_true_det.box.x + circle_true_det.box.width
-        //              << "," << circle_true_det.box.y + circle_true_det.box.height << ")"
-        //              << "中心点:(" << center_x << "," << center_y << ")";
+            // 更新最新目标位置
+            latest_target_x = static_cast<float>(center_x);
+            latest_target_y = static_cast<float>(center_y);
+            target_updated = true;
+            has_target = true;
+
+            // 可选：打印调试信息（每30帧打印一次，减少日志）
+            if (frame_count % 30 == 0) {
+                qDebug() << "帧" << frame_count
+                         << "分类:" << class_names[current_class]
+                         << "ID:" << target_det.track_id
+                         << "置信度:" << target_det.confidence
+                         << "中心点:(" << center_x << "," << center_y << ")";
+            }
+
+            // 绘制检测结果
+            yolo.drawDetections(bgr_frame, detections);
 
             // 在图像上绘制中心点
+            // if (center_x < 0) center_x = 0;
+            // if (center_x >= bgr_frame.cols) center_x = bgr_frame.cols - 1;
+            // if (center_y < 0) center_y = 0;
+            // if (center_y >= bgr_frame.rows) center_y = bgr_frame.rows - 1;
             cv::circle(bgr_frame, cv::Point(center_x, center_y), 5, cv::Scalar(0, 0, 255), -1);
 
             // 添加追踪信息
+            QString track_text = QString("Tracking: %1 ID:%2")
+                                     .arg(class_names[current_class])
+                                     .arg(target_det.track_id);
             cv::putText(bgr_frame,
-                        "Tracking ID: " + std::to_string(circle_true_det.track_id),
+                        track_text.toStdString(),
                         cv::Point(10, 60),
                         cv::FONT_HERSHEY_SIMPLEX,
                         0.7,
                         cv::Scalar(0, 255, 0),
                         2);
 
-        //     // 中心点
-        //     MSDriverPRO::mouseMoveTo(Gplayer.game_window.x + box_pos_x + center_x, Gplayer.game_window.y + box_pos_y + center_y);
-
-            // auto t3_time = std::chrono::high_resolution_clock::now();
-            // auto t3_duration = std::chrono::duration_cast<std::chrono::milliseconds>(t3_time - t2_time).count();
-            //     qDebug() << "t3_duration用时:" << t3_duration;
-
-            // 保存识别结果图片
+            // 保存识别结果图片（可选，取消注释以启用）
             int now_timestamp = QDateTime::currentMSecsSinceEpoch();
             QString save_path = QString("%1/frame_%2.jpg").arg(save_dir).arg(now_timestamp, 6, 10, QChar('0'));
             cv::imwrite(save_path.toStdString(), bgr_frame);
+        } else {
+            // 未检测到目标
+            if (locked_class >= 0 && frame_count % 100 == 0) {
+                qDebug() << "未检测到锁定目标:" << class_names[locked_class];
+            }
 
-        //     auto now_time = std::chrono::high_resolution_clock::now();
-        //     auto use_time = now_time - last_time;
-        //     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(use_time).count();
-        //     qDebug() << "帧处理用时:" << duration;
-        //     last_time = now_time;
-        }else{
-            // 判断商店是否打开
+            // 判断滑鼠界面是否还存在
             int now_timestamp = QDateTime::currentMSecsSinceEpoch();
-            if(now_timestamp - last_timestamp > 500){
+            if (now_timestamp - last_timestamp > 500) {
                 MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
                 cv::Point title_coor;
-                if(!tempmatch.match(title_coor)){
+                if (!tempmatch.match(title_coor)) {
                     Gplayer.mousecheck_exists = false;
                     qDebug() << "滑鼠验证界面已消失~";
                     break;
                 }
-                last_timestamp = QDateTime::currentMSecsSinceEpoch();
+                last_timestamp = now_timestamp;
             }
         }
 
+        // 可选：绘制所有检测结果（用于调试）
+        // yolo.drawDetections(bgr_frame, detections);
+
+        // 可选：显示画面（用于调试）
+        // cv::imshow("Tracking", bgr_frame);
+        // if (cv::waitKey(1) == 27) break;  // ESC 退出
+
         frame_count++;
 
-        // 每100帧输出进度
-        if (frame_count % 100 == 0) {
-            qDebug() << "已处理" << frame_count << "帧";
-        }
+        // if (frame_count % 100 == 0) {
+        //     qDebug() << "已处理" << frame_count << "帧";
+        // }
     }
 
     running = false;
     mouse_thread.join();
+    qDebug() << "test() 函数退出，锁定的分类:" << class_names[locked_class];
 }

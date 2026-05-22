@@ -272,6 +272,16 @@
         "area": [2, 2, 2, 2]
     }]
 },{
+    "uuid": "3150a2a0-128c-42c6-bbc9-d2305546fd18",
+    "name": "時間分岔道",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
     "uuid": "3f0fd016-a8b8-4d85-a06b-cfe30eebc336",
     "name": "雲彩公園3",
     "type": 0,
