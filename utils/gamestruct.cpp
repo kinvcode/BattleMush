@@ -1,4 +1,5 @@
 #include "gamestruct.h"
+#include "utils/helper.h"
 
 using namespace Mem;
 
@@ -80,18 +81,27 @@ void GameStruct::printEntityChild(quint64 entity, int depth)
             // 读取名称
             QString name = readEntityName(compPtr);
 
-            qDebug().noquote() << QString("%1  ├─[%2] 0x%3  %4")
-                                      .arg(indent)
-                                      .arg(i)
-                                      .arg(compPtr, 0, 16)
-                                      .arg(name);
-
+            QString name_str = QString("%1  ├─[%2] 0x%3  %4")
+                                   .arg(indent)
+                                   .arg(i)
+                                   .arg(compPtr, 0, 16)
+                                   .arg(name);
+            // qDebug().noquote() << QString("%1  ├─[%2] 0x%3  %4")
+            //                           .arg(indent)
+            //                           .arg(i)
+            //                           .arg(compPtr, 0, 16)
+            //                           .arg(name);
+            Helper::console(name_str);
             // 递归遍历下一层
             printEntityChild(compPtr, depth + 1);
         } else {
-            qDebug().noquote() << QString("%1  ├─[%2] NULL")
-                                      .arg(indent)
-                                      .arg(i);
+            // qDebug().noquote() << QString("%1  ├─[%2] NULL")
+            //                           .arg(indent)
+            //                           .arg(i);
+            QString name_str =   QString("%1  ├─[%2] NULL")
+                                   .arg(indent)
+                                   .arg(i);
+            Helper::console(name_str);
         }
     }
 }

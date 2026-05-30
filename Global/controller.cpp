@@ -121,7 +121,7 @@ void Controller::initTaskList()
     /* ============【 菇 菇 山 丘 】===================== */
     MapRoomPath map0000;
     map0000.id = 0;
-    map0000.name = "菇菇山丘";
+    map0000.name = "(Lv8~15)菇菇山丘";
     map0000.uuid = "5624c829-11e1-4544-91b1-a9220c654f5a";
 
     RoomRest map0000_rest00;
@@ -158,7 +158,7 @@ void Controller::initTaskList()
     /* ============【 維 多 利 亞 港 外 圍 】============= */
     MapRoomPath map0001;
     map0001.id = 1;
-    map0001.name = "維多利亞港外圍";
+    map0001.name = "(Lv1~5)維多利亞港外圍";
     map0001.uuid = "8ded358a-8cd6-4dde-8b93-018b5650b5c0";
 
     RoomRest map0001_rest00;
@@ -183,7 +183,7 @@ void Controller::initTaskList()
     /* ============【 遺 跡 發 掘 地 1 】============= */
     MapRoomPath map0002;
     map0002.id = 2;
-    map0002.name = "遺跡發掘地1";
+    map0002.name = "(Lv19~23)遺跡發掘地1";
     map0002.uuid = "d26fc64e-2ff3-4f66-978e-f606f286ddf9";
 
     RoomRest map0002_rest00;
@@ -208,7 +208,7 @@ void Controller::initTaskList()
     /* ============【 弓 箭 手 村 訓 練 場 2 】============= */
     MapRoomPath map0003;
     map0003.id = 3;
-    map0003.name = "弓箭手村訓練場2";
+    map0003.name = "(Lv8~15)弓箭手村訓練場2";
     map0003.uuid = "1f234900-61d7-45d0-8ad0-871a119b183f";
 
     RoomRest map0003_rest00;
@@ -233,7 +233,7 @@ void Controller::initTaskList()
     /* ============【 黑 肥 肥 領 土 2 】============= */
     MapRoomPath map0004;
     map0004.id = 4;
-    map0004.name = "黑肥肥領土2";
+    map0004.name = "(Lv25~27)黑肥肥領土2";
     map0004.uuid = "dc87557c-2165-4962-bcbb-370e9a1f38a8";
 
     RoomRest map0004_rest00;
@@ -258,7 +258,7 @@ void Controller::initTaskList()
     /* ============【 遺 跡 發 掘 地 2 】============= */
     MapRoomPath map0005;
     map0005.id = 5;
-    map0005.name = "遺跡發掘地2";
+    map0005.name = "(Lv23~25)遺跡發掘地2";
     map0005.uuid = "ccbb98d2-61f6-4b4a-8e88-67cfa921fc32";
 
     RoomRest map0005_rest00;
@@ -283,7 +283,7 @@ void Controller::initTaskList()
     /* ============【 火 焰 之 地 1 】============= */
     MapRoomPath map0006;
     map0006.id = 6;
-    map0006.name = "火焰之地1";
+    map0006.name = "(Lv32~35)火焰之地1";
     map0006.uuid = "c9349a80-5a2d-401d-8cdb-8e5ff414de71";
 
     RoomRest map0006_rest00;
@@ -308,7 +308,7 @@ void Controller::initTaskList()
     /* ============【 2號線<1區> 】============= */
     MapRoomPath map0007;
     map0007.id = 7;
-    map0007.name = "2號線<1區>";
+    map0007.name = "(Lv35~37)2號線<1區>";
     map0007.uuid = "e1b1a71f-0a41-4657-9579-7f90807c00bc";
 
     RoomRest map0007_rest00;
@@ -333,7 +333,7 @@ void Controller::initTaskList()
     /* ============【 遺 跡 發 掘 地 3 】============= */
     MapRoomPath map0008;
     map0008.id = 8;
-    map0008.name = "遺跡發掘地3";
+    map0008.name = "(Lv23~25)遺跡發掘地3";
     map0008.uuid = "258b9b4d-dd3f-4147-8aae-b31272c57e91";
 
     RoomRest map0008_rest00;
@@ -358,7 +358,7 @@ void Controller::initTaskList()
     /* ============【 玩 具 工 廠 < 主 工 程 A > 】============= */
     MapRoomPath map0009;
     map0009.id = 9;
-    map0009.name = "玩具工廠<主工程A>";
+    map0009.name = "(Lv36~38)玩具工廠<主工程A>";
     map0009.uuid = "2c865a87-555b-4302-a328-f8d7b07ecc23";
 
     RoomRest map0009_rest00;
@@ -383,7 +383,7 @@ void Controller::initTaskList()
     /* ============【 時 間 分 岔 道 】============= */
     MapRoomPath map0010;
     map0010.id = 10;
-    map0010.name = "時間分岔道";
+    map0010.name = "(Lv40~42)時間分岔道";
     map0010.uuid = "3150a2a0-128c-42c6-bbc9-d2305546fd18";
 
     RoomRest map0010_rest00;
@@ -408,7 +408,7 @@ void Controller::initTaskList()
     /* ============【 雲 彩 公 園 3 】============= */
     MapRoomPath map0011;
     map0011.id = 11;
-    map0011.name = "雲彩公園3";
+    map0011.name = "(Lv45~47)雲彩公園3";
     map0011.uuid = "3f0fd016-a8b8-4d85-a06b-cfe30eebc336";
 
     RoomRest map0011_rest00;
@@ -430,19 +430,201 @@ void Controller::initTaskList()
 
     map0011.rests.push_back(map0011_rest00);
 
+    /* ============【 名 人 大 道 南 部 區 域 】============= */
+    MapRoomPath map0012;
+    map0012.id = 12;
+    map0012.name = "(Lv76~78)名人大道南部區域";
+    map0012.uuid = "b4cf7e17-50e3-44db-affa-df917364c7de";
+
+    RoomRest map0012_rest00;
+    map0012_rest00.id = 0;
+    map0012_rest00.name = "【休息点A】地图上方平台";
+    map0012_rest00.platform = 8;
+
+    RoomPath map0012_path00;
+    map0012_path00.id = 0;
+    map0012_path00.name = "自动规划路线";
+
+    RoomPath map0012_path01;
+    map0012_path01.id = 1;
+    map0012_path01.name = "【路线A】刷全图";
+    map0012_path01.platforms = {6,5,4};
+
+    map0012.paths.push_back(map0012_path00);
+    map0012.paths.push_back(map0012_path01);
+
+    map0012.rests.push_back(map0012_rest00);
+
+    /* ============【 石 巨 人 寺 院 入 口 】============= */
+    MapRoomPath map0013;
+    map0013.id = 13;
+    map0013.name = "(Lv55~57)石巨人寺院入口";
+    map0013.uuid = "ff51af0c-3daf-4b60-8158-be6d16d30374";
+
+    // RoomRest map0013_rest00;
+    // map0013_rest00.id = 0;
+    // map0013_rest00.name = "【休息点A】地图上方平台";
+    // map0013_rest00.platform = 0;
+
+    RoomPath map0013_path00;
+    map0013_path00.id = 0;
+    map0013_path00.name = "自动规划路线";
+
+    RoomPath map0013_path01;
+    map0013_path01.id = 1;
+    map0013_path01.name = "【路线A】刷全图";
+    map0013_path01.platforms = {3,4,1,0,2};
+
+    map0013.paths.push_back(map0013_path00);
+    map0013.paths.push_back(map0013_path01);
+
+    // map0013.rests.push_back(map0013_rest00);
+
+    /* ============【 鋼 之 黑 肥 肥 之 地 】============= */
+    MapRoomPath map0014;
+    map0014.id = 14;
+    map0014.name = "(Lv45~47)鋼之黑肥肥之地";
+    map0014.uuid = "294ed65c-b4e2-46ae-b868-4f052a903006";
+
+    RoomRest map0014_rest00;
+    map0014_rest00.id = 0;
+    map0014_rest00.name = "【休息点A】地图左上方平台";
+    map0014_rest00.platform = 10;
+
+    RoomPath map0014_path00;
+    map0014_path00.id = 0;
+    map0014_path00.name = "自动规划路线";
+
+    RoomPath map0014_path01;
+    map0014_path01.id = 1;
+    map0014_path01.name = "【路线A】刷全图";
+    map0014_path01.platforms = {29,6,0,5};
+
+    map0014.paths.push_back(map0014_path00);
+    map0014.paths.push_back(map0014_path01);
+
+    map0014.rests.push_back(map0014_rest00);
+
+    /* ============【 巨 人 之 森 】============= */
+    MapRoomPath map0015;
+    map0015.id = 15;
+    map0015.name = "(Lv58~62)巨人之森";
+    map0015.uuid = "9521b27c-d545-4ba8-bf22-fd1d6246d2f8";
+
+    RoomRest map0015_rest00;
+    map0015_rest00.id = 0;
+    map0015_rest00.name = "【休息点A】地图上方平台";
+    map0015_rest00.platform = 0;
+
+    RoomPath map0015_path00;
+    map0015_path00.id = 0;
+    map0015_path00.name = "自动规划路线";
+
+    RoomPath map0015_path01;
+    map0015_path01.id = 1;
+    map0015_path01.name = "【路线A】刷全图";
+    map0015_path01.platforms = {2,3,4};
+
+    map0015.paths.push_back(map0015_path00);
+    map0015.paths.push_back(map0015_path01);
+
+    map0015.rests.push_back(map0015_rest00);
+
+    /* ============【 青 螃 蟹 海 灘 Ⅱ 】============= */
+    MapRoomPath map0016;
+    map0016.id = 16;
+    map0016.name = "(Lv48~50)青螃蟹海灘Ⅱ";
+    map0016.uuid = "9cef013d-5021-4314-92a7-f535bb27f3fd";
+
+    RoomRest map0016_rest00;
+    map0016_rest00.id = 0;
+    map0016_rest00.name = "【休息点A】地图上方平台";
+    map0016_rest00.platform = 14;
+
+    RoomPath map0016_path00;
+    map0016_path00.id = 0;
+    map0016_path00.name = "自动规划路线";
+
+    RoomPath map0016_path01;
+    map0016_path01.id = 1;
+    map0016_path01.name = "【路线A】刷全图";
+    map0016_path01.platforms = {2,10,5,13,3,11,4,12};
+
+    map0016.paths.push_back(map0016_path00);
+    map0016.paths.push_back(map0016_path01);
+
+    map0016.rests.push_back(map0016_rest00);
+
+    /* ============【 龍 族 狩 獵 場 】============= */
+    MapRoomPath map0017;
+    map0017.id = 17;
+    map0017.name = "(Lv50~52)龍族狩獵場";
+    map0017.uuid = "27d886ad-d3d7-416e-b246-e49d3738e3dd";
+
+    RoomRest map0017_rest00;
+    map0017_rest00.id = 0;
+    map0017_rest00.name = "【休息点A】地图左方平台";
+    map0017_rest00.platform = 0;
+
+    RoomPath map0017_path00;
+    map0017_path00.id = 0;
+    map0017_path00.name = "自动规划路线";
+
+    RoomPath map0017_path01;
+    map0017_path01.id = 1;
+    map0017_path01.name = "【路线A】刷全图";
+    map0017_path01.platforms = {9,10,11,1};
+
+    map0017.paths.push_back(map0017_path00);
+    map0017.paths.push_back(map0017_path01);
+
+    map0017.rests.push_back(map0017_rest00);
+
+    /* ============【 魔 龍 領 土 】============= */
+    MapRoomPath map0018;
+    map0018.id = 18;
+    map0018.name = "(Lv62~64)魔龍領土";
+    map0018.uuid = "8b2384ca-5ada-4464-b482-887e1fc99205";
+
+    RoomRest map0018_rest00;
+    map0018_rest00.id = 0;
+    map0018_rest00.name = "【休息点A】地图下方平台";
+    map0018_rest00.platform = 1;
+
+    RoomPath map0018_path00;
+    map0018_path00.id = 0;
+    map0018_path00.name = "自动规划路线";
+
+    RoomPath map0018_path01;
+    map0018_path01.id = 1;
+    map0018_path01.name = "【路线A】刷全图";
+    map0018_path01.platforms = {9,10,11,1};
+
+    map0018.paths.push_back(map0018_path00);
+    map0018.paths.push_back(map0018_path01);
+
+    map0018.rests.push_back(map0018_rest00);
+
     /* ============【 加 入 刷 图 列 表】============= */
-    m_clean_room_list.push_back(map0000);
-    m_clean_room_list.push_back(map0001);
-    m_clean_room_list.push_back(map0002);
-    m_clean_room_list.push_back(map0003);
-    m_clean_room_list.push_back(map0004);
-    m_clean_room_list.push_back(map0005);
-    m_clean_room_list.push_back(map0006);
-    m_clean_room_list.push_back(map0007);
-    m_clean_room_list.push_back(map0008);
-    m_clean_room_list.push_back(map0009);
-    m_clean_room_list.push_back(map0010);
-    m_clean_room_list.push_back(map0011);
+    m_clean_room_list.push_back(map0001); // 維多利亞港外圍
+    m_clean_room_list.push_back(map0003); // 弓箭手村訓練場2
+    m_clean_room_list.push_back(map0000); // 菇菇山丘
+    m_clean_room_list.push_back(map0002); // 遺跡發掘地1
+    m_clean_room_list.push_back(map0005); // 遺跡發掘地2
+    m_clean_room_list.push_back(map0008); // 遺跡發掘地3
+    m_clean_room_list.push_back(map0004); // 黑肥肥領土2
+    m_clean_room_list.push_back(map0006); // 火焰之地1
+    m_clean_room_list.push_back(map0007); // 2號線<1區>
+    m_clean_room_list.push_back(map0009); // 玩具工廠<主工程A>
+    m_clean_room_list.push_back(map0010); // 時間分岔道
+    m_clean_room_list.push_back(map0011); // 雲彩公園3
+    m_clean_room_list.push_back(map0014); // 鋼之黑肥肥之地
+    m_clean_room_list.push_back(map0016); // 青螃蟹海灘Ⅱ
+    m_clean_room_list.push_back(map0017); // 龍族狩獵場
+    m_clean_room_list.push_back(map0013); // 石巨人寺院入口
+    m_clean_room_list.push_back(map0015); // 巨人之森
+    m_clean_room_list.push_back(map0018); // 魔龍領土
+    m_clean_room_list.push_back(map0012); // 名人大道南部區域
 
 
     /* ============【 加 入 休 息 列 表】============= */
@@ -458,6 +640,13 @@ void Controller::initTaskList()
     m_rest_point_list.push_back(map0009);
     m_rest_point_list.push_back(map0010);
     m_rest_point_list.push_back(map0011);
+    m_rest_point_list.push_back(map0012);
+    // m_rest_point_list.push_back(map0013); // 没有休息点
+    m_rest_point_list.push_back(map0014);
+    m_rest_point_list.push_back(map0015);
+    m_rest_point_list.push_back(map0016);
+    m_rest_point_list.push_back(map0017);
+    m_rest_point_list.push_back(map0018);
 
 
     // 初始化NPC任务列表

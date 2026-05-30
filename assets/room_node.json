@@ -291,4 +291,74 @@
         "platform": 0,
         "area": [2, 2, 2, 2]
     }]
+},{
+    "uuid": "294ed65c-b4e2-46ae-b868-4f052a903006",
+    "name": "鋼之黑肥肥之地",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "ff51af0c-3daf-4b60-8158-be6d16d30374",
+    "name": "石巨人寺院入口",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "ff51af0c-3daf-4b60-8158-be6d16d30374",
+    "name": "石巨人寺院入口",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "9cef013d-5021-4314-92a7-f535bb27f3fd",
+    "name": "青螃蟹海灘Ⅱ",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "27d886ad-d3d7-416e-b246-e49d3738e3dd",
+    "name": "龍族狩獵場",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "8b2384ca-5ada-4464-b482-887e1fc99205",
+    "name": "魔龍領土",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "b4cf7e17-50e3-44db-affa-df917364c7de",
+    "name": "名人大道南部區域",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
 }]

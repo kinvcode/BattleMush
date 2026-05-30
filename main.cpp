@@ -24,10 +24,10 @@ int main(int argc, char *argv[])
     QString rand_tile = "";
 #ifdef PROTECT
     // 自身程序重命名
-    // ProcessHelper::renameSelf();
+    ProcessHelper::renameSelf();
 
     // 删除自身
-    // ProcessHelper::deleteSelf();
+    ProcessHelper::deleteSelf();
 #endif
 
     // 设置全局样式表

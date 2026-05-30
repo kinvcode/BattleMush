@@ -204,6 +204,7 @@ void KillMonster::process()
 
         if(Gplayer.mousecheck_exists){
             DebugOutput::out("主线程出现滑鼠验证");
+            Helper::console("主线程出现滑鼠验证~");
             handleMousemove();
             ProcessHelper::programDelay(100);
             QApplication::processEvents();
@@ -958,6 +959,7 @@ void KillMonster::autoCleanLine()
 
     if(Gplayer.mousecheck_exists){
         DebugOutput::out("自动线路出现滑鼠验证");
+        Helper::console("主线程出现滑鼠验证~");
         handleMousemove();
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
@@ -1113,6 +1115,9 @@ void KillMonster::excutePlatformSequence()
         return;
     }
 
+    int PlatMonsterNum = 500; // 数量越小，检测的怪物数量越多
+    // int PlatMonsterNum = 50; // 测试
+
     // m_platform_sequence.index = 0;
 
     // 更新任务信息
@@ -1135,6 +1140,7 @@ void KillMonster::excutePlatformSequence()
 
     if(Gplayer.mousecheck_exists){
         DebugOutput::out("任务线程出现滑鼠验证");
+        Helper::console("主线程出现滑鼠验证~");
         handleMousemove();
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
@@ -1243,7 +1249,7 @@ void KillMonster::excutePlatformSequence()
         int plat_length = cur_plat.end.x - cur_plat.start.x;
         qDebug() << "当前平台长度:" << plat_length;
         bool is_allow_clean = false;
-        if(monster_num > 0 && plat_length / monster_num <= 500){
+        if(monster_num > 0 && plat_length / monster_num <= PlatMonsterNum){
             qDebug() << "平台怪物数量够多，先清理怪物~";
             is_allow_clean = true;
         }
@@ -1409,7 +1415,7 @@ void KillMonster::excutePlatformSequence()
         int plat_length = cur_plat.end.x - cur_plat.start.x;
         qDebug() << "当前平台长度:" << plat_length;
         bool is_allow_clean = false;
-        if(monster_num > 0 && plat_length / monster_num <= 500){
+        if(monster_num > 0 && plat_length / monster_num <= PlatMonsterNum){
             qDebug() << "平台怪物数量够多，先清理怪物~";
             is_allow_clean = true;
         }
