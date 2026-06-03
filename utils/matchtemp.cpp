@@ -27,6 +27,8 @@ void MatchTemp::getScreenShot()
         Gplayer.game_window.height
     );
 
+    // qDebug() << "Game Position:" << Gplayer.game_window.x << Gplayer.game_window.y;
+
     img_width = cur_capture.width();
     img_height = cur_capture.height();
 }
@@ -91,7 +93,8 @@ bool MatchTemp::match(cv::Point &coor)
     getScreenShot();
 
     if(img_width != 1296 || img_height != 759){
-        qDebug() << "窗口大小不符合要求";
+        qDebug() << "窗口大小不符合要求:" << img_width << img_height;
+        cur_capture.save(QCoreApplication::applicationDirPath() + "/error/getScreenShot.png");
         return false;
     }
 

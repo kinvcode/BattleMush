@@ -810,7 +810,6 @@ void MouseTrack::test()
     // 获取主屏幕
     QScreen* m_pScreen = QGuiApplication::primaryScreen();
 
-    int last_timestamp = QDateTime::currentMSecsSinceEpoch();
     int frame_count = 0;
 
     qDebug() << "开始检测目标...";
@@ -912,19 +911,17 @@ void MouseTrack::test()
             // 未检测到目标
             if (locked_class >= 0 && frame_count % 100 == 0) {
                 qDebug() << "未检测到锁定目标:" << class_names[locked_class];
-            }
 
-            // 判断滑鼠界面是否还存在
-            int now_timestamp = QDateTime::currentMSecsSinceEpoch();
-            if (now_timestamp - last_timestamp > 500) {
-                MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
-                cv::Point title_coor;
-                if (!tempmatch.match(title_coor)) {
-                    Gplayer.mousecheck_exists = false;
-                    qDebug() << "滑鼠验证界面已消失~";
-                    break;
+                // 判断滑鼠界面是否还存在
+                if(frame_count > 250){
+                    MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
+                    cv::Point title_coor;
+                    if (!tempmatch.match(title_coor)) {
+                        Gplayer.mousecheck_exists = false;
+                        qDebug() << "滑鼠验证界面已消失~";
+                        break;
+                    }
                 }
-                last_timestamp = now_timestamp;
             }
         }
 
@@ -937,7 +934,7 @@ void MouseTrack::test()
 
         frame_count++;
 
-        // if (frame_count % 100 == 0) {
+        // if (frame_count % 10 == 0) {
         //     qDebug() << "已处理" << frame_count << "帧";
         // }
     }

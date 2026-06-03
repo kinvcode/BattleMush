@@ -606,25 +606,26 @@ void Controller::initTaskList()
     map0018.rests.push_back(map0018_rest00);
 
     /* ============【 加 入 刷 图 列 表】============= */
-    m_clean_room_list.push_back(map0001); // 維多利亞港外圍
-    m_clean_room_list.push_back(map0003); // 弓箭手村訓練場2
     m_clean_room_list.push_back(map0000); // 菇菇山丘
+    m_clean_room_list.push_back(map0001); // 維多利亞港外圍
     m_clean_room_list.push_back(map0002); // 遺跡發掘地1
-    m_clean_room_list.push_back(map0005); // 遺跡發掘地2
-    m_clean_room_list.push_back(map0008); // 遺跡發掘地3
+    m_clean_room_list.push_back(map0003); // 弓箭手村訓練場2
     m_clean_room_list.push_back(map0004); // 黑肥肥領土2
+    m_clean_room_list.push_back(map0005); // 遺跡發掘地2
     m_clean_room_list.push_back(map0006); // 火焰之地1
     m_clean_room_list.push_back(map0007); // 2號線<1區>
+    m_clean_room_list.push_back(map0008); // 遺跡發掘地3
     m_clean_room_list.push_back(map0009); // 玩具工廠<主工程A>
     m_clean_room_list.push_back(map0010); // 時間分岔道
     m_clean_room_list.push_back(map0011); // 雲彩公園3
+    m_clean_room_list.push_back(map0012); // 名人大道南部區域
+    m_clean_room_list.push_back(map0013); // 石巨人寺院入口
     m_clean_room_list.push_back(map0014); // 鋼之黑肥肥之地
+    m_clean_room_list.push_back(map0015); // 巨人之森
     m_clean_room_list.push_back(map0016); // 青螃蟹海灘Ⅱ
     m_clean_room_list.push_back(map0017); // 龍族狩獵場
-    m_clean_room_list.push_back(map0013); // 石巨人寺院入口
-    m_clean_room_list.push_back(map0015); // 巨人之森
     m_clean_room_list.push_back(map0018); // 魔龍領土
-    m_clean_room_list.push_back(map0012); // 名人大道南部區域
+
 
 
     /* ============【 加 入 休 息 列 表】============= */

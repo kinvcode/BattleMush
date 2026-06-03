@@ -1611,6 +1611,19 @@ void MainWindow::on_checkBox_atk_switch_skillteleport_stateChanged(int arg1)
 
 void MainWindow::on_pushButton_mousetrack_clicked()
 {
+    RECT game_rect;
+    QScreen* m_pScreen  = QGuiApplication::primaryScreen();
+    QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
+    int game_x          = game_rect.left;
+    int game_y          = game_rect.top;
+    int game_width      = game_rect.right - game_rect.left;
+    int game_height     = game_rect.bottom - game_rect.top;
+    cur_capture         = cur_capture.copy(game_x,game_y,game_width,game_height);
+    Gplayer.game_window.x = game_x;
+    Gplayer.game_window.y = game_y;
+    Gplayer.game_window.width = game_width;
+    Gplayer.game_window.height = game_height;
+
     Gplayer.mousecheck_exists = true;
     MouseTrack tracktest;
     tracktest.test();
