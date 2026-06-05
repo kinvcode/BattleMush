@@ -108,6 +108,7 @@ private:
 class MouseTrack{
 public:
     static void test();
+    static void realTrackTest();
 };
 
 #endif // MOUSETRACK_H

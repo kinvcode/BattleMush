@@ -1626,7 +1626,8 @@ void MainWindow::on_pushButton_mousetrack_clicked()
 
     Gplayer.mousecheck_exists = true;
     MouseTrack tracktest;
-    tracktest.test();
+    // tracktest.test();
+    tracktest.realTrackTest();
     qDebug() << "滑鼠验证结束~";
 }
 

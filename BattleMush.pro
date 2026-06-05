@@ -4,7 +4,7 @@ RC_ICONS = assets/images/icons/abc.ico
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++17
+CONFIG += c++20
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -81,6 +81,7 @@ SOURCES += \
     utils/mapserializer.cpp \
     utils/matchtemp.cpp \
     utils/mousetrack.cpp \
+    utils/realtracker.cpp \
     widgets/alertwindow.cpp \
     widgets/hotkeyedit.cpp \
     widgets/noticewidget.cpp \
@@ -118,6 +119,7 @@ HEADERS += \
     utils/mapserializer.h \
     utils/matchtemp.h \
     utils/mousetrack.h \
+    utils/realtracker.h \
     vmp/VMProtectSDK.h \
     widgets/alertwindow.h \
     widgets/hotkeyedit.h \
