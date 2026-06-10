@@ -272,14 +272,14 @@ void YOLOv8Inference::drawDetections(cv::Mat &frame, const std::vector<Detection
         // }
 
         // 检查 class_id 是否有效
-        if (det.class_id < 0 || det.class_id >= colors.size()) {
-            qDebug() << "警告：无效的 class_id:" << det.class_id
-                     << "，有效范围: 0-" << colors.size() - 1;
-            continue;  // 跳过这个检测
-        }
+        // if (det.class_id < 0 || det.class_id >= colors.size()) {
+        //     qDebug() << "警告：无效的 class_id:" << det.class_id
+        //              << "，有效范围: 0-" << colors.size() - 1;
+        //     continue;  // 跳过这个检测
+        // }
 
         // 绘制边界框
-        cv::rectangle(frame, det.box, colors[det.class_id], 2);
+        cv::rectangle(frame, det.box, colors[det.class_id], 1);
 
         // 绘制标签
         std::string label = class_names[det.class_id] + ": " +
@@ -301,9 +301,9 @@ void YOLOv8Inference::drawDetections(cv::Mat &frame, const std::vector<Detection
                     cv::Point(det.box.x, det.box.y - 5),
                     cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1);
 
-        if(det.class_id == 0){
-            break;
-        }
+        // if(det.class_id == 0){
+        //     break;
+        // }
     }
 }
 
@@ -980,7 +980,34 @@ void MouseTrack::test()
 void MouseTrack::realTrackTest()
 {
     YOLOv8Inference yolo(":/assets/best.onnx");
-    QString save_dir = "detection_results";
+    QString save_dir = QCoreApplication::applicationDirPath() + "/detection_results";
+
+    // 获取目录名和父目录
+    QDir dir(save_dir);
+    QString dirName = dir.dirName();
+    QDir parentDir = dir;
+    parentDir.cdUp();
+
+    // 如果目录存在，先递归删除所有内容，然后删除目录本身
+    if (dir.exists()) {
+        // 方法1：使用 removeRecursively() 删除整个目录树（Qt 5+）
+        if (!dir.removeRecursively()) {
+            qWarning() << "删除目录失败:" << save_dir;
+            return;
+        }
+
+        // 重新创建空目录
+        if (!parentDir.mkdir(dirName)) {
+            qWarning() << "创建目录失败:" << save_dir;
+            return;
+        }
+    } else {
+        // 目录不存在，直接创建
+        if (!parentDir.mkdir(dirName)) {
+            qWarning() << "创建目录失败:" << save_dir;
+            return;
+        }
+    }
 
     // 查找游戏窗口
     HWND game_hwnd = FindWindow(NULL, TEXT("MapleStory Worlds-Artale (繁體中文版)"));
@@ -1096,6 +1123,7 @@ void MouseTrack::realTrackTest()
     qDebug() << "开始真实目标检测...";
 
     while (true) {
+        qDebug() << "第" << frame_count << "帧";
         // 截取屏幕
         QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
         cur_capture = cur_capture.copy(pos_x, pos_y, detect_width, detect_height);
@@ -1108,6 +1136,9 @@ void MouseTrack::realTrackTest()
 
         // 追踪检测
         auto detections = yolo.track(bgr_frame, 0.25);
+
+        // 绘制所有检测
+        yolo.drawDetections(bgr_frame, detections);
 
         // 转换为跟踪结果格式
         std::vector<TrackInfo> track_results;
@@ -1143,8 +1174,9 @@ void MouseTrack::realTrackTest()
             for (const auto& contour : contours) {
                 cv::Rect rect = cv::boundingRect(contour);
                 double area = rect.width * rect.height;
+                qDebug() << "area:" << area;
                 // if (area > 2000 && area > max_area) {
-                if (area > 1500 && area > max_area) {
+                if (area > 800 && area > max_area) {
                     float ratio = std::max(rect.width, rect.height) / static_cast<float>(std::min(rect.width, rect.height));
                     if (ratio > 1.5f) continue;
 
@@ -1159,6 +1191,10 @@ void MouseTrack::realTrackTest()
                     real_target_detector.setLockCoordinate(lock_position);
                     locked_frame_count = 31;
                     qDebug() << "锁定坐标确定:" << lock_position.x << "," << lock_position.y;
+                    // 绘制锁定坐标
+                    if (lock_position.x > 0 && lock_position.y > 0) {
+                        cv::circle(bgr_frame, lock_position, 6, cv::Scalar(255, 255, 0), -1);
+                    }
                 }
             }
             locked_frame_count++;
@@ -1192,10 +1228,10 @@ void MouseTrack::realTrackTest()
                         has_target = true;
 
                         // 绘制真实目标
-                        cv::rectangle(bgr_frame, det.box, cv::Scalar(0, 0, 255), 2);
+                        // cv::rectangle(bgr_frame, det.box, cv::Scalar(0, 0, 255), 2);
                         cv::circle(bgr_frame, cv::Point(center_x, center_y), 5, cv::Scalar(0, 0, 255), -1);
 
-                        QString track_text = QString("REAL ID:%1").arg(identified_id);
+                        QString track_text = QString("ID:%1").arg(identified_id);
                         cv::putText(bgr_frame,
                                     track_text.toStdString(),
                                     cv::Point(det.box.x, det.box.y - 10),
@@ -1209,18 +1245,11 @@ void MouseTrack::realTrackTest()
                     }
                 }
             }
-
-            // 绘制锁定坐标
-            if (lock_position.x > 0 && lock_position.y > 0) {
-                cv::circle(bgr_frame, lock_position, 6, cv::Scalar(255, 255, 0), -1);
-            }
         }
 
-        // 绘制所有检测
-        yolo.drawDetections(bgr_frame, detections);
 
         // 检测滑鼠界面是否消失
-        if (frame_count > 250 && frame_count % 100 == 0) {
+        if (frame_count > 155) {
             MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
             cv::Point title_coor;
             if (!tempmatch.match(title_coor)) {
@@ -1229,6 +1258,7 @@ void MouseTrack::realTrackTest()
                 break;
             }
         }
+
         QString save_path = QString("%1/frame_%2.jpg").arg(save_dir).arg(frame_count, 6, 10, QChar('0'));
         cv::imwrite(save_path.toStdString(), bgr_frame);
         frame_count++;

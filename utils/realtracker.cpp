@@ -24,6 +24,68 @@ void RealTargetDetector::reset() {
     position_history_.clear();
 }
 
+std::map<int, int> RealTargetDetector::countDirectionsByCategory(const std::vector<TrackInfo> &tracks)
+{
+    std::map<int, int> direction_counts;
+    // 方向分类: 0=上, 1=右上, 2=右, 3=右下, 4=下, 5=左下, 6=左, 7=左上
+    const int direction_bins = 8;
+
+    std::vector<QString> dir_names = {"上", "右上", "右", "右下", "下", "左下", "左", "左上"};
+
+    for (const auto& track : tracks) {
+        auto [angle, speed, _] = calculateMovementMetrics2(track.track_id);
+        // if (angle < 0) continue;
+
+        // 将角度(0-360)映射到8个方向
+        int direction = static_cast<int>((angle + 22.5) / 45.0) % 8;
+
+        // 简化方向描述
+        qDebug() << "Track" << track.track_id << "方向:" << dir_names[direction]
+                 << QString("(%1°)").arg(angle, 0, 'f', 1);
+
+        direction_counts[direction]++;
+    }
+
+    return direction_counts;
+}
+
+int RealTargetDetector::getBackgroundDirection(const std::map<int, int> &direction_counts)
+{
+    if (direction_counts.empty()) return -1;
+
+    int max_direction = -1;
+    int max_count = 0;
+
+    for (const auto& [dir, count] : direction_counts) {
+        if (count > max_count) {
+            max_count = count;
+            max_direction = dir;
+        }
+    }
+
+    return max_direction;
+}
+
+bool RealTargetDetector::isDifferentFromBackground(int track_id, int background_direction, const std::vector<TrackInfo> &tracks)
+{
+    for (const auto& track : tracks) {
+        if (track.track_id != track_id) continue;
+
+        auto [angle, speed, _] = calculateMovementMetrics(track.track_id);
+        if (angle < 0) return false;
+
+        int track_direction = static_cast<int>((angle + 22.5) / 45.0) % 8;
+
+        // 计算方向差异（考虑循环）
+        int diff = std::abs(track_direction - background_direction);
+        diff = std::min(diff, 8 - diff);
+
+        // 方向差异大于2个象限才算不同（90度以上）
+        return diff > 2;
+    }
+    return false;
+}
+
 void RealTargetDetector::setLockCoordinate(const cv::Point2i& coord) {
     lock_coord_ = coord;
     lock_transferred_ = false;
@@ -86,6 +148,46 @@ std::tuple<double, double, double> RealTargetDetector::calculateMovementMetrics(
             speed_variance += (s - avg_speed) * (s - avg_speed);
         }
         speed_variance /= speeds.size();
+    }
+
+    return { angle, avg_speed, speed_variance };
+}
+
+std::tuple<double, double, double> RealTargetDetector::calculateMovementMetrics2(int trackId)
+{
+    auto it = track_history_.find(trackId);
+    if (it == track_history_.end() || it->second.size() < 2) {
+        return { -1.0, -1.0, -1.0 };
+    }
+
+    const auto& positions = it->second;
+
+    // 使用最近两帧计算运动方向
+    const auto& current = positions.back();
+    const auto& prev = positions[positions.size() - 2];
+
+    double dx = current.x - prev.x;
+    double dy = current.y - prev.y;
+
+    double angle = -1.0;
+    if (std::abs(dx) > 0.01 || std::abs(dy) > 0.01) {
+        angle = std::atan2(dx, -dy) * 180.0 / CV_PI;
+        if (angle < 0) angle += 360.0;
+    }
+
+    // 计算速度（像素/帧）
+    double distance = std::sqrt(dx*dx + dy*dy);
+    double avg_speed = distance;
+
+    // 速度方差（需要至少3个点）
+    double speed_variance = -1.0;
+    if (positions.size() >= 3) {
+        const auto& prev2 = positions[positions.size() - 3];
+        double dx2 = prev.x - prev2.x;
+        double dy2 = prev.y - prev2.y;
+        double dist2 = std::sqrt(dx2*dx2 + dy2*dy2);
+        double avg = (distance + dist2) / 2.0;
+        speed_variance = ((distance - avg)*(distance - avg) + (dist2 - avg)*(dist2 - avg)) / 2.0;
     }
 
     return { angle, avg_speed, speed_variance };
@@ -215,10 +317,26 @@ int RealTargetDetector::identifyRealTarget(
         return real_target_id_;
     }
 
+    // 当前帧所有目标的位置
     std::map<int, cv::Point2f> current_positions;
+    // 真实目标附近的目标
+    std::map<int, TrackInfo> near_targets;
     for (const auto& track : tracks) {
         current_positions[track.track_id] = track.center;
+        // 保存真实目标附近的所有目标
+        if (real_target_id_ >= 0) {
+             // 50范围内搜索ID
+            double min_distance = 50.0;
+            double dx = track.center.x - currentPos.x;
+            double dy = track.center.y - currentPos.y;
+            double distance = std::sqrt(dx*dx + dy*dy);
+            if (distance <= min_distance){
+                near_targets[track.track_id] = track;
+                qDebug() << "附近目标:" << track.track_id << "距离" << distance;
+            }
+        }
     }
+
     updateTracks(tracks);
 
     frame_count_++;
@@ -235,7 +353,7 @@ int RealTargetDetector::identifyRealTarget(
             switch_counter_ = 0;
             qDebug() << "锁定坐标已移交到目标" << closest_target << ", 距离:" << min_distance << "像素";
 
-            auto [angle, avg_speed, _] = calculateMovementMetrics(closest_target);
+            auto [angle, avg_speed, _] = calculateMovementMetrics2(closest_target);
             if (angle >= 0) {
                 last_angle_ = angle;
                 last_speed_ = avg_speed;
@@ -247,14 +365,45 @@ int RealTargetDetector::identifyRealTarget(
         }
     }
 
+    std::vector<QString> dir_names = {"上", "右上", "右", "右下", "下", "左下", "左", "左上"};
+
+    // 统计当前帧所有目标的方向
+    auto direction_counts = countDirectionsByCategory(tracks);
+    // 获取当前背景的运动方向
+    int background_direction = getBackgroundDirection(direction_counts);
+    qDebug() << "背景运动方向：" << background_direction;
+
+    // 寻找 真实ID与背景运动相同且附近存在与背景运动相反的目标
+    std::vector<int> real_near_id_list;
+    if (background_direction >= 0) {
+        // 2. 检查真实ID的运动方向
+        if (real_target_id_ >= 0) {
+            auto real_it = std::find_if(tracks.begin(), tracks.end(),
+                [this](const TrackInfo& t) { return t.track_id == real_target_id_; });
+            if (real_it != tracks.end()) {
+                auto [real_angle, _, __] = calculateMovementMetrics2(real_target_id_);
+                int real_direction = static_cast<int>((real_angle + 22.5) / 45.0) % 8;
+                bool similar_direction = real_direction == background_direction;  // 45度内算相似
+                qDebug() << "真实ID" << real_target_id_
+                         << "方向:" << dir_names[real_direction]
+                         << "与背景" << (similar_direction ? "一致" : "不同");
+            }
+        }
+    }
+
     std::map<int, TargetScore> candidate_scores;
 
+    qDebug() << "-----------------------------------";
+    qDebug() << "track_id | 方向 | 与背景方向相同 | 综合分";
     for (const auto& track : tracks) {
-        auto [angle, avg_speed, speed_variance] = calculateMovementMetrics(track.track_id);
-        if (angle < 0) continue;
+        auto [angle, avg_speed, speed_variance] = calculateMovementMetrics2(track.track_id);
+        // if (angle < 0 && track.track_id != real_target_id_) continue;
 
         auto [near_boundary, boundary_type] = isNearBoundary(track, detectionRegion, aspectRatio);
-        if (near_boundary) continue;
+        // if (near_boundary) continue;
+
+        int direction = static_cast<int>((angle + 22.5) / 45.0) % 8;
+        bool similar_direction = direction == background_direction;
 
         double angle_score = 0.0;
         if (background_angle_ >= 0) {
@@ -274,60 +423,75 @@ int RealTargetDetector::identifyRealTarget(
         ts.position = track.center;
 
         candidate_scores[track.track_id] = ts;
+        qDebug() << track.track_id << " | " << dir_names[direction] << " | " << (similar_direction ? "相同" : "不同") << " | " << combined_score;
     }
+    qDebug() << "-----------------------------------";
 
     updateBackgroundAngle(candidate_scores);
 
     if (!candidate_scores.empty()) {
+
+        // 筛选出最佳备选目标
         auto best_target = std::max_element(
             candidate_scores.begin(), candidate_scores.end(),
             [](const auto& a, const auto& b) {
                 return a.second.combined_score < b.second.combined_score;
             });
         int best_id = best_target->first;
+        qDebug() << "best_id" << best_id;
         const auto& best_scores = best_target->second;
 
         bool should_switch = false;
         bool distance_check_passed = true;
 
+        // 计算备选目标与真实目标位置的距离
         cv::Point2f candidate_position = best_scores.position;
         double dx = candidate_position.x - currentPos.x;
         double dy = candidate_position.y - currentPos.y;
         double distance = std::sqrt(dx * dx + dy * dy);
 
-        const double MAX_ALLOWED_DISTANCE = 350.0;
+        const double MAX_ALLOWED_DISTANCE = 100.0; //350
         distance_check_passed = distance <= MAX_ALLOWED_DISTANCE;
 
         if (!distance_check_passed) {
             qDebug() << "距离检查失败: 候选目标" << best_id << "距离当前目标" << real_target_id_ << "为" << distance << "像素 >" << MAX_ALLOWED_DISTANCE << "像素";
         }
 
+        // 如果备选目标不是真实目标
         if (real_target_id_ != best_id) {
             if (maintainTargetContinuity(current_positions)) {
+                qDebug() << "备选目标不是真实目标，上次有效目标存在本帧中。切换统计归零";
                 should_switch = false;
                 switch_counter_ = 0;
             } else {
+                qDebug() << "备选目标不是真实目标，上次有效目标不在本帧中";
                 if (last_switch_candidate_ == best_id) {
                     switch_counter_++;
+                    qDebug() << "上次切换的目标与备选目标一致，切换统计增加";
                 } else {
                     switch_counter_ = 1;
                     last_switch_candidate_ = best_id;
+                    qDebug() << "上次切换的目标与备选目标不一致，切换统计设置1";
                 }
                 should_switch = (switch_counter_ >= switch_threshold_) && distance_check_passed;
             }
         } else {
+            // 如果备选目标就是真实目标，检测真实目标运动是否稳定
             bool is_stable = checkMovementStability(best_scores.angle, best_scores.speed);
             if (!is_stable) {
+                qDebug() << "真实目标运动不稳定，切换统计增加";
                 should_switch = true;
                 switch_counter_++;
             } else {
+                qDebug() << "真实目标运动稳定，切换统计归零";
                 switch_counter_ = 0;
             }
         }
 
+        // 如果备选目标综合分大于0.25，并且应该切换目标，并且切换次数大于3次，并且符合距离。则将备选目标切换为真实目标
         if (best_scores.combined_score > 0.25 && should_switch &&
             switch_counter_ >= switch_threshold_ && distance_check_passed) {
-
+            qDebug() << "备选目标" << best_id << "替换目标" << real_target_id_ << "为真实目标";
             int old_target = real_target_id_;
             real_target_id_ = best_id;
             last_valid_target_id_ = best_id;
@@ -337,8 +501,10 @@ int RealTargetDetector::identifyRealTarget(
             switch_counter_ = 0;
             last_switch_candidate_ = -1;
         } else {
+            // 如果当前帧存在真实目标，记录上次有效的目标
             if (real_target_id_ >= 0 &&
                 current_positions.find(real_target_id_) != current_positions.end()) {
+                qDebug() << "将真实目标设置为上次有效目标";
                 last_valid_target_id_ = real_target_id_;
             }
         }
@@ -347,6 +513,11 @@ int RealTargetDetector::identifyRealTarget(
             switch_counter_ = 0;
             qDebug() << "没有合适目标且无法保持上次目标";
         }
+    }
+
+    qDebug() << "最终运算真实ID：" << real_target_id_;
+    if (real_target_id_ >= 0 && current_positions.find(real_target_id_) == current_positions.end()) {
+        qDebug() << "目标不存在2";
     }
 
     return real_target_id_;

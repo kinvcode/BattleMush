@@ -93,9 +93,9 @@ bool MatchTemp::match(cv::Point &coor)
     getScreenShot();
 
     if(img_width != 1296 || img_height != 759){
-        qDebug() << "窗口大小不符合要求:" << img_width << img_height;
-        cur_capture.save(QCoreApplication::applicationDirPath() + "/error/getScreenShot.png");
-        return false;
+        // qDebug() << "窗口大小不符合要求:" << img_width << img_height;
+        // cur_capture.save(QCoreApplication::applicationDirPath() + "/error/getScreenShot.png");
+        // return false;
     }
 
     begin:

@@ -38,6 +38,7 @@ public:
 
     // 移动指标计算
     std::tuple<double, double, double> calculateMovementMetrics(int trackId);
+    std::tuple<double, double, double> calculateMovementMetrics2(int trackId);
     double calculateAngleDifference(double angle1, double angle2);
     bool checkMovementStability(double currentAngle, double currentSpeed);
 
@@ -52,6 +53,15 @@ public:
     int getRealTargetId() const { return real_target_id_; }
     int getTargetLostCounter() const { return target_lost_counter_; }
     bool isLockTransferred() const { return lock_transferred_; }
+
+    // 统计当前帧各方向数量
+    std::map<int, int> countDirectionsByCategory(const std::vector<TrackInfo>& tracks);
+
+    // 获取最多的方向（背景运动方向）
+    int getBackgroundDirection(const std::map<int, int>& direction_counts);
+
+    // 检查候选目标是否与背景方向不同
+    bool isDifferentFromBackground(int track_id,int background_direction,const std::vector<TrackInfo>& tracks);
 
 private:
     void updateBackgroundAngle(const std::map<int, TargetScore>& candidateScores);
@@ -83,6 +93,11 @@ private:
 
     cv::Point2i lock_coord_;
     bool lock_transferred_ = false;
+
+    // 方向属性
+    int reset_real_count_ = 0;  // 重置计数器
+    int last_background_direction_ = -1;  // 上一帧背景方向
+    int consecutive_same_direction_ = 0;  // 连续相同方向帧数
 
     // 轨迹历史
     std::map<int, std::deque<cv::Point2f>> track_history_;
