@@ -1075,7 +1075,7 @@ void MouseTrack::realTrackTest()
     cv::VideoCapture video_cap;
     double video_fps = 30.0;
     constexpr double video_capture_fps = 3.0;
-    constexpr double screenshot_capture_fps = 3.0;
+    constexpr double screenshot_capture_fps = 30.0;
     using SteadyClock = std::chrono::steady_clock;
     const auto screenshot_interval = std::chrono::duration_cast<SteadyClock::duration>(
         std::chrono::duration<double>(1.0 / screenshot_capture_fps));
@@ -1221,6 +1221,8 @@ void MouseTrack::realTrackTest()
     int locked_frame_count = 0;  // 锁定坐标帧计数
     cv::Point2i lock_position(-1, -1);  // 锁定坐标
     auto next_screenshot_time = SteadyClock::now();
+    const auto screenshot_test_start = SteadyClock::now();
+    constexpr auto mouse_check_delay = std::chrono::seconds(16);
 
     qDebug() << "开始真实目标检测...";
 
@@ -1338,14 +1340,9 @@ void MouseTrack::realTrackTest()
             int current_pos_y = static_cast<int>(latest_target_y);
             cv::Point2i current_pos(current_pos_x, current_pos_y);
 
+            // 追踪真实目标
             int identified_id = real_target_detector.identifyRealTarget(
                 track_results, current_pos, 1.0, detection_region);
-
-            if (frame_count % 30 == 0) {
-                qDebug() << "真实目标ID:" << identified_id
-                         << "锁定转移:" << real_target_detector.isLockTransferred()
-                         << "丢失计数:" << real_target_detector.getTargetLostCounter();
-            }
 
             // 查找真实目标
             if (identified_id >= 0) {
@@ -1361,7 +1358,11 @@ void MouseTrack::realTrackTest()
 
                         // 绘制真实目标
                         // cv::rectangle(bgr_frame, det.box, cv::Scalar(0, 0, 255), 2);
-                        cv::circle(bgr_frame, cv::Point(center_x, center_y), 5, cv::Scalar(0, 0, 255), -1);
+                        if(real_target_detector.getRealTargetId() != identified_id){
+                            cv::circle(bgr_frame, cv::Point(center_x, center_y), 5, cv::Scalar(255, 0, 0), -1);
+                        }else{
+                           cv::circle(bgr_frame, cv::Point(center_x, center_y), 5, cv::Scalar(0, 0, 255), -1);
+                        }
 
                         QString track_text = QString("ID:%1").arg(identified_id);
                         cv::putText(bgr_frame,
@@ -1380,8 +1381,8 @@ void MouseTrack::realTrackTest()
         }
 
 
-        // 检测滑鼠界面是否消失（仅截图模式）
-        if (!use_video && frame_count > 55) {
+        // 检测滑鼠界面是否消失（仅截图模式，运行超过16秒后开始检测）
+        if (!use_video && SteadyClock::now() - screenshot_test_start > mouse_check_delay) {
             MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
             cv::Point title_coor;
             if (!tempmatch.match(title_coor)) {

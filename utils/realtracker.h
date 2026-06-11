@@ -17,6 +17,11 @@ struct TrackInfo {
     std::vector<cv::Point2f> trajectory;
 };
 
+struct TrackPositionRecord {
+    int frame = 0;
+    cv::Point2f position;
+};
+
 struct TargetScore {
     double angle;
     double angle_score;
@@ -76,7 +81,7 @@ public:
                           const cv::Rect& detectionRegion);
 
     std::tuple<double, double, double> calculateMovementMetrics(int trackId);
-    std::tuple<double, double, double> calculateMovementMetrics2(int trackId);
+    std::tuple<double, double> calculateMovementMetrics2(int trackId);
     double calculateAngleDifference(double angle1, double angle2) const;
     bool checkMovementStability(double currentAngle, double currentSpeed);
 
@@ -166,6 +171,7 @@ private:
     int switch_threshold_ = 3;
 
     int real_target_id_ = -1;
+    int real_target_direction_ = -1;
     int frame_count_ = 0;
     int stability_counter_ = 0;
     int target_lost_counter_ = 0;
@@ -181,9 +187,9 @@ private:
     bool lock_transferred_ = false;
     int last_background_direction_ = -1;
 
-    std::map<int, std::deque<cv::Point2f>> track_history_;
+    std::map<int, std::deque<TrackPositionRecord>> track_history_;
     std::map<int, TargetScore> target_scores_;
-    std::map<int, std::deque<cv::Point2f>> position_history_;
+    std::map<int, std::deque<TrackPositionRecord>> position_history_;
 
     double merge_tolerance_ = 20.0;
     double angle_match_tolerance_ = 15.0;
