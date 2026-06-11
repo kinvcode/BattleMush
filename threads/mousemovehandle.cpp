@@ -82,9 +82,10 @@ void MouseMoveHandle::process()
 void MouseMoveHandle::checkMouseMove()
 {
     if(Gplayer.mousecheck_exists){
-        return;
+        // return;
         MouseTrack tracktest;
-        tracktest.test();
+        // tracktest.test();
+        tracktest.realTrackTest();
         qDebug() << "滑鼠验证结束~";
         Helper::console("滑鼠验证结束~");
         return;
