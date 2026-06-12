@@ -52,6 +52,7 @@ LIBS += $$PWD/lib/vmp/VMProtectSDK64.lib
 LIBS += Advapi32.lib
 LIBS += -lSetupAPI
 LIBS += -lUser32 -lKernel32
+LIBS += -ld3d11 -ldxgi -lwindowsapp
 
 SOURCES += \
     driver/mem.cpp \
@@ -82,6 +83,7 @@ SOURCES += \
     utils/matchtemp.cpp \
     utils/mousetrack.cpp \
     utils/realtracker.cpp \
+    utils/wgccapture.cpp \
     widgets/alertwindow.cpp \
     widgets/hotkeyedit.cpp \
     widgets/noticewidget.cpp \
@@ -120,6 +122,7 @@ HEADERS += \
     utils/matchtemp.h \
     utils/mousetrack.h \
     utils/realtracker.h \
+    utils/wgccapture.h \
     vmp/VMProtectSDK.h \
     widgets/alertwindow.h \
     widgets/hotkeyedit.h \

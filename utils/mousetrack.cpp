@@ -16,6 +16,7 @@
 #include "driver/mskeycode.h"
 #include "utils/helper.h"
 #include "utils/matchtemp.h"
+#include "utils/wgccapture.h"
 #include <chrono>
 #include <thread>
 
@@ -1067,6 +1068,12 @@ void MouseTrack::realTrackTest()
     qDebug() << "识别区域:" << pos_x << pos_y << detect_width << detect_height;
     qDebug() << "画面来源: 屏幕截图, 采样率:" << screenshot_capture_fps << "fps";
 
+    WgcWindowCapturer wgc_capturer;
+    if (!wgc_capturer.init(game_hwnd, box_pos_x, box_pos_y, box_width, box_height)) {
+        qCritical() << "WGC 截图初始化失败";
+        return;
+    }
+
     // 真实目标检测器
     RealTargetDetector real_target_detector;
 
@@ -1168,13 +1175,16 @@ void MouseTrack::realTrackTest()
         next_screenshot_time = capture_time + screenshot_interval;
 
         qDebug() << "第" << frame_count << "帧";
-        QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
-        cur_capture = cur_capture.copy(pos_x, pos_y, detect_width, detect_height);
+        // QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
+        // cur_capture = cur_capture.copy(pos_x, pos_y, detect_width, detect_height);
+        // QImage image = cur_capture.toImage();
+        // cv::Mat frame(image.height(), image.width(), CV_8UC4,
+        //               const_cast<uchar*>(image.bits()), image.bytesPerLine());
+        // cv::cvtColor(frame, bgr_frame, cv::COLOR_BGRA2BGR);
 
-        QImage image = cur_capture.toImage();
-        cv::Mat frame(image.height(), image.width(), CV_8UC4,
-                      const_cast<uchar*>(image.bits()), image.bytesPerLine());
-        cv::cvtColor(frame, bgr_frame, cv::COLOR_BGRA2BGR);
+        if (!wgc_capturer.captureBgr(bgr_frame)) {
+            continue;
+        }
 
         // 追踪检测
         auto detections = yolo.track(bgr_frame, 0.25);
@@ -1321,6 +1331,7 @@ void MouseTrack::realTrackTest()
         const double total_elapsed =
             std::chrono::duration<double>(test_end - screenshot_test_start).count();
         const double avg_fps = total_elapsed > 0.0 ? frame_count / total_elapsed : 0.0;
+        avg_fps_ = avg_fps;
         qDebug() << "实际帧率统计: 共处理" << frame_count << "帧, 耗时"
                  << QString::number(total_elapsed, 'f', 2) << "秒, 平均"
                  << QString::number(avg_fps, 'f', 2) << "fps (目标"
@@ -1328,4 +1339,9 @@ void MouseTrack::realTrackTest()
     }
 
     qDebug() << "realTrackTest() 函数退出，真实目标ID:" << real_track_id.load();
+}
+
+int MouseTrack::getfps()
+{
+    return avg_fps_;
 }

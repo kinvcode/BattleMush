@@ -106,9 +106,12 @@ private:
 };
 
 class MouseTrack{
+private:
+    int avg_fps_;
 public:
     static void test();
-    static void realTrackTest();
+    void realTrackTest();
+    int getfps();
 };
 
 #endif // MOUSETRACK_H
