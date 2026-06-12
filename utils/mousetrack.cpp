@@ -1060,7 +1060,7 @@ void MouseTrack::realTrackTest()
     // 检测区域
     cv::Rect detection_region(0, 0, detect_width, detect_height);
 
-    constexpr double screenshot_capture_fps = 30.0;
+    constexpr double screenshot_capture_fps = 3.0;
     using SteadyClock = std::chrono::steady_clock;
     const auto screenshot_interval = std::chrono::duration_cast<SteadyClock::duration>(
         std::chrono::duration<double>(1.0 / screenshot_capture_fps));
@@ -1150,29 +1150,24 @@ void MouseTrack::realTrackTest()
     });
 
 
-    QScreen* m_pScreen = QGuiApplication::primaryScreen();
-
     int frame_count = 0;
     int locked_frame_count = 0;  // 锁定坐标帧计数
     cv::Point2i lock_position(-1, -1);  // 锁定坐标
-    auto next_screenshot_time = SteadyClock::now();
     const auto screenshot_test_start = SteadyClock::now();
     constexpr auto mouse_check_delay = std::chrono::seconds(16);
-    auto fps_window_start = screenshot_test_start;
-    int fps_window_frames = 0;
-    constexpr int fps_log_interval = 30;
+
+    const auto waitForScreenshotInterval = [&](const SteadyClock::time_point& frame_start) {
+        const auto elapsed = SteadyClock::now() - frame_start;
+        if (elapsed < screenshot_interval) {
+            std::this_thread::sleep_for(screenshot_interval - elapsed);
+        }
+    };
 
     qDebug() << "开始真实目标检测...";
 
     while (true) {
+        const auto frame_start = SteadyClock::now();
         cv::Mat bgr_frame;
-
-        const auto now = SteadyClock::now();
-        if (now < next_screenshot_time) {
-            std::this_thread::sleep_until(next_screenshot_time);
-        }
-        const auto capture_time = SteadyClock::now();
-        next_screenshot_time = capture_time + screenshot_interval;
 
         qDebug() << "第" << frame_count << "帧";
         // QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
@@ -1183,6 +1178,7 @@ void MouseTrack::realTrackTest()
         // cv::cvtColor(frame, bgr_frame, cv::COLOR_BGRA2BGR);
 
         if (!wgc_capturer.captureBgr(bgr_frame)) {
+            waitForScreenshotInterval(frame_start);
             continue;
         }
 
@@ -1319,6 +1315,7 @@ void MouseTrack::realTrackTest()
         QString save_path = QString("%1/frame_%2.jpg").arg(save_dir).arg(frame_count, 6, 10, QChar('0'));
         cv::imwrite(save_path.toStdString(), bgr_frame);
         frame_count++;
+        waitForScreenshotInterval(frame_start);
     }
 
     running = false;
