@@ -997,9 +997,6 @@ static bool openLocalVideoCapture(cv::VideoCapture& cap, const QString& videoPat
 
 void MouseTrack::realTrackTest()
 {
-    QString videoPath = "D:/CodeRepos/Pythons/mousemove/detvideos/三角形8.mp4";
-    videoPath.clear();
-    const bool use_video = !videoPath.isEmpty();
     YOLOv8Inference yolo(":/assets/best.onnx");
     QString save_dir = QCoreApplication::applicationDirPath() + "/detection_results";
 
@@ -1032,32 +1029,22 @@ void MouseTrack::realTrackTest()
 
     // 查找游戏窗口（截图模式）
     HWND game_hwnd = NULL;
-    if (!use_video) {
-        game_hwnd = FindWindow(NULL, TEXT("MapleStory Worlds-Artale (繁體中文版)"));
-        if (game_hwnd == NULL) {
-            qCritical() << "游戏窗口不存在！";
-            return;
-        }
-    } else if (!QFileInfo::exists(videoPath)) {
-        qCritical() << "视频文件不存在:" << videoPath;
+    game_hwnd = FindWindow(NULL, TEXT("MapleStory Worlds-Artale (繁體中文版)"));
+    if (game_hwnd == NULL) {
+        qCritical() << "游戏窗口不存在！";
         return;
     }
+
 
     // 获取窗口位置和大小
     RECT game_rect{};
     int game_x = 0;
     int game_y = 0;
-    if (!use_video) {
-        GetWindowRect(game_hwnd, &game_rect);
-        game_x = game_rect.left;
-        game_y = game_rect.top;
-    }
+    GetWindowRect(game_hwnd, &game_rect);
+    game_x = game_rect.left;
+    game_y = game_rect.top;
     int box_pos_x = 399;
     int box_pos_y = 218;
-    if(use_video){
-        box_pos_x -= 9;
-        box_pos_y -= 31;
-    }
     int box_width = 500;
     int box_height = 335;
 
@@ -1083,60 +1070,7 @@ void MouseTrack::realTrackTest()
     int video_frame_index = 0;
 
     qDebug() << "识别区域:" << pos_x << pos_y << detect_width << detect_height;
-    if (use_video) {
-        qDebug() << "画面来源: 本地视频" << videoPath;
-    } else {
-        qDebug() << "画面来源: 屏幕截图, 采样率:" << screenshot_capture_fps << "fps";
-    }
-
-    if (use_video) {
-        if (!QFileInfo::exists(videoPath)) {
-            qCritical() << "视频文件不存在:" << videoPath;
-            return;
-        }
-        if (!openLocalVideoCapture(video_cap, videoPath) || !video_cap.isOpened()) {
-            qCritical() << "无法打开视频文件:" << videoPath;
-            return;
-        }
-        video_fps = video_cap.get(cv::CAP_PROP_FPS);
-        if (video_fps <= 1.0) {
-            video_fps = 30.0;
-        }
-        qDebug() << "视频帧率:" << video_fps
-                 << "总帧数:" << static_cast<int>(video_cap.get(cv::CAP_PROP_FRAME_COUNT));
-        video_frame_step = std::max(1, static_cast<int>(std::round(video_fps / video_capture_fps)));
-        qDebug() << "视频采样率:" << video_capture_fps << "fps, 每" << video_frame_step << "帧采集一次";
-    }
-
-    auto extractDetectFrame = [&](const cv::Mat& input) -> cv::Mat {
-        if (input.empty()) {
-            return {};
-        }
-        cv::Mat working = input;
-        const int ch = working.channels();
-        if (ch != 1 && ch != 3 && ch != 4) {
-            qWarning() << "不支持的通道数:" << ch;
-            return {};
-        }
-        if (working.channels() == 4) {
-            cv::Mat bgr;
-            cv::cvtColor(working, bgr, cv::COLOR_BGRA2BGR);
-            working = bgr;
-        } else if (working.channels() == 1) {
-            cv::Mat bgr;
-            cv::cvtColor(working, bgr, cv::COLOR_GRAY2BGR);
-            working = bgr;
-        }
-        if (working.cols == detect_width && working.rows == detect_height) {
-            return working.clone();
-        }
-        if (working.cols >= box_pos_x + detect_width && working.rows >= box_pos_y + detect_height) {
-            return working(cv::Rect(box_pos_x, box_pos_y, detect_width, detect_height)).clone();
-        }
-        cv::Mat resized;
-        cv::resize(working, resized, cv::Size(detect_width, detect_height));
-        return resized;
-    };
+    qDebug() << "画面来源: 屏幕截图, 采样率:" << screenshot_capture_fps << "fps";
 
     // 真实目标检测器
     RealTargetDetector real_target_detector;
@@ -1158,10 +1092,9 @@ void MouseTrack::realTrackTest()
 
     // 鼠标移动线程（仅截图模式）
     std::thread mouse_thread;
-    if (!use_video) {
-        mouse_thread = std::thread([&]() {
-        auto last_move_time = std::chrono::high_resolution_clock::now();
 
+    mouse_thread = std::thread([&]() {
+    auto last_move_time = std::chrono::high_resolution_clock::now();
         while (running) {
             if (!Gplayer.mousecheck_exists) {
                 qDebug() << "滑鼠界面不存在，退出线程~";
@@ -1212,10 +1145,10 @@ void MouseTrack::realTrackTest()
                 }
             }
         }
-        });
-    }
+    });
 
-    QScreen* m_pScreen = use_video ? nullptr : QGuiApplication::primaryScreen();
+
+    QScreen* m_pScreen = QGuiApplication::primaryScreen();
 
     int frame_count = 0;
     int locked_frame_count = 0;  // 锁定坐标帧计数
@@ -1228,45 +1161,22 @@ void MouseTrack::realTrackTest()
 
     while (true) {
         cv::Mat bgr_frame;
-        if (use_video) {
-            cv::Mat raw_frame;
-            video_cap >> raw_frame;
-            if (raw_frame.empty()) {
-                qDebug() << "视频读取完毕，共处理" << frame_count << "帧";
-                break;
-            }
-            video_frame_index++;
-            if ((video_frame_index - 1) % video_frame_step != 0) {
-                continue;
-            }
-            qDebug() << "第" << frame_count << "帧 (视频第" << video_frame_index << "帧)";
-            bgr_frame = extractDetectFrame(raw_frame);
-            if (bgr_frame.empty()) {
-                qWarning() << "视频帧无效，跳过第" << frame_count << "帧";
-                continue;
-            }
-        } else {
-            const auto now = SteadyClock::now();
-            if (now < next_screenshot_time) {
-                std::this_thread::sleep_until(next_screenshot_time);
-            }
-            const auto capture_time = SteadyClock::now();
-            next_screenshot_time = capture_time + screenshot_interval;
 
-            qDebug() << "第" << frame_count << "帧";
-            QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
-            cur_capture = cur_capture.copy(pos_x, pos_y, detect_width, detect_height);
-
-            QImage image = cur_capture.toImage();
-            cv::Mat frame(image.height(), image.width(), CV_8UC4,
-                          const_cast<uchar*>(image.bits()), image.bytesPerLine());
-            cv::cvtColor(frame, bgr_frame, cv::COLOR_BGRA2BGR);
+        const auto now = SteadyClock::now();
+        if (now < next_screenshot_time) {
+            std::this_thread::sleep_until(next_screenshot_time);
         }
+        const auto capture_time = SteadyClock::now();
+        next_screenshot_time = capture_time + screenshot_interval;
 
-        // if(frame_count < 39){
-        //     frame_count++;
-        //     continue;
-        // }
+        qDebug() << "第" << frame_count << "帧";
+        QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
+        cur_capture = cur_capture.copy(pos_x, pos_y, detect_width, detect_height);
+
+        QImage image = cur_capture.toImage();
+        cv::Mat frame(image.height(), image.width(), CV_8UC4,
+                      const_cast<uchar*>(image.bits()), image.bytesPerLine());
+        cv::cvtColor(frame, bgr_frame, cv::COLOR_BGRA2BGR);
 
         // 追踪检测
         auto detections = yolo.track(bgr_frame, 0.25);
@@ -1317,12 +1227,9 @@ void MouseTrack::realTrackTest()
             for (const auto& contour : contours) {
                 cv::Rect rect = cv::boundingRect(contour);
                 double area = rect.width * rect.height;
-                qDebug() << "area:" << area;
-                // if (area > 2000 && area > max_area) {
                 if (area > 800 && area > max_area) {
                     float ratio = std::max(rect.width, rect.height) / static_cast<float>(std::min(rect.width, rect.height));
                     if (ratio > 1.5f) continue;
-
                     max_area = area;
                     max_center = cv::Point2i(rect.x + rect.width / 2, rect.y + rect.height / 2);
                 }
@@ -1391,7 +1298,7 @@ void MouseTrack::realTrackTest()
 
 
         // 检测滑鼠界面是否消失（仅截图模式，运行超过16秒后开始检测）
-        if (!use_video && SteadyClock::now() - screenshot_test_start > mouse_check_delay) {
+        if (SteadyClock::now() - screenshot_test_start > mouse_check_delay) {
             MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
             cv::Point title_coor;
             if (!tempmatch.match(title_coor)) {
@@ -1409,9 +1316,6 @@ void MouseTrack::realTrackTest()
     running = false;
     if (mouse_thread.joinable()) {
         mouse_thread.join();
-    }
-    if (use_video) {
-        video_cap.release();
     }
 
     qDebug() << "realTrackTest() 函数退出，真实目标ID:" << real_track_id.load();
