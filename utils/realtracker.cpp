@@ -108,10 +108,11 @@ void RealTargetDetector::updateTracks(const std::vector<TrackInfo>& tracks) {
             track_history_[track.track_id].pop_front();
         }
 
-        position_history_[track.track_id].push_back(record);
-        if (static_cast<int>(position_history_[track.track_id].size()) > MAX_TRAJECTORY_SIZE) {
-            position_history_[track.track_id].pop_front();
-        }
+        // 用不到的数据
+        // position_history_[track.track_id].push_back(record);
+        // if (static_cast<int>(position_history_[track.track_id].size()) > MAX_TRAJECTORY_SIZE) {
+        //     position_history_[track.track_id].pop_front();
+        // }
     }
 
     // track_id 不在本帧时保留历史中的最后一次位置，不删除记录
@@ -1415,6 +1416,7 @@ int RealTargetDetector::identifyRealTarget(
         if (real_target_id_ >= 0) {
             if(real_target_id_ == track.track_id){
                 real_track_inframe = true;
+                continue;
             }
 
             // 50范围内搜索ID
@@ -1459,11 +1461,45 @@ int RealTargetDetector::identifyRealTarget(
     auto direction_counts = countDirectionsByCategory(tracks);
     // 获取当前背景的运动方向
     int background_direction = getBackgroundDirection(direction_counts);
-    qDebug() << "背景运动方向：" << dir_names[background_direction];
+
+    // 获取当前背景的运动速度（过滤掉大于50的速度）
+    double background_speed = -1.0;
+    {
+        double speed_sum = 0.0;
+        int speed_count = 0;
+        for (const auto& track : tracks) {
+            if (real_target_id_ >= 0 && track.track_id == real_target_id_) {
+                continue;
+            }
+            auto [angle, avg_speed] = calculateMovementMetrics2(track.track_id);
+            if (avg_speed < 0 || avg_speed > 50.0) {
+                continue;
+            }
+            speed_sum += avg_speed;
+            speed_count++;
+        }
+        if (speed_count > 0) {
+            background_speed = speed_sum / speed_count;
+        }
+    }
+
+    // 获取当前真实ID的运动速度
+    double real_target_speed = -1.0;
+    if (real_target_id_ >= 0) {
+        auto [real_angle, real_speed] = calculateMovementMetrics2(real_target_id_);
+        if (real_speed >= 0) {
+            real_target_speed = real_speed;
+        }
+    }
+
+    bool same_background_direction = real_target_direction_ == background_direction;
+    qDebug() << "背景运动方向：" << dir_names[background_direction]
+             << "背景速度：" << background_speed;
     if(real_target_direction_ > -1 && real_target_direction_ < 8){
         qDebug() << "真实ID" << real_target_id_
                  << "方向:" << dir_names[real_target_direction_]
-                 << "与背景" << (real_target_direction_ == background_direction ? "一致" : "不同");
+                 << "速度:" << real_target_speed
+                 << "与背景" << (same_background_direction ? "一致" : "不同");
     }
 
     // 对真实目标附近的目标进行排序。按照以下优先级排序
@@ -1478,6 +1514,15 @@ int RealTargetDetector::identifyRealTarget(
 
     std::vector<NearTargetRank> sorted_near_targets;
     sorted_near_targets.reserve(near_targets.size());
+
+    const cv::Point2f real_pos(static_cast<float>(currentPos.x), static_cast<float>(currentPos.y));
+
+    for (const auto& [track_id, track] : near_targets) {
+        const double dx = track.center.x - real_pos.x;
+        const double dy = track.center.y - real_pos.y;
+        const double distance = std::sqrt(dx * dx + dy * dy);
+        sorted_near_targets.push_back({track_id, track, distance});
+    }
 
     std::sort(sorted_near_targets.begin(), sorted_near_targets.end(),
               [](const NearTargetRank& a, const NearTargetRank& b) {
@@ -1547,85 +1592,153 @@ int RealTargetDetector::identifyRealTarget(
 
     if (!candidate_scores.empty()) {
 
-        // 筛选出最佳备选目标
+        // 筛选出最佳备选目标（先过滤不符合距离要求的候选）
         const double MAX_ALLOWED_DISTANCE = 100.0; //350
-        auto best_target = std::max_element(
-            candidate_scores.begin(), candidate_scores.end(),
-            [](const auto& a, const auto& b) {
-                return a.second.combined_score < b.second.combined_score;
-            });
-        int best_id = best_target->first;
-        qDebug() << "best_id" << best_id;
-        const auto& best_scores = best_target->second;
-
-        bool should_switch = false;
-        bool distance_check_passed = true;
-
-        // 计算备选目标与真实目标位置的距离
-        cv::Point2f candidate_position = best_scores.position;
-        double dx = candidate_position.x - currentPos.x;
-        double dy = candidate_position.y - currentPos.y;
-        double distance = std::sqrt(dx * dx + dy * dy);
-
-        distance_check_passed = distance <= MAX_ALLOWED_DISTANCE;
-        if (!distance_check_passed) {
-            qDebug() << "距离检查失败: 候选目标" << best_id << "距离当前目标" << real_target_id_ << "为" << distance << "像素 >" << MAX_ALLOWED_DISTANCE << "像素";
+        std::map<int, TargetScore> eligible_scores;
+        for (const auto& [id, score] : candidate_scores) {
+            const double dx = score.position.x - currentPos.x;
+            const double dy = score.position.y - currentPos.y;
+            const double distance = std::sqrt(dx * dx + dy * dy);
+            if (distance <= MAX_ALLOWED_DISTANCE) {
+                eligible_scores[id] = score;
+                qDebug() << "候选目标：" << id << "距离当前位置" << distance << "像素";
+            } else {
+                // qDebug() << "距离过滤: 候选目标" << id << "距离当前位置" << distance << "像素 >" << MAX_ALLOWED_DISTANCE << "像素";
+            }
         }
 
-        // 如果备选目标不是真实目标
-        if (real_target_id_ != best_id) {
-            if (maintainTargetContinuity(current_positions)) {
-                qDebug() << "备选目标不是真实目标，上次有效目标存在本帧中。切换统计归零";
-                should_switch = false;
+        if (eligible_scores.empty()) {
+            qDebug() << "无符合距离要求的候选目标";
+            if (!maintainTargetContinuity(current_positions)) {
                 switch_counter_ = 0;
-            } else {
-                qDebug() << "备选目标不是真实目标，上次有效目标不在本帧中";
-                if (last_switch_candidate_ == best_id) {
-                    switch_counter_++;
-                    qDebug() << "上次切换的目标与备选目标一致，切换统计增加";
-                } else {
-                    switch_counter_ = 1;
-                    last_switch_candidate_ = best_id;
-                    qDebug() << "上次切换的目标与备选目标不一致，切换统计设置1";
+                qDebug() << "没有合适目标且无法保持上次目标";
+            }
+        } else {
+            auto best_target = std::max_element(
+                eligible_scores.begin(), eligible_scores.end(),
+                [](const auto& a, const auto& b) {
+                    return a.second.combined_score < b.second.combined_score;
+                });
+            int best_id = best_target->first;
+            qDebug() << "best_id" << best_id;
+            const auto& best_scores = best_target->second;
 
-                    // 如果真实目标附近存在元素，则临时给一个跟踪目标
-                    if(!sorted_near_targets.empty()){
-                        tmp_track_id = sorted_near_targets[0].track_id;
+            bool should_switch = false;
+
+            // 如果真实目标不在本帧中
+            if(real_track_inframe){
+
+                // 如果真实目标速度小于等于背景速度且运动方向一致,real_target_sameback_count_自增1
+                if (real_target_speed >= 0 && background_speed >= 0
+                    && abs(real_target_speed - background_speed) < 10
+                    && same_background_direction)
+                {
+                    if(last_log_sameback_count_ + 1 == frame_count_){
+                        real_target_sameback_count_++;
+                        qDebug() << "真实目标与背景同向且速度不超过背景, 计数累计:" << real_target_sameback_count_;
+                    }else{
+                        real_target_sameback_count_ = 1;
                     }
+                    last_log_sameback_count_ = frame_count_;
+                }else{
+                    real_target_sameback_count_ = 0;
                 }
-                should_switch = (switch_counter_ >= switch_threshold_) && distance_check_passed;
+
+                // 如果备选目标不是真实目标
+                if (real_target_id_ != best_id) {
+                    if (maintainTargetContinuity(current_positions)) {
+                        qDebug() << "备选目标不是真实目标，上次有效目标存在本帧中。切换统计归零";
+                        should_switch = false;
+                        switch_counter_ = 0;
+                    } else {
+                        qDebug() << "备选目标不是真实目标，上次有效目标不在本帧中";
+                        if (last_switch_candidate_ == best_id) {
+                            switch_counter_++;
+                            qDebug() << "上次切换的目标与备选目标一致，切换统计增加";
+                        } else {
+                            switch_counter_ = 1;
+                            last_switch_candidate_ = best_id;
+                            qDebug() << "上次切换的目标与备选目标不一致，切换统计设置1";
+                        }
+                        should_switch = switch_counter_ >= switch_threshold_;
+                    }
+                } else {
+                    qDebug() << "备选目标是真实目标，切换统计归零";
+                    switch_counter_ = 0;
+
+                    // 如果备选目标就是真实目标，检测真实目标运动是否稳定
+                    // 1.
+
+                    // bool is_stable = checkMovementStability(best_scores.angle, best_scores.speed);
+                    // if (!is_stable) {
+                    //     qDebug() << "真实目标运动不稳定，切换统计增加";
+                    //     should_switch = true;
+                    //     switch_counter_++;
+                    // } else {
+                    //     qDebug() << "真实目标运动稳定，切换统计归零";
+                    //     switch_counter_ = 0;
+                    // }
+                }
+            }else{
+                // 本帧中不存在真实元素
+                real_target_sameback_count_ = 0;
+
+                // 如果真实目标附近存在元素，则临时给一个跟踪目标
+                if (!sorted_near_targets.empty()) {
+                    qDebug() << "真实目标不存在，临时使用最近的目标";
+                    tmp_track_id = sorted_near_targets[0].track_id;
+
+                    // 记录临时目标连续
+                    if (last_switch_candidate_ == tmp_track_id) {
+                        switch_counter_++;
+                        qDebug() << "上次切换的目标与临时目标一致，切换统计增加";
+                    } else {
+                        switch_counter_ = 1;
+                        last_switch_candidate_ = tmp_track_id;
+                        qDebug() << "上次切换的目标与临时目标不一致，切换统计设置1";
+                    }
+                    should_switch = switch_counter_ >= switch_threshold_;
+
+                }else{
+                    qDebug() << "真实目标不存在，附近没有可用目标";
+                }
             }
-        } else {
-            // 如果备选目标就是真实目标，检测真实目标运动是否稳定
-            bool is_stable = checkMovementStability(best_scores.angle, best_scores.speed);
-            if (!is_stable) {
-                qDebug() << "真实目标运动不稳定，切换统计增加";
-                should_switch = true;
-                switch_counter_++;
-            } else {
-                qDebug() << "真实目标运动稳定，切换统计归零";
+
+            if(real_target_sameback_count_ >= 3)
+            {
+                if(!sorted_near_targets.empty()){
+                    // 如果best_id存在于sorted_near_targets中，则should_switch=true
+                    const int near_id = sorted_near_targets[0].track_id;
+                    qDebug() << "真实目标与背景运动连续3帧相同，备选目标" << near_id << "替换目标" << real_target_id_ << "为真实目标";
+                    real_target_id_ = near_id;
+                    last_valid_target_id_ = near_id;
+                    switch_counter_ = 0;
+                    last_switch_candidate_ = -1;
+                    real_target_sameback_count_ = 0;
+                }
+            }
+
+            // 如果备选目标综合分大于0.25，并且应该切换目标，并且切换次数大于3次。则将备选目标切换为真实目标
+            if (best_scores.combined_score > 0.25
+                && should_switch
+                && switch_counter_ >= switch_threshold_
+                && best_id != real_target_id_
+            ) {
+                qDebug() << "备选目标" << best_id << "替换目标" << real_target_id_ << "为真实目标";
+                real_target_id_ = best_id;
+                last_valid_target_id_ = best_id;
+                target_scores_[best_id] = best_scores;
+
+                stability_counter_ = 0;
                 switch_counter_ = 0;
-            }
-        }
-
-        // 如果备选目标综合分大于0.25，并且应该切换目标，并且切换次数大于3次，并且符合距离。则将备选目标切换为真实目标
-        if (best_scores.combined_score > 0.25 && should_switch &&
-            switch_counter_ >= switch_threshold_ && distance_check_passed) {
-            qDebug() << "备选目标" << best_id << "替换目标" << real_target_id_ << "为真实目标";
-            int old_target = real_target_id_;
-            real_target_id_ = best_id;
-            last_valid_target_id_ = best_id;
-            target_scores_[best_id] = best_scores;
-
-            stability_counter_ = 0;
-            switch_counter_ = 0;
-            last_switch_candidate_ = -1;
-        } else {
-            // 如果当前帧存在真实目标，记录上次有效的目标
-            if (real_target_id_ >= 0 &&
-                current_positions.find(real_target_id_) != current_positions.end()) {
-                qDebug() << "将真实目标设置为上次有效目标";
-                last_valid_target_id_ = real_target_id_;
+                last_switch_candidate_ = -1;
+            } else {
+                // 如果当前帧存在真实目标，记录上次有效的目标
+                if (real_target_id_ >= 0 &&
+                    current_positions.find(real_target_id_) != current_positions.end()) {
+                    qDebug() << "将真实目标设置为上次有效目标";
+                    last_valid_target_id_ = real_target_id_;
+                }
             }
         }
     } else {

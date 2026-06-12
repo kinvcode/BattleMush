@@ -172,12 +172,14 @@ private:
 
     int real_target_id_ = -1;
     int real_target_direction_ = -1;
+    int real_target_sameback_count_ = 0;
     int frame_count_ = 0;
     int stability_counter_ = 0;
     int target_lost_counter_ = 0;
     int switch_counter_ = 0;
     int last_switch_candidate_ = -1;
     int last_valid_target_id_ = -1;
+    int last_log_sameback_count_ = 0;
 
     double background_angle_ = -1.0;
     double last_angle_ = -1.0;

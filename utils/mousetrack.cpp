@@ -1279,6 +1279,15 @@ void MouseTrack::realTrackTest()
         for (const auto& det : detections) {
             if (det.track_id < 0) continue;
 
+            bool already_exists = false;
+            for (const auto& existing : track_results) {
+                if (existing.track_id == det.track_id) {
+                    already_exists = true;
+                    break;
+                }
+            }
+            if (already_exists) continue;
+
             TrackInfo info;
             info.track_id = det.track_id;
             info.center = cv::Point2f(
