@@ -105,13 +105,20 @@ private:
     std::chrono::high_resolution_clock::time_point m_last_time;
 };
 
+namespace MouseTrackConfig {
+    constexpr int ROI_W = 500;
+    constexpr int ROI_H = 335;
+    constexpr int TRAIN_IMG_W = 416;
+    constexpr int TRAIN_IMG_H = 256;
+}
+
 class MouseTrack{
 private:
-    int avg_fps_;
+    double avg_fps_;
 public:
     static void test();
     void realTrackTest();
-    int getfps();
+    double getfps();
 };
 
 #endif // MOUSETRACK_H

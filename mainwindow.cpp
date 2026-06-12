@@ -1628,7 +1628,7 @@ void MainWindow::on_pushButton_mousetrack_clicked()
     MouseTrack tracktest;
     // tracktest.test();
     tracktest.realTrackTest();
-    console("FPS:"+QString::number(tracktest.getfps()));
+    console("FPS:" + QString::number(tracktest.getfps()));
     qDebug() << "滑鼠验证结束~";
 }
 

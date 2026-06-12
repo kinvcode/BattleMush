@@ -23,14 +23,8 @@
 YOLOv8Inference::YOLOv8Inference(const QString &model_path)
 : m_tracker(0.3, 30, 0.1, 0.5)  // IoU阈值, 最大丢失帧数, 低置信度阈值, 高置信度阈值
 {
-    QResource resource(model_path);
-
     // 创建 ONNX Runtime 环境
     m_env = Ort::Env(ORT_LOGGING_LEVEL_WARNING, "YOLOv8");
-
-    // 获取资源数据（直接指向内存，无需拷贝）
-    const uchar* data = resource.data();
-    size_t dataSize = resource.size();
 
     // 配置 Session 选项
     Ort::SessionOptions session_options;
@@ -48,8 +42,16 @@ YOLOv8Inference::YOLOv8Inference(const QString &model_path)
     // // 设置执行模式为并行
     // session_options.SetExecutionMode(ExecutionMode::ORT_PARALLEL);
 
-    // 加载模型
-    m_session = new Ort::Session(m_env, data, dataSize, session_options);
+    // 加载模型（Qt 资源或本地文件）
+    if (model_path.startsWith(":/")) {
+        QResource resource(model_path);
+        const uchar* data = resource.data();
+        size_t dataSize = resource.size();
+        m_session = new Ort::Session(m_env, data, dataSize, session_options);
+    } else {
+        const std::wstring wpath = model_path.toStdWString();
+        m_session = new Ort::Session(m_env, wpath.c_str(), session_options);
+    }
 
     // 获取输入/输出名称（保存为成员变量）
     Ort::AllocatorWithDefaultOptions allocator;
@@ -95,42 +97,21 @@ YOLOv8Inference::YOLOv8Inference(const QString &model_path)
 
 std::vector<Detection> YOLOv8Inference::detect(const cv::Mat &frame, float conf_threshold, float iou_threshold)
 {
-    int original_width = frame.cols;
-    int original_height = frame.rows;
+    const int original_width = frame.cols;
+    const int original_height = frame.rows;
 
-    int target_height = static_cast<int>(m_input_shape[2]);  // 736
-    int target_width = static_cast<int>(m_input_shape[3]);   // 1280
+    const int target_height = static_cast<int>(m_input_shape[2]);
+    const int target_width = static_cast<int>(m_input_shape[3]);
 
-    // 计算缩放和偏移（与之前相同）
-    float scale = static_cast<float>(target_width) / original_width;  // 1.0
-    int new_width = original_width;
-    int new_height = static_cast<int>(original_height * scale);
+    // 与训练一致：ROI(500x335) 直接缩放到模型输入(416x256)，不做 letterbox
+    const float scale_x = static_cast<float>(target_width) / original_width;
+    const float scale_y = static_cast<float>(target_height) / original_height;
 
-    if (new_height > target_height) {
-        scale = static_cast<float>(target_height) / original_height;
-        new_width = static_cast<int>(original_width * scale);
-        new_height = original_height;
-    }
-
-    new_width = std::min(new_width, target_width);
-    new_height = std::min(new_height, target_height);
-
-    // 调整大小
     cv::Mat resized;
-    cv::resize(frame, resized, cv::Size(new_width, new_height));
+    cv::resize(frame, resized, cv::Size(target_width, target_height));
 
-    // Letterbox 填充
-    cv::Scalar pad_color(114, 114, 114);
-    cv::Mat letterboxed(target_height, target_width, frame.type(), pad_color);
-
-    int pad_x = (target_width - new_width) / 2;
-    int pad_y = (target_height - new_height) / 2;
-
-    resized.copyTo(letterboxed(cv::Rect(pad_x, pad_y, new_width, new_height)));
-
-    // 创建 blob
     cv::Mat blob;
-    cv::dnn::blobFromImage(letterboxed, blob, 1.0 / 255.0,
+    cv::dnn::blobFromImage(resized, blob, 1.0 / 255.0,
                            cv::Size(target_width, target_height),
                            cv::Scalar(), true, false);
 
@@ -184,11 +165,11 @@ std::vector<Detection> YOLOv8Inference::detect(const cv::Mat &frame, float conf_
             continue;
         }
 
-        // 坐标转换回原始图像
-        float original_x1 = (x1 - pad_x) / scale;
-        float original_y1 = (y1 - pad_y) / scale;
-        float original_x2 = (x2 - pad_x) / scale;
-        float original_y2 = (y2 - pad_y) / scale;
+        // 坐标转换回 ROI 原始尺寸
+        float original_x1 = x1 / scale_x;
+        float original_y1 = y1 / scale_y;
+        float original_x2 = x2 / scale_x;
+        float original_y2 = y2 / scale_y;
 
         int x = static_cast<int>(std::max(0.0f, original_x1));
         int y = static_cast<int>(std::max(0.0f, original_y1));
@@ -710,8 +691,8 @@ void MouseTrack::test()
     int game_height = game_rect.bottom - game_rect.top;
     int box_pos_x = 399;
     int box_pos_y = 218;
-    int box_width = 500;
-    int box_height = 335;
+    const int box_width = MouseTrackConfig::ROI_W;
+    const int box_height = MouseTrackConfig::ROI_H;
 
     // 鼠标允许的移动范围
     cv::Rect allow_rect = {game_x + box_pos_x, game_y + box_pos_y, box_width, box_height};
@@ -721,7 +702,8 @@ void MouseTrack::test()
     int detect_width = box_width;
     int detect_height = box_height;
 
-    qDebug() << "识别区域:" << pos_x << pos_y << detect_width << detect_height;
+    qDebug() << "识别区域:" << pos_x << pos_y << detect_width << detect_height
+             << "模型输入:" << MouseTrackConfig::TRAIN_IMG_W << MouseTrackConfig::TRAIN_IMG_H;
 
     // 需要检测的分类列表 (0, 2, 4, 6)
     const std::vector<int> target_classes = {0, 2, 4, 6};
@@ -998,7 +980,13 @@ static bool openLocalVideoCapture(cv::VideoCapture& cap, const QString& videoPat
 
 void MouseTrack::realTrackTest()
 {
-    YOLOv8Inference yolo(":/assets/best.onnx");
+    const QString model_path = QCoreApplication::applicationDirPath() + "/models/all.onnx";
+    if (!QFileInfo::exists(model_path)) {
+        qCritical() << "模型文件不存在:" << model_path;
+        return;
+    }
+
+    YOLOv8Inference yolo(model_path);
     QString save_dir = QCoreApplication::applicationDirPath() + "/detection_results";
 
     // 获取目录名和父目录
@@ -1044,10 +1032,10 @@ void MouseTrack::realTrackTest()
     GetWindowRect(game_hwnd, &game_rect);
     game_x = game_rect.left;
     game_y = game_rect.top;
-    int box_pos_x = 399;
-    int box_pos_y = 218;
-    int box_width = 500;
-    int box_height = 335;
+    int box_pos_x = 391; // 391 + 8
+    int box_pos_y = 218; // 186 + 32
+    const int box_width = MouseTrackConfig::ROI_W;
+    const int box_height = MouseTrackConfig::ROI_H;
 
     // 鼠标允许的移动范围
     cv::Rect allow_rect = {game_x + box_pos_x, game_y + box_pos_y, box_width, box_height};
@@ -1060,12 +1048,13 @@ void MouseTrack::realTrackTest()
     // 检测区域
     cv::Rect detection_region(0, 0, detect_width, detect_height);
 
-    constexpr double screenshot_capture_fps = 3.0;
+    constexpr double screenshot_capture_fps = 6.0;
     using SteadyClock = std::chrono::steady_clock;
     const auto screenshot_interval = std::chrono::duration_cast<SteadyClock::duration>(
         std::chrono::duration<double>(1.0 / screenshot_capture_fps));
 
-    qDebug() << "识别区域:" << pos_x << pos_y << detect_width << detect_height;
+    qDebug() << "识别区域:" << pos_x << pos_y << detect_width << detect_height
+             << "模型输入:" << MouseTrackConfig::TRAIN_IMG_W << MouseTrackConfig::TRAIN_IMG_H;
     qDebug() << "画面来源: 屏幕截图, 采样率:" << screenshot_capture_fps << "fps";
 
     WgcWindowCapturer wgc_capturer;
@@ -1303,13 +1292,13 @@ void MouseTrack::realTrackTest()
 
         // 检测滑鼠界面是否消失（仅截图模式，运行超过16秒后开始检测）
         if (SteadyClock::now() - screenshot_test_start > mouse_check_delay) {
-            MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
-            cv::Point title_coor;
-            if (!tempmatch.match(title_coor)) {
+            // MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
+            // cv::Point title_coor;
+            // if (!tempmatch.match(title_coor)) {
                 Gplayer.mousecheck_exists = false;
                 qDebug() << "滑鼠验证界面已消失~";
                 break;
-            }
+            // }
         }
 
         QString save_path = QString("%1/frame_%2.jpg").arg(save_dir).arg(frame_count, 6, 10, QChar('0'));
@@ -1338,7 +1327,7 @@ void MouseTrack::realTrackTest()
     qDebug() << "realTrackTest() 函数退出，真实目标ID:" << real_track_id.load();
 }
 
-int MouseTrack::getfps()
+double MouseTrack::getfps()
 {
     return avg_fps_;
 }
