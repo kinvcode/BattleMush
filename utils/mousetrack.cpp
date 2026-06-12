@@ -695,7 +695,7 @@ void MouseTrack::test()
     const int box_height = MouseTrackConfig::ROI_H;
 
     // 鼠标允许的移动范围
-    cv::Rect allow_rect = {game_x + box_pos_x, game_y + box_pos_y, box_width, box_height};
+    cv::Rect allow_rect = {game_x + 8 + box_pos_x, game_y + box_pos_y, box_width, box_height};
 
     int pos_x = game_x + box_pos_x;
     int pos_y = game_y + box_pos_y;
@@ -1038,7 +1038,7 @@ void MouseTrack::realTrackTest()
     const int box_height = MouseTrackConfig::ROI_H;
 
     // 鼠标允许的移动范围
-    cv::Rect allow_rect = {game_x + box_pos_x, game_y + box_pos_y, box_width, box_height};
+    cv::Rect allow_rect = {game_x + 8 + box_pos_x, game_y + box_pos_y, box_width, box_height};
 
     int pos_x = game_x + box_pos_x;
     int pos_y = game_y + box_pos_y;
@@ -1066,26 +1066,23 @@ void MouseTrack::realTrackTest()
     // 真实目标检测器
     RealTargetDetector real_target_detector;
 
-    // 鼠标预测器
     MousePredictor mouse_predictor;
 
-    // 线程控制
-    std::atomic<bool> has_target(false);
-    std::atomic<float> latest_target_x(0);
-    std::atomic<float> latest_target_y(0);
+    std::atomic<int> real_track_id(-1);
+    std::atomic<float> latest_target_x(0.f);
+    std::atomic<float> latest_target_y(0.f);
     std::atomic<bool> target_updated(false);
+    std::atomic<bool> has_target(false);
     std::atomic<bool> running(true);
-    std::atomic<int> real_track_id(-1);  // 真实目标ID
+    std::atomic<int> screen_save_index(-1);
 
-    // 平滑移动的当前值
-    float current_x = 0;
-    float current_y = 0;
+    float current_x = 0.f;
+    float current_y = 0.f;
 
-    // 鼠标移动线程（仅截图模式）
-    std::thread mouse_thread;
+    // 鼠标移动线程
+    std::thread mouse_thread([&]() {
+        auto last_move_time = std::chrono::high_resolution_clock::now();
 
-    mouse_thread = std::thread([&]() {
-    auto last_move_time = std::chrono::high_resolution_clock::now();
         while (running) {
             if (!Gplayer.mousecheck_exists) {
                 qDebug() << "滑鼠界面不存在，退出线程~";
@@ -1138,7 +1135,6 @@ void MouseTrack::realTrackTest()
         }
     });
 
-
     int frame_count = 0;
     int locked_frame_count = 0;  // 锁定坐标帧计数
     cv::Point2i lock_position(-1, -1);  // 锁定坐标
@@ -1167,12 +1163,24 @@ void MouseTrack::realTrackTest()
         // cv::cvtColor(frame, bgr_frame, cv::COLOR_BGRA2BGR);
 
         if (!wgc_capturer.captureBgr(bgr_frame)) {
-            waitForScreenshotInterval(frame_start);
+            // waitForScreenshotInterval(frame_start);
+            qDebug() << "截图失败~";
             continue;
         }
+        const auto capture_time = SteadyClock::now();
+        const double capture_elapsed_ms =
+            std::chrono::duration<double, std::milli>(capture_time - frame_start).count();
+        qDebug() << "截图时间:"
+                 << QString::number(capture_elapsed_ms, 'f', 2) << "ms";
 
         // 追踪检测
         auto detections = yolo.track(bgr_frame, 0.25);
+
+        const auto track_time = SteadyClock::now();
+        const double track_elapsed_ms =
+            std::chrono::duration<double, std::milli>(track_time - frame_start).count();
+        qDebug() << "追踪目标完成时间:"
+                 << QString::number(track_elapsed_ms, 'f', 2) << "ms";
 
         // 绘制所有检测
         yolo.drawDetections(bgr_frame, detections);
@@ -1245,8 +1253,8 @@ void MouseTrack::realTrackTest()
 
         // 真实目标识别
         if (locked_frame_count >= 31) {
-            int current_pos_x = static_cast<int>(latest_target_x);
-            int current_pos_y = static_cast<int>(latest_target_y);
+            const int current_pos_x = static_cast<int>(latest_target_x.load());
+            const int current_pos_y = static_cast<int>(latest_target_y.load());
             cv::Point2i current_pos(current_pos_x, current_pos_y);
 
             // 追踪真实目标
@@ -1260,10 +1268,20 @@ void MouseTrack::realTrackTest()
                         int center_x = det.box.x + det.box.width / 2;
                         int center_y = det.box.y + det.box.height / 2;
 
+                        // 更新最新目标位置
                         latest_target_x = static_cast<float>(center_x);
                         latest_target_y = static_cast<float>(center_y);
                         target_updated = true;
                         has_target = true;
+
+                        const auto mouse_update_time = SteadyClock::now();
+                        const double mouse_update_elapsed_ms =
+                            std::chrono::duration<double, std::milli>(mouse_update_time - frame_start).count();
+                        const double since_capture_ms =
+                            std::chrono::duration<double, std::milli>(mouse_update_time - capture_time).count();
+                        qDebug() << "更新鼠标位置时间:"
+                                 << QString::number(mouse_update_elapsed_ms, 'f', 2) << "ms, 与截图时间相差"
+                                 << QString::number(since_capture_ms, 'f', 2) << "ms";
 
                         // 绘制真实目标
                         // cv::rectangle(bgr_frame, det.box, cv::Scalar(0, 0, 255), 2);
@@ -1282,7 +1300,7 @@ void MouseTrack::realTrackTest()
                                     cv::Scalar(0, 0, 255),
                                     2);
 
-                        real_track_id = identified_id;
+                        real_track_id.store(identified_id);
                         break;
                     }
                 }
@@ -1301,13 +1319,14 @@ void MouseTrack::realTrackTest()
             // }
         }
 
-        QString save_path = QString("%1/frame_%2.jpg").arg(save_dir).arg(frame_count, 6, 10, QChar('0'));
-        cv::imwrite(save_path.toStdString(), bgr_frame);
+        const QString frame_index = QString("%1").arg(frame_count, 6, 10, QChar('0'));
+        cv::imwrite(QString("%1/frame_%2.jpg").arg(save_dir, frame_index).toStdString(), bgr_frame);
+
         frame_count++;
         waitForScreenshotInterval(frame_start);
     }
 
-    running = false;
+    running.store(false);
     if (mouse_thread.joinable()) {
         mouse_thread.join();
     }
@@ -1323,8 +1342,6 @@ void MouseTrack::realTrackTest()
                  << QString::number(avg_fps, 'f', 2) << "fps (目标"
                  << screenshot_capture_fps << "fps)";
     }
-
-    qDebug() << "realTrackTest() 函数退出，真实目标ID:" << real_track_id.load();
 }
 
 double MouseTrack::getfps()
