@@ -1059,15 +1059,10 @@ void MouseTrack::realTrackTest()
     // 检测区域
     cv::Rect detection_region(0, 0, detect_width, detect_height);
 
-    cv::VideoCapture video_cap;
-    double video_fps = 30.0;
-    constexpr double video_capture_fps = 3.0;
     constexpr double screenshot_capture_fps = 30.0;
     using SteadyClock = std::chrono::steady_clock;
     const auto screenshot_interval = std::chrono::duration_cast<SteadyClock::duration>(
         std::chrono::duration<double>(1.0 / screenshot_capture_fps));
-    int video_frame_step = 1;
-    int video_frame_index = 0;
 
     qDebug() << "识别区域:" << pos_x << pos_y << detect_width << detect_height;
     qDebug() << "画面来源: 屏幕截图, 采样率:" << screenshot_capture_fps << "fps";
@@ -1156,6 +1151,9 @@ void MouseTrack::realTrackTest()
     auto next_screenshot_time = SteadyClock::now();
     const auto screenshot_test_start = SteadyClock::now();
     constexpr auto mouse_check_delay = std::chrono::seconds(16);
+    auto fps_window_start = screenshot_test_start;
+    int fps_window_frames = 0;
+    constexpr int fps_log_interval = 30;
 
     qDebug() << "开始真实目标检测...";
 
@@ -1316,6 +1314,17 @@ void MouseTrack::realTrackTest()
     running = false;
     if (mouse_thread.joinable()) {
         mouse_thread.join();
+    }
+
+    {
+        const auto test_end = SteadyClock::now();
+        const double total_elapsed =
+            std::chrono::duration<double>(test_end - screenshot_test_start).count();
+        const double avg_fps = total_elapsed > 0.0 ? frame_count / total_elapsed : 0.0;
+        qDebug() << "实际帧率统计: 共处理" << frame_count << "帧, 耗时"
+                 << QString::number(total_elapsed, 'f', 2) << "秒, 平均"
+                 << QString::number(avg_fps, 'f', 2) << "fps (目标"
+                 << screenshot_capture_fps << "fps)";
     }
 
     qDebug() << "realTrackTest() 函数退出，真实目标ID:" << real_track_id.load();

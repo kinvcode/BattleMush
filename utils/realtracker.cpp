@@ -1602,8 +1602,6 @@ int RealTargetDetector::identifyRealTarget(
             if (distance <= MAX_ALLOWED_DISTANCE) {
                 eligible_scores[id] = score;
                 qDebug() << "候选目标：" << id << "距离当前位置" << distance << "像素";
-            } else {
-                // qDebug() << "距离过滤: 候选目标" << id << "距离当前位置" << distance << "像素 >" << MAX_ALLOWED_DISTANCE << "像素";
             }
         }
 
