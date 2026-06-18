@@ -1628,7 +1628,32 @@ void MainWindow::on_pushButton_mousetrack_clicked()
     MouseTrack tracktest;
     // tracktest.test();
     tracktest.realTrackTest();
-    console("FPS:" + QString::number(tracktest.getfps()));
+    console("帧率：" + QString::number(tracktest.getfps()));
     qDebug() << "滑鼠验证结束~";
+}
+
+
+void MainWindow::on_pushButton_text_list_clicked()
+{
+    // Mem::readPointer();
+    if(!Gplayer.p_assemblybase){
+        qDebug() << "先运行一次，再获取数据";
+        return;
+    }
+
+    quint64 text_list = Gplayer.p_gamecontext_entries = readPointer(Gplayer.p_assemblybase,
+        BASE::TMP_UpdateManager_base,
+        BASE::TMP_UpdateManager_offset_lv1,
+        BASE::TMP_UpdateManager_offset_lv2,
+        BASE::TMP_UpdateManager_List);
+    int text_count = readInt(text_list + BASE::List::size);
+
+    quint64 text_head = readLong(text_list + BASE::List::InternalArray) + BASE::InternalArray::Head;
+
+    for(int i = 0; i < text_count; i++){
+        quint64 text_mesh_pro = readLong(text_head + i * 8);
+        QString text_string = readString(readLong(text_mesh_pro + BASE::TextMeshPro::m_text) + BASE::String::text, 100);
+        qDebug() << "内容:" << text_string;
+    }
 }
 

@@ -1,22 +1,22 @@
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include "mousetrack.h"
 #include "utils/realtracker.h"
 #include <QCoreApplication>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QGuiApplication>
-#include <QResource>
 #include <QScreen>
 #include <opencv2/dnn.hpp>
 #include <opencv2/video/tracking.hpp>
 #include <opencv2/videoio.hpp>
-#include "utils/gamestruct.h"
-#include "global/gameoffset.h"
 #include "global/globalplayer.h"
 #include "driver/msdriverpro.h"
-#include "driver/mskeycode.h"
-#include "utils/helper.h"
 #include "utils/matchtemp.h"
-#include "utils/wgccapture.h"
+#include "process/process.h"
 #include <chrono>
 #include <thread>
 
@@ -42,16 +42,10 @@ YOLOv8Inference::YOLOv8Inference(const QString &model_path)
     // // 设置执行模式为并行
     // session_options.SetExecutionMode(ExecutionMode::ORT_PARALLEL);
 
-    // 加载模型（Qt 资源或本地文件）
-    if (model_path.startsWith(":/")) {
-        QResource resource(model_path);
-        const uchar* data = resource.data();
-        size_t dataSize = resource.size();
-        m_session = new Ort::Session(m_env, data, dataSize, session_options);
-    } else {
-        const std::wstring wpath = model_path.toStdWString();
-        m_session = new Ort::Session(m_env, wpath.c_str(), session_options);
-    }
+    // 加载模型
+    // 获取资源数据（直接指向内存，无需拷贝）
+    const std::wstring wpath = model_path.toStdWString();
+    m_session = new Ort::Session(m_env, wpath.c_str(), session_options);
 
     // 获取输入/输出名称（保存为成员变量）
     Ort::AllocatorWithDefaultOptions allocator;
@@ -95,23 +89,44 @@ YOLOv8Inference::YOLOv8Inference(const QString &model_path)
     qDebug() << "模型加载成功!";
 }
 
-std::vector<Detection> YOLOv8Inference::detect(const cv::Mat &frame, float conf_threshold, float iou_threshold)
+std::vector<Detection> YOLOv8Inference::detect(const cv::Mat &frame, float conf_threshold)
 {
-    const int original_width = frame.cols;
-    const int original_height = frame.rows;
+    int original_width = frame.cols;
+    int original_height = frame.rows;
 
-    const int target_height = static_cast<int>(m_input_shape[2]);
-    const int target_width = static_cast<int>(m_input_shape[3]);
+    int target_height = static_cast<int>(m_input_shape[2]);  // 736
+    int target_width = static_cast<int>(m_input_shape[3]);   // 1280
 
-    // 与训练一致：ROI(500x335) 直接缩放到模型输入(416x256)，不做 letterbox
-    const float scale_x = static_cast<float>(target_width) / original_width;
-    const float scale_y = static_cast<float>(target_height) / original_height;
+    // 计算缩放和偏移（与之前相同）
+    float scale = static_cast<float>(target_width) / original_width;  // 1.0
+    int new_width = original_width;
+    int new_height = static_cast<int>(original_height * scale);
 
+    if (new_height > target_height) {
+        scale = static_cast<float>(target_height) / original_height;
+        new_width = static_cast<int>(original_width * scale);
+        new_height = original_height;
+    }
+
+    new_width = std::min(new_width, target_width);
+    new_height = std::min(new_height, target_height);
+
+    // 调整大小
     cv::Mat resized;
-    cv::resize(frame, resized, cv::Size(target_width, target_height));
+    cv::resize(frame, resized, cv::Size(new_width, new_height));
 
+    // Letterbox 填充
+    cv::Scalar pad_color(114, 114, 114);
+    cv::Mat letterboxed(target_height, target_width, frame.type(), pad_color);
+
+    int pad_x = (target_width - new_width) / 2;
+    int pad_y = (target_height - new_height) / 2;
+
+    resized.copyTo(letterboxed(cv::Rect(pad_x, pad_y, new_width, new_height)));
+
+    // 创建 blob
     cv::Mat blob;
-    cv::dnn::blobFromImage(resized, blob, 1.0 / 255.0,
+    cv::dnn::blobFromImage(letterboxed, blob, 1.0 / 255.0,
                            cv::Size(target_width, target_height),
                            cv::Scalar(), true, false);
 
@@ -165,11 +180,11 @@ std::vector<Detection> YOLOv8Inference::detect(const cv::Mat &frame, float conf_
             continue;
         }
 
-        // 坐标转换回 ROI 原始尺寸
-        float original_x1 = x1 / scale_x;
-        float original_y1 = y1 / scale_y;
-        float original_x2 = x2 / scale_x;
-        float original_y2 = y2 / scale_y;
+        // 坐标转换回原始图像
+        float original_x1 = (x1 - pad_x) / scale;
+        float original_y1 = (y1 - pad_y) / scale;
+        float original_x2 = (x2 - pad_x) / scale;
+        float original_y2 = (y2 - pad_y) / scale;
 
         int x = static_cast<int>(std::max(0.0f, original_x1));
         int y = static_cast<int>(std::max(0.0f, original_y1));
@@ -184,6 +199,7 @@ std::vector<Detection> YOLOv8Inference::detect(const cv::Mat &frame, float conf_
             det.class_id = class_id;
             det.confidence = confidence;
             det.box = cv::Rect(x, y, width, height);
+            det.track_id = -1;
             detections.push_back(det);
 
             // qDebug() << "检测到 class:" << class_id << "conf:" << confidence << "box:[" << x << "," << y << "," << x+width << "," << y+height << "]";
@@ -212,21 +228,6 @@ std::vector<Detection> YOLOv8Inference::track(const cv::Mat &frame, float conf_t
     //                 .arg(std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t1).count());
 
     return results;
-}
-
-double YOLOv8Inference::calculateIoU(const cv::Rect &box1, const cv::Rect &box2)
-{
-    int x1 = std::max(box1.x, box2.x);
-    int y1 = std::max(box1.y, box2.y);
-    int x2 = std::min(box1.x + box1.width, box2.x + box2.width);
-    int y2 = std::min(box1.y + box1.height, box2.y + box2.height);
-
-    int intersection = std::max(0, x2 - x1) * std::max(0, y2 - y1);
-    int area1 = box1.width * box1.height;
-    int area2 = box2.width * box2.height;
-    int union_area = area1 + area2 - intersection;
-
-    return union_area > 0 ? static_cast<double>(intersection) / union_area : 0.0;
 }
 
 void YOLOv8Inference::drawDetections(cv::Mat &frame, const std::vector<Detection> &detections)
@@ -318,14 +319,14 @@ void ByteTracker::initKalmanFilter(TrackState& track, const cv::Rect& box)
 
     // 状态转移矩阵
     track.kf.transitionMatrix = (cv::Mat_<float>(8, 8) <<
-                                     1, 0, 0, 0, 1, 0, 0, 0,
-                                 0, 1, 0, 0, 0, 1, 0, 0,
-                                 0, 0, 1, 0, 0, 0, 1, 0,
-                                 0, 0, 0, 1, 0, 0, 0, 1,
-                                 0, 0, 0, 0, 1, 0, 0, 0,
-                                 0, 0, 0, 0, 0, 1, 0, 0,
-                                 0, 0, 0, 0, 0, 0, 1, 0,
-                                 0, 0, 0, 0, 0, 0, 0, 1);
+        1, 0, 0, 0, 1, 0, 0, 0,
+        0, 1, 0, 0, 0, 1, 0, 0,
+        0, 0, 1, 0, 0, 0, 1, 0,
+        0, 0, 0, 1, 0, 0, 0, 1,
+        0, 0, 0, 0, 1, 0, 0, 0,
+        0, 0, 0, 0, 0, 1, 0, 0,
+        0, 0, 0, 0, 0, 0, 1, 0,
+        0, 0, 0, 0, 0, 0, 0, 1);
 
     // 测量矩阵
     cv::setIdentity(track.kf.measurementMatrix);
@@ -341,11 +342,11 @@ void ByteTracker::initKalmanFilter(TrackState& track, const cv::Rect& box)
 
     // 初始状态
     track.kf.statePost = (cv::Mat_<float>(8, 1) <<
-                              box.x + box.width/2.0f,   // center x
-                          box.y + box.height/2.0f,  // center y
-                          box.width,                 // width
-                          box.height,                // height
-                          0, 0, 0, 0);              // 初始速度为0
+        box.x + box.width/2.0f,   // center x
+        box.y + box.height/2.0f,  // center y
+        box.width,                // width
+        box.height,               // height
+        0, 0, 0, 0);              // 初始速度为0
 }
 
 cv::Rect ByteTracker::predictKalman(TrackState& track)
@@ -473,6 +474,7 @@ std::vector<Detection> ByteTracker::update(const std::vector<Detection>& detecti
             new_track.age = 0;
             new_track.active = true;
             new_track.confidence = high_conf_dets[i].confidence;
+
             initKalmanFilter(new_track, high_conf_dets[i].box);
             m_tracks.push_back(new_track);
 
@@ -480,7 +482,6 @@ std::vector<Detection> ByteTracker::update(const std::vector<Detection>& detecti
         }
     }
 
-    // ========== 关键修复：重新获取 track_matched 的大小 ==========
     // 扩展 track_matched 以匹配新的 m_tracks 大小
     int old_num_tracks = static_cast<int>(track_matched.size());
     int new_num_tracks = static_cast<int>(m_tracks.size());
@@ -654,333 +655,9 @@ float MousePredictor::getPredictedY() const
     return m_predicted_y;
 }
 
-bool MousePredictor::isInitialized() const
-{
-    return m_has_initialized;
-}
-
-void MousePredictor::reset()
-{
-    m_has_initialized = false;
-    m_predicted_x = 0;
-    m_predicted_y = 0;
-    m_kalman.statePost = cv::Mat::zeros(6, 1, CV_32F);
-    m_kalman.errorCovPost = cv::Mat::eye(6, 6, CV_32F);
-    m_last_time = std::chrono::high_resolution_clock::now();
-
-    qDebug() << "MousePredictor 已重置";
-}
-
-void MouseTrack::test()
-{
-    YOLOv8Inference yolo(":/assets/best.onnx");
-
-    // 查找游戏窗口
-    HWND game_hwnd = FindWindow(NULL, TEXT("MapleStory Worlds-Artale (繁體中文版)"));
-    if (game_hwnd == NULL) {
-        qCritical() << "游戏窗口不存在！";
-        return;
-    }
-
-    // 获取窗口位置和大小
-    RECT game_rect;
-    GetWindowRect(game_hwnd, &game_rect);
-    int game_x = game_rect.left;
-    int game_y = game_rect.top;
-    int game_width = game_rect.right - game_rect.left;
-    int game_height = game_rect.bottom - game_rect.top;
-    int box_pos_x = 399;
-    int box_pos_y = 218;
-    const int box_width = MouseTrackConfig::ROI_W;
-    const int box_height = MouseTrackConfig::ROI_H;
-
-    // 鼠标允许的移动范围
-    cv::Rect allow_rect = {game_x + 8 + box_pos_x, game_y + box_pos_y, box_width, box_height};
-
-    int pos_x = game_x + box_pos_x;
-    int pos_y = game_y + box_pos_y;
-    int detect_width = box_width;
-    int detect_height = box_height;
-
-    qDebug() << "识别区域:" << pos_x << pos_y << detect_width << detect_height
-             << "模型输入:" << MouseTrackConfig::TRAIN_IMG_W << MouseTrackConfig::TRAIN_IMG_H;
-
-    // 需要检测的分类列表 (0, 2, 4, 6)
-    const std::vector<int> target_classes = {0, 2, 4, 6};
-
-    // 锁定的分类（首次检测到的分类）
-    std::atomic<int> locked_class(-1);
-    // 锁定的追踪ID（首次检测到的track_id）
-    std::atomic<int> locked_track_id(-1);
-
-    // 分类名称映射
-    std::map<int, QString> class_names = {
-        {0, "circle_true"},
-        {2, "rect_true"},
-        {4, "star_true"},
-        {6, "triangle_true"}
-    };
-
-    qDebug() << "等待检测目标分类: circle_true(0), rect_true(2), star_true(4), triangle_true(6)";
-
-    // 创建保存图片的目录
-    QString save_dir = "detection_results";
-    QDir dir;
-    if (dir.exists(save_dir)) {
-        // dir.removeRecursively();
-        // qDebug() << "清空目录:" << save_dir;
-    }else{
-        dir.mkpath(save_dir);
-        qDebug() << "创建目录:" << save_dir;
-    }
-
-    // 鼠标预测器
-    MousePredictor mouse_predictor;
-
-    // 线程控制
-    std::atomic<bool> has_target(false);
-    std::atomic<float> latest_target_x(0);
-    std::atomic<float> latest_target_y(0);
-    std::atomic<bool> target_updated(false);
-    std::atomic<bool> running(true);
-
-    // 平滑移动的当前值
-    float current_x = 0;
-    float current_y = 0;
-
-    // 鼠标移动线程
-    std::thread mouse_thread([&]() {
-        auto last_move_time = std::chrono::high_resolution_clock::now();
-
-        while (running) {
-            if (!Gplayer.mousecheck_exists) {
-                qDebug() << "滑鼠界面不存在，退出线程~";
-                break;
-            }
-
-            auto now = std::chrono::high_resolution_clock::now();
-            float dt = std::chrono::duration<float, std::milli>(now - last_move_time).count();
-            last_move_time = now;
-
-            if (dt > 100) dt = 16;
-
-            float move_x, move_y;
-
-            if (target_updated) {
-                mouse_predictor.update(latest_target_x, latest_target_y);
-                move_x = latest_target_x;
-                move_y = latest_target_y;
-                target_updated = false;
-                has_target = true;
-                current_x = move_x;
-                current_y = move_y;
-            } else if (has_target) {
-                mouse_predictor.predict(dt);
-                move_x = mouse_predictor.getPredictedX();
-                move_y = mouse_predictor.getPredictedY();
-
-                float step = std::min(1.0f, dt / 16.0f);
-                current_x = current_x * (1 - step) + move_x * step;
-                current_y = current_y * (1 - step) + move_y * step;
-            } else {
-                std::this_thread::sleep_for(std::chrono::milliseconds(16));
-                continue;
-            }
-
-            if (current_x >= 0 && current_x <= box_width &&
-                current_y >= 0 && current_y <= box_height) {
-
-                int target_x = allow_rect.x + static_cast<int>(current_x);
-                int target_y = allow_rect.y + static_cast<int>(current_y);
-
-                if (target_x >= allow_rect.x &&
-                    target_x <= allow_rect.x + allow_rect.width &&
-                    target_y >= allow_rect.y &&
-                    target_y <= allow_rect.y + allow_rect.height) {
-
-                    MSDriverPRO::mouseMoveTo(target_x, target_y);
-                }
-            }
-        }
-    });
-
-    // 获取主屏幕
-    QScreen* m_pScreen = QGuiApplication::primaryScreen();
-
-    int frame_count = 0;
-
-    qDebug() << "开始检测目标...";
-
-    while (true) {
-        // 截取屏幕
-        QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
-        cur_capture = cur_capture.copy(pos_x, pos_y, detect_width, detect_height);
-
-        // 转换为 OpenCV Mat 格式
-        QImage image = cur_capture.toImage();
-        cv::Mat frame(image.height(), image.width(), CV_8UC4, image.bits(), image.bytesPerLine());
-        cv::Mat bgr_frame;
-        cv::cvtColor(frame, bgr_frame, cv::COLOR_BGRA2BGR);
-
-        // 追踪检测
-        auto detections = yolo.track(bgr_frame, 0.25);
-
-        // 查找目标
-        bool found = false;
-        Detection target_det;
-        int current_class = -1;
-
-        // 如果已经锁定了分类和track_id，优先匹配track_id
-        if (locked_track_id >= 0) {
-            for (const auto& det : detections) {
-                if (det.track_id == locked_track_id) {
-                    target_det = det;
-                    found = true;
-                    current_class = det.class_id;
-                    break;
-                }
-            }
-            // 如果track_id丢失，尝试匹配锁定的分类
-            if (!found && locked_class >= 0) {
-                for (const auto& det : detections) {
-                    if (det.class_id == locked_class) {
-                        target_det = det;
-                        found = true;
-                        current_class = locked_class;
-                        locked_track_id = det.track_id;  // 更新track_id
-                        qDebug() << "更新锁定目标分类:" << class_names[current_class] << "(ID:" << current_class << ") 追踪ID:" << locked_track_id;
-                        break;
-                    }
-                }
-            }
-        } else if (locked_class >= 0) {
-            // 未锁定track_id但已锁定分类，按分类查找
-            for (const auto& det : detections) {
-                if (det.class_id == locked_class) {
-                    target_det = det;
-                    found = true;
-                    current_class = locked_class;
-                    locked_track_id = det.track_id;  // 锁定track_id
-                    qDebug() << "锁定目标分类:" << class_names[current_class] << "(ID:" << current_class << ") 追踪ID:" << locked_track_id;
-                    break;
-                }
-            }
-        } else {
-            // 未锁定时，按优先级查找目标分类 (0, 2, 4, 6)
-            // 优先级顺序: circle_true(0) > rect_true(2) > star_true(4) > triangle_true(6)
-            for (int target_class : target_classes) {
-                for (const auto& det : detections) {
-                    if (det.class_id == target_class) {
-                        target_det = det;
-                        found = true;
-                        current_class = target_class;
-                        locked_class = target_class;  // 锁定分类
-                        locked_track_id = det.track_id;  // 锁定追踪ID
-                        qDebug() << "锁定目标分类:" << class_names[target_class] << "(ID:" << target_class << ")";
-                        break;
-                    }
-                }
-                if (found) break;
-            }
-        }
-
-        // 处理检测结果
-        if (found) {
-            int center_x = target_det.box.x + target_det.box.width / 2;
-            int center_y = target_det.box.y + target_det.box.height / 2;
-
-            // 更新最新目标位置
-            latest_target_x = static_cast<float>(center_x);
-            latest_target_y = static_cast<float>(center_y);
-            target_updated = true;
-            has_target = true;
-
-            // 可选：打印调试信息（每30帧打印一次，减少日志）
-            if (frame_count % 10 == 0) {
-                qDebug() << "帧" << frame_count
-                         << "分类:" << class_names[current_class]
-                         << "ID:" << locked_track_id
-                         << "置信度:" << target_det.confidence
-                         << "中心点:(" << center_x << "," << center_y << ")";
-            }
-
-            // 绘制检测结果
-            yolo.drawDetections(bgr_frame, detections);
-
-            // 在图像上绘制中心点
-            // if (center_x < 0) center_x = 0;
-            // if (center_x >= bgr_frame.cols) center_x = bgr_frame.cols - 1;
-            // if (center_y < 0) center_y = 0;
-            // if (center_y >= bgr_frame.rows) center_y = bgr_frame.rows - 1;
-
-            cv::circle(bgr_frame, cv::Point(center_x, center_y), 5, cv::Scalar(0, 0, 255), -1);
-
-            // 添加追踪信息
-            QString track_text = QString("Locked: %1 TrackID:%2")
-                                     .arg(class_names[current_class])
-                                     .arg(locked_track_id);
-            cv::putText(bgr_frame,
-                        track_text.toStdString(),
-                        cv::Point(10, 60),
-                        cv::FONT_HERSHEY_SIMPLEX,
-                        0.7,
-                        cv::Scalar(0, 255, 0),
-                        2);
-
-            // 保存识别结果图片（可选，取消注释以启用）
-            QString save_path = QString("%1/frame_%2.jpg").arg(save_dir).arg(frame_count, 6, 10, QChar('0'));
-            cv::imwrite(save_path.toStdString(), bgr_frame);
-        } else {
-            // 未检测到目标
-            if (locked_class >= 0 && frame_count % 100 == 0) {
-                qDebug() << "未检测到锁定目标:" << class_names[locked_class];
-
-                // 判断滑鼠界面是否还存在
-                if(frame_count > 250){
-                    MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
-                    cv::Point title_coor;
-                    if (!tempmatch.match(title_coor)) {
-                        Gplayer.mousecheck_exists = false;
-                        qDebug() << "滑鼠验证界面已消失~";
-                        break;
-                    }
-                }
-            }
-        }
-
-        // 可选：绘制所有检测结果（用于调试）
-        // yolo.drawDetections(bgr_frame, detections);
-
-        // 可选：显示画面（用于调试）
-        // cv::imshow("Tracking", bgr_frame);
-        // if (cv::waitKey(1) == 27) break;  // ESC 退出
-
-        frame_count++;
-
-        // if (frame_count % 10 == 0) {
-        //     qDebug() << "已处理" << frame_count << "帧";
-        // }
-    }
-
-    running = false;
-    mouse_thread.join();
-    qDebug() << "test() 函数退出，锁定的分类:" << class_names[locked_class];
-}
-
-static bool openLocalVideoCapture(cv::VideoCapture& cap, const QString& videoPath)
-{
-    const QString nativePath =
-        QDir::toNativeSeparators(QFileInfo(videoPath).absoluteFilePath());
-    const cv::String cvPath = nativePath.toLocal8Bit().constData();
-    if (cap.open(cvPath, cv::CAP_FFMPEG)) {
-        return true;
-    }
-    return cap.open(cvPath);
-}
-
 void MouseTrack::realTrackTest()
 {
-    const QString model_path = QCoreApplication::applicationDirPath() + "/models/all.onnx";
+    const QString model_path = QCoreApplication::applicationDirPath() + "/models/yolo26n.onnx";// all,triangle,best_m,qn,yolov8s,yolo26n
     if (!QFileInfo::exists(model_path)) {
         qCritical() << "模型文件不存在:" << model_path;
         return;
@@ -1018,27 +695,29 @@ void MouseTrack::realTrackTest()
 
     // 查找游戏窗口（截图模式）
     HWND game_hwnd = NULL;
+
     game_hwnd = FindWindow(NULL, TEXT("MapleStory Worlds-Artale (繁體中文版)"));
     if (game_hwnd == NULL) {
         qCritical() << "游戏窗口不存在！";
         return;
     }
 
-
     // 获取窗口位置和大小
     RECT game_rect{};
     int game_x = 0;
     int game_y = 0;
+
     GetWindowRect(game_hwnd, &game_rect);
     game_x = game_rect.left;
     game_y = game_rect.top;
-    int box_pos_x = 391; // 391 + 8
-    int box_pos_y = 218; // 186 + 32
-    const int box_width = MouseTrackConfig::ROI_W;
-    const int box_height = MouseTrackConfig::ROI_H;
+
+    int box_pos_x = 399;
+    int box_pos_y = 218;
+    int box_width = 500;
+    int box_height = 335;
 
     // 鼠标允许的移动范围
-    cv::Rect allow_rect = {game_x + 8 + box_pos_x, game_y + box_pos_y, box_width, box_height};
+    cv::Rect allow_rect = {game_x + box_pos_x, game_y + box_pos_y, box_width, box_height};
 
     int pos_x = game_x + box_pos_x;
     int pos_y = game_y + box_pos_y;
@@ -1048,39 +727,38 @@ void MouseTrack::realTrackTest()
     // 检测区域
     cv::Rect detection_region(0, 0, detect_width, detect_height);
 
-    constexpr double screenshot_capture_fps = 6.0;
+    constexpr double screenshot_capture_fps = 7.0;
     using SteadyClock = std::chrono::steady_clock;
     const auto screenshot_interval = std::chrono::duration_cast<SteadyClock::duration>(
         std::chrono::duration<double>(1.0 / screenshot_capture_fps));
 
-    qDebug() << "识别区域:" << pos_x << pos_y << detect_width << detect_height
-             << "模型输入:" << MouseTrackConfig::TRAIN_IMG_W << MouseTrackConfig::TRAIN_IMG_H;
+
+    qDebug() << "识别区域:" << pos_x << pos_y << detect_width << detect_height;
+
     qDebug() << "画面来源: 屏幕截图, 采样率:" << screenshot_capture_fps << "fps";
 
-    WgcWindowCapturer wgc_capturer;
-    if (!wgc_capturer.init(game_hwnd, box_pos_x, box_pos_y, box_width, box_height)) {
-        qCritical() << "WGC 截图初始化失败";
-        return;
-    }
 
     // 真实目标检测器
     RealTargetDetector real_target_detector;
 
+    // 鼠标预测器
     MousePredictor mouse_predictor;
 
-    std::atomic<int> real_track_id(-1);
-    std::atomic<float> latest_target_x(0.f);
-    std::atomic<float> latest_target_y(0.f);
-    std::atomic<bool> target_updated(false);
+    // 线程控制
     std::atomic<bool> has_target(false);
+    std::atomic<float> latest_target_x(0);
+    std::atomic<float> latest_target_y(0);
+    std::atomic<bool> target_updated(false);
     std::atomic<bool> running(true);
-    std::atomic<int> screen_save_index(-1);
+    std::atomic<int> real_track_id(-1);  // 真实目标ID
 
-    float current_x = 0.f;
-    float current_y = 0.f;
+    // 平滑移动的当前值
+    float current_x = 0;
+    float current_y = 0;
 
-    // 鼠标移动线程
-    std::thread mouse_thread([&]() {
+    // 鼠标移动线程（仅截图模式）
+    std::thread mouse_thread;
+    mouse_thread = std::thread([&]() {
         auto last_move_time = std::chrono::high_resolution_clock::now();
 
         while (running) {
@@ -1114,7 +792,9 @@ void MouseTrack::realTrackTest()
                 current_x = current_x * (1 - step) + move_x * step;
                 current_y = current_y * (1 - step) + move_y * step;
             } else {
-                std::this_thread::sleep_for(std::chrono::milliseconds(16));
+                // std::this_thread::sleep_for(std::chrono::milliseconds(16));
+                ProcessHelper::programDelay(16);
+                ProcessHelper::handleEvents();
                 continue;
             }
 
@@ -1132,21 +812,19 @@ void MouseTrack::realTrackTest()
                     MSDriverPRO::mouseMoveTo(target_x, target_y);
                 }
             }
+            ProcessHelper::handleEvents();
         }
     });
+
+
+    QScreen* m_pScreen = QGuiApplication::primaryScreen();
 
     int frame_count = 0;
     int locked_frame_count = 0;  // 锁定坐标帧计数
     cv::Point2i lock_position(-1, -1);  // 锁定坐标
     const auto screenshot_test_start = SteadyClock::now();
-    constexpr auto mouse_check_delay = std::chrono::seconds(16);
-
-    const auto waitForScreenshotInterval = [&](const SteadyClock::time_point& frame_start) {
-        const auto elapsed = SteadyClock::now() - frame_start;
-        if (elapsed < screenshot_interval) {
-            std::this_thread::sleep_for(screenshot_interval - elapsed);
-        }
-    };
+    constexpr auto mouse_check_delay = std::chrono::seconds(15);
+    constexpr auto mouse_end_delay = std::chrono::seconds(20);
 
     qDebug() << "开始真实目标检测...";
 
@@ -1155,32 +833,21 @@ void MouseTrack::realTrackTest()
         cv::Mat bgr_frame;
 
         qDebug() << "第" << frame_count << "帧";
-        // QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
-        // cur_capture = cur_capture.copy(pos_x, pos_y, detect_width, detect_height);
-        // QImage image = cur_capture.toImage();
-        // cv::Mat frame(image.height(), image.width(), CV_8UC4,
-        //               const_cast<uchar*>(image.bits()), image.bytesPerLine());
-        // cv::cvtColor(frame, bgr_frame, cv::COLOR_BGRA2BGR);
 
-        if (!wgc_capturer.captureBgr(bgr_frame)) {
-            // waitForScreenshotInterval(frame_start);
-            qDebug() << "截图失败~";
-            continue;
-        }
-        const auto capture_time = SteadyClock::now();
-        const double capture_elapsed_ms =
-            std::chrono::duration<double, std::milli>(capture_time - frame_start).count();
-        qDebug() << "截图时间:"
-                 << QString::number(capture_elapsed_ms, 'f', 2) << "ms";
+        QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow(),pos_x, pos_y, detect_width, detect_height);
+        QImage image = cur_capture.toImage();
+        cv::Mat frame(image.height(), image.width(), CV_8UC4,
+                      const_cast<uchar*>(image.bits()), image.bytesPerLine());
+        cv::cvtColor(frame, bgr_frame, cv::COLOR_BGRA2BGR);
 
         // 追踪检测
         auto detections = yolo.track(bgr_frame, 0.25);
 
-        const auto track_time = SteadyClock::now();
-        const double track_elapsed_ms =
-            std::chrono::duration<double, std::milli>(track_time - frame_start).count();
-        qDebug() << "追踪目标完成时间:"
-                 << QString::number(track_elapsed_ms, 'f', 2) << "ms";
+        for(auto item : detections){
+            qDebug() << "track_id" << item.track_id
+                     << "置信度:" << item.confidence
+                     << "坐标:" << item.box.x << "," << item.box.y;
+        }
 
         // 绘制所有检测
         yolo.drawDetections(bgr_frame, detections);
@@ -1228,9 +895,12 @@ void MouseTrack::realTrackTest()
             for (const auto& contour : contours) {
                 cv::Rect rect = cv::boundingRect(contour);
                 double area = rect.width * rect.height;
+                qDebug() << "area:" << area;
+                // if (area > 2000 && area > max_area) {
                 if (area > 800 && area > max_area) {
                     float ratio = std::max(rect.width, rect.height) / static_cast<float>(std::min(rect.width, rect.height));
                     if (ratio > 1.5f) continue;
+
                     max_area = area;
                     max_center = cv::Point2i(rect.x + rect.width / 2, rect.y + rect.height / 2);
                 }
@@ -1253,8 +923,15 @@ void MouseTrack::realTrackTest()
 
         // 真实目标识别
         if (locked_frame_count >= 31) {
-            const int current_pos_x = static_cast<int>(latest_target_x.load());
-            const int current_pos_y = static_cast<int>(latest_target_y.load());
+            if (real_target_detector.hasPredictTargetRect()) {
+                cv::rectangle(bgr_frame,
+                              real_target_detector.getPredictTargetRect(),
+                              cv::Scalar(0, 255, 255),
+                              2);
+            }
+
+            int current_pos_x = static_cast<int>(latest_target_x);
+            int current_pos_y = static_cast<int>(latest_target_y);
             cv::Point2i current_pos(current_pos_x, current_pos_y);
 
             // 追踪真实目标
@@ -1268,20 +945,10 @@ void MouseTrack::realTrackTest()
                         int center_x = det.box.x + det.box.width / 2;
                         int center_y = det.box.y + det.box.height / 2;
 
-                        // 更新最新目标位置
                         latest_target_x = static_cast<float>(center_x);
                         latest_target_y = static_cast<float>(center_y);
                         target_updated = true;
                         has_target = true;
-
-                        const auto mouse_update_time = SteadyClock::now();
-                        const double mouse_update_elapsed_ms =
-                            std::chrono::duration<double, std::milli>(mouse_update_time - frame_start).count();
-                        const double since_capture_ms =
-                            std::chrono::duration<double, std::milli>(mouse_update_time - capture_time).count();
-                        qDebug() << "更新鼠标位置时间:"
-                                 << QString::number(mouse_update_elapsed_ms, 'f', 2) << "ms, 与截图时间相差"
-                                 << QString::number(since_capture_ms, 'f', 2) << "ms";
 
                         // 绘制真实目标
                         // cv::rectangle(bgr_frame, det.box, cv::Scalar(0, 0, 255), 2);
@@ -1300,48 +967,63 @@ void MouseTrack::realTrackTest()
                                     cv::Scalar(0, 0, 255),
                                     2);
 
-                        real_track_id.store(identified_id);
+                        real_track_id = identified_id;
                         break;
                     }
                 }
+            }else{
+                // 如果不存在真实目标，则使用预测框中心位置
+                qDebug() << "真实目标不存在，使用预测框位置";
             }
         }
 
 
         // 检测滑鼠界面是否消失（仅截图模式，运行超过16秒后开始检测）
         if (SteadyClock::now() - screenshot_test_start > mouse_check_delay) {
-            // MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
-            // cv::Point title_coor;
-            // if (!tempmatch.match(title_coor)) {
+            MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
+            cv::Point title_coor;
+            if (!tempmatch.match(title_coor)) {
                 Gplayer.mousecheck_exists = false;
                 qDebug() << "滑鼠验证界面已消失~";
                 break;
-            // }
+            }
         }
 
-        const QString frame_index = QString("%1").arg(frame_count, 6, 10, QChar('0'));
-        cv::imwrite(QString("%1/frame_%2.jpg").arg(save_dir, frame_index).toStdString(), bgr_frame);
+        if(SteadyClock::now() - screenshot_test_start > mouse_end_delay){
+            qDebug() << "滑鼠验证超时，退出验证";
+            break;
+        }
+
+        QString save_path = QString("%1/frame_%2.jpg").arg(save_dir).arg(frame_count, 6, 10, QChar('0'));
+        cv::imwrite(save_path.toStdString(), bgr_frame);
+
+
+        const auto frame_elapsed = SteadyClock::now() - frame_start;
+        if (frame_elapsed < screenshot_interval) {
+            std::this_thread::sleep_for(screenshot_interval - frame_elapsed);
+        }
 
         frame_count++;
-        waitForScreenshotInterval(frame_start);
+        ProcessHelper::handleEvents();
     }
 
-    running.store(false);
+    running = false;
     if (mouse_thread.joinable()) {
         mouse_thread.join();
     }
 
-    {
-        const auto test_end = SteadyClock::now();
-        const double total_elapsed =
-            std::chrono::duration<double>(test_end - screenshot_test_start).count();
-        const double avg_fps = total_elapsed > 0.0 ? frame_count / total_elapsed : 0.0;
-        avg_fps_ = avg_fps;
-        qDebug() << "实际帧率统计: 共处理" << frame_count << "帧, 耗时"
-                 << QString::number(total_elapsed, 'f', 2) << "秒, 平均"
-                 << QString::number(avg_fps, 'f', 2) << "fps (目标"
-                 << screenshot_capture_fps << "fps)";
-    }
+
+    const auto test_end = SteadyClock::now();
+    const double total_elapsed =
+        std::chrono::duration<double>(test_end - screenshot_test_start).count();
+    const double avg_fps = total_elapsed > 0.0 ? frame_count / total_elapsed : 0.0;
+    avg_fps_ = avg_fps;
+    qDebug() << "实际帧率统计: 共处理" << frame_count << "帧, 耗时"
+             << QString::number(total_elapsed, 'f', 2) << "秒, 平均"
+             << QString::number(avg_fps, 'f', 2) << "fps (目标"
+             << screenshot_capture_fps << "fps)";
+
+    qDebug() << "realTrackTest() 函数退出，真实目标ID:" << real_track_id.load();
 }
 
 double MouseTrack::getfps()

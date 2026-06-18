@@ -45,16 +45,11 @@ public:
 
     // void YOLOv8Inference(const QString &model_path);
 
-    std::vector<Detection> detect(const cv::Mat& frame, float conf_threshold = 0.25, float iou_threshold = 0.45);
+    std::vector<Detection> detect(const cv::Mat& frame, float conf_threshold = 0.25);
 
-    // 带跟踪的检测（简化版）
     std::vector<Detection> track(const cv::Mat& frame, float conf_threshold = 0.25);
 
-double calculateIoU(const cv::Rect& box1, const cv::Rect& box2);
-
-// 绘制检测结果（支持 Qt 或 OpenCV）
-
-void drawDetections(cv::Mat& frame, const std::vector<Detection>& detections);
+    void drawDetections(cv::Mat& frame, const std::vector<Detection>& detections);
 
 };
 
@@ -87,16 +82,6 @@ public:
      */
     float getPredictedY() const;
 
-    /**
-     * @brief 检查是否已初始化
-     */
-    bool isInitialized() const;
-
-    /**
-     * @brief 重置预测器
-     */
-    void reset();
-
 private:
     cv::KalmanFilter m_kalman;
     bool m_has_initialized;
@@ -105,18 +90,10 @@ private:
     std::chrono::high_resolution_clock::time_point m_last_time;
 };
 
-namespace MouseTrackConfig {
-    constexpr int ROI_W = 500;
-    constexpr int ROI_H = 335;
-    constexpr int TRAIN_IMG_W = 416;
-    constexpr int TRAIN_IMG_H = 256;
-}
-
 class MouseTrack{
 private:
     double avg_fps_;
 public:
-    static void test();
     void realTrackTest();
     double getfps();
 };

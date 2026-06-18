@@ -2114,7 +2114,7 @@ void KillMonster::handleMousemove()
     // MouseTrack tracktest;
     // tracktest.test();
     // qDebug() << "滑鼠验证结束~";
-    // ProcessHelper::programDelay(1500);
+    ProcessHelper::programDelay(3000);
 }
 
 void KillMonster::updateTaskID()

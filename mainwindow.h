@@ -189,6 +189,8 @@ private slots:
 
     void on_pushButton_mousetrack_clicked();
 
+    void on_pushButton_text_list_clicked();
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

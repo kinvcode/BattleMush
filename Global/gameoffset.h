@@ -16,6 +16,11 @@ namespace BASE {
     static int Camera_offset_lv1 = 0xB8;
     static int Camera_offset_lv2 = 0x0;
 
+    static int TMP_UpdateManager_base = 0xA98AD18;
+    static int TMP_UpdateManager_offset_lv1 = 0xB8;
+    static int TMP_UpdateManager_offset_lv2 = 0x0;
+    static int TMP_UpdateManager_List = 0x38;
+
     namespace Dictionary{
         static int InternalArray_entries = 0x18;
         static int count = 0x20;
@@ -170,6 +175,10 @@ namespace BASE {
 
     namespace CinemachineBrain{
         static int Camera = 0x50;
+    };
+
+    namespace TextMeshPro{
+        static int m_text = 0xE0;
     };
 };
 

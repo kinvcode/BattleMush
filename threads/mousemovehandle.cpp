@@ -74,7 +74,7 @@ void MouseMoveHandle::process()
         checkMouseMove();
 
         // 控制频率
-        ProcessHelper::programDelay(100);
+        ProcessHelper::programDelay(500);
         QApplication::processEvents();
     }
 }
@@ -91,12 +91,40 @@ void MouseMoveHandle::checkMouseMove()
         return;
     }
 
+    // 尋找透明圖形
+    if(!Gplayer.p_assemblybase){
+        qDebug() << "先运行一次，再获取数据";
+        return;
+    }
+
+    quint64 text_list = readPointer(Gplayer.p_assemblybase,
+                            BASE::TMP_UpdateManager_base,
+                            BASE::TMP_UpdateManager_offset_lv1,
+                            BASE::TMP_UpdateManager_offset_lv2,
+                            BASE::TMP_UpdateManager_List);
+    int text_count = readInt(text_list + BASE::List::size);
+
+    quint64 text_head = readLong(text_list + BASE::List::InternalArray) + BASE::InternalArray::Head;
+
+    bool find_mousemove = false;
+    for(int i = 0; i < text_count; i++){
+        quint64 text_mesh_pro = readLong(text_head + i * 8);
+        QString text_string = readString(readLong(text_mesh_pro + BASE::TextMeshPro::m_text) + BASE::String::text, 100);
+        // qDebug() << "内容:" << text_string;
+        if(text_string == "尋找透明圖形"){
+            find_mousemove = true;
+            break;
+        }
+    }
+
     // 判断是否存在
-    MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
-    cv::Point title_coor;
-    if(tempmatch.match(title_coor)){
-        qDebug() << "发现滑鼠验证界面！！！";
-        Helper::console("发现滑鼠验证界面！！！");
-        Gplayer.mousecheck_exists = true;
+    if(find_mousemove){
+        MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
+        cv::Point title_coor;
+        if(tempmatch.match(title_coor)){
+            qDebug() << "发现滑鼠验证界面！！！";
+            Helper::console("发现滑鼠验证界面！！！");
+            Gplayer.mousecheck_exists = true;
+        }
     }
 }
