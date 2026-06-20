@@ -715,6 +715,22 @@ bool KillMonster::isExistsRune()
     return false;
 }
 
+bool KillMonster::isAnswerCheck()
+{
+    if(!Gplayer.p_uientity){
+        return false;
+    }
+
+    // 寻找LocalUserGroup
+    quint64 lieDetectorGroup_p = Helper::findChild(Gplayer.p_uientity,"LieDetectorGroup");
+
+    quint64 quiz_p = Helper::findChild(lieDetectorGroup_p,"quiz");
+    if( quiz_p == 0){
+        return false;
+    }
+    return true;
+}
+
 void KillMonster::solveRune()
 {
 retryEnter:
@@ -801,6 +817,26 @@ retryEnter:
 
     DebugOutput::out("A星到达路线节点失败~，重新执行路线");
     ProcessHelper::programDelay(100);
+    QApplication::processEvents();
+    goto retryEnter;
+}
+
+void KillMonster::answerQuestion()
+{
+retryEnter:
+    if(m_paused || !m_running){
+        return;
+    }
+
+    Helper::warningSound();
+    qDebug() << "处理问答中";
+
+    if(!isAnswerCheck()){
+        qDebug() << "问答已解决！";
+        return;
+    }
+
+    ProcessHelper::programDelay(500);
     QApplication::processEvents();
     goto retryEnter;
 }
@@ -973,6 +1009,15 @@ void KillMonster::autoCleanLine()
     if(isExistsRune()){
         qDebug() << "检测到解除符文封印，尝试解除中...";
         solveRune();
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        goto continue_tryEnter;
+    }
+
+    // 问答检测
+    if(isAnswerCheck()){
+        qDebug() << "检测到问答检测，回答中...";
+        answerQuestion();
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
         goto continue_tryEnter;
@@ -1151,6 +1196,15 @@ void KillMonster::excutePlatformSequence()
     if(isExistsRune()){
         qDebug() << "检测到解除符文封印，尝试解除中...";
         solveRune();
+        ProcessHelper::programDelay(100);
+        QApplication::processEvents();
+        goto retryEnter;
+    }
+
+    // 问答检测
+    if(isAnswerCheck()){
+        qDebug() << "检测到问答检测，回答中...";
+        answerQuestion();
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
         goto retryEnter;

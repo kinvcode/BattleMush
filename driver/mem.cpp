@@ -145,7 +145,8 @@ QString Mem::readAnsiString(ULONG64 address, int maxLength)
     readMemory(start_address, (byte*)tempBuffer, count);
     tempBuffer[count] = '\0';  // 手动添加结束符
 
-    QString text = QString::fromLocal8Bit(tempBuffer);  // 或 fromUtf8
+    // QString text = QString::fromLocal8Bit(tempBuffer);  // 或 fromUtf8
+    QString text = QString::fromUtf8(tempBuffer, count);  // 指定长度
     delete[] tempBuffer;
     return text;
 }

@@ -1657,3 +1657,248 @@ void MainWindow::on_pushButton_text_list_clicked()
     }
 }
 
+
+void MainWindow::on_pushButton_answer_check_info_clicked()
+{
+    if(!Gplayer.p_uientity){
+        qDebug() << "UI指针为空，获取信息失败";
+        return;
+    }
+
+    // 寻找LocalUserGroup
+    quint64 lieDetectorGroup_p = Helper::findChild(Gplayer.p_uientity,"LieDetectorGroup");
+
+    quint64 quiz_p = Helper::findChild(lieDetectorGroup_p,"quiz");
+    if( quiz_p == 0){
+        qDebug() << "quiz指针为空，问答检测界面不存在~";
+        return;
+    }
+}
+
+
+void MainWindow::on_pushButton_print_modentity_list_clicked()
+{
+    // 检测游戏是否存在
+    Gplayer.p_gamepid = MSDriverPRO::getPid("msw.exe");
+
+    if(Gplayer.p_gamepid == 0){
+        DebugOutput::out("游戏进程不存在");
+        Helper::console("游戏进程不存在");
+        return;
+    }
+
+    DebugOutput::out("游戏进程:" + QString::number(Gplayer.p_gamepid));
+    Gplayer.p_assemblybase = MSDriverPRO::getModuleAddr(Gplayer.p_gamepid, "GameAssembly.dll");
+    DebugOutput::out("模块基址:" + QString::number(Gplayer.p_assemblybase, 16).toUpper());
+
+    Gplayer.p_gamecontext_entries = readPointer(
+        Gplayer.p_assemblybase,
+        BASE::ClientCoreThreadManager_base,
+        BASE::ClientCoreThreadManager_offset_lv1,
+        BASE::ClientCoreThreadManager_offset_lv2,
+        BASE::ClientCoreThreadManager_GameDictionary,
+        BASE::Dictionary::InternalArray_entries);
+
+    Gplayer.p_gamecontext = readPointer(Gplayer.p_gamecontext_entries, BASE::InternalArray::Head + 0x10);
+    DebugOutput::out("GameContext:" + QString::number(Gplayer.p_gamecontext, 16).toUpper());
+
+    // 检测是否已经进入游戏
+    if(Gplayer.p_gamecontext == 0){
+        // 尚未进入游戏，
+        DebugOutput::out("等待进入游戏中...");
+        Helper::console("等待进入游戏中...");
+        return;
+    }
+
+    // 实例个数
+    int entity_count = readInt(Gplayer.p_gamecontext + BASE::GameContext::EntityCountsFromEvent);
+
+    qDebug() << "实例个数：" << entity_count;
+
+    quint64 p_worldentity = readPointer(Gplayer.p_gamecontext, BASE::GameContext::WorldEntity);
+
+    std::unordered_set<quint64> entity_set;
+
+    // 构建 JSON 对象
+    QJsonObject root = GameStruct::buildJSONEntityChild(p_worldentity, entity_set, 0);
+
+    qDebug() << "遍历实例数量：" << entity_set.size();
+
+    // 转换为格式化的 JSON 字符串
+    QJsonDocument doc(root);
+    QString jsonString = doc.toJson(QJsonDocument::Indented);
+
+    // 打印 JSON
+    qDebug().noquote() << jsonString;
+
+
+}
+
+
+void MainWindow::on_pushButton_print_allservice_clicked()
+{
+    // 检测游戏是否存在
+    Gplayer.p_gamepid = MSDriverPRO::getPid("msw.exe");
+
+    if(Gplayer.p_gamepid == 0){
+        DebugOutput::out("游戏进程不存在");
+        Helper::console("游戏进程不存在");
+        return;
+    }
+
+    DebugOutput::out("游戏进程:" + QString::number(Gplayer.p_gamepid));
+    Gplayer.p_assemblybase = MSDriverPRO::getModuleAddr(Gplayer.p_gamepid, "GameAssembly.dll");
+    DebugOutput::out("模块基址:" + QString::number(Gplayer.p_assemblybase, 16).toUpper());
+
+    Gplayer.p_gamecontext_entries = readPointer(
+        Gplayer.p_assemblybase,
+        BASE::ClientCoreThreadManager_base,
+        BASE::ClientCoreThreadManager_offset_lv1,
+        BASE::ClientCoreThreadManager_offset_lv2,
+        BASE::ClientCoreThreadManager_GameDictionary,
+        BASE::Dictionary::InternalArray_entries);
+
+    Gplayer.p_gamecontext = readPointer(Gplayer.p_gamecontext_entries, BASE::InternalArray::Head + 0x10);
+    DebugOutput::out("GameContext:" + QString::number(Gplayer.p_gamecontext, 16).toUpper());
+
+    // 检测是否已经进入游戏
+    if(Gplayer.p_gamecontext == 0){
+        // 尚未进入游戏，
+        DebugOutput::out("等待进入游戏中...");
+        Helper::console("等待进入游戏中...");
+        return;
+    }
+
+    // 实例个数
+    quint64 all_services = readLong(Gplayer.p_gamecontext + BASE::GameContext::allServices);
+
+    // 子列表地址
+    quint64 listAddress = all_services;
+    qDebug() << QString("all_services 0x%1").arg(listAddress, 0, 16);
+
+    quint64 myArrayAddress = readLong(listAddress + BASE::List::InternalArray);
+    if (!myArrayAddress) {
+        return;
+    }
+
+    int32_t count = readInt(listAddress + BASE::List::size);
+    if (count <= 0) {
+        return;
+    }
+
+    quint64 arrayStartAddress = myArrayAddress + BASE::InternalArray::Head;
+
+    // 构建子节点数组
+    QJsonArray childrenArray;
+
+    for (int i = 0; i < count; ++i) {
+        quint64 service_p = readLong(arrayStartAddress + i * 8);
+        QString name = readAnsiString(readLong(readLong(service_p) + 0x10), 100);
+        qDebug() << i << "name:" << name << "地址：" << QString("0x%1").arg(service_p, 0, 16);
+    }
+}
+
+
+void MainWindow::on_pushButton_mousetrack_info_clicked()
+{
+    // 检测游戏是否存在
+    Gplayer.p_gamepid = MSDriverPRO::getPid("msw.exe");
+
+    if(Gplayer.p_gamepid == 0){
+        DebugOutput::out("游戏进程不存在");
+        Helper::console("游戏进程不存在");
+        return;
+    }
+
+    DebugOutput::out("游戏进程:" + QString::number(Gplayer.p_gamepid));
+    Gplayer.p_assemblybase = MSDriverPRO::getModuleAddr(Gplayer.p_gamepid, "GameAssembly.dll");
+    DebugOutput::out("模块基址:" + QString::number(Gplayer.p_assemblybase, 16).toUpper());
+
+    quint64 ui_anti_macro = readPointer(
+        Gplayer.p_assemblybase,
+        0xA8BF178,
+        0xB8,
+        0x0,
+        0x58,
+        0x20);
+
+    qDebug() << "---------------------------------------------------------------------------------------";
+    qDebug() << "第1帧";
+    QDateTime currentDateTime = QDateTime::currentDateTime();
+    QString currentTime = currentDateTime.toString("yyyy-MM-dd hh:mm:ss");
+    qDebug() << "第" << 1 << "帧" << " " << currentTime;
+    qDebug() << "---------------------------------------------------------------------------------------";
+
+    qDebug() << QString("ui_anti_macro:0x%1").arg(ui_anti_macro, 0, 16);
+
+
+    quint64 plan_a = ui_anti_macro;
+    quint64 plan_b = ui_anti_macro + 0x160;
+
+    qDebug() << QString("PlanA:0x%1").arg(plan_a, 0, 16);
+    qDebug() << QString("PlanB:0x%1").arg(plan_b, 0, 16);
+
+    // 打印数据
+
+    int Id = readInt(plan_a + 0x38);
+    bool IsLoadComplete = readByte(plan_a + 0x3C);
+    bool IsDestroy = readByte(plan_a + 0x3D);
+    bool IsForceClose = readByte(plan_a + 0x3E);
+
+    // posList
+    // mousePosList
+    int currentStatus = readInt(plan_a + 0xD0);
+    qint64 currentTick = readLong(plan_a + 0xD8);
+    qint64 readyTick = readLong(plan_a + 0xE0);
+    qint64 randomCheckColorTick = readLong(plan_a + 0xE8);
+    qint64 startTick = readLong(plan_a + 0xF0);
+    qint64 setResultTick = readLong(plan_a + 0xF8);
+    int level = readInt(plan_a + 0x100);
+    QString detectId = readString(readLong(plan_a + 0x108) + 0x14,100);
+    qint64 expireTime = readLong(plan_a + 0x110);
+    cv::Point cursor;
+    cursor.x = readInt(plan_a + 0x14C);
+    cursor.y = readInt(plan_a + 0x150);
+
+    qDebug() << "Id:" << Id;
+    qDebug() << "IsLoadComplete:" << IsLoadComplete;
+    qDebug() << "IsDestroy:" << IsDestroy;
+    qDebug() << "IsForceClose:" << IsForceClose;
+    qDebug() << "currentStatus:" << currentStatus;
+    qDebug() << "currentTick:" << currentTick;
+    qDebug() << "readyTick:" << readyTick;
+    qDebug() << "randomCheckColorTick:" << randomCheckColorTick;
+    qDebug() << "startTick:" << startTick;
+    qDebug() << "setResultTick:" << setResultTick;
+    qDebug() << "level:" << level;
+    qDebug() << "detectId:" << detectId;
+    qDebug() << "expireTime:" << expireTime;
+    qDebug() << "cursor:" << cursor.x << "," << cursor.y;
+
+    quint64 posList = readLong(plan_a + 0xC0);
+    int pos_count = readInt(posList + BASE::List::size);
+    quint64 pos_head = readLong(posList + BASE::List::InternalArray) + BASE::InternalArray::Head;
+    std::vector<cv::Point2f> pos_list;
+    for(int i = 0; i < pos_count; i++){
+        quint64 cur_pos = pos_head + i * 8;
+        float pos_x = readFloat(cur_pos);
+        pos_x = std::round(pos_x * 100) / 100.0f;
+        float pos_y = readFloat(cur_pos + 4);
+        pos_y = std::round(pos_y * 100) / 100.0f;
+        qDebug() << i << "{" << pos_x << "," << pos_y << "}";
+        pos_list.push_back({pos_x,pos_y});
+    }
+
+    quint64 mousePosList = readLong(plan_a + 0xC8);
+    int mousepos_count = readInt(mousePosList + BASE::List::size);
+    quint64 mousepos_head = readLong(mousePosList + BASE::List::InternalArray) + BASE::InternalArray::Head;
+    for(int i = 0; i < mousepos_count; i++){
+        quint64 cur_pos = mousepos_head + i * 8;
+        float pos_x = readFloat(cur_pos);
+        pos_x = std::round(pos_x * 100) / 100.0f;
+        float pos_y = readFloat(cur_pos + 4);
+        pos_y = std::round(pos_y * 100) / 100.0f;
+        qDebug() << i << "{" << pos_x << "," << pos_y << "}";
+    }
+}
+

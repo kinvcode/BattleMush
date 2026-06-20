@@ -114,6 +114,9 @@ private:
     // 是否存在符文
     bool isExistsRune();
 
+    // 是否存在问答检测
+    bool isAnswerCheck();
+
 // 计划任务
 private:
     struct PlatformSequence{
@@ -146,6 +149,9 @@ private:
 
     // 解除符文
     void solveRune();
+
+    // 回答问答
+    void answerQuestion();
 
     // 解除封印按键
     void runneKeyboard();
