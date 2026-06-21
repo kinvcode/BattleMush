@@ -836,6 +836,163 @@ retryEnter:
         return;
     }
 
+    // 寻找LocalUserGroup
+    quint64 lieDetectorGroup_p = Helper::findChild(Gplayer.p_uientity,"LieDetectorGroup");
+    qDebug() << QString("lieDetectorGroup_p:0x%1").arg(lieDetectorGroup_p, 0, 16);
+
+    quint64 quiz_p = Helper::findChild(lieDetectorGroup_p,"quiz");
+    qDebug() << QString("quiz_p:0x%1").arg(quiz_p, 0, 16);
+    if( quiz_p == 0){
+        qDebug() << "quiz指针为空，问答检测界面不存在~";
+        return;
+    }
+
+    // 子组件列表地址
+    uintptr_t listAddress = readLong(quiz_p + BASE::MODEntity::children);
+    if (!listAddress) {
+        qDebug() << "不存在子组件";
+        return;
+    }
+
+    uintptr_t myArrayAddress = readLong(listAddress + BASE::List::InternalArray);
+    if (!myArrayAddress) {
+        qDebug() << "不存在子组件";
+        return;
+    }
+
+    int32_t count = readInt(listAddress + BASE::List::size);
+    if (count <= 0 || count > 1000) {
+        qDebug() << "子组件数量异常";
+        return;
+    }
+
+    QDateTime logDateTime = QDateTime::currentDateTime();
+    QString logTimeString = logDateTime.toString("yyyy-MM-dd-hh-mm-ss");
+    QString save_dir = QCoreApplication::applicationDirPath() + "/output/quiz/" + logTimeString;
+
+    // 获取目录名和父目录
+    QDir dir(save_dir);
+    QString dirName = dir.dirName();
+    QDir parentDir = dir;
+    parentDir.cdUp();
+
+    // 如果目录存在，先递归删除所有内容，然后删除目录本身
+    if (dir.exists()) {
+        // 方法1：使用 removeRecursively() 删除整个目录树（Qt 5+）
+        if (!dir.removeRecursively()) {
+            qWarning() << "删除目录失败:" << save_dir;
+            return;
+        }
+
+        // 重新创建空目录
+        if (!parentDir.mkdir(dirName)) {
+            qWarning() << "创建目录失败:" << save_dir;
+            return;
+        }
+    } else {
+        // 目录不存在，直接创建
+        if (!parentDir.mkdir(dirName)) {
+            qWarning() << "创建目录失败:" << save_dir;
+            return;
+        }
+    }
+
+    HWND game_hwnd = NULL;
+
+    game_hwnd = FindWindow(NULL, TEXT("MapleStory Worlds-Artale (繁體中文版)"));
+    if (game_hwnd == NULL) {
+        qCritical() << "游戏窗口不存在！";
+        return;
+    }
+
+    RECT game_rect{};
+    GetWindowRect(game_hwnd, &game_rect);
+    int game_x = game_rect.left;
+    int game_y = game_rect.top;
+
+    QScreen* m_pScreen = QGuiApplication::primaryScreen();
+
+    QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow(),
+                                                game_x + 8,
+                                                game_y + 31,
+                                                1280,
+                                                720);
+    cv::Mat bgr_frame;
+    QImage image = cur_capture.toImage();
+    cv::Mat frame(image.height(), image.width(), CV_8UC4, const_cast<uchar*>(image.bits()), image.bytesPerLine());
+    cv::cvtColor(frame, bgr_frame, cv::COLOR_BGRA2BGR);
+    QString save_path = QString("%1/shortscreen.png").arg(save_dir);
+    cv::imwrite(save_path.toStdString(), bgr_frame);
+
+    // 数据区起始地址
+    uintptr_t arrayStartAddress = myArrayAddress + BASE::InternalArray::Head;
+
+    // quint64 quiz_image_dataid = 0;
+    QString quiz_image_dataid = "";
+    for (int i = 0; i < count; ++i) {
+        // 子组件指针
+        uintptr_t compPtr = readLong(arrayStartAddress + i * 8);
+
+        if (compPtr && compPtr != 0) {
+            // 读取名称
+            QString name = GameStruct::readEntityName(compPtr);
+            // qDebug() << i << name;
+            // qDebug() << QString("地址:0x%1").arg(compPtr, 0, 16);
+            if(name == "QuizImage"){
+                quiz_image_dataid = readString(readLong(readLong(readLong(
+                    compPtr + BASE::MODEntity::SpriteGUIRendererComponent)
+                    +BASE::SpriteGUIRendererComponent::MODDataRef)
+                    +BASE::MODDataRef::dataId) + BASE::String::text, 100);
+                break;
+            }
+        }
+    }
+
+    qDebug() << "quiz_image_dataid:" << quiz_image_dataid;
+
+    // 读取地图文件
+    QString json_file = ":/assets/question.json";
+    QFile file(json_file);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "Failed to open file for reading:" << json_file;
+        return;
+    }
+
+    QByteArray data = file.readAll();
+    file.close();
+
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    if (doc.isNull()) {
+        qDebug() << "Failed to parse JSON from file:" << json_file;
+        return;
+    }
+
+    QJsonObject json = doc.object();
+
+    // 使用 const_iterator
+    bool finded_answer;
+    for (QJsonObject::const_iterator it = json.constBegin(); it != json.constEnd(); ++it) {
+        QString key = it.key();
+        QJsonValue value = it.value();
+        if(key == quiz_image_dataid)
+        {
+            finded_answer = true;
+            qDebug() << "答案：" << value.toString();
+
+            // 匹配check按钮位置
+
+            // 点击输入框
+
+            // 开始输入答案
+
+            // 点击check按钮
+        }
+    }
+
+    if(!finded_answer){
+        // 截图上传
+    }
+
     ProcessHelper::programDelay(500);
     QApplication::processEvents();
     goto retryEnter;

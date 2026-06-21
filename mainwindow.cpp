@@ -1667,11 +1667,47 @@ void MainWindow::on_pushButton_answer_check_info_clicked()
 
     // 寻找LocalUserGroup
     quint64 lieDetectorGroup_p = Helper::findChild(Gplayer.p_uientity,"LieDetectorGroup");
+    qDebug() << QString("lieDetectorGroup_p:0x%1").arg(lieDetectorGroup_p, 0, 16);
 
     quint64 quiz_p = Helper::findChild(lieDetectorGroup_p,"quiz");
+    qDebug() << QString("quiz_p:0x%1").arg(quiz_p, 0, 16);
     if( quiz_p == 0){
         qDebug() << "quiz指针为空，问答检测界面不存在~";
         return;
+    }
+
+    // 子组件列表地址
+    uintptr_t listAddress = readLong(quiz_p + BASE::MODEntity::children);
+    if (!listAddress) {
+        qDebug() << "不存在子组件";
+        return;
+    }
+
+    uintptr_t myArrayAddress = readLong(listAddress + BASE::List::InternalArray);
+    if (!myArrayAddress) {
+        qDebug() << "不存在子组件";
+        return;
+    }
+
+    int32_t count = readInt(listAddress + BASE::List::size);
+    if (count <= 0 || count > 1000) {
+        qDebug() << "子组件数量异常";
+        return;
+    }
+
+    // 数据区起始地址
+    uintptr_t arrayStartAddress = myArrayAddress + BASE::InternalArray::Head;
+
+    for (int i = 0; i < count; ++i) {
+        // 子组件指针
+        uintptr_t compPtr = readLong(arrayStartAddress + i * 8);
+
+        if (compPtr && compPtr != 0) {
+            // 读取名称
+            QString name = GameStruct::readEntityName(compPtr);
+            qDebug() << i << name;
+            qDebug() << QString("地址:0x%1").arg(compPtr, 0, 16);
+        }
     }
 }
 

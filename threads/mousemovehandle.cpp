@@ -87,13 +87,14 @@ void MouseMoveHandle::checkMouseMove()
     quint64 on_change_screen_size = readLong(UIPopupManager + BASE::UIPopupManager::OnChangeScreenSize);
 
     if(on_change_screen_size == 0){
-        qDebug() << "滑鼠验证不存在";
+        // qDebug() << "滑鼠验证不存在";
         Gplayer.mousecheck_exists = false;
         ProcessHelper::programDelay(500);
         QApplication::processEvents();
         return;
     }
 
+    qDebug() << "发现滑鼠，即将处理~";
     Gplayer.mousecheck_exists = true;
 
     handleMouseCheck();
@@ -104,7 +105,7 @@ void MouseMoveHandle::checkMouseMove()
 
     qDebug() << "滑鼠验证结束~";
     Helper::console("滑鼠验证结束~");
-    ProcessHelper::programDelay(1500);
+    ProcessHelper::programDelay(500);
 }
 
 bool MouseMoveHandle::UIAntiMacroExists(quint64 list, quint64 head)
@@ -200,10 +201,10 @@ void MouseMoveHandle::handleMouseCheck()
         BASE::UIPopupManager_base,
         BASE::UIPopupManager_offset_lv1,
         BASE::UIPopupManager_offset_lv2);
-
     qDebug() << QString("UIPopupManager:0x%1").arg(UIPopupManager, 0, 16);
 
     quint64 on_change_screen_size = readLong(UIPopupManager + BASE::UIPopupManager::OnChangeScreenSize);
+    qDebug() << QString("on_change_screen_size:0x%1").arg(on_change_screen_size, 0, 16);
 
     if(on_change_screen_size == 0){
         qDebug() << "滑鼠验证不存在";
@@ -211,44 +212,109 @@ void MouseMoveHandle::handleMouseCheck()
     }
 
     quint64 uiantimacro = readLong(on_change_screen_size + 0x20);
+    qDebug() << QString("uiantimacro:0x%1").arg(uiantimacro, 0, 16);
+    if(uiantimacro == 0){
+        qDebug() << "滑鼠验证不存在";
+        return;
+    }
 
-    // 读取坐标
-    quint64 pos_list = readLong(uiantimacro + BASE::UIAntiMacro::posList);
-    int pos_count = readInt(pos_list + BASE::List::size);
-    quint64 pos_head = readLong(pos_list + BASE::List::InternalArray) + BASE::InternalArray::Head;
+    int log_index = 1;
 
     std::vector<cv::Point2f> raw_pos_list;
-    for(int i = 0; i < pos_count; i++){
-        quint64 cur_pos = pos_head + i * 8;
-        float pos_x = readFloat(cur_pos);
-        pos_x = std::round(pos_x * 100) / 100.0f;
-        float pos_y = readFloat(cur_pos + 4);
-        pos_y = std::round(pos_y * 100) / 100.0f;
-        raw_pos_list.push_back({pos_x,pos_y});
-    }
-
-    // 转换坐标
+    raw_pos_list.resize(330);
     mouse_pos_.clear();
-    mouse_pos_.resize(330);
-    for(int i = 0; i < 330; i++){
-        mouse_pos_[i] = to_pixel_coords(raw_pos_list[i]);
-    }
 
     // 主循环
     while(true){
-        quint64 mousecheck_pannel = readLong(UIPopupManager + BASE::UIPopupManager::OnChangeScreenSize);
-        if(mousecheck_pannel == 0 && false){
+        // 必须实时更新，因为提示框和滑鼠界面不一样
+        on_change_screen_size = readLong(UIPopupManager + BASE::UIPopupManager::OnChangeScreenSize);
+        qDebug() << QString("on_change_screen_size:0x%1").arg(on_change_screen_size, 0, 16);
+
+        if(on_change_screen_size == 0){
             qDebug() << "滑鼠验证不存在";
             return;
         }
 
-        int currentTick = readLong(uiantimacro + BASE::UIAntiMacro::currentTick);
+        uiantimacro = readLong(on_change_screen_size + 0x20);
+        qDebug() << QString("uiantimacro:0x%1").arg(uiantimacro, 0, 16);
+        if(uiantimacro == 0){
+            qDebug() << "滑鼠验证不存在";
+            return;
+        }
+
+        int readyTick = readInt(uiantimacro + BASE::UIAntiMacro::readyTick);
+        if(readyTick < 10){
+            qDebug() << "滑鼠界面尚未出现，继续等待中...";
+            ProcessHelper::programDelay(100);
+            ProcessHelper::handleEvents();
+            continue;
+        }
+
+        int currentTick = readInt(uiantimacro + BASE::UIAntiMacro::currentTick);
+        qDebug() << "currentTick:" << currentTick;
         if(currentTick < 0 || currentTick > 330){
             currentTick = 0;
         }
 
+        int currentStatus = readInt(uiantimacro + BASE::UIAntiMacro::currentStatus);
+
+        if(currentTick >= 330 && currentStatus > 0)
+        {
+            qDebug() << "滑鼠处理完毕，即将关闭滑鼠界面~";
+            // return;
+        }
+
+        if(currentTick < 1 && mouse_pos_.size() == 0){
+            // 转换坐标，读取坐标
+            quint64 pos_list = readLong(uiantimacro + BASE::UIAntiMacro::posList);
+            qDebug() << QString("pos_list:0x%1").arg(pos_list, 0, 16);
+            int pos_count = readInt(pos_list + BASE::List::size);
+            qDebug() << "坐标数量：" << pos_count;
+
+            if(pos_count < 1){
+                qDebug() << "鼠标轨迹数据异常，退出~";
+                return;
+            }
+
+            quint64 pos_head = readLong(pos_list + BASE::List::InternalArray) + BASE::InternalArray::Head;
+            qDebug() << QString("pos_head:0x%1").arg(pos_head, 0, 16);
+
+            qDebug() << "------------开始读取坐标------------";
+            raw_pos_list.resize(330);
+            for(int i = 0; i < 330; i++){
+                quint64 cur_pos = pos_head + i * 8;
+                float pos_x = readFloat(cur_pos);
+                pos_x = std::round(pos_x * 100) / 100.0f;
+                float pos_y = readFloat(cur_pos + 4);
+                pos_y = std::round(pos_y * 100) / 100.0f;
+                qDebug() << i << ":" << pos_x << "," << pos_y;
+                raw_pos_list[i] = cv::Point2f(pos_x,pos_y);
+            }
+            qDebug() << "------------读取坐标完毕------------";
+
+            // 转换坐标
+            qDebug() << "------------开始转换坐标------------";
+            mouse_pos_.clear();
+            mouse_pos_.resize(330);
+            for(int i = 0; i < 330; i++){
+                mouse_pos_[i] = to_pixel_coords(raw_pos_list[i]);
+                qDebug() << i << ":" << mouse_pos_[i].x << "," << mouse_pos_[i].y;
+            }
+            qDebug() << "------------转换坐标完毕------------";
+        }
+
+        if(currentTick < 1){
+            cv::Point2f start_pos = to_pixel_coords({0,0});
+            cv::Point2i start_target_pos = cv::Point2i(
+                static_cast<int>(start_pos.x + box_pos_x_),
+                static_cast<int>(start_pos.y + box_pos_y_));
+            int target_x = game_x + start_target_pos.x;
+            int target_y = game_y + start_target_pos.y;
+            // MSDriverPRO::mouseMoveTo(target_x, target_y);
+        }
+
         // 创建当前帧的日志文件
-        QString logFilePath = QString("%1/frame_%2.log").arg(save_dir).arg(currentTick, 6, 10, QChar('0'));
+        QString logFilePath = QString("%1/log_%2.log").arg(save_dir).arg(log_index, 6, 10, QChar('0'));
         QFile logFile(logFilePath);
         logFile.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream stream(&logFile);
@@ -257,11 +323,16 @@ void MouseMoveHandle::handleMouseCheck()
 
         if(now_time > 20000){
             stream << "滑鼠界面超时，退出\r\n";
+            qDebug() << "滑鼠界面超时，退出\r\n";
             break;
         }
 
         // 转换成游戏屏幕坐标
-        cv::Point2f raw_pos = mouse_pos_[currentTick];
+        int pos_index = 0;
+        if(currentTick){
+            pos_index = currentTick - 1;
+        }
+        cv::Point2f raw_pos = mouse_pos_[pos_index];
         cv::Point2i cur_target_pos = cv::Point2i(
             static_cast<int>(raw_pos.x + box_pos_x_),
             static_cast<int>(raw_pos.y + box_pos_y_));
@@ -270,7 +341,9 @@ void MouseMoveHandle::handleMouseCheck()
         QDateTime currentDateTime = QDateTime::currentDateTime();
         QString currentTime = currentDateTime.toString("yyyy-MM-dd hh:mm:ss");
         stream << "第" << currentTick << "帧" << " " << currentTime << "\r\n";
+        qDebug() << "第" << currentTick << "帧" << " " << currentTime << "\r\n";
         stream << "坐标:" << cur_target_pos.x << "," << cur_target_pos.y;
+        qDebug() << "坐标:" << cur_target_pos.x << "," << cur_target_pos.y;
         stream << "---------------------------------------------------------------------------------------\r\n";
 
         QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow(),
@@ -291,15 +364,16 @@ void MouseMoveHandle::handleMouseCheck()
                     2);
         cv::Point2i cursor_pos = {cur_target_pos.x - 8, cur_target_pos.y - 31};
         cv::circle(bgr_frame, cursor_pos, 10, cv::Scalar(0, 0, 0), -1);
-        QString save_path = QString("%1/frame_%2.jpg").arg(save_dir).arg(currentTick, 6, 10, QChar('0'));
+        QString save_path = QString("%1/log_%2.jpg").arg(save_dir).arg(log_index, 6, 10, QChar('0'));
         cv::imwrite(save_path.toStdString(), bgr_frame);
 
         int target_x = game_x + cur_target_pos.x;
         int target_y = game_y + cur_target_pos.y;
 
-        MSDriverPRO::mouseMoveTo(target_x, target_y);
+        // MSDriverPRO::mouseMoveTo(target_x, target_y);
 
         printMouseInfo(&stream);
+        log_index++;
         ProcessHelper::programDelay(10);
         ProcessHelper::handleEvents();
     }
@@ -314,14 +388,13 @@ void MouseMoveHandle::printMouseInfo(QTextStream* stream)
 
     quint64 ui_anti_macro = readPointer(
         Gplayer.p_assemblybase,
-        0xA8BF178,
-        0xB8,
-        0x0,
-        0x58,
+        BASE::UIPopupManager_base,
+        BASE::UIPopupManager_offset_lv1,
+        BASE::UIPopupManager_offset_lv2,
+        BASE::UIPopupManager::OnChangeScreenSize,
         0x20);
 
     *stream << QString("ui_anti_macro:0x%1").arg(ui_anti_macro, 0, 16) << "\r\n";
-
 
     quint64 plan_a = ui_anti_macro;
     quint64 plan_b = ui_anti_macro + 0x160;
@@ -375,6 +448,9 @@ void MouseMoveHandle::printPlanInfo(quint64 plan_p,QTextStream* stream)
     quint64 pos_head = readLong(posList + BASE::List::InternalArray) + BASE::InternalArray::Head;
     std::vector<cv::Point2f> pos_list;
     for(int i = 0; i < pos_count; i++){
+        if(i > 330){
+            break;
+        }
         quint64 cur_pos = pos_head + i * 8;
         float pos_x = readFloat(cur_pos);
         pos_x = std::round(pos_x * 100) / 100.0f;
@@ -388,6 +464,9 @@ void MouseMoveHandle::printPlanInfo(quint64 plan_p,QTextStream* stream)
     int mousepos_count = readInt(mousePosList + BASE::List::size);
     quint64 mousepos_head = readLong(mousePosList + BASE::List::InternalArray) + BASE::InternalArray::Head;
     for(int i = 0; i < mousepos_count; i++){
+        if(i > 330){
+            break;
+        }
         quint64 cur_pos = mousepos_head + i * 8;
         float pos_x = readFloat(cur_pos);
         pos_x = std::round(pos_x * 100) / 100.0f;

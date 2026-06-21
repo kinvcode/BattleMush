@@ -196,6 +196,7 @@ namespace BASE {
         static int posList = 0xC0;
         static int currentStatus = 0xD0;
         static int currentTick = 0xD8;
+        static int readyTick = 0xE0;
     };
 };
 
