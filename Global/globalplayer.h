@@ -116,7 +116,7 @@ public:
     bool need_hp_potion = false;
     bool need_mp_potion = false;
 
-    GameWindow game_window = {0,0,0,0};
+    GameWindow game_window = {0,0,1920,1080};
 private:
 
 };

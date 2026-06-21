@@ -980,17 +980,34 @@ retryEnter:
             qDebug() << "答案：" << value.toString();
 
             // 匹配check按钮位置
+            MatchTemp tempmatch(":assets/templat/check_btn_black");
+            cv::Point check_coor;
+            tempmatch.setGrayscale();
+            tempmatch.setThreshold(120,255);
+            if(tempmatch.match(check_coor)){
+                qDebug() << "check按钮位置:" << check_coor.x << "," << check_coor.y;
 
-            // 点击输入框
+                // 点击输入框
+                MSKM::humanMove(check_coor.x + 74, check_coor.y - 22);
+                MSDriverPRO::mouseLeftClick();
 
-            // 开始输入答案
+                // 开始输入答案
 
-            // 点击check按钮
+                ProcessHelper::programDelay(500);
+                // 点击check按钮
+                MSKM::humanMove(check_coor.x + 28, check_coor.y + 13);
+                MSDriverPRO::mouseLeftClick();
+            }
+
+
+
         }
     }
 
     if(!finded_answer){
         // 截图上传
+        // 截图 save_path
+        // 问题资源 quiz_image_dataid
     }
 
     ProcessHelper::programDelay(500);

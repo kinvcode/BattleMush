@@ -63,5 +63,6 @@
         <file>assets/maps/map_27d886ad-d3d7-416e-b246-e49d3738e3dd.json</file>
         <file>assets/maps/map_8b2384ca-5ada-4464-b482-887e1fc99205.json</file>
         <file>assets/question.json</file>
+        <file>assets/templat/check_btn_black.png</file>
     </qresource>
 </RCC>

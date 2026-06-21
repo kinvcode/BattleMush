@@ -24,6 +24,7 @@
 #include "widgets/taskeditdialog.h"
 #include "utils/data.h"
 #include "utils/mousetrack.h"
+#include "utils/matchtemp.h"
 
 // 测试头文件
 #include "global/globalplayer.h"
