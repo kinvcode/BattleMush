@@ -1902,3 +1902,29 @@ void MainWindow::on_pushButton_mousetrack_info_clicked()
     }
 }
 
+
+void MainWindow::on_pushButton_get_user_screen_pos_clicked()
+{
+    COORDINATE pos{41.35, -4.24, 0.0f};
+
+    cv::Point screen;
+
+    if(Gplayer.p_gamepid == 0 || Gplayer.p_assemblybase == 0){
+        DebugOutput::out("游戏进程不存在");
+        Helper::console("游戏进程不存在");
+        return;
+    }
+
+    quint64 p_camera = readPointer(Gplayer.p_assemblybase,
+        BASE::Camera_base,
+        BASE::Camera_offset_lv1,
+        BASE::Camera_offset_lv2,
+        BASE::MODPlayerMain::CinemachineBrain,
+        BASE::CinemachineBrain::Camera, 0x10);
+
+    if (CameraTool::WorldToScreen(p_camera, pos, screen))
+    {
+        qDebug() << "Screen:" << screen.x << screen.y;
+    }
+}
+

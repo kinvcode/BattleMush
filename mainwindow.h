@@ -199,6 +199,8 @@ private slots:
 
     void on_pushButton_mousetrack_info_clicked();
 
+    void on_pushButton_get_user_screen_pos_clicked();
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

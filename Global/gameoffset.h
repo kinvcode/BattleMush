@@ -21,6 +21,10 @@ namespace BASE {
     static int TMP_UpdateManager_offset_lv2 = 0x0;
     static int TMP_UpdateManager_List = 0x38;
 
+    static int UIPopupManager_base = 0xA8BF178;
+    static int UIPopupManager_offset_lv1 = 0xB8;
+    static int UIPopupManager_offset_lv2 = 0x0;
+
     namespace Dictionary{
         static int InternalArray_entries = 0x18;
         static int count = 0x20;
@@ -182,6 +186,16 @@ namespace BASE {
 
     namespace TextMeshPro{
         static int m_text = 0xE0;
+    };
+
+    namespace UIPopupManager{
+        static int OnChangeScreenSize = 0x58;
+    };
+
+    namespace UIAntiMacro{
+        static int posList = 0xC0;
+        static int currentStatus = 0xD0;
+        static int currentTick = 0xD8;
     };
 };
 

@@ -77,55 +77,46 @@ void MouseMoveHandle::process()
 
 void MouseMoveHandle::checkMouseMove()
 {
-    bool find_mousemove = false;
+    // 提前读取数据
+    quint64 UIPopupManager = readPointer(
+        Gplayer.p_assemblybase,
+        BASE::UIPopupManager_base,
+        BASE::UIPopupManager_offset_lv1,
+        BASE::UIPopupManager_offset_lv2);
 
-    quint64 text_list = readPointer(Gplayer.p_assemblybase,
-                                    BASE::TMP_UpdateManager_base,
-                                    BASE::TMP_UpdateManager_offset_lv1,
-                                    BASE::TMP_UpdateManager_offset_lv2,
-                                    BASE::TMP_UpdateManager_List);
-    quint64 text_head = readLong(text_list + BASE::List::InternalArray) + BASE::InternalArray::Head;
+    quint64 on_change_screen_size = readLong(UIPopupManager + BASE::UIPopupManager::OnChangeScreenSize);
 
-    if(Gplayer.mousecheck_exists){
-
-        logMouseCheck();
-        // MouseTrack tracktest;
-        // tracktest.realTrackTest();
-        qDebug() << "滑鼠验证结束~";
-        Helper::console("滑鼠验证结束~");
-        ProcessHelper::programDelay(10000);
+    if(on_change_screen_size == 0){
+        qDebug() << "滑鼠验证不存在";
+        Gplayer.mousecheck_exists = false;
+        ProcessHelper::programDelay(500);
+        QApplication::processEvents();
         return;
     }
 
-    // 尋找透明圖形
-    if(!Gplayer.p_assemblybase){
-        qDebug() << "先运行一次，再获取数据";
-        ProcessHelper::programDelay(1000);
-        return;
-    }
+    Gplayer.mousecheck_exists = true;
 
-    find_mousemove = UIAntiMacroExists(text_list, text_head);
+    handleMouseCheck();
 
-    // 判断是否存在
-    if(find_mousemove){
-        Gplayer.mousecheck_exists = true;
+    // AI识别
+    // MouseTrack tracktest;
+    // tracktest.realTrackTest();
 
-        // MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
-        // cv::Point title_coor;
-        // if(tempmatch.match(title_coor)){
-        //     qDebug() << "发现滑鼠验证界面！！！";
-        //     Helper::console("发现滑鼠验证界面！！！");
-        //     Gplayer.mousecheck_exists = true;
-        //     return;
-        // }
-    }
-    ProcessHelper::programDelay(500);
-    // 控制频率
-    QApplication::processEvents();
+    qDebug() << "滑鼠验证结束~";
+    Helper::console("滑鼠验证结束~");
+    ProcessHelper::programDelay(1500);
 }
 
 bool MouseMoveHandle::UIAntiMacroExists(quint64 list, quint64 head)
 {
+    // quint64 text_list = readPointer(Gplayer.p_assemblybase,
+    //                                 BASE::TMP_UpdateManager_base,
+    //                                 BASE::TMP_UpdateManager_offset_lv1,
+    //                                 BASE::TMP_UpdateManager_offset_lv2,
+    //                                 BASE::TMP_UpdateManager_List);
+    // quint64 text_head = readLong(text_list + BASE::List::InternalArray) + BASE::InternalArray::Head;
+
+
     int text_count = readInt(list + BASE::List::size);
     for(int i = 0; i < text_count; i++){
         quint64 text_mesh_pro = readLong(head + i * 8);
@@ -137,22 +128,28 @@ bool MouseMoveHandle::UIAntiMacroExists(quint64 list, quint64 head)
     return false;
 }
 
-void MouseMoveHandle::logMouseCheck()
+cv::Point2f MouseMoveHandle::to_pixel_coords(cv::Point2f pos)
 {
-    quint64 text_list = readPointer(Gplayer.p_assemblybase,
-                                    BASE::TMP_UpdateManager_base,
-                                    BASE::TMP_UpdateManager_offset_lv1,
-                                    BASE::TMP_UpdateManager_offset_lv2,
-                                    BASE::TMP_UpdateManager_List);
-    quint64 text_head = readLong(text_list + BASE::List::InternalArray) + BASE::InternalArray::Head;
+    cv::Point2f res = {0,0};
+    res.x = (pos.x - range_.x) / (range_.y - range_.x) * box_width_;
+    res.y = (pos.y - range_.x) / (range_.y - range_.x) * box_height_;
+    return res;
+}
+
+void MouseMoveHandle::handleMouseCheck()
+{
+    if(Gplayer.p_assemblybase == 0)
+    {
+        qDebug() << "游戏尚未初始化";
+        return;
+    }
 
     // 时间戳
     QElapsedTimer run_start_time;
     run_start_time.start();
-    int frame_index = 1;
 
     QDateTime logDateTime = QDateTime::currentDateTime();
-    QString logTimeString = logDateTime.toString("hh-mm-ss");
+    QString logTimeString = logDateTime.toString("yyyy-MM-dd-hh-mm-ss");
     QString save_dir = QCoreApplication::applicationDirPath() + "/output/mousecheck/" + logTimeString;
 
     // 获取目录名和父目录
@@ -197,30 +194,90 @@ void MouseMoveHandle::logMouseCheck()
 
     QScreen* m_pScreen = QGuiApplication::primaryScreen();
 
-    bool find_mousemove = false;
+    // 提前读取数据
+    quint64 UIPopupManager = readPointer(
+        Gplayer.p_assemblybase,
+        BASE::UIPopupManager_base,
+        BASE::UIPopupManager_offset_lv1,
+        BASE::UIPopupManager_offset_lv2);
 
+    qDebug() << QString("UIPopupManager:0x%1").arg(UIPopupManager, 0, 16);
+
+    quint64 on_change_screen_size = readLong(UIPopupManager + BASE::UIPopupManager::OnChangeScreenSize);
+
+    if(on_change_screen_size == 0){
+        qDebug() << "滑鼠验证不存在";
+        return;
+    }
+
+    quint64 uiantimacro = readLong(on_change_screen_size + 0x20);
+
+    // 读取坐标
+    quint64 pos_list = readLong(uiantimacro + BASE::UIAntiMacro::posList);
+    int pos_count = readInt(pos_list + BASE::List::size);
+    quint64 pos_head = readLong(pos_list + BASE::List::InternalArray) + BASE::InternalArray::Head;
+
+    std::vector<cv::Point2f> raw_pos_list;
+    for(int i = 0; i < pos_count; i++){
+        quint64 cur_pos = pos_head + i * 8;
+        float pos_x = readFloat(cur_pos);
+        pos_x = std::round(pos_x * 100) / 100.0f;
+        float pos_y = readFloat(cur_pos + 4);
+        pos_y = std::round(pos_y * 100) / 100.0f;
+        raw_pos_list.push_back({pos_x,pos_y});
+    }
+
+    // 转换坐标
+    mouse_pos_.clear();
+    mouse_pos_.resize(330);
+    for(int i = 0; i < 330; i++){
+        mouse_pos_[i] = to_pixel_coords(raw_pos_list[i]);
+    }
+
+    // 主循环
     while(true){
-
-        find_mousemove = UIAntiMacroExists(text_list, text_head);
-        if(!find_mousemove){
-            qDebug() << "滑鼠界面不存在，退出";
-            break;
+        quint64 mousecheck_pannel = readLong(UIPopupManager + BASE::UIPopupManager::OnChangeScreenSize);
+        if(mousecheck_pannel == 0 && false){
+            qDebug() << "滑鼠验证不存在";
+            return;
         }
+
+        int currentTick = readLong(uiantimacro + BASE::UIAntiMacro::currentTick);
+        if(currentTick < 0 || currentTick > 330){
+            currentTick = 0;
+        }
+
+        // 创建当前帧的日志文件
+        QString logFilePath = QString("%1/frame_%2.log").arg(save_dir).arg(currentTick, 6, 10, QChar('0'));
+        QFile logFile(logFilePath);
+        logFile.open(QIODevice::WriteOnly | QIODevice::Text);
+        QTextStream stream(&logFile);
 
         int now_time = run_start_time.elapsed();
 
-        if(now_time > 15000){
-            qDebug() << "滑鼠界面超时，退出";
+        if(now_time > 20000){
+            stream << "滑鼠界面超时，退出\r\n";
             break;
         }
 
-        qDebug() << "---------------------------------------------------------------------------------------";
+        // 转换成游戏屏幕坐标
+        cv::Point2f raw_pos = mouse_pos_[currentTick];
+        cv::Point2i cur_target_pos = cv::Point2i(
+            static_cast<int>(raw_pos.x + box_pos_x_),
+            static_cast<int>(raw_pos.y + box_pos_y_));
+
+        stream << "---------------------------------------------------------------------------------------\r\n";
         QDateTime currentDateTime = QDateTime::currentDateTime();
         QString currentTime = currentDateTime.toString("yyyy-MM-dd hh:mm:ss");
-        qDebug() << "第" << frame_index << "帧" << " " << currentTime;
-        qDebug() << "---------------------------------------------------------------------------------------";
+        stream << "第" << currentTick << "帧" << " " << currentTime << "\r\n";
+        stream << "坐标:" << cur_target_pos.x << "," << cur_target_pos.y;
+        stream << "---------------------------------------------------------------------------------------\r\n";
 
-        QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow(), game_x, game_y, 1280, 720);
+        QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow(),
+                                                    game_x + 8,
+                                                    game_y + 31,
+                                                    1280,
+                                                    720);
         cv::Mat bgr_frame;
         QImage image = cur_capture.toImage();
         cv::Mat frame(image.height(), image.width(), CV_8UC4, const_cast<uchar*>(image.bits()), image.bytesPerLine());
@@ -232,21 +289,26 @@ void MouseMoveHandle::logMouseCheck()
                     0.6,
                     cv::Scalar(0, 0, 255),
                     2);
-        QString save_path = QString("%1/frame_%2.jpg").arg(save_dir).arg(frame_index, 6, 10, QChar('0'));
+        cv::Point2i cursor_pos = {cur_target_pos.x - 8, cur_target_pos.y - 31};
+        cv::circle(bgr_frame, cursor_pos, 10, cv::Scalar(0, 0, 0), -1);
+        QString save_path = QString("%1/frame_%2.jpg").arg(save_dir).arg(currentTick, 6, 10, QChar('0'));
         cv::imwrite(save_path.toStdString(), bgr_frame);
 
-        printMouseInfo();
-        frame_index++;
-        ProcessHelper::programDelay(500);
+        int target_x = game_x + cur_target_pos.x;
+        int target_y = game_y + cur_target_pos.y;
+
+        MSDriverPRO::mouseMoveTo(target_x, target_y);
+
+        printMouseInfo(&stream);
+        ProcessHelper::programDelay(10);
         ProcessHelper::handleEvents();
     }
 }
 
-void MouseMoveHandle::printMouseInfo()
+void MouseMoveHandle::printMouseInfo(QTextStream* stream)
 {
     if(Gplayer.p_gamepid == 0 || Gplayer.p_assemblybase == 0){
-        DebugOutput::out("游戏进程不存在");
-        Helper::console("游戏进程不存在");
+        *stream << "游戏进程不存在\r\n";
         return;
     }
 
@@ -258,20 +320,20 @@ void MouseMoveHandle::printMouseInfo()
         0x58,
         0x20);
 
-    qDebug() << QString("ui_anti_macro:0x%1").arg(ui_anti_macro, 0, 16);
+    *stream << QString("ui_anti_macro:0x%1").arg(ui_anti_macro, 0, 16) << "\r\n";
 
 
     quint64 plan_a = ui_anti_macro;
     quint64 plan_b = ui_anti_macro + 0x160;
 
     // 打印数据
-    qDebug() << QString("PlanA:0x%1").arg(plan_a, 0, 16);
-    printPlanInfo(plan_a);
-    qDebug() << QString("PlanB:0x%1").arg(plan_b, 0, 16);
-    printPlanInfo(plan_b);
+    *stream << QString("PlanA:0x%1").arg(plan_a, 0, 16) << "\r\n";
+    printPlanInfo(plan_a,stream);
+    *stream << QString("PlanB:0x%1").arg(plan_b, 0, 16) << "\r\n";
+    printPlanInfo(plan_b,stream);
 }
 
-void MouseMoveHandle::printPlanInfo(quint64 plan_p)
+void MouseMoveHandle::printPlanInfo(quint64 plan_p,QTextStream* stream)
 {
     int Id = readInt(plan_p + 0x38);
     bool IsLoadComplete = readByte(plan_p + 0x3C);
@@ -293,20 +355,20 @@ void MouseMoveHandle::printPlanInfo(quint64 plan_p)
     cursor.x = readInt(plan_p + 0x14C);
     cursor.y = readInt(plan_p + 0x150);
 
-    qDebug() << "Id:" << Id;
-    qDebug() << "IsLoadComplete:" << IsLoadComplete;
-    qDebug() << "IsDestroy:" << IsDestroy;
-    qDebug() << "IsForceClose:" << IsForceClose;
-    qDebug() << "currentStatus:" << currentStatus;
-    qDebug() << "currentTick:" << currentTick;
-    qDebug() << "readyTick:" << readyTick;
-    qDebug() << "randomCheckColorTick:" << randomCheckColorTick;
-    qDebug() << "startTick:" << startTick;
-    qDebug() << "setResultTick:" << setResultTick;
-    qDebug() << "level:" << level;
-    qDebug() << "detectId:" << detectId;
-    qDebug() << "expireTime:" << expireTime;
-    qDebug() << "cursor:" << cursor.x << "," << cursor.y;
+    *stream << "Id:" << Id << "\r\n";
+    *stream << "IsLoadComplete:" << IsLoadComplete << "\r\n";
+    *stream << "IsDestroy:" << IsDestroy << "\r\n";
+    *stream << "IsForceClose:" << IsForceClose << "\r\n";
+    *stream << "currentStatus:" << currentStatus << "\r\n";
+    *stream << "currentTick:" << currentTick << "\r\n";
+    *stream << "readyTick:" << readyTick << "\r\n";
+    *stream << "randomCheckColorTick:" << randomCheckColorTick << "\r\n";
+    *stream << "startTick:" << startTick << "\r\n";
+    *stream << "setResultTick:" << setResultTick << "\r\n";
+    *stream << "level:" << level << "\r\n";
+    *stream << "detectId:" << detectId << "\r\n";
+    *stream << "expireTime:" << expireTime << "\r\n";
+    *stream << "cursor:" << cursor.x << "," << cursor.y << "\r\n";
 
     quint64 posList = readLong(plan_p + 0xC0);
     int pos_count = readInt(posList + BASE::List::size);
@@ -318,7 +380,7 @@ void MouseMoveHandle::printPlanInfo(quint64 plan_p)
         pos_x = std::round(pos_x * 100) / 100.0f;
         float pos_y = readFloat(cur_pos + 4);
         pos_y = std::round(pos_y * 100) / 100.0f;
-        qDebug() << i << "{" << pos_x << "," << pos_y << "}";
+        *stream << i << "{" << pos_x << "," << pos_y << "}\r\n";
         pos_list.push_back({pos_x,pos_y});
     }
 
@@ -331,6 +393,6 @@ void MouseMoveHandle::printPlanInfo(quint64 plan_p)
         pos_x = std::round(pos_x * 100) / 100.0f;
         float pos_y = readFloat(cur_pos + 4);
         pos_y = std::round(pos_y * 100) / 100.0f;
-        qDebug() << i << "{" << pos_x << "," << pos_y << "}";
+        *stream << i << "{" << pos_x << "," << pos_y << "}\r\n";
     }
 }

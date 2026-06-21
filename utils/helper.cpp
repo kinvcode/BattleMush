@@ -2855,6 +2855,20 @@ void CameraTool::WorldToClip(const COORDINATE &pos, const Matrix4x4 &view, const
     cy = vx*proj.m[1] + vy*proj.m[5] + vz*proj.m[9]  + vw*proj.m[13];
     cz = vx*proj.m[2] + vy*proj.m[6] + vz*proj.m[10] + vw*proj.m[14];
     cw = vx*proj.m[3] + vy*proj.m[7] + vz*proj.m[11] + vw*proj.m[15];
+/*
+1280 * 720的分辨率，矩阵数据如下。不能直接用，-41.02 2.84这两个数据是会变化的
+ViewMatrix
+1.00 0.00 0.00 0.00
+0.00 1.00 0.00 0.00
+0.00 0.00 -1.00 0.00
+-41.02 2.84 -30.00 1.00
+
+ProjectionMatrix
+0.16 0.00 0.00 0.00
+0.00 0.28 0.00 0.00
+0.00 0.00 0.00 0.00
+0.00 0.00 -1.00 1.00
+*/
 }
 
 bool CameraTool::WorldToScreen(uintptr_t cam, const COORDINATE &pos, cv::Point &out)
