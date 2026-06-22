@@ -25,6 +25,8 @@ private:
     int box_pos_y_ = 218;
     int box_width_ = 500;
     int box_height_ = 335;
+    cv::Point2f Xrange_ = {-0.7,0.7};
+    cv::Point2f Yrange_ = {-0.5,0.5};
     cv::Point2f range_ = {-0.5,0.5};
 
 private:

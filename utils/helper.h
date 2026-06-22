@@ -58,6 +58,8 @@ public:
 
     // 调整窗口大小
 
+    static double getSystemGDI();
+
 signals:
     void sendWarning(QString msg);
 };
@@ -287,7 +289,7 @@ public:
 
 class MSKM{
 public:
-    static void humanMove(int targetX, int targetY);
+    // static void humanMove(int targetX, int targetY);
 
     static void inputNum(int num);
 };

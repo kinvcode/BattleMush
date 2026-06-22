@@ -24,6 +24,8 @@ public:
 protected:
     void keyPressEvent(QKeyEvent *event) override;
     QString scanCodeToString(int sc);
+    int scanCodeToUSBCode(int sc);
+    QString usbCodeToString(int usbCode);
 private:
 
 };

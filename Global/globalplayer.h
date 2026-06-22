@@ -2,6 +2,7 @@
 #define GLOBALPLAYER_H
 #include <QObject>
 #include "global/struct.h"
+#include <windows.h>
 
 class GlobalPlayer : public QObject
 {
@@ -13,6 +14,9 @@ public:
         static GlobalPlayer instance;
         return &instance;
     }
+
+    // 键鼠驱动句柄
+    HANDLE MSDK_HANDLE = NULL;
 
     // 警报
     bool show_warning = false;

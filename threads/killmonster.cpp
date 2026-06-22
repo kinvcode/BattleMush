@@ -14,6 +14,7 @@
 #include "mainwindow.h"
 #include "utils/matchtemp.h"
 #include "utils/mousetrack.h"
+#include "driver/msdk/msdkDriver.h"
 
 using namespace Mem;
 
@@ -195,7 +196,7 @@ void KillMonster::process()
         }
 
         // 检查键盘
-        if ((GetKeyState(VK_NUMLOCK) & 1)) MSDriverPRO::keyboardClick(0x45);
+        // if ((GetKeyState(VK_NUMLOCK) & 1)) MSDK::keyPress(0x45);
 
         if(Gplayer.DIED){
             // 处理死亡
@@ -550,7 +551,7 @@ void KillMonster::skillRecast()
                 QApplication::processEvents();
             }
 
-            MSDriverPRO::keyboardClick(m_recast_buff1_keycode, 1);
+            MSDK::keyPress(m_recast_buff1_keycode, 1);
             Helper::console("BUFF1已按");
 
             m_recast_buff1_lasttime = m_timer.elapsed() / 1000;
@@ -574,7 +575,7 @@ void KillMonster::skillRecast()
                 QApplication::processEvents();
             }
 
-            MSDriverPRO::keyboardClick(m_recast_buff2_keycode, 1);
+            MSDK::keyPress(m_recast_buff2_keycode, 1);
             Helper::console("BUFF1已按");
 
             m_recast_buff2_lasttime = m_timer.elapsed() / 1000;
@@ -598,7 +599,7 @@ void KillMonster::skillRecast()
                 QApplication::processEvents();
             }
 
-            MSDriverPRO::keyboardClick(m_recast_buff3_keycode, 1);
+            MSDK::keyPress(m_recast_buff3_keycode, 1);
             Helper::console("BUFF1已按");
 
             m_recast_buff3_lasttime = m_timer.elapsed() / 1000;
@@ -622,7 +623,7 @@ void KillMonster::skillRecast()
                 QApplication::processEvents();
             }
 
-            MSDriverPRO::keyboardClick(m_recast_buff4_keycode, 1);
+            MSDK::keyPress(m_recast_buff4_keycode, 1);
             Helper::console("BUFF4已按");
 
             m_recast_buff4_lasttime = m_timer.elapsed() / 1000;
@@ -646,7 +647,7 @@ void KillMonster::skillRecast()
                 QApplication::processEvents();
             }
 
-            MSDriverPRO::keyboardClick(m_recast_buff5_keycode, 1);
+            MSDK::keyPress(m_recast_buff5_keycode, 1);
             Helper::console("BUFF1已按");
 
             m_recast_buff5_lasttime = m_timer.elapsed() / 1000;
@@ -977,30 +978,33 @@ retryEnter:
         if(key == quiz_image_dataid)
         {
             finded_answer = true;
-            qDebug() << "答案：" << value.toString();
+            QString answer_text = value.toString();
+            qDebug() << "答案：" << answer_text;
 
             // 匹配check按钮位置
-            MatchTemp tempmatch(":assets/templat/check_btn_black");
-            cv::Point check_coor;
+            MatchTemp tempmatch(":assets/templat/answer_check_text");
             tempmatch.setGrayscale();
             tempmatch.setThreshold(120,255);
+            cv::Point check_coor;
             if(tempmatch.match(check_coor)){
                 qDebug() << "check按钮位置:" << check_coor.x << "," << check_coor.y;
 
                 // 点击输入框
-                MSKM::humanMove(check_coor.x + 74, check_coor.y - 22);
-                MSDriverPRO::mouseLeftClick();
-
-                // 开始输入答案
+                MSDK::humanMove(check_coor.x + 82, check_coor.y - 22);
+                MSDK::LeftDoubleClick();
 
                 ProcessHelper::programDelay(500);
+
+                // 开始输入答案
+                MSDK::KeyInputUnicode(answer_text);
+
+                ProcessHelper::programDelay(1500);
                 // 点击check按钮
-                MSKM::humanMove(check_coor.x + 28, check_coor.y + 13);
-                MSDriverPRO::mouseLeftClick();
+                MSDK::humanMove(check_coor.x + 10, check_coor.y + 2);
+                MSDK::LeftDoubleClick();
             }
 
-
-
+            break;
         }
     }
 
@@ -1008,6 +1012,7 @@ retryEnter:
         // 截图上传
         // 截图 save_path
         // 问题资源 quiz_image_dataid
+        qDebug() << "将问题上传到题库";
     }
 
     ProcessHelper::programDelay(500);
@@ -1018,7 +1023,7 @@ retryEnter:
 void KillMonster::runneKeyboard()
 {
     // 按上键触发指令
-    MSDriverPRO::keyboardClick(MSKeyboard_UpArrow,1);
+    MSDK::keyPress(Keyboard_UpArrow,1);
 
     ProcessHelper::programDelay(300);
     QApplication::processEvents();
@@ -1081,16 +1086,16 @@ void KillMonster::runneKeyboard()
     for(int i = 0; i < 4; i++){
         if(arrows[i] == "467d3efd79eb46368dcb17a6d891ca1a"){
             qDebug() << "指令：左键";
-            MSDriverPRO::keyboardClick(MSKeyboard_LeftArrow,1);
+            MSDK::keyPress(Keyboard_LeftArrow,1);
         }else if(arrows[i] == "bdcd80c306884d58be078cd31b33ac02"){
             qDebug() << "指令：右键";
-            MSDriverPRO::keyboardClick(MSKeyboard_RightArrow,1);
+            MSDK::keyPress(Keyboard_RightArrow,1);
         }else if(arrows[i] == "d74418eb49f44475953e75c7df39f01f"){
             qDebug() << "指令：上键";
-            MSDriverPRO::keyboardClick(MSKeyboard_UpArrow,1);
+            MSDK::keyPress(Keyboard_UpArrow,1);
         }else if(arrows[i] == "997c024d824e4c60995d461f718f1e86"){
             qDebug() << "指令：下键";
-            MSDriverPRO::keyboardClick(MSKeyboard_DownArrow,1);
+            MSDK::keyPress(Keyboard_DownArrow,1);
         }
 
         ProcessHelper::randomDelay(300,500);
@@ -1839,7 +1844,7 @@ void KillMonster::moveToRoomByUUID(const QString &uuid)
             QApplication::processEvents();
 
             qDebug() << "切换地图中...";
-            MSDriverPRO::keyboardClick(MSKeyboard_UpArrow, 1);
+            MSDK::keyPress(Keyboard_UpArrow, 1);
             ProcessHelper::programDelay(1500);
             QApplication::processEvents();
             return;
@@ -1910,7 +1915,7 @@ void KillMonster::buyPotion()
     if(cur_roomnode.type == 0){
         qDebug() << "当前未在城镇，准备使用回城卷轴~";
         int homekey = Gconfig.getValue("bindkey/gohome").toInt();
-        MSDriverPRO::keyboardClick(homekey,1);
+        MSDK::keyPress(homekey,1);
         ProcessHelper::programDelay(1500);
         QApplication::processEvents();
         return;
@@ -1949,7 +1954,7 @@ void KillMonster::buyPotion()
                 QApplication::processEvents();
 
                 qDebug() << "切换地图中...";
-                MSDriverPRO::keyboardClick(MSKeyboard_UpArrow, 1);
+                MSDK::keyPress(Keyboard_UpArrow, 1);
                 ProcessHelper::programDelay(1500);
                 QApplication::processEvents();
                 return;
@@ -2092,8 +2097,8 @@ void KillMonster::potionShopBuyItem(QString npc)
     }
 
     qDebug() << "选择NPC";
-    MSKM::humanMove(screen_coor.x, screen_coor.y);
-    MSDriverPRO::mouseLeftClick();
+    MSDK::humanMove(screen_coor.x, screen_coor.y);
+    MSDK::LeftClick();
     ProcessHelper::programDelay(1000);
     QApplication::processEvents();
 
@@ -2102,7 +2107,7 @@ void KillMonster::potionShopBuyItem(QString npc)
     cv::Point leave_coor;
     if(tempmatch.match(leave_coor)){
         qDebug() << "选择药水";
-        MSKM::humanMove(560, 400);
+        MSDK::humanMove(560, 400);
         ProcessHelper::programDelay(500);
 
         // 如果滚动条不在顶端
@@ -2121,7 +2126,7 @@ void KillMonster::potionShopBuyItem(QString npc)
             int up_times = position / 22 + 3;
 
             for(int i = 0; i < up_times; i++){
-                MSDriverPRO::mouseWheel(1);
+                MSDK::MouseWheel(1);
                 ProcessHelper::programDelay(300);
             }
         }
@@ -2171,29 +2176,29 @@ void KillMonster::potionShopBuyItem(QString npc)
                 cv::Point redpotion_coor;
                 if(match_redpotion.match(redpotion_coor)){
                     qDebug() << "购买血药";
-                    MSKM::humanMove(redpotion_coor.x + 120, redpotion_coor.y + 25);
+                    MSDK::humanMove(redpotion_coor.x + 120, redpotion_coor.y + 25);
                     ProcessHelper::programDelay(200);
-                    MSDriverPRO::mouseLeftClick();
+                    MSDK::LeftClick();
                     ProcessHelper::programDelay(50);
-                    MSDriverPRO::mouseLeftClick();
+                    MSDK::LeftClick();
                     ProcessHelper::programDelay(200);
 
                     MatchTemp match_ok(":assets/templat/potion_shop/ok");
                     cv::Point ok_coor;
                     if(match_ok.match(ok_coor)){
                         qDebug() << "点击输入框";
-                        MSKM::humanMove(500, 404);
-                        MSDriverPRO::mouseLeftClick();
+                        MSDK::humanMove(500, 404);
+                        MSDK::LeftClick();
                         ProcessHelper::programDelay(500);
 
                         qDebug() << "输入购买数量";
-                        // MSDriverPRO::keyboardClick(MSKeyboard_1,1);
+                        // MSDK::keyPress(MSKeyboard_1,1);
                         MSKM::inputNum(hp_num);
                         ProcessHelper::programDelay(500);
 
                         qDebug() << "确认购买";
-                        MSKM::humanMove(ok_coor.x + 30, ok_coor.y + 10);
-                        MSDriverPRO::mouseLeftClick();
+                        MSDK::humanMove(ok_coor.x + 30, ok_coor.y + 10);
+                        MSDK::LeftClick();
                         qDebug() << "购买动作执行完毕，等待1秒";
                         ProcessHelper::programDelay(1000);
                     }
@@ -2249,29 +2254,29 @@ void KillMonster::potionShopBuyItem(QString npc)
                 cv::Point redpotion_coor;
                 if(match_redpotion.match(redpotion_coor)){
                     qDebug() << "购买蓝药";
-                    MSKM::humanMove(redpotion_coor.x + 120, redpotion_coor.y + 25);
+                    MSDK::humanMove(redpotion_coor.x + 120, redpotion_coor.y + 25);
                     ProcessHelper::programDelay(200);
-                    MSDriverPRO::mouseLeftClick();
+                    MSDK::LeftClick();
                     ProcessHelper::programDelay(50);
-                    MSDriverPRO::mouseLeftClick();
+                    MSDK::LeftClick();
                     ProcessHelper::programDelay(200);
 
                     MatchTemp match_ok(":assets/templat/potion_shop/ok");
                     cv::Point ok_coor;
                     if(match_ok.match(ok_coor)){
                         qDebug() << "点击输入框";
-                        MSKM::humanMove(500, 404);
-                        MSDriverPRO::mouseLeftClick();
+                        MSDK::humanMove(500, 404);
+                        MSDK::LeftClick();
                         ProcessHelper::programDelay(500);
 
                         qDebug() << "输入购买数量";
-                        // MSDriverPRO::keyboardClick(MSKeyboard_1,1);
+                        // MSDK::keyPress(MSKeyboard_1,1);
                         MSKM::inputNum(mp_num);
                         ProcessHelper::programDelay(500);
 
                         qDebug() << "确认购买";
-                        MSKM::humanMove(ok_coor.x + 30, ok_coor.y + 10);
-                        MSDriverPRO::mouseLeftClick();
+                        MSDK::humanMove(ok_coor.x + 30, ok_coor.y + 10);
+                        MSDK::LeftClick();
                         qDebug() << "购买动作执行完毕，等待1秒";
                         ProcessHelper::programDelay(1000);
                     }
@@ -2295,14 +2300,14 @@ void KillMonster::potionShopBuyItem(QString npc)
         if(match_ok.match(ok_coor)){
             ProcessHelper::programDelay(5000);
             qDebug() << "关闭确认框";
-            MSKM::humanMove(ok_coor.x + 40, ok_coor.y + 15);
-            MSDriverPRO::mouseLeftClick();
+            MSDK::humanMove(ok_coor.x + 40, ok_coor.y + 15);
+            MSDK::LeftClick();
             ProcessHelper::programDelay(3000);
         }
 
         qDebug() << "关闭商店";
-        MSKM::humanMove(leave_coor.x + 40, leave_coor.y + 11);
-        MSDriverPRO::mouseLeftClick();
+        MSDK::humanMove(leave_coor.x + 40, leave_coor.y + 11);
+        MSDK::LeftClick();
         ProcessHelper::programDelay(1000);
         QApplication::processEvents();
     }else{
@@ -2329,9 +2334,9 @@ void KillMonster::handleDied()
     cv::Point died_ok;
     if(tempmatch.match(died_ok)){
         qDebug() << "点击确定";
-        MSKM::humanMove(died_ok.x + 27, died_ok.y + 10);
+        MSDK::humanMove(died_ok.x + 27, died_ok.y + 10);
         ProcessHelper::programDelay(500);
-        MSDriverPRO::mouseLeftClick();
+        MSDK::LeftClick();
         ProcessHelper::programDelay(1500);
     }
 }

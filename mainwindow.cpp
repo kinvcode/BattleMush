@@ -25,6 +25,7 @@
 #include "utils/data.h"
 #include "utils/mousetrack.h"
 #include "utils/matchtemp.h"
+#include "driver/msdk/msdkDriver.h"
 
 // 测试头文件
 #include "global/globalplayer.h"
@@ -39,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     loadDriver();
+
+    initMSDK();
 
     // 初始化组件
     initCompomentUI();
@@ -57,6 +60,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // 初始化线程
     initThreads();
+
+
 
     console("系统初始化完毕！");
 
@@ -124,7 +129,7 @@ void MainWindow::loadDriver()
         #endif
 
         // 初始化键盘状态，打开小键盘
-        if ((GetKeyState(VK_NUMLOCK) & 1)) MSDriverPRO::keyboardClick(0x45);
+        // if ((GetKeyState(VK_NUMLOCK) & 1)) MSDriverPRO::keyboardClick(0x45);
     }
 }
 
@@ -451,6 +456,57 @@ void MainWindow::initTask()
     refreshTable();
 }
 
+void MainWindow::initMSDK()
+{
+    if(Gplayer.MSDK_HANDLE != NULL)
+    {
+        console("键鼠设备已存在，无需安装");
+        return;
+    }
+
+    Gplayer.MSDK_HANDLE = MSDK::Open(1);
+    if ((__int64)Gplayer.MSDK_HANDLE != -1)
+    {
+        // 设置鼠标移动延迟为0
+        MSDK::setParam(20,0,0);
+
+        HDC hdc = GetDC(NULL); //获得屏幕设备描述表句柄;
+        int iScrWidth = GetDeviceCaps(hdc, HORZRES); //获取屏幕水平分辨率;
+        int iScrHeight = GetDeviceCaps(hdc, VERTRES); //获取屏幕垂直分辨率;
+        double gdi = Helper::getSystemGDI();
+        int real_width = iScrWidth;
+        int real_height = iScrHeight;
+
+        // 兼容多个分辨率屏幕,如果是放大界面
+        if(gdi > 1){
+            real_width = (int)iScrWidth*gdi;
+            real_height = (int)iScrHeight*gdi;
+
+            switch(iScrWidth){
+            case 2560:
+                if(real_height == 2100){
+                    real_height = 2160;
+                }
+                break;
+            }
+
+        }
+        console("分辨率为:" + QString::number(real_width) + "x" + QString::number(real_height));
+        int res = MSDK::ResolutionUsed(real_width, real_height);
+        if (res == -10)
+        {
+            Gplayer.MSDK_HANDLE = NULL;
+            console("易键鼠驱动设备初始化失败");
+        }else{
+            console("易键鼠驱动设备已安装");
+        }
+        ReleaseDC(NULL, hdc); //释放屏幕设备描述表
+    } else {
+        Gplayer.MSDK_HANDLE = NULL;
+        console("易键鼠驱动设备未安装");
+    }
+}
+
 void MainWindow::onStartAll()
 {
     m_threadManager->startAll();
@@ -573,7 +629,7 @@ void MainWindow::warning(QString msg)
 void MainWindow::onApplicationQuit()
 {
     DebugOutput::out("安全关闭程序中... ...");
-    if(!GetKeyState(VK_NUMLOCK)) MSDriverPRO::keyboardClick(0x45); // 打开小键盘
+    // if(!GetKeyState(VK_NUMLOCK)) MSDriverPRO::keyboardClick(0x45); // 打开小键盘
 
     if(MSDriverPRO::isLoadDriver())
     {
@@ -1661,6 +1717,36 @@ void MainWindow::on_pushButton_text_list_clicked()
 
 void MainWindow::on_pushButton_answer_check_info_clicked()
 {
+    // 匹配check按钮位置
+    MatchTemp tempmatch(":assets/templat/answer_check_text");
+    tempmatch.setGrayscale();
+    tempmatch.setThreshold(120,255);
+    cv::Point check_coor;
+    if(tempmatch.match(check_coor)){
+        qDebug() << "check按钮位置:" << check_coor.x << "," << check_coor.y;
+
+        // 点击输入框
+        MSDK::humanMove(check_coor.x + 82, check_coor.y - 22);
+        // MSDK::LeftClick();
+        MSDK::LeftDoubleClick();
+
+        ProcessHelper::programDelay(500);
+
+        // 开始输入答案
+        // MSDK::KeyInputUnicode(answer_text);
+
+        ProcessHelper::programDelay(1500);
+        // 点击check按钮
+        MSDK::humanMove(check_coor.x + 28, check_coor.y + 13);
+        // MSDK::LeftClick();
+        MSDK::LeftDoubleClick();
+    }
+
+    // ProcessHelper::programDelay(1500);
+    // MSDK::KeyInputUnicode("褐色發條熊");
+
+    return;
+
     if(!Gplayer.p_uientity){
         qDebug() << "UI指针为空，获取信息失败";
         return;
@@ -1838,6 +1924,179 @@ void MainWindow::on_pushButton_print_allservice_clicked()
 
 void MainWindow::on_pushButton_mousetrack_info_clicked()
 {
+    // 开始绘制
+
+    // 时间戳
+    QElapsedTimer run_start_time;
+    run_start_time.start();
+
+    QDateTime logDateTime = QDateTime::currentDateTime();
+    QString logTimeString = logDateTime.toString("yyyy-MM-dd-hh-mm-ss");
+    QString save_dir = QCoreApplication::applicationDirPath() + "/output/mousecheck/test";
+
+    // 获取目录名和父目录
+    QDir dir(save_dir);
+    QString dirName = dir.dirName();
+    QDir parentDir = dir;
+    parentDir.cdUp();
+
+    // 如果目录存在，先递归删除所有内容，然后删除目录本身
+    if (dir.exists()) {
+        // 方法1：使用 removeRecursively() 删除整个目录树（Qt 5+）
+        if (!dir.removeRecursively()) {
+            qWarning() << "删除目录失败:" << save_dir;
+            return;
+        }
+
+        // 重新创建空目录
+        if (!parentDir.mkdir(dirName)) {
+            qWarning() << "创建目录失败:" << save_dir;
+            return;
+        }
+    } else {
+        // 目录不存在，直接创建
+        if (!parentDir.mkdir(dirName)) {
+            qWarning() << "创建目录失败:" << save_dir;
+            return;
+        }
+    }
+
+
+    HWND game_hwnd = NULL;
+
+    game_hwnd = FindWindow(NULL, TEXT("MapleStory Worlds-Artale (繁體中文版)"));
+    if (game_hwnd == NULL) {
+        qCritical() << "游戏窗口不存在！";
+        return;
+    }
+
+    RECT game_rect{};
+    GetWindowRect(game_hwnd, &game_rect);
+    int game_x = game_rect.left;
+    int game_y = game_rect.top;
+
+    QScreen* m_pScreen = QGuiApplication::primaryScreen();
+
+    QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow(),
+                                                game_x + 8,
+                                                game_y + 31,
+                                                1280,
+                                                720);
+
+    cv::Mat bgr_frame;
+    QImage image = cur_capture.toImage();
+    cv::Mat frame(image.height(), image.width(), CV_8UC4, const_cast<uchar*>(image.bits()), image.bytesPerLine());
+    cv::cvtColor(frame, bgr_frame, cv::COLOR_BGRA2BGR);
+
+    cv::rectangle(bgr_frame,
+        cv::Point(399 - 8, 218 - 31),
+        cv::Point(339 - 8 + 500, 218 - 31 + 335),
+        cv::Scalar(0, 255, 0), -1);
+
+    std::vector<cv::Point2f> raw_pos_list = {
+{0, -0.01}, {0, -0.01}, {0, -0.01}, {0.01, -0.02}, {0.01, -0.02},
+{0.02, -0.03}, {0.02, -0.03}, {0.02, -0.03}, {0.02, -0.04}, {0.03, -0.04},
+{0.03, -0.05}, {0.03, -0.05}, {0.03, -0.05}, {0.04, -0.06}, {0.04, -0.06},
+{0.05, -0.07}, {0.05, -0.07}, {0.06, -0.08}, {0.06, -0.08}, {0.07, -0.08},
+{0.07, -0.09}, {0.08, -0.09}, {0.08, -0.09}, {0.08, -0.09}, {0.09, -0.1},
+{0.09, -0.1}, {0.09, -0.11}, {0.1, -0.11}, {0.1, -0.11}, {0.1, -0.12},
+{0.11, -0.12}, {0.12, -0.12}, {0.12, -0.12}, {0.13, -0.13}, {0.13, -0.13},
+{0.14, -0.13}, {0.14, -0.13}, {0.15, -0.13}, {0.15, -0.14}, {0.16, -0.14},
+{0.16, -0.14}, {0.17, -0.13}, {0.17, -0.13}, {0.18, -0.13}, {0.18, -0.13},
+{0.19, -0.13}, {0.19, -0.12}, {0.2, -0.12}, {0.2, -0.12}, {0.21, -0.11},
+{0.21, -0.11}, {0.21, -0.11}, {0.21, -0.1}, {0.22, -0.09}, {0.22, -0.09},
+{0.22, -0.08}, {0.22, -0.08}, {0.22, -0.07}, {0.22, -0.07}, {0.22, -0.06},
+{0.22, -0.06}, {0.22, -0.05}, {0.22, -0.05}, {0.22, -0.04}, {0.22, -0.04},
+{0.22, -0.03}, {0.21, -0.03}, {0.21, -0.02}, {0.21, -0.02}, {0.2, -0.01},
+{0.2, -0.01}, {0.2, 0}, {0.2, 0}, {0.19, 0}, {0.19, 0.01},
+{0.19, 0.01}, {0.18, 0.02}, {0.17, 0.02}, {0.17, 0.02}, {0.16, 0.03},
+{0.16, 0.03}, {0.15, 0.03}, {0.14, 0.03}, {0.14, 0.03}, {0.13, 0.02},
+{0.13, 0.02}, {0.13, 0.02}, {0.12, 0.02}, {0.12, 0.02}, {0.12, 0.02},
+{0.11, 0.02}, {0.11, 0.01}, {0.1, 0.01}, {0.1, 0}, {0.09, 0},
+{0.09, 0}, {0.09, -0.01}, {0.09, -0.01}, {0.09, -0.02}, {0.09, -0.02},
+{0.09, -0.03}, {0.09, -0.03}, {0.09, -0.04}, {0.09, -0.05}, {0.08, -0.05},
+{0.08, -0.06}, {0.08, -0.06}, {0.08, -0.07}, {0.08, -0.07}, {0.08, -0.08},
+{0.08, -0.08}, {0.07, -0.09}, {0.07, -0.1}, {0.07, -0.1}, {0.06, -0.1},
+{0.06, -0.11}, {0.05, -0.11}, {0.04, -0.11}, {0.04, -0.11}, {0.03, -0.11},
+{0.03, -0.12}, {0.02, -0.12}, {0.02, -0.12}, {0.01, -0.12}, {0.01, -0.12},
+{0, -0.12}, {0, -0.12}, {0, -0.13}, {-0.01, -0.13}, {-0.02, -0.13},
+{-0.03, -0.13}, {-0.03, -0.13}, {-0.04, -0.13}, {-0.04, -0.13}, {-0.04, -0.14},
+{-0.05, -0.14}, {-0.06, -0.14}, {-0.06, -0.14}, {-0.06, -0.14}, {-0.07, -0.15},
+{-0.08, -0.15}, {-0.08, -0.15}, {-0.09, -0.15}, {-0.09, -0.15}, {-0.1, -0.15},
+{-0.1, -0.15}, {-0.11, -0.15}, {-0.12, -0.15}, {-0.12, -0.15}, {-0.12, -0.15},
+{-0.13, -0.16}, {-0.14, -0.16}, {-0.14, -0.16}, {-0.15, -0.16}, {-0.15, -0.17},
+{-0.16, -0.17}, {-0.16, -0.18}, {-0.16, -0.18}, {-0.16, -0.19}, {-0.16, -0.19},
+{-0.16, -0.2}, {-0.16, -0.2}, {-0.16, -0.21}, {-0.16, -0.21}, {-0.16, -0.22},
+{-0.16, -0.22}, {-0.16, -0.23}, {-0.16, -0.23}, {-0.16, -0.24}, {-0.16, -0.24},
+{-0.16, -0.25}, {-0.16, -0.25}, {-0.16, -0.26}, {-0.16, -0.27}, {-0.16, -0.27},
+{-0.17, -0.28}, {-0.17, -0.28}, {-0.17, -0.28}, {-0.17, -0.29}, {-0.16, -0.3},
+{-0.16, -0.3}, {-0.16, -0.31}, {-0.16, -0.31}, {-0.16, -0.32}, {-0.16, -0.32},
+{-0.16, -0.33}, {-0.16, -0.33}, {-0.16, -0.34}, {-0.17, -0.34}, {-0.17, -0.34},
+{-0.18, -0.35}, {-0.18, -0.35}, {-0.19, -0.36}, {-0.19, -0.36}, {-0.2, -0.36},
+{-0.21, -0.36}, {-0.21, -0.37}, {-0.21, -0.37}, {-0.22, -0.37}, {-0.23, -0.36},
+{-0.23, -0.36}, {-0.24, -0.36}, {-0.24, -0.36}, {-0.25, -0.36}, {-0.26, -0.36},
+{-0.26, -0.35}, {-0.27, -0.35}, {-0.27, -0.35}, {-0.27, -0.35}, {-0.28, -0.34},
+{-0.28, -0.34}, {-0.28, -0.33}, {-0.29, -0.33}, {-0.29, -0.32}, {-0.3, -0.32},
+{-0.31, -0.32}, {-0.31, -0.31}, {-0.32, -0.31}, {-0.32, -0.31}, {-0.33, -0.3},
+{-0.33, -0.3}, {-0.34, -0.3}, {-0.34, -0.29}, {-0.35, -0.29}, {-0.35, -0.28},
+{-0.36, -0.28}, {-0.36, -0.27}, {-0.36, -0.27}, {-0.36, -0.26}, {-0.37, -0.26},
+{-0.37, -0.26}, {-0.38, -0.26}, {-0.38, -0.25}, {-0.39, -0.25}, {-0.39, -0.24},
+{-0.39, -0.24}, {-0.4, -0.23}, {-0.4, -0.23}, {-0.41, -0.23}, {-0.41, -0.23},
+{-0.42, -0.22}, {-0.42, -0.22}, {-0.43, -0.22}, {-0.44, -0.22}, {-0.44, -0.21},
+{-0.45, -0.21}, {-0.45, -0.21}, {-0.46, -0.21}, {-0.46, -0.21}, {-0.46, -0.21},
+{-0.47, -0.21}, {-0.47, -0.2}, {-0.48, -0.2}, {-0.48, -0.2}, {-0.48, -0.19},
+{-0.49, -0.19}, {-0.49, -0.18}, {-0.49, -0.18}, {-0.49, -0.17}, {-0.49, -0.17},
+{-0.49, -0.17}, {-0.5, -0.16}, {-0.5, -0.16}, {-0.5, -0.15}, {-0.51, -0.15},
+{-0.51, -0.15}, {-0.52, -0.15}, {-0.53, -0.14}, {-0.53, -0.14}, {-0.54, -0.14},
+{-0.54, -0.14}, {-0.55, -0.14}, {-0.56, -0.14}, {-0.56, -0.14}, {-0.56, -0.14},
+{-0.57, -0.14}, {-0.57, -0.14}, {-0.58, -0.14}, {-0.59, -0.13}, {-0.59, -0.13},
+{-0.6, -0.13}, {-0.6, -0.13}, {-0.6, -0.13}, {-0.61, -0.13}, {-0.61, -0.13},
+{-0.62, -0.13}, {-0.62, -0.13}, {-0.63, -0.13}, {-0.63, -0.13}, {-0.63, -0.12},
+{-0.64, -0.12}, {-0.64, -0.12}, {-0.65, -0.12}, {-0.65, -0.12}, {-0.66, -0.12},
+{-0.66, -0.11}, {-0.67, -0.11}, {-0.67, -0.1}, {-0.67, -0.1}, {-0.67, -0.1},
+{-0.66, -0.09}, {-0.66, -0.09}, {-0.66, -0.08}, {-0.67, -0.07}, {-0.67, -0.07},
+{-0.67, -0.06}, {-0.67, -0.06}, {-0.67, -0.05}, {-0.67, -0.05}, {-0.66, -0.04},
+{-0.66, -0.04}, {-0.66, -0.03}, {-0.66, -0.03}, {-0.67, -0.02}, {-0.67, -0.01},
+{-0.67, -0.01}, {-0.67, 0}, {-0.67, 0}, {-0.67, 0.01},
+{-0.67, 0.02}, {-0.67, 0.02}, {-0.67, 0.03}, {-0.67, 0.03}, {-0.67, 0.04},
+{-0.66, 0.04}, {-0.66, 0.04}, {-0.66, 0.05}, {-0.66, 0.05}, {-0.66, 0.06},
+{-0.66, 0.06}
+};
+
+    std::vector<cv::Point2f> mouse_pos_;
+    mouse_pos_.clear();
+
+    qDebug() << "------------开始读取坐标------------";
+    for(int i = 0; i < 330; i++){
+        qDebug() << i << ":" << raw_pos_list[i].x << "," << raw_pos_list[i].y;
+    }
+    qDebug() << "------------读取坐标完毕------------";
+
+    // 转换坐标
+    mouse_pos_.clear();
+    mouse_pos_.resize(330);
+    for(int i = 0; i < 330; i++){
+        cv::Point2f res = {0,0};
+        res.x = (raw_pos_list[i].x - -0.7) / (0.7 - -0.7) * 500;
+        res.y = (raw_pos_list[i].y - -0.5) / (0.5 - -0.5) * 335;
+        mouse_pos_[i] = res;
+        qDebug() << i << ":" << mouse_pos_[i].x << "," << mouse_pos_[i].y;
+
+        cv::Point2i cur_target_pos = cv::Point2i(
+            static_cast<int>(res.x + 399),
+            static_cast<int>(res.y + 218));
+
+        cv::Point2i cursor_pos = {cur_target_pos.x - 8, cur_target_pos.y - 31};
+        cv::circle(bgr_frame, cursor_pos, 10, cv::Scalar(255, 0, 0), -1);
+
+    }
+
+    QString save_path = QString("%1/test_%2.jpg").arg(save_dir).arg(logTimeString);
+    cv::imwrite(save_path.toStdString(), bgr_frame);
+
+
+    return;
+
     // 检测游戏是否存在
     Gplayer.p_gamepid = MSDriverPRO::getPid("msw.exe");
 

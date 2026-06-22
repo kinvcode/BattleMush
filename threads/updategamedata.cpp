@@ -10,6 +10,7 @@
 #include "utils/mapserializer.h"
 #include "driver/msdriverpro.h"
 #include "utils/matchtemp.h"
+#include "driver/msdk/msdkDriver.h"
 
 using namespace Mem;
 
@@ -145,7 +146,7 @@ void UpdateGameData::process()
             statuspanel = Helper::findChild(localusergroup,"StatusPanel");
             if( statuspanel == 0){
                 DebugOutput::out("找不到statuspanel模块，确保打开过能力值面板。即将尝试打开能力值面板");
-                MSDriverPRO::keyboardClick(MSKeyboard_s);
+                MSDK::keyPress(MSKeyboard_s,1);
                 ProcessHelper::programDelay(3000);
                 QApplication::processEvents();
                 continue;

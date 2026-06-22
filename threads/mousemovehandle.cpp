@@ -8,6 +8,7 @@
 #include "driver/msdriverpro.h"
 #include "utils/matchtemp.h"
 #include "utils/mousetrack.h"
+#include "driver/msdk/msdkDriver.h"
 
 using namespace Mem;
 
@@ -132,8 +133,8 @@ bool MouseMoveHandle::UIAntiMacroExists(quint64 list, quint64 head)
 cv::Point2f MouseMoveHandle::to_pixel_coords(cv::Point2f pos)
 {
     cv::Point2f res = {0,0};
-    res.x = (pos.x - range_.x) / (range_.y - range_.x) * box_width_;
-    res.y = (pos.y - range_.x) / (range_.y - range_.x) * box_height_;
+    res.x = (pos.x - Xrange_.x) / (Xrange_.y - Xrange_.x) * box_width_;
+    res.y = (pos.y - Yrange_.x) / (Yrange_.y - Yrange_.x) * box_height_;
     return res;
 }
 
@@ -310,7 +311,7 @@ void MouseMoveHandle::handleMouseCheck()
                 static_cast<int>(start_pos.y + box_pos_y_));
             int target_x = game_x + start_target_pos.x;
             int target_y = game_y + start_target_pos.y;
-            // MSDriverPRO::mouseMoveTo(target_x, target_y);
+            MSDK::MoveTo(target_x, target_y);
         }
 
         // 创建当前帧的日志文件
@@ -329,9 +330,15 @@ void MouseMoveHandle::handleMouseCheck()
 
         // 转换成游戏屏幕坐标
         int pos_index = 0;
+        if(mouse_pos_.empty()){
+            stream << "滑鼠轨迹为空~\r\n";
+            qDebug() << "滑鼠轨迹为空，退出";
+            break;
+        }
         if(currentTick){
             pos_index = currentTick - 1;
         }
+
         cv::Point2f raw_pos = mouse_pos_[pos_index];
         cv::Point2i cur_target_pos = cv::Point2i(
             static_cast<int>(raw_pos.x + box_pos_x_),
@@ -369,8 +376,7 @@ void MouseMoveHandle::handleMouseCheck()
 
         int target_x = game_x + cur_target_pos.x;
         int target_y = game_y + cur_target_pos.y;
-
-        // MSDriverPRO::mouseMoveTo(target_x, target_y);
+        MSDK::MoveTo(target_x, target_y);
 
         printMouseInfo(&stream);
         log_index++;

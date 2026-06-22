@@ -15,6 +15,7 @@
 #include <opencv2/videoio.hpp>
 #include "global/globalplayer.h"
 #include "driver/msdriverpro.h"
+#include "driver/msdk/msdkDriver.h"
 #include "utils/matchtemp.h"
 #include "process/process.h"
 #include <chrono>
@@ -809,7 +810,7 @@ void MouseTrack::realTrackTest()
                     target_y >= allow_rect.y &&
                     target_y <= allow_rect.y + allow_rect.height) {
 
-                    MSDriverPRO::mouseMoveTo(target_x, target_y);
+                    MSDK::MoveTo(target_x, target_y);
                 }
             }
             ProcessHelper::handleEvents();

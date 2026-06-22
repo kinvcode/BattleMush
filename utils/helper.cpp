@@ -9,6 +9,7 @@
 #include "utils/mapserializer.h"
 #include "mainwindow.h"
 #include "utils/gamestruct.h"
+#include "driver/msdk/msdkDriver.h"
 
 using namespace Mem;
 
@@ -1041,6 +1042,39 @@ void Helper::updateGameWindow()
         Gplayer.game_window.y          = game_rect.top;
         Gplayer.game_window.width      = game_rect.right - game_rect.left;
         Gplayer.game_window.height     = game_rect.bottom - game_rect.top;
+    }
+    qDebug() << "更新游戏窗口";
+    qDebug() << Gplayer.game_window.x << Gplayer.game_window.y << Gplayer.game_window.width << Gplayer.game_window.height;
+}
+
+double Helper::getSystemGDI()
+{
+    // 获取窗口当前显示的监视器
+    HWND hWnd = GetDesktopWindow();//根据需要可以替换成自己程序的句柄
+    HMONITOR hMonitor = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+
+    // 获取监视器逻辑宽度与高度
+    MONITORINFOEX miex;
+    miex.cbSize = sizeof(miex);
+    GetMonitorInfo(hMonitor, &miex);
+    int cxLogical = (miex.rcMonitor.right - miex.rcMonitor.left);
+    int cyLogical = (miex.rcMonitor.bottom - miex.rcMonitor.top);
+
+    // 获取监视器物理宽度与高度
+    DEVMODE dm;
+    dm.dmSize = sizeof(dm);
+    dm.dmDriverExtra = 0;
+    EnumDisplaySettings(miex.szDevice, ENUM_CURRENT_SETTINGS, &dm);
+    int cxPhysical = dm.dmPelsWidth;
+    int cyPhysical = dm.dmPelsHeight;
+
+    //缩放比例计算
+    double horzScale = ((double)cxPhysical / (double)cxLogical);
+    double vertScale = ((double)cyPhysical / (double)cyLogical);
+    if(horzScale == vertScale){
+        return horzScale;
+    }else{
+        return 0;
     }
 }
 
@@ -2898,69 +2932,69 @@ bool CameraTool::WorldToScreen(uintptr_t cam, const COORDINATE &pos, cv::Point &
     return true;
 }
 
-void MSKM::humanMove(int targetX, int targetY)
-{
-    targetX = Gplayer.game_window.x + targetX;
-    targetY = Gplayer.game_window.y + targetY;
+// void MSKM::humanMove(int targetX, int targetY)
+// {
+//     targetX = Gplayer.game_window.x + targetX;
+//     targetY = Gplayer.game_window.y + targetY;
 
-    QPoint currentPos = QCursor::pos();
-    int currentX = currentPos.x();
-    int currentY = currentPos.y();
+//     QPoint currentPos = QCursor::pos();
+//     int currentX = currentPos.x();
+//     int currentY = currentPos.y();
 
-    // 计算直径
-    int length = qSqrt(qPow((currentX-targetX),2)+qPow((currentY-targetY),2));
-    int controllValue = 5;
-    int rand_value = 15;
-    if(length < 300)
-    {
-        // 控制弧度
-        controllValue = 5;
-        // 控制抖动
-        rand_value = 3;
-    }
+//     // 计算直径
+//     int length = qSqrt(qPow((currentX-targetX),2)+qPow((currentY-targetY),2));
+//     int controllValue = 5;
+//     int rand_value = 15;
+//     if(length < 300)
+//     {
+//         // 控制弧度
+//         controllValue = 5;
+//         // 控制抖动
+//         rand_value = 3;
+//     }
 
-    // 随机化控制点1的偏移量
-    int control1OffsetX = QRandomGenerator::global()->bounded(-controllValue, controllValue);
-    int control1OffsetY = QRandomGenerator::global()->bounded(-controllValue, controllValue);
+//     // 随机化控制点1的偏移量
+//     int control1OffsetX = QRandomGenerator::global()->bounded(-controllValue, controllValue);
+//     int control1OffsetY = QRandomGenerator::global()->bounded(-controllValue, controllValue);
 
-    // 随机化控制点2的偏移量
-    int control2OffsetX = QRandomGenerator::global()->bounded(-controllValue, controllValue);
-    int control2OffsetY = QRandomGenerator::global()->bounded(-controllValue, controllValue);
+//     // 随机化控制点2的偏移量
+//     int control2OffsetX = QRandomGenerator::global()->bounded(-controllValue, controllValue);
+//     int control2OffsetY = QRandomGenerator::global()->bounded(-controllValue, controllValue);
 
-    // 控制点1坐标
-    int control1X = currentX + (targetX - currentX) / 3 + control1OffsetX;
-    int control1Y = currentY - qAbs(targetY - currentY) / 2 - controllValue + control1OffsetY; // 调整控制点1的Y坐标偏移量
-    control1X = targetX;
-    control1Y = targetY;
+//     // 控制点1坐标
+//     int control1X = currentX + (targetX - currentX) / 3 + control1OffsetX;
+//     int control1Y = currentY - qAbs(targetY - currentY) / 2 - controllValue + control1OffsetY; // 调整控制点1的Y坐标偏移量
+//     control1X = targetX;
+//     control1Y = targetY;
 
-    // 控制点2坐标
-    int control2X = currentX + 2 * (targetX - currentX) / 3 + control2OffsetX;
-    int control2Y = targetY + qAbs(targetY - currentY) / 2 + controllValue + control2OffsetY; // 调整控制点2的Y坐标偏移量
-    control2Y = targetY;
+//     // 控制点2坐标
+//     int control2X = currentX + 2 * (targetX - currentX) / 3 + control2OffsetX;
+//     int control2Y = targetY + qAbs(targetY - currentY) / 2 + controllValue + control2OffsetY; // 调整控制点2的Y坐标偏移量
+//     control2Y = targetY;
 
-    // 贝塞尔曲线轨迹
-    for (double t = 0; t <= 1; t += 0.03) {
-        // 计算当前点的坐标
-        qreal x = qPow(1 - t, 3) * currentX + 3 * qPow(1 - t, 2) * t * control1X + 3 * (1 - t) * qPow(t, 2) * control2X + qPow(t, 3) * targetX;
-        qreal y = qPow(1 - t, 3) * currentY + 3 * qPow(1 - t, 2) * t * control1Y + 3 * (1 - t) * qPow(t, 2) * control2Y + qPow(t, 3) * targetY;
+//     // 贝塞尔曲线轨迹
+//     for (double t = 0; t <= 1; t += 0.03) {
+//         // 计算当前点的坐标
+//         qreal x = qPow(1 - t, 3) * currentX + 3 * qPow(1 - t, 2) * t * control1X + 3 * (1 - t) * qPow(t, 2) * control2X + qPow(t, 3) * targetX;
+//         qreal y = qPow(1 - t, 3) * currentY + 3 * qPow(1 - t, 2) * t * control1Y + 3 * (1 - t) * qPow(t, 2) * control2Y + qPow(t, 3) * targetY;
 
-        // 添加较低频率的随机抖动效果
-        if (QRandomGenerator::global()->bounded(100) < rand_value) {
-            int jitterX = QRandomGenerator::global()->bounded(-5, 5);
-            int jitterY = QRandomGenerator::global()->bounded(-5, 5);
-            x += jitterX;
-            y += jitterY;
-        }
+//         // 添加较低频率的随机抖动效果
+//         if (QRandomGenerator::global()->bounded(100) < rand_value) {
+//             int jitterX = QRandomGenerator::global()->bounded(-5, 5);
+//             int jitterY = QRandomGenerator::global()->bounded(-5, 5);
+//             x += jitterX;
+//             y += jitterY;
+//         }
 
-        // 移动鼠标
-        MSDriverPRO::mouseMoveTo(qRound(x), qRound(y));
+//         // 移动鼠标
+//         MSDriverPRO::mouseMoveTo(qRound(x), qRound(y));
 
-        // 等待一段时间
-        QThread::msleep(QRandomGenerator::global()->bounded(5, 15));
-    }
+//         // 等待一段时间
+//         QThread::msleep(QRandomGenerator::global()->bounded(5, 15));
+//     }
 
-    MSDriverPRO::mouseMoveTo(targetX, targetY);
-}
+//     MSDriverPRO::mouseMoveTo(targetX, targetY);
+// }
 
 void MSKM::inputNum(int num)
 {
@@ -2970,8 +3004,8 @@ void MSKM::inputNum(int num)
 
     // 定义键盘枚举数组
     const int keyboardKeys[] = {
-        MSKeyboard_0, MSKeyboard_1, MSKeyboard_2, MSKeyboard_3, MSKeyboard_4,
-        MSKeyboard_5, MSKeyboard_6, MSKeyboard_7, MSKeyboard_8, MSKeyboard_9
+        Keyboard_0, Keyboard_1, Keyboard_2, Keyboard_3, Keyboard_4,
+        Keyboard_5, Keyboard_6, Keyboard_7, Keyboard_8, Keyboard_9
     };
 
     // 转换为QString并逐字符处理
@@ -2986,7 +3020,7 @@ void MSKM::inputNum(int num)
 
         int digit = ch.digitValue(); // QChar转数字，-1表示非数字
         if (digit >= 0 && digit <= 9) {
-            MSDriverPRO::keyboardClick(keyboardKeys[digit], 1);
+            MSDK::keyPress(keyboardKeys[digit], 1);
         }
     }
 }

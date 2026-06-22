@@ -28,7 +28,7 @@ void MatchTemp::getScreenShot()
     );
 
     // qDebug() << "Game Position:" << Gplayer.game_window.x << Gplayer.game_window.y;
-
+    qDebug() << Gplayer.game_window.x << Gplayer.game_window.y << Gplayer.game_window.width << Gplayer.game_window.height;
     img_width = cur_capture.width();
     img_height = cur_capture.height();
 }
@@ -96,6 +96,7 @@ bool MatchTemp::match(cv::Point &coor)
         // qDebug() << "窗口大小不符合要求:" << img_width << img_height;
         // cur_capture.save(QCoreApplication::applicationDirPath() + "/error/getScreenShot.png");
         // return false;
+        // qDebug() << img_width << img_height;
     }
 
     begin:
@@ -180,7 +181,7 @@ bool MatchTemp::match(cv::Point &coor)
     }
 
 
-    qDebug() <<("当前匹配位置：" + QString::number(coor.x) + "," + QString::number(coor.y));
+    // qDebug() <<("当前匹配位置：" + QString::number(coor.x) + "," + QString::number(coor.y));
     return true;
 }
 

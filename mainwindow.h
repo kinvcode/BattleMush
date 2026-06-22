@@ -53,6 +53,7 @@ private:
     void initSinalBind();
     void initThreads();
     void initTask();
+    void initMSDK();
 
 private slots:
 

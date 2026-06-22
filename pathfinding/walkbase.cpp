@@ -10,6 +10,7 @@
 #include "utils/gamestruct.h"
 #include "global/globalconfig.h"
 #include "global/controller.h"
+#include "driver/msdk/msdkDriver.h"
 
 using namespace Mem;
 
@@ -40,10 +41,10 @@ bool WalkBase::run()
     int direction_x;
     if (m_target_x > user_x) {
         // 向右
-        direction_x = MSKeyboard_RightArrow;
+        direction_x = Keyboard_RightArrow;
     } else {
         // 向左
-        direction_x = MSKeyboard_LeftArrow;
+        direction_x = Keyboard_LeftArrow;
     }
 
     // 是否到达
@@ -56,7 +57,7 @@ bool WalkBase::run()
     run_status_time.start();
 
     // 开始移动
-    MSDriverPRO::keyboardDown(direction_x);
+    MSDK::KeyDown(direction_x);
 
     while(true){
 
@@ -87,14 +88,14 @@ bool WalkBase::run()
                 // 如果目标距离自己大于150，使用瞬移
                 if(abs(user_x - m_target_x) > 150){
                     use_skill = true;
-                    if(direction_x == MSKeyboard_LeftArrow){
+                    if(direction_x == Keyboard_LeftArrow){
                         qDebug() << "可以使用瞬移:左";
-                    }else if(direction_x == MSKeyboard_RightArrow){
+                    }else if(direction_x == Keyboard_RightArrow){
                         qDebug() << "可以使用瞬移:右";
                     }
                 }
                 if(use_skill){
-                    MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skillteleport);
+                    MSDK::keyPress(Gplayer.m_bindkey.skillteleport,1);
                     Gplayer.last_useskillteleport = nowtime;
                 }
             }
@@ -131,10 +132,10 @@ bool WalkBase::runY()
     int direction_y;
     if (m_target_y > user_y) {
         // 向下
-        direction_y = MSKeyboard_DownArrow;
+        direction_y = Keyboard_DownArrow;
     } else {
         // 向上
-        direction_y = MSKeyboard_UpArrow;
+        direction_y = Keyboard_UpArrow;
     }
 
     // 是否到达
@@ -147,7 +148,7 @@ bool WalkBase::runY()
     run_status_time.start();
 
     // 开始移动
-    MSDriverPRO::keyboardDown(direction_y);
+    MSDK::KeyDown(direction_y);
 
     while(true){
 
@@ -200,12 +201,12 @@ void WalkBase::clearMonster(const Monster &monster)
     if (monster.pos.x > user_pos.x) {
         // 向右
         // qDebug() << "向右走~";
-        direction_x = MSKeyboard_RightArrow;
+        direction_x = Keyboard_RightArrow;
     } else {
         // 向左
         // qDebug() << "向左走~";
         is_left = true;
-        direction_x = MSKeyboard_LeftArrow;
+        direction_x = Keyboard_LeftArrow;
     }
 
     // m_skill_range = range;
@@ -230,7 +231,7 @@ void WalkBase::clearMonster(const Monster &monster)
     int last_time = begin_timer.elapsed();
 
     // 开始移动
-    MSDriverPRO::keyboardDown(direction_x);
+    MSDK::KeyDown(direction_x);
 
     int map_start = 0;
 
@@ -294,14 +295,14 @@ void WalkBase::clearMonster(const Monster &monster)
                 // 如果目标距离自己大于150，使用瞬移
                 if(abs(user_pos.x - monster.pos.x) > 150){
                     use_skill = true;
-                    if(direction_x == MSKeyboard_LeftArrow){
+                    if(direction_x == Keyboard_LeftArrow){
                         qDebug() << "可以使用瞬移:左";
-                    }else if(direction_x == MSKeyboard_RightArrow){
+                    }else if(direction_x == Keyboard_RightArrow){
                         qDebug() << "可以使用瞬移:右";
                     }
                 }
                 if(use_skill){
-                    MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skillteleport);
+                    MSDK::keyPress(Gplayer.m_bindkey.skillteleport,1);
                     Gplayer.last_useskillteleport = nowtime;
                 }
             }
@@ -354,12 +355,12 @@ bool WalkBase::moveToItem()
     if (m_target_x > user_x) {
         // 向右
         qDebug() << "向右走~";
-        direction_x = MSKeyboard_RightArrow;
+        direction_x = Keyboard_RightArrow;
     } else {
         // 向左
         qDebug() << "向左走~";
         is_left = true;
-        direction_x = MSKeyboard_LeftArrow;
+        direction_x = Keyboard_LeftArrow;
     }
 
     // 是否到达
@@ -371,7 +372,7 @@ bool WalkBase::moveToItem()
     int last_time = begin_timer.elapsed();
 
     // 开始移动
-    MSDriverPRO::keyboardDown(direction_x);
+    MSDK::KeyDown(direction_x);
 
     int map_start = 0;
 
@@ -429,15 +430,15 @@ bool WalkBase::moveToItem()
                 // 如果目标距离自己大于150，使用瞬移
                 if(abs(user_x - m_target_x) > 150){
                     use_skill = true;
-                    if(direction_x == MSKeyboard_LeftArrow){
+                    if(direction_x == Keyboard_LeftArrow){
                         qDebug() << "可以使用瞬移:左";
-                    }else if(direction_x == MSKeyboard_RightArrow){
+                    }else if(direction_x == Keyboard_RightArrow){
                         qDebug() << "可以使用瞬移:右";
                     }
                 }
 
                 if(use_skill){
-                    MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skillteleport);
+                    MSDK::keyPress(Gplayer.m_bindkey.skillteleport,1);
                     Gplayer.last_useskillteleport = nowtime;
                 }
             }
@@ -512,19 +513,19 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
     if (m_target_pos > user_pos) {
         if(self_climb){
             qDebug() << "向下攀爬~";
-            direction_arrow = MSKeyboard_DownArrow;
+            direction_arrow = Keyboard_DownArrow;
         }else{
             qDebug() << "向右走~";
-            direction_arrow = MSKeyboard_RightArrow;
+            direction_arrow = Keyboard_RightArrow;
         }
     } else {
         if(self_climb){
             qDebug() << "向上攀爬~";
-            direction_arrow = MSKeyboard_UpArrow;
+            direction_arrow = Keyboard_UpArrow;
         }else{
             is_left = true;
             qDebug() << "向左走~";
-            direction_arrow = MSKeyboard_LeftArrow;
+            direction_arrow = Keyboard_LeftArrow;
         }
     }
 
@@ -534,7 +535,7 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
     int last_time = begin_timer.elapsed();
 
     // 开始移动
-    MSDriverPRO::keyboardDown(direction_arrow);
+    MSDK::KeyDown(direction_arrow);
 
     int map_start = 0;
 
@@ -629,20 +630,20 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
             if(nowtime - Gplayer.last_useskillteleport >= 1000){
                 bool use_skill = false;
                 // 如果目标距离自己大于150，使用瞬移
-                if(direction_arrow == MSKeyboard_LeftArrow)
+                if(direction_arrow == Keyboard_LeftArrow)
                 {
                     if(abs(user_pos - range.y) > 150){
                         use_skill = true;
                         qDebug() << "可以使用瞬移:左";
                     }
-                }else if(direction_arrow == MSKeyboard_RightArrow){
+                }else if(direction_arrow == Keyboard_RightArrow){
                     if(abs(user_pos - range.x) > 150){
                         use_skill = true;
                         qDebug() << "可以使用瞬移:右";
                     }
                 }
                 if(use_skill){
-                    MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skillteleport);
+                    MSDK::keyPress(Gplayer.m_bindkey.skillteleport,1);
                     Gplayer.last_useskillteleport = nowtime;
                 }
             }
@@ -707,14 +708,14 @@ cv::Point WalkBase::getUserPos()
 
 void WalkBase::clearXkey()
 {
-    MSDriverPRO::keyboardUp(MSKeyboard_RightArrow);
-    MSDriverPRO::keyboardUp(MSKeyboard_LeftArrow);
+    MSDK::KeyUp(Keyboard_RightArrow);
+    MSDK::KeyUp(Keyboard_LeftArrow);
 }
 
 void WalkBase::clearYkey()
 {
-    MSDriverPRO::keyboardUp(MSKeyboard_UpArrow);
-    MSDriverPRO::keyboardUp(MSKeyboard_DownArrow);
+    MSDK::KeyUp(Keyboard_UpArrow);
+    MSDK::KeyUp(Keyboard_DownArrow);
 }
 
 bool WalkBase::isAttaking()
@@ -868,10 +869,10 @@ void WalkBase::attackMonster(cv::Point user_pos, const Monster &monster)
     bool face_left = isFaceLeft();
     if(face_left && user_pos.x < monster.pos.x){
         // qDebug() << "调整人物方向，向右";
-        MSDriverPRO::keyboardClick(MSKeyboard_RightArrow);
+        MSDK::keyPress(Keyboard_RightArrow,1);
     }else if(!face_left && user_pos.x > monster.pos.x){
         // qDebug() << "调整人物方向，向左";
-        MSDriverPRO::keyboardClick(MSKeyboard_LeftArrow);
+        MSDK::keyPress(Keyboard_LeftArrow,1);
     }
 
     // 检查怪物是否存在
@@ -882,10 +883,10 @@ void WalkBase::attackMonster(cv::Point user_pos, const Monster &monster)
 
     if(Gcontroller.m_attack_info.type == 0){
         // qDebug() << "使用普通攻击";
-        MSDriverPRO::keyboardClick(Gplayer.m_bindkey.general_atk, 1);
+        MSDK::keyPress(Gplayer.m_bindkey.general_atk, 1);
     }else{
         // qDebug() << "使用技能攻击";
-        MSDriverPRO::keyboardClick(Gplayer.m_bindkey.skill_atk1, 1);
+        MSDK::keyPress(Gplayer.m_bindkey.skill_atk1, 1);
     }
 
     // 给一个延迟，防止放空技能

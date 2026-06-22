@@ -4,6 +4,7 @@
 #include "global/globalplayer.h"
 #include "driver/mem.h"
 #include "utils/helper.h"
+#include "driver/msdk/msdkDriver.h"
 #include "global/globalconfig.h"
 #include <QElapsedTimer>
 
@@ -317,9 +318,9 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
     if(is_climb){
         qDebug() << "向左跳跃到攀爬物体";
         // 到达地点之后进行跳跃操作
-        MSDriverPRO::keyboardDown(MSKeyboard_LeftArrow);
-        MSDriverPRO::keyboardClick(jump_key);
-        MSDriverPRO::keyboardDown(MSKeyboard_UpArrow);
+        MSDK::KeyDown(Keyboard_LeftArrow);
+        MSDK::keyPress(jump_key,1);
+        MSDK::KeyDown(Keyboard_UpArrow);
 
         quint64 foothold_p = getUserFootholdP();
         quint64 climb_p = getUserClimbP();
@@ -330,8 +331,8 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
             foothold_p = getUserFootholdP();
         }
 
-        MSDriverPRO::keyboardUp(MSKeyboard_LeftArrow);
-        MSDriverPRO::keyboardUp(MSKeyboard_UpArrow);
+        MSDK::KeyUp(Keyboard_LeftArrow);
+        MSDK::KeyUp(Keyboard_UpArrow);
 
         if(platform == getUserPlatform(true)){
             qDebug() << "向左跳跃已到达指定攀爬物";
@@ -341,8 +342,8 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
     }else{
         qDebug() << "向左跳跃到地板";
         // 到达地点之后进行跳跃操作
-        MSDriverPRO::keyboardDown(MSKeyboard_LeftArrow);
-        MSDriverPRO::keyboardClick(jump_key);
+        MSDK::KeyDown(Keyboard_LeftArrow);
+        MSDK::keyPress(jump_key,1);
 
         quint64 foothold_p = getUserFootholdP();
         while(foothold_p == 0){
@@ -350,7 +351,7 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
             QApplication::processEvents();
             foothold_p = getUserFootholdP();
         }
-        MSDriverPRO::keyboardUp(MSKeyboard_LeftArrow);
+        MSDK::KeyUp(Keyboard_LeftArrow);
 
         if(platform == getUserPlatform()){
             qDebug() << "向左跳跃已到达指定平台";
@@ -383,9 +384,9 @@ bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool 
     if(is_climb){
         // 到达地点之后进行跳跃操作
         // qDebug() << "向右跳跃";
-        MSDriverPRO::keyboardDown(MSKeyboard_RightArrow);
-        MSDriverPRO::keyboardDown(MSKeyboard_UpArrow);
-        MSDriverPRO::keyboardClick(jump_key);
+        MSDK::KeyDown(Keyboard_RightArrow);
+        MSDK::KeyDown(Keyboard_UpArrow);
+        MSDK::keyPress(jump_key,1);
 
         quint64 foothold_p = getUserFootholdP();
         quint64 climb_p = getUserClimbP();
@@ -396,8 +397,8 @@ bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool 
             foothold_p = getUserFootholdP();
         }
 
-        MSDriverPRO::keyboardUp(MSKeyboard_RightArrow);
-        MSDriverPRO::keyboardUp(MSKeyboard_UpArrow);
+        MSDK::KeyUp(Keyboard_RightArrow);
+        MSDK::KeyUp(Keyboard_UpArrow);
 
         if(platform == getUserPlatform(true)){
             qDebug() << "向右跳跃已到达指定攀爬物";
@@ -405,8 +406,8 @@ bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool 
         }
     }else{
         // 到达地点之后进行跳跃操作
-        MSDriverPRO::keyboardDown(MSKeyboard_RightArrow);
-        MSDriverPRO::keyboardClick(jump_key);
+        MSDK::KeyDown(Keyboard_RightArrow);
+        MSDK::keyPress(jump_key,1);
 
         quint64 foothold_p = getUserFootholdP();
         while(foothold_p == 0){
@@ -414,7 +415,7 @@ bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool 
             QApplication::processEvents();
             foothold_p = getUserFootholdP();
         }
-        MSDriverPRO::keyboardUp(MSKeyboard_RightArrow);
+        MSDK::KeyUp(Keyboard_RightArrow);
 
         if(platform == getUserPlatform()){
             qDebug() << "向右跳跃已到达指定平台";
@@ -439,8 +440,8 @@ bool MovePlatform::jumpUP(cv::Point range, int platform, bool is_climb)
         QApplication::processEvents();
 
         // 到达地点之后进行跳跃操作
-        MSDriverPRO::keyboardDown(MSKeyboard_UpArrow);
-        MSDriverPRO::keyboardClick(jump_key);
+        MSDK::KeyDown(Keyboard_UpArrow);
+        MSDK::keyPress(jump_key,1);
 
         quint64 foothold_p = getUserFootholdP();
         quint64 climb_p = getUserClimbP();
@@ -451,7 +452,7 @@ bool MovePlatform::jumpUP(cv::Point range, int platform, bool is_climb)
             foothold_p = getUserFootholdP();
         }
 
-        MSDriverPRO::keyboardUp(MSKeyboard_UpArrow);
+        MSDK::KeyUp(Keyboard_UpArrow);
 
         if(platform == getUserPlatform(true)){
             qDebug() << "向上跳跃已到达指定攀爬物";
@@ -462,7 +463,7 @@ bool MovePlatform::jumpUP(cv::Point range, int platform, bool is_climb)
         QApplication::processEvents();
 
         // 到达地点之后进行跳跃操作
-        MSDriverPRO::keyboardClick(jump_key);
+        MSDK::keyPress(jump_key,1);
 
         quint64 foothold_p = getUserFootholdP();
         while(foothold_p == 0){
@@ -491,9 +492,9 @@ bool MovePlatform::jumpDown(cv::Point range, int platform)
     QApplication::processEvents();
 
     // 到达地点之后进行跳跃操作
-    MSDriverPRO::keyboardDown(MSKeyboard_DownArrow);
-    MSDriverPRO::keyboardClick(jump_key);
-    MSDriverPRO::keyboardUp(MSKeyboard_DownArrow);
+    MSDK::KeyDown(Keyboard_DownArrow);
+    MSDK::keyPress(jump_key,1);
+    MSDK::KeyUp(Keyboard_DownArrow);
 
     quint64 foothold_p = getUserFootholdP();
     while(foothold_p == 0){
@@ -517,7 +518,7 @@ bool MovePlatform::jumpDown(cv::Point range, int platform)
 bool MovePlatform::up(cv::Point range, int platform, bool self_climb)
 {
     if(self_climb){
-        MSDriverPRO::keyboardDown(MSKeyboard_UpArrow);
+        MSDK::KeyDown(Keyboard_UpArrow);
 
         quint64 foothold_p = getUserFootholdP();
         quint64 climb_p = getUserClimbP();
@@ -528,7 +529,7 @@ bool MovePlatform::up(cv::Point range, int platform, bool self_climb)
             foothold_p = getUserFootholdP();
         }
 
-        MSDriverPRO::keyboardUp(MSKeyboard_UpArrow);
+        MSDK::KeyUp(Keyboard_UpArrow);
         if(platform == getUserPlatform()){
             qDebug() << "向上攀爬已到达指定平台";
             return true;
@@ -544,7 +545,7 @@ bool MovePlatform::up(cv::Point range, int platform, bool self_climb)
         QApplication::processEvents();
 
         // 到达地点之后按上键
-        MSDriverPRO::keyboardClick(MSKeyboard_UpArrow);
+        MSDK::keyPress(Keyboard_UpArrow,1);
 
         ProcessHelper::programDelay(100);
         quint64 climb_p = getUserClimbP();
@@ -571,7 +572,7 @@ bool MovePlatform::up(cv::Point range, int platform, bool self_climb)
 bool MovePlatform::down(cv::Point range, int platform, bool self_climb)
 {
     if(self_climb){
-        MSDriverPRO::keyboardDown(MSKeyboard_DownArrow);
+        MSDK::KeyDown(Keyboard_DownArrow);
 
         quint64 foothold_p = getUserFootholdP();
         quint64 climb_p = getUserClimbP();
@@ -582,7 +583,7 @@ bool MovePlatform::down(cv::Point range, int platform, bool self_climb)
             foothold_p = getUserFootholdP();
         }
 
-        MSDriverPRO::keyboardUp(MSKeyboard_DownArrow);
+        MSDK::KeyUp(Keyboard_DownArrow);
         if(platform == getUserPlatform()){
             qDebug() << "向下攀爬已到达指定平台";
             return true;
@@ -593,7 +594,7 @@ bool MovePlatform::down(cv::Point range, int platform, bool self_climb)
         if(!arrived) return false;
 
         // 到达地点之后按下方向键
-        MSDriverPRO::keyboardClick(MSKeyboard_DownArrow);
+        MSDK::keyPress(Keyboard_DownArrow,1);
 
         ProcessHelper::programDelay(100);
         quint64 climb_p = getUserClimbP();
@@ -622,7 +623,7 @@ bool MovePlatform::teleport(cv::Point range, int platform)
     if(!arrived) return false;
 
     // 到达地点之后按向上方向键
-    MSDriverPRO::keyboardClick(MSKeyboard_UpArrow);
+    MSDK::keyPress(Keyboard_UpArrow,1);
 
     ProcessHelper::programDelay(100);
 

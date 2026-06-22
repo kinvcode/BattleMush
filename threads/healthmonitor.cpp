@@ -6,6 +6,7 @@
 #include "utils/helper.h"
 #include "global/gameoffset.h"
 #include "driver/mem.h"
+#include "driver/msdk/msdkDriver.h"
 #include "global/controller.h"
 
 using namespace Mem;
@@ -114,7 +115,7 @@ void HealthMonitor::process()
 
                     DebugOutput::out("检测到血量低于安全值，自动加血");
                     Helper::console("检测到血量低于安全值，自动加血");
-                    MSDriverPRO::keyboardClick(m_hp_key_code, 1);
+                    MSDK::keyPress(m_hp_key_code, 1);
                     ProcessHelper::programDelay(1000); // 防止加两次
                 }
             }
@@ -131,7 +132,7 @@ void HealthMonitor::process()
                     qDebug() << "当前比例" << cur_mp_rate;
                     DebugOutput::out("检测到蓝量低于安全值，自动加蓝");
                     Helper::console("检测到蓝量低于安全值，自动加蓝");
-                    MSDriverPRO::keyboardClick(m_mp_key_code, 1);
+                    MSDK::keyPress(m_mp_key_code, 1);
                     ProcessHelper::programDelay(1000);
                 }
             }
