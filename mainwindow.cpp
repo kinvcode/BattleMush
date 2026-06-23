@@ -8,6 +8,7 @@
 #include <QPoint>
 #include <QMenu>
 #include <QJsonArray>
+#include <QDirIterator>
 
 #include <vmp/VMProtectSDK.h>
 #include "driver/msdriverpro.h"
@@ -1717,6 +1718,29 @@ void MainWindow::on_pushButton_text_list_clicked()
 
 void MainWindow::on_pushButton_answer_check_info_clicked()
 {
+    QDirIterator it("D:/CodeRepos/QT/BattleMush/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug/debug/output/quiz", QDirIterator::Subdirectories);
+
+    while (it.hasNext()) {
+        QString filePath = it.next();
+        QFileInfo fileInfo(filePath);
+
+        if (fileInfo.isFile() && fileInfo.suffix().toLower() == "png") {
+            qDebug() << "PNG文件:" << filePath;
+            MatchTemp tempmatch(":assets/templat/answer_check_text");
+            tempmatch.setGrayscale();
+            tempmatch.setThreshold(120,255);
+            cv::Point check_coor;
+            if(tempmatch.matchImage(check_coor, filePath)){
+                qDebug() << "check按钮位置:" << check_coor.x << "," << check_coor.y;
+            }else{
+                qDebug() << "check按钮匹配失败！！！";
+            }
+        }
+    }
+
+    return;
+
+
     // 匹配check按钮位置
     MatchTemp tempmatch(":assets/templat/answer_check_text");
     tempmatch.setGrayscale();
@@ -2222,5 +2246,15 @@ void MainWindow::on_pushButton_get_user_screen_pos_clicked()
     {
         qDebug() << "Screen:" << screen.x << screen.y;
     }
+}
+
+
+void MainWindow::on_pushButton_answer_input_test_clicked()
+{
+    QString answer_text = "玩具鴨";
+    ProcessHelper::programDelay(1500);
+
+    // 开始输入答案
+    MSDK::KeyInputUnicode(answer_text);
 }
 

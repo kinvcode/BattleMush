@@ -193,6 +193,7 @@ namespace BASE {
     };
 
     namespace UIAntiMacro{
+        static int DialogID = 0x38;
         static int posList = 0xC0;
         static int currentStatus = 0xD0;
         static int currentTick = 0xD8;

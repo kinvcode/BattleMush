@@ -39,6 +39,8 @@ private:
     // 检测滑鼠
     void checkMouseMove();
 
+    void AIcheckMouseMove();
+
     bool UIAntiMacroExists(quint64 list, quint64 head);
 
     cv::Point2f to_pixel_coords(cv::Point2f pos);

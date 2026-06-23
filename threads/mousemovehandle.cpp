@@ -73,6 +73,8 @@ void MouseMoveHandle::process()
 
         // 检测鼠标验证
         checkMouseMove();
+
+        // AIcheckMouseMove();
     }
 }
 
@@ -100,13 +102,49 @@ void MouseMoveHandle::checkMouseMove()
 
     handleMouseCheck();
 
-    // AI识别
-    // MouseTrack tracktest;
-    // tracktest.realTrackTest();
-
     qDebug() << "滑鼠验证结束~";
     Helper::console("滑鼠验证结束~");
     ProcessHelper::programDelay(500);
+}
+
+void MouseMoveHandle::AIcheckMouseMove()
+{
+    bool find_mousemove = false;
+
+    quint64 text_list = readPointer(Gplayer.p_assemblybase,
+                                    BASE::TMP_UpdateManager_base,
+                                    BASE::TMP_UpdateManager_offset_lv1,
+                                    BASE::TMP_UpdateManager_offset_lv2,
+                                    BASE::TMP_UpdateManager_List);
+    quint64 text_head = readLong(text_list + BASE::List::InternalArray) + BASE::InternalArray::Head;
+
+    if(Gplayer.mousecheck_exists){
+
+        MouseTrack tracktest;
+        tracktest.realTrackTest();
+        qDebug() << "滑鼠验证结束~";
+        Helper::console("滑鼠验证结束~");
+        Gplayer.mousecheck_exists = false;
+        ProcessHelper::programDelay(10000);
+        return;
+    }
+
+    // 尋找透明圖形
+    if(!Gplayer.p_assemblybase){
+        qDebug() << "先运行一次，再获取数据";
+        ProcessHelper::programDelay(1000);
+        return;
+    }
+
+    find_mousemove = UIAntiMacroExists(text_list, text_head);
+
+    // 判断是否存在
+    if(find_mousemove){
+        Gplayer.mousecheck_exists = true;
+    }
+    ProcessHelper::programDelay(500);
+    // 控制频率
+    QApplication::processEvents();
 }
 
 bool MouseMoveHandle::UIAntiMacroExists(quint64 list, quint64 head)
@@ -243,8 +281,16 @@ void MouseMoveHandle::handleMouseCheck()
             return;
         }
 
+        int DialogID = readInt(uiantimacro + BASE::UIAntiMacro::DialogID);
+        if(DialogID != 134){
+            qDebug() << "滑鼠界面尚未出现，继续等待中...";
+            ProcessHelper::programDelay(100);
+            ProcessHelper::handleEvents();
+            continue;
+        }
+
         int readyTick = readInt(uiantimacro + BASE::UIAntiMacro::readyTick);
-        if(readyTick < 10){
+        if(readyTick < 10 || readyTick > 1000){
             qDebug() << "滑鼠界面尚未出现，继续等待中...";
             ProcessHelper::programDelay(100);
             ProcessHelper::handleEvents();

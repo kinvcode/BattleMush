@@ -112,6 +112,8 @@ void MSDK::humanMove(int targetX, int targetY)
 {
     targetX = Gplayer.game_window.x + targetX;
     targetY = Gplayer.game_window.y + targetY;
+    Jo5KxStTbxF(Gplayer.MSDK_HANDLE,targetX, targetY);
+    return;
 
     // qDebug() << "移动位置:" << targetX << targetY;
 

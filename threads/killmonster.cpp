@@ -930,6 +930,7 @@ retryEnter:
 
     // quint64 quiz_image_dataid = 0;
     QString quiz_image_dataid = "";
+    quint64 TimerText = 0x0;
     for (int i = 0; i < count; ++i) {
         // 子组件指针
         uintptr_t compPtr = readLong(arrayStartAddress + i * 8);
@@ -944,9 +945,16 @@ retryEnter:
                     compPtr + BASE::MODEntity::SpriteGUIRendererComponent)
                     +BASE::SpriteGUIRendererComponent::MODDataRef)
                     +BASE::MODDataRef::dataId) + BASE::String::text, 100);
-                break;
+            }
+            if(name == "TimerText"){
+                TimerText = compPtr;
             }
         }
+    }
+
+    if(!TimerText){
+        qDebug() << "未找到倒计时组件";
+        return;
     }
 
     qDebug() << "quiz_image_dataid:" << quiz_image_dataid;
@@ -971,47 +979,90 @@ retryEnter:
     QJsonObject json = doc.object();
 
     // 使用 const_iterator
-    bool finded_answer;
+    bool finded_answer = false;
     for (QJsonObject::const_iterator it = json.constBegin(); it != json.constEnd(); ++it) {
         QString key = it.key();
         QJsonValue value = it.value();
         if(key == quiz_image_dataid)
         {
-            finded_answer = true;
             QString answer_text = value.toString();
             qDebug() << "答案：" << answer_text;
 
-            // 匹配check按钮位置
-            MatchTemp tempmatch(":assets/templat/answer_check_text");
-            tempmatch.setGrayscale();
-            tempmatch.setThreshold(120,255);
-            cv::Point check_coor;
-            if(tempmatch.match(check_coor)){
-                qDebug() << "check按钮位置:" << check_coor.x << "," << check_coor.y;
+            QElapsedTimer start_execute_time;
+            start_execute_time.start();
+
+            qDebug() << "开始匹配check按钮位置";
+            cv::Point check_btn_coor = {0,0};
+            while(true){
+                if(start_execute_time.elapsed() > 60000){
+                    qDebug() << "答题超时";
+                    break;
+                }
+
+                QString timer_text = readString(readLong(readLong(
+                    TimerText+ BASE::MODEntity::TextComponent)
+                    + BASE::TextComponent::_text)
+                    + BASE::String::text,100);
+                int expired = timer_text.toInt();
+                if(expired < 1 || expired > 60){
+                    qDebug() << "答题计时器数值不符合预期";
+                    break;
+                }
+
+                MatchTemp tempmatch(":assets/templat/answer_check_text");
+                tempmatch.setGrayscale();
+                tempmatch.setThreshold(120,255);
+                if(tempmatch.match(check_btn_coor)){
+                    qDebug() << "已匹配到check按钮：" << check_btn_coor.x << "," << check_btn_coor.y;
+                    break;
+                }
+            }
+
+            if(check_btn_coor.x == 0 || check_btn_coor.y == 0){
+                qDebug() << "未找到check按钮";
+                break;
+            }
+
+            qDebug() << "开始输入正确答案";
+            start_execute_time.restart();
+            while(true){
+                if(start_execute_time.elapsed() > 60000){
+                    qDebug() << "答题超时";
+                    break;
+                }
+
+                QString timer_text = readString(readLong(readLong(
+                    TimerText+ BASE::MODEntity::TextComponent)
+                    + BASE::TextComponent::_text)
+                    + BASE::String::text,100);
+                int expired = timer_text.toInt();
+                if(expired < 1 || expired > 60){
+                    qDebug() << "答题计时器数值不符合预期";
+                    break;
+                }
 
                 // 点击输入框
-                MSDK::humanMove(check_coor.x + 82, check_coor.y - 22);
+                MSDK::humanMove(check_btn_coor.x + 82, check_btn_coor.y - 22);
                 MSDK::LeftDoubleClick();
 
                 ProcessHelper::programDelay(500);
-
                 // 开始输入答案
                 MSDK::KeyInputUnicode(answer_text);
+                ProcessHelper::programDelay(1000);
 
-                ProcessHelper::programDelay(1500);
                 // 点击check按钮
-                MSDK::humanMove(check_coor.x + 10, check_coor.y + 2);
+                MSDK::humanMove(check_btn_coor.x + 10, check_btn_coor.y + 2);
                 MSDK::LeftDoubleClick();
-            }
 
+                finded_answer = true;
+            }
             break;
         }
     }
 
     if(!finded_answer){
-        // 截图上传
-        // 截图 save_path
-        // 问题资源 quiz_image_dataid
+        QString save_path = QString("%1/quiz_image_dataid_%2.png").arg(save_dir).arg(quiz_image_dataid);
+        cv::imwrite(save_path.toStdString(), bgr_frame);
         qDebug() << "将问题上传到题库";
     }
 

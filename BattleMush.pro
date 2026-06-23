@@ -11,7 +11,7 @@ CONFIG += c++20
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 #保护版本
-DEFINES += PROTECT=TRUE
+# DEFINES += PROTECT=TRUE
 
 OPENCV_PATH = D:/CodeRepos/3th/opencv/           #opencv目录
 ONNXRUNTIME_DIR = D:/CodeRepos/3th/onnxruntime-win-x64-1.23.2/ #onnxruntime v1.23.2 https://github.com/microsoft/onnxruntime/releases

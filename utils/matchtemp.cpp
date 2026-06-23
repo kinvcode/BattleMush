@@ -28,7 +28,7 @@ void MatchTemp::getScreenShot()
     );
 
     // qDebug() << "Game Position:" << Gplayer.game_window.x << Gplayer.game_window.y;
-    qDebug() << Gplayer.game_window.x << Gplayer.game_window.y << Gplayer.game_window.width << Gplayer.game_window.height;
+    // qDebug() << Gplayer.game_window.x << Gplayer.game_window.y << Gplayer.game_window.width << Gplayer.game_window.height;
     img_width = cur_capture.width();
     img_height = cur_capture.height();
 }
@@ -182,6 +182,104 @@ bool MatchTemp::match(cv::Point &coor)
 
 
     // qDebug() <<("当前匹配位置：" + QString::number(coor.x) + "," + QString::number(coor.y));
+    return true;
+}
+
+bool MatchTemp::matchImage(cv::Point &coor, QString &path)
+{
+    cur_capture = QPixmap(path);
+
+    img_width = cur_capture.width();
+    img_height = cur_capture.height();
+
+
+    if(img_width != 1296 || img_height != 759){
+
+    }
+
+begin:
+
+    // 裁剪截图
+    if(iscut){
+        cutPicture();
+    }
+
+    coor.x = 0;
+    coor.y = 0;
+
+    // 载入模板图片
+    QPixmap tmp_file(tmp_src);
+    // qDebug() << "当前匹配模板：" << tmp_src;
+
+    // 模板
+    cv::Mat cv_templat = QPixmapToMat(tmp_file);
+    if(cv_templat.empty()){
+        qDebug() << "模板为空";
+        return false;
+    }
+
+    tmp_width = cv_templat.cols;
+    tmp_height = cv_templat.rows;
+    // qDebug() << "模板大小:" << tmp_width << "," << tmp_height;
+
+    // 截图
+    cv::Mat cv_capture = QPixmapToMat(cur_capture);
+    if(cv_capture.empty()){
+        qDebug() << "截图为空";
+        return false;
+    }
+
+    // 设置灰度
+    if(grayscale)
+    {
+        cv::cvtColor(cv_templat, cv_templat, cv::COLOR_BGR2GRAY);
+        cv::cvtColor(cv_capture, cv_capture, cv::COLOR_BGR2GRAY);
+    }
+
+    // 设置阈值
+    if(threshold)
+    {
+        cv::threshold(cv_templat, cv_templat, threshold_val, threshold_max, cv::THRESH_BINARY);
+        cv::threshold(cv_capture, cv_capture, threshold_val, threshold_max, cv::THRESH_BINARY);
+    }
+
+    // 查看处理后的图片
+    // QString path = QCoreApplication::applicationDirPath() + "/temp/opencv.png";
+    // cv::imwrite(path.toStdString(), cv_capture);
+
+    // 模板匹配
+    cv::Mat cv_result;
+    cv::matchTemplate(cv_capture, cv_templat, cv_result, cv::TM_SQDIFF);
+
+    // // 获取匹配的坐标点
+    double minVal;
+    cv::Point matchLoc;
+    cv::minMaxLoc(cv_result, &minVal, NULL, &matchLoc);
+    qDebug() <<("当前匹配系数：" + QString::number(minVal) + " 坐标:" + QString::number(matchLoc.x + x_offset) + "," + QString::number(matchLoc.y + y_offset));
+
+
+    if(minVal > 1000000)
+    {
+        if(retry_times > 0){
+            retry_times--;
+            getScreenShot();
+            goto begin;
+        }
+        // 匹配失败
+        // qDebug() <<("匹配系数太低，匹配失败");
+        return false;
+    }
+
+    if(iscut){
+        coor.x = matchLoc.x + x_offset;
+        coor.y = matchLoc.y + y_offset;
+    }else{
+        coor.x = matchLoc.x;
+        coor.y = matchLoc.y;
+    }
+
+
+    qDebug() <<("当前匹配位置：" + QString::number(coor.x) + "," + QString::number(coor.y));
     return true;
 }
 

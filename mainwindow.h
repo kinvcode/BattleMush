@@ -202,6 +202,8 @@ private slots:
 
     void on_pushButton_get_user_screen_pos_clicked();
 
+    void on_pushButton_answer_input_test_clicked();
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

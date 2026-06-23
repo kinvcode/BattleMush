@@ -47,6 +47,9 @@ public:
     // 执行模板匹配
     bool match(cv::Point &coor);
 
+    // 模板匹配图片
+    bool matchImage(cv::Point &coor,QString& path);
+
     // 执行形状匹配
     bool shapeMatch(cv::Point &coor);
 
