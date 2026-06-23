@@ -9,6 +9,7 @@
 #include "utils/matchtemp.h"
 #include "utils/mousetrack.h"
 #include "driver/msdk/msdkDriver.h"
+#include <algorithm>
 
 using namespace Mem;
 
@@ -259,8 +260,7 @@ void MouseMoveHandle::handleMouseCheck()
 
     int log_index = 1;
 
-    std::vector<cv::Point2f> raw_pos_list;
-    raw_pos_list.resize(330);
+    std::unordered_map<int, cv::Point2f> raw_pos_list;
     mouse_pos_.clear();
 
     // 主循环
@@ -311,7 +311,7 @@ void MouseMoveHandle::handleMouseCheck()
             // return;
         }
 
-        if(currentTick < 1 && mouse_pos_.size() == 0){
+        if(currentTick < 1 && mouse_pos_.empty()){
             // 转换坐标，读取坐标
             quint64 pos_list = readLong(uiantimacro + BASE::UIAntiMacro::posList);
             qDebug() << QString("pos_list:0x%1").arg(pos_list, 0, 16);
@@ -327,7 +327,7 @@ void MouseMoveHandle::handleMouseCheck()
             qDebug() << QString("pos_head:0x%1").arg(pos_head, 0, 16);
 
             qDebug() << "------------开始读取坐标------------";
-            raw_pos_list.resize(330);
+            raw_pos_list.clear();
             for(int i = 0; i < 330; i++){
                 quint64 cur_pos = pos_head + i * 8;
                 float pos_x = readFloat(cur_pos);
@@ -335,17 +335,16 @@ void MouseMoveHandle::handleMouseCheck()
                 float pos_y = readFloat(cur_pos + 4);
                 pos_y = std::round(pos_y * 100) / 100.0f;
                 qDebug() << i << ":" << pos_x << "," << pos_y;
-                raw_pos_list[i] = cv::Point2f(pos_x,pos_y);
+                raw_pos_list[i] = cv::Point2f(pos_x, pos_y);
             }
             qDebug() << "------------读取坐标完毕------------";
 
             // 转换坐标
             qDebug() << "------------开始转换坐标------------";
             mouse_pos_.clear();
-            mouse_pos_.resize(330);
-            for(int i = 0; i < 330; i++){
-                mouse_pos_[i] = to_pixel_coords(raw_pos_list[i]);
-                qDebug() << i << ":" << mouse_pos_[i].x << "," << mouse_pos_[i].y;
+            for(const auto& entry : raw_pos_list){
+                mouse_pos_[entry.first] = to_pixel_coords(entry.second);
+                qDebug() << entry.first << ":" << mouse_pos_[entry.first].x << "," << mouse_pos_[entry.first].y;
             }
             qDebug() << "------------转换坐标完毕------------";
         }
@@ -375,17 +374,24 @@ void MouseMoveHandle::handleMouseCheck()
         }
 
         // 转换成游戏屏幕坐标
-        int pos_index = 0;
         if(mouse_pos_.empty()){
             stream << "滑鼠轨迹为空~\r\n";
             qDebug() << "滑鼠轨迹为空，退出";
             break;
         }
-        if(currentTick){
-            pos_index = currentTick - 1;
+
+        int pos_index = currentTick > 0 ? currentTick - 1 : 0;
+        auto pos_it = mouse_pos_.find(pos_index);
+        if(pos_it == mouse_pos_.end()){
+            stream << "滑鼠轨迹索引" << pos_index << "不存在，跳过~\r\n";
+            qDebug() << "滑鼠轨迹索引" << pos_index << "不存在，跳过";
+            log_index++;
+            ProcessHelper::programDelay(10);
+            ProcessHelper::handleEvents();
+            continue;
         }
 
-        cv::Point2f raw_pos = mouse_pos_[pos_index];
+        cv::Point2f raw_pos = pos_it->second;
         cv::Point2i cur_target_pos = cv::Point2i(
             static_cast<int>(raw_pos.x + box_pos_x_),
             static_cast<int>(raw_pos.y + box_pos_y_));

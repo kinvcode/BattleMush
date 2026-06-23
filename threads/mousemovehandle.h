@@ -4,6 +4,7 @@
 #include <qthread.h>
 #include <QApplication>
 #include <QObject>
+#include <unordered_map>
 #include "threads/iworker.h"
 #include "global/struct.h"
 
@@ -57,7 +58,7 @@ private:
 
 
 private:
-    std::vector<cv::Point2f> mouse_pos_;
+    std::unordered_map<int, cv::Point2f> mouse_pos_;
     std::vector<cv::Point2f> test_mouse_pos_ = {
         {0, 0}, {0, 0.01}, {-0.01, 0.01}, {-0.01, 0.01}, {-0.02, 0.02},
         {-0.02, 0.02}, {-0.02, 0.03}, {-0.02, 0.03}, {-0.03, 0.04},
