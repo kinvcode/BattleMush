@@ -72,8 +72,16 @@ void MouseMoveHandle::process()
             continue;
         }
 
-        // 检测鼠标验证
-        checkMouseMove();
+        try{
+            // 检测鼠标验证
+            checkMouseMove();
+        } catch (const std::exception& e) {
+            // 捕获线程异常
+            // LOG("ERROR自动线程错误：" + QString::fromStdString(e.what()));
+        } catch (...) {
+            // 捕获所有其他异常
+            // LOG("ERROR自动线程发生未知异常");
+        }
 
         // AIcheckMouseMove();
     }

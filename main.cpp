@@ -7,6 +7,9 @@
 #include <windows.h>
 #include "global/controller.h"
 #include "process/process.h"
+#include "driver/msdk/msdkDriver.h"
+#include <dbghelp.h>
+#include "process/exception.h"
 
 void setStyle(const QString &style);
 
@@ -14,12 +17,16 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    // _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
+
     // 使用QSharedMemory来实现互斥锁，禁止重复运行
     // QSharedMemory sharedMemory;
     // sharedMemory.setKey("BattleMushKey");
     // if (!sharedMemory.create(1)) {
     //     return 1;
     // }
+
+    SetUnhandledExceptionFilter(BattleCrashHandler);
 
     QString rand_tile = "";
 #ifdef PROTECT
@@ -67,4 +74,3 @@ void setStyle(const QString &style) {
     qApp->setStyleSheet(qss.readAll());
     qss.close();
 }
-

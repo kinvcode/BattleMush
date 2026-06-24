@@ -82,6 +82,7 @@ SOURCES += \
     mainwindow.cpp \
     pathfinding/moveplatform.cpp \
     pathfinding/walkbase.cpp \
+    process/exception.cpp \
     process/process.cpp \
     threads/healthmonitor.cpp \
     threads/iworker.cpp \
@@ -123,6 +124,7 @@ HEADERS += \
     mainwindow.h \
     pathfinding/moveplatform.h \
     pathfinding/walkbase.h \
+    process/exception.h \
     process/process.h \
     threads/healthmonitor.h \
     threads/iworker.h \

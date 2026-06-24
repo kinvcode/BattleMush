@@ -15,6 +15,8 @@
 #include "utils/matchtemp.h"
 #include "utils/mousetrack.h"
 #include "driver/msdk/msdkDriver.h"
+#include "DbgHelp.h"
+#include "process/exception.h"
 
 using namespace Mem;
 
@@ -198,46 +200,55 @@ void KillMonster::process()
         // 检查键盘
         // if ((GetKeyState(VK_NUMLOCK) & 1)) MSDK::keyPress(0x45);
 
-        if(Gplayer.DIED){
-            // 处理死亡
-            handleDied();
-        }
+        try{
 
-        if(Gplayer.mousecheck_exists){
-            DebugOutput::out("主线程出现滑鼠验证");
-            Helper::console("主线程出现滑鼠验证~");
-            handleMousemove();
-            ProcessHelper::programDelay(100);
-            QApplication::processEvents();
-            continue;
-        }
+            if(Gplayer.DIED){
+                // 处理死亡
+                handleDied();
+            }
 
-        // 获取当前的任务
-        if(Gcontroller.m_tasks.empty())
-        {
-            DebugOutput::out("当前没有计划任务，即将执行智能路线模式");
-            autoCleanLine();
-            ProcessHelper::programDelay(100);
-            QApplication::processEvents();
-            continue;
-        }
+            if(Gplayer.mousecheck_exists){
+                DebugOutput::out("主线程出现滑鼠验证");
+                Helper::console("主线程出现滑鼠验证~");
+                handleMousemove();
+                ProcessHelper::programDelay(100);
+                QApplication::processEvents();
+                continue;
+            }
 
-        if(m_task_id >= Gcontroller.m_tasks.size()){
-            DebugOutput::out("计划任务ID错误，即将重置任务");
-            m_task_id = 0;
-            continue;
-        }
+            // 获取当前的任务
+            if(Gcontroller.m_tasks.empty())
+            {
+                DebugOutput::out("当前没有计划任务，即将执行智能路线模式");
+                autoCleanLine();
+                ProcessHelper::programDelay(100);
+                QApplication::processEvents();
+                continue;
+            }
 
-        m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
-        m_task_timer.restart();
-        m_task_info.id = m_task_id;
+            if(m_task_id >= Gcontroller.m_tasks.size()){
+                DebugOutput::out("计划任务ID错误，即将重置任务");
+                m_task_id = 0;
+                continue;
+            }
 
-        if(m_task_type == 0){
-            taskCleanRoom();
-        }else if(m_task_type == 1){
-            taskRest();
-        }else if(m_task_type == 2){
-            taskQuest();
+            m_task_type = Gcontroller.m_tasks.at(m_task_id).type;
+            m_task_timer.restart();
+            m_task_info.id = m_task_id;
+
+            if(m_task_type == 0){
+                taskCleanRoom();
+            }else if(m_task_type == 1){
+                taskRest();
+            }else if(m_task_type == 2){
+                taskQuest();
+            }
+        } catch (const std::exception& e) {
+            // 捕获线程异常
+            // LOG("ERROR自动线程错误：" + QString::fromStdString(e.what()));
+        } catch (...) {
+            // 捕获所有其他异常
+            // LOG("ERROR自动线程发生未知异常");
         }
 
         DebugOutput::out("主线程循环体进入下一次循环");

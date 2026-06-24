@@ -27,6 +27,8 @@
 #include "utils/mousetrack.h"
 #include "utils/matchtemp.h"
 #include "driver/msdk/msdkDriver.h"
+#include <dbghelp.h>
+#include "process/exception.h"
 
 // 测试头文件
 #include "global/globalplayer.h"
@@ -39,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent)
     , m_threadManager(new ThreadManager(this))
 {
     ui->setupUi(this);
+
+    SetUnhandledExceptionFilter(BattleCrashHandler);
 
     loadDriver();
 
@@ -413,6 +417,36 @@ void MainWindow::initDir()
     {
         project_img_dir.mkdir(img_dir);
     }
+
+    QString output_dir = QCoreApplication::applicationDirPath() + "/output/";
+    QDir project_output_dir(output_dir);
+    if(!project_output_dir.exists())
+    {
+        project_output_dir.mkdir(output_dir);
+    }
+
+    QString mousecheck_dir = QCoreApplication::applicationDirPath() + "/output/mousecheck/";
+    QDir project_mousecheck_dir(mousecheck_dir);
+    if(!project_mousecheck_dir.exists())
+    {
+        project_mousecheck_dir.mkdir(mousecheck_dir);
+    }
+
+
+    QString quiz_dir = QCoreApplication::applicationDirPath() + "/output/quiz/";
+    QDir project_quiz_dir(quiz_dir);
+    if(!project_quiz_dir.exists())
+    {
+        project_quiz_dir.mkdir(quiz_dir);
+    }
+
+    QString dump_dir = QCoreApplication::applicationDirPath() + "/output/dump/";
+    QDir project_dump_dir(dump_dir);
+    if(!project_dump_dir.exists())
+    {
+        project_dump_dir.mkdir(dump_dir);
+    }
+
 }
 
 void MainWindow::initSinalBind()
@@ -2251,6 +2285,15 @@ void MainWindow::on_pushButton_get_user_screen_pos_clicked()
 
 void MainWindow::on_pushButton_answer_input_test_clicked()
 {
+
+    std::vector<int> list;
+    list.clear();
+    list.resize(330);
+    int aindex = list.at(999);
+
+
+    return;
+
     QString answer_text = "玩具鴨";
     ProcessHelper::programDelay(1500);
 

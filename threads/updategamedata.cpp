@@ -180,22 +180,28 @@ void UpdateGameData::process()
                 break;
             }
 
-            // 检测鼠标验证
-            // checkMouseMove();
+            try{
+                // 更新用户信息
+                UpdateUserStatus(statuspanel);
 
-            // 更新用户信息
-            UpdateUserStatus(statuspanel);
+                // 更新快捷栏
+                updateQuickSlot(Gplayer.p_uientity);
 
-            // 更新快捷栏
-            updateQuickSlot(Gplayer.p_uientity);
+                if(Gplayer.p_curmapentity != Gplayer.last_mapentity){
+                    DebugOutput::out("切换了地图");
+                    Gplayer.m_map_loaded = false;
+                    Gplayer.last_mapentity = Gplayer.p_curmapentity;
+                    // 更新地图信息
+                    UpdateRoomMap();
+                    continue;
+                }
 
-            if(Gplayer.p_curmapentity != Gplayer.last_mapentity){
-                DebugOutput::out("切换了地图");
-                Gplayer.m_map_loaded = false;
-                Gplayer.last_mapentity = Gplayer.p_curmapentity;
-                // 更新地图信息
-                UpdateRoomMap();
-                continue;
+            } catch (const std::exception& e) {
+                // 捕获线程异常
+                // LOG("ERROR自动线程错误：" + QString::fromStdString(e.what()));
+            } catch (...) {
+                // 捕获所有其他异常
+                // LOG("ERROR自动线程发生未知异常");
             }
 
             ProcessHelper::programDelay(500); // 0.5秒更新一次数据
