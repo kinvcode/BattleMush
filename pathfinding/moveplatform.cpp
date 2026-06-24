@@ -263,10 +263,15 @@ bool MovePlatform::walkLeft(cv::Point range, int platform)
 
     // 这时候读人物的坐标
     quint64 foothold_p = getUserFootholdP();
+    QElapsedTimer check_time;
+    check_time.start();
     while(foothold_p == 0){
         ProcessHelper::programDelay(50);
         QApplication::processEvents();
         foothold_p = getUserFootholdP();
+        if(check_time.elapsed() > 10000){
+            break;
+        }
     }
 
     if(platform == getUserPlatform()){
@@ -283,10 +288,15 @@ bool MovePlatform::walkRight(cv::Point range, int platform)
 
     // 这时候读人物的坐标
     quint64 foothold_p = getUserFootholdP();
+    QElapsedTimer check_time;
+    check_time.start();
     while(foothold_p == 0){
         ProcessHelper::programDelay(50);
         QApplication::processEvents();
         foothold_p = getUserFootholdP();
+        if(check_time.elapsed() > 10000){
+            break;
+        }
     }
 
     if(platform == getUserPlatform()){
@@ -324,11 +334,16 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
 
         quint64 foothold_p = getUserFootholdP();
         quint64 climb_p = getUserClimbP();
+        QElapsedTimer check_time;
+        check_time.start();
         while(climb_p == 0 && foothold_p == 0){
             ProcessHelper::programDelay(10);
             QApplication::processEvents();
             climb_p = getUserClimbP();
             foothold_p = getUserFootholdP();
+            if(check_time.elapsed() > 10000){
+                break;
+            }
         }
 
         MSDK::KeyUp(Keyboard_LeftArrow);
@@ -346,10 +361,15 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
         MSDK::keyPress(jump_key,1);
 
         quint64 foothold_p = getUserFootholdP();
+        QElapsedTimer check_time;
+        check_time.start();
         while(foothold_p == 0){
             ProcessHelper::programDelay(50);
             QApplication::processEvents();
             foothold_p = getUserFootholdP();
+            if(check_time.elapsed() > 10000){
+                break;
+            }
         }
         MSDK::KeyUp(Keyboard_LeftArrow);
 
@@ -390,11 +410,16 @@ bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool 
 
         quint64 foothold_p = getUserFootholdP();
         quint64 climb_p = getUserClimbP();
+        QElapsedTimer check_time;
+        check_time.start();
         while(climb_p == 0 && foothold_p == 0){
             ProcessHelper::programDelay(10);
             QApplication::processEvents();
             climb_p = getUserClimbP();
             foothold_p = getUserFootholdP();
+            if(check_time.elapsed() > 10000){
+                break;
+            }
         }
 
         MSDK::KeyUp(Keyboard_RightArrow);
@@ -410,10 +435,15 @@ bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool 
         MSDK::keyPress(jump_key,1);
 
         quint64 foothold_p = getUserFootholdP();
+        QElapsedTimer check_time;
+        check_time.start();
         while(foothold_p == 0){
             ProcessHelper::programDelay(50);
             QApplication::processEvents();
             foothold_p = getUserFootholdP();
+            if(check_time.elapsed() > 10000){
+                break;
+            }
         }
         MSDK::KeyUp(Keyboard_RightArrow);
 
@@ -445,11 +475,16 @@ bool MovePlatform::jumpUP(cv::Point range, int platform, bool is_climb)
 
         quint64 foothold_p = getUserFootholdP();
         quint64 climb_p = getUserClimbP();
+        QElapsedTimer check_time;
+        check_time.start();
         while(climb_p == 0 && foothold_p == 0){
             ProcessHelper::programDelay(10);
             QApplication::processEvents();
             climb_p = getUserClimbP();
             foothold_p = getUserFootholdP();
+            if(check_time.elapsed() > 10000){
+                break;
+            }
         }
 
         MSDK::KeyUp(Keyboard_UpArrow);
@@ -466,10 +501,15 @@ bool MovePlatform::jumpUP(cv::Point range, int platform, bool is_climb)
         MSDK::keyPress(jump_key,1);
 
         quint64 foothold_p = getUserFootholdP();
+        QElapsedTimer check_time;
+        check_time.start();
         while(foothold_p == 0){
             ProcessHelper::programDelay(50);
             QApplication::processEvents();
             foothold_p = getUserFootholdP();
+            if(check_time.elapsed() > 10000){
+                break;
+            }
         }
 
         if(platform == getUserPlatform()){
@@ -497,6 +537,8 @@ bool MovePlatform::jumpDown(cv::Point range, int platform)
     MSDK::KeyUp(Keyboard_DownArrow);
 
     quint64 foothold_p = getUserFootholdP();
+    QElapsedTimer check_time;
+    check_time.start();
     while(foothold_p == 0){
         if(getUserClimbP() != 0){
             break;
@@ -504,6 +546,9 @@ bool MovePlatform::jumpDown(cv::Point range, int platform)
         ProcessHelper::programDelay(50);
         QApplication::processEvents();
         foothold_p = getUserFootholdP();
+        if(check_time.elapsed() > 10000){
+            break;
+        }
     }
 
     if(platform == getUserPlatform()){
@@ -522,11 +567,16 @@ bool MovePlatform::up(cv::Point range, int platform, bool self_climb)
 
         quint64 foothold_p = getUserFootholdP();
         quint64 climb_p = getUserClimbP();
+        QElapsedTimer check_time;
+        check_time.start();
         while(foothold_p == 0 && climb_p != 0){
             ProcessHelper::programDelay(50);
             QApplication::processEvents();
             climb_p = getUserClimbP();
             foothold_p = getUserFootholdP();
+            if(check_time.elapsed() > 10000){
+                break;
+            }
         }
 
         MSDK::KeyUp(Keyboard_UpArrow);
@@ -576,11 +626,16 @@ bool MovePlatform::down(cv::Point range, int platform, bool self_climb)
 
         quint64 foothold_p = getUserFootholdP();
         quint64 climb_p = getUserClimbP();
+        QElapsedTimer check_time;
+        check_time.start();
         while(foothold_p == 0 && climb_p != 0){
             ProcessHelper::programDelay(50);
             QApplication::processEvents();
             climb_p = getUserClimbP();
             foothold_p = getUserFootholdP();
+            if(check_time.elapsed() > 10000){
+                break;
+            }
         }
 
         MSDK::KeyUp(Keyboard_DownArrow);
@@ -628,6 +683,8 @@ bool MovePlatform::teleport(cv::Point range, int platform)
     ProcessHelper::programDelay(100);
 
     quint64 foothold_p = getUserFootholdP();
+    QElapsedTimer check_time;
+    check_time.start();
     while(foothold_p == 0){
         if(getUserClimbP() != 0){
             break;
@@ -635,6 +692,9 @@ bool MovePlatform::teleport(cv::Point range, int platform)
         ProcessHelper::programDelay(50);
         QApplication::processEvents();
         foothold_p = getUserFootholdP();
+        if(check_time.elapsed() > 10000){
+            break;
+        }
     }
 
     if(platform == getUserPlatform()){

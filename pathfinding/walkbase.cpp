@@ -52,6 +52,15 @@ bool WalkBase::run()
 
     QElapsedTimer begin_timer;
     begin_timer.restart();
+/*
+
+    QElapsedTimer check_time;
+    check_time.start();
+    if(check_time.elapsed() > 10000){
+        break;
+    }
+
+*/
 
     QElapsedTimer run_status_time;
     run_status_time.start();
