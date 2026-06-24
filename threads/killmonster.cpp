@@ -991,6 +991,7 @@ retryEnter:
 
     // 使用 const_iterator
     bool finded_answer = false;
+    int screen_index = 0;
     for (QJsonObject::const_iterator it = json.constBegin(); it != json.constEnd(); ++it) {
         QString key = it.key();
         QJsonValue value = it.value();
@@ -1005,6 +1006,19 @@ retryEnter:
             qDebug() << "开始匹配check按钮位置";
             cv::Point check_btn_coor = {0,0};
             while(true){
+                QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow(),
+                                                            game_x + 8,
+                                                            game_y + 31,
+                                                            1280,
+                                                            720);
+                cv::Mat bgr_frame;
+                QImage image = cur_capture.toImage();
+                cv::Mat frame(image.height(), image.width(), CV_8UC4, const_cast<uchar*>(image.bits()), image.bytesPerLine());
+                cv::cvtColor(frame, bgr_frame, cv::COLOR_BGRA2BGR);
+                QString save_path = QString("%1/shortscreen_%2.png").arg(save_dir).arg(screen_index);
+                screen_index++;
+                cv::imwrite(save_path.toStdString(), bgr_frame);
+
                 if(start_execute_time.elapsed() > 60000){
                     qDebug() << "答题超时";
                     break;
@@ -1023,6 +1037,7 @@ retryEnter:
                 MatchTemp tempmatch(":assets/templat/answer_check_text");
                 tempmatch.setGrayscale();
                 tempmatch.setThreshold(120,255);
+                tempmatch.setminVal(5000000);
                 if(tempmatch.match(check_btn_coor)){
                     qDebug() << "已匹配到check按钮：" << check_btn_coor.x << "," << check_btn_coor.y;
                     break;
@@ -1037,6 +1052,19 @@ retryEnter:
             qDebug() << "开始输入正确答案";
             start_execute_time.restart();
             while(true){
+                QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow(),
+                                                            game_x + 8,
+                                                            game_y + 31,
+                                                            1280,
+                                                            720);
+                cv::Mat bgr_frame;
+                QImage image = cur_capture.toImage();
+                cv::Mat frame(image.height(), image.width(), CV_8UC4, const_cast<uchar*>(image.bits()), image.bytesPerLine());
+                cv::cvtColor(frame, bgr_frame, cv::COLOR_BGRA2BGR);
+                QString save_path = QString("%1/shortscreen_%2.png").arg(save_dir).arg(screen_index);
+                screen_index++;
+                cv::imwrite(save_path.toStdString(), bgr_frame);
+
                 if(start_execute_time.elapsed() > 60000){
                     qDebug() << "答题超时";
                     break;
@@ -1053,7 +1081,7 @@ retryEnter:
                 }
 
                 // 点击输入框
-                MSDK::humanMove(check_btn_coor.x + 82, check_btn_coor.y - 22);
+                MSDK::humanMove(check_btn_coor.x + 70, check_btn_coor.y - 30);
                 MSDK::LeftDoubleClick();
 
                 ProcessHelper::programDelay(500);
@@ -1062,7 +1090,7 @@ retryEnter:
                 ProcessHelper::programDelay(1000);
 
                 // 点击check按钮
-                MSDK::humanMove(check_btn_coor.x + 10, check_btn_coor.y + 2);
+                MSDK::humanMove(check_btn_coor.x + 20, check_btn_coor.y + 5);
                 MSDK::LeftDoubleClick();
 
                 finded_answer = true;

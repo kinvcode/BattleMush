@@ -1763,6 +1763,7 @@ void MainWindow::on_pushButton_answer_check_info_clicked()
             MatchTemp tempmatch(":assets/templat/answer_check_text");
             tempmatch.setGrayscale();
             tempmatch.setThreshold(120,255);
+            tempmatch.setminVal(5000000);
             cv::Point check_coor;
             if(tempmatch.matchImage(check_coor, filePath)){
                 qDebug() << "check按钮位置:" << check_coor.x << "," << check_coor.y;

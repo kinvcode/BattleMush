@@ -71,6 +71,9 @@ public:
     // 阈值设置
     void setThreshold(double thresh,double maxval);
 
+    // 设置匹配系数阈值
+    void setminVal(double value);
+
     // 模板宽度
     int tmpWidth();
 
@@ -88,6 +91,8 @@ protected:
 
     // 模板匹配区域高度
     int y_length = 0;
+
+    double minVal_ = 1000000;
 
     // 模板宽度
     int tmp_width;

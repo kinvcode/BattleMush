@@ -87,6 +87,11 @@ void MatchTemp::setThreshold(double thresh, double maxval)
     threshold_max = maxval;
 }
 
+void MatchTemp::setminVal(double value)
+{
+    minVal_ = value;
+}
+
 bool MatchTemp::match(cv::Point &coor)
 {
     // 截图
@@ -157,10 +162,10 @@ bool MatchTemp::match(cv::Point &coor)
     double minVal;
     cv::Point matchLoc;
     cv::minMaxLoc(cv_result, &minVal, NULL, &matchLoc);
-    // qDebug() <<("当前匹配系数：" + QString::number(minVal) + " 坐标:" + QString::number(matchLoc.x + x_offset) + "," + QString::number(matchLoc.y + y_offset));
+    qDebug() <<("当前匹配系数：" + QString::number(minVal, 'f', 2) + " 坐标:" + QString::number(matchLoc.x + x_offset) + "," + QString::number(matchLoc.y + y_offset));
 
 
-    if(minVal > 1000000)
+    if(minVal > minVal_)
     {
         if(retry_times > 0){
             retry_times--;
@@ -244,8 +249,8 @@ begin:
     }
 
     // 查看处理后的图片
-    // QString path = QCoreApplication::applicationDirPath() + "/temp/opencv.png";
-    // cv::imwrite(path.toStdString(), cv_capture);
+    QString tmp_path = QCoreApplication::applicationDirPath() + "/temp/opencv.png";
+    cv::imwrite(tmp_path.toStdString(), cv_capture);
 
     // 模板匹配
     cv::Mat cv_result;
@@ -255,10 +260,10 @@ begin:
     double minVal;
     cv::Point matchLoc;
     cv::minMaxLoc(cv_result, &minVal, NULL, &matchLoc);
-    qDebug() <<("当前匹配系数：" + QString::number(minVal) + " 坐标:" + QString::number(matchLoc.x + x_offset) + "," + QString::number(matchLoc.y + y_offset));
+    qDebug() <<("当前匹配系数：" + QString::number(minVal, 'f', 2) + " 坐标:" + QString::number(matchLoc.x + x_offset) + "," + QString::number(matchLoc.y + y_offset));
 
 
-    if(minVal > 1000000)
+    if(minVal > minVal_)
     {
         if(retry_times > 0){
             retry_times--;
