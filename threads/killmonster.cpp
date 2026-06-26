@@ -840,11 +840,15 @@ retryEnter:
         return;
     }
 
+    DebugOutput::out("当前存在问答检测，准备处理中~");
+    Helper::console("当前存在问答检测，准备处理中~");
+
     Helper::warningSound();
     qDebug() << "处理问答中";
 
     if(!isAnswerCheck()){
-        qDebug() << "问答已解决！";
+        qDebug() << "问答界面已经消失";
+        Helper::console("问答界面已经消失~");
         return;
     }
 
@@ -942,6 +946,7 @@ retryEnter:
     // quint64 quiz_image_dataid = 0;
     QString quiz_image_dataid = "";
     quint64 TimerText = 0x0;
+    quint64 CheckButton = 0x0;
     for (int i = 0; i < count; ++i) {
         // 子组件指针
         uintptr_t compPtr = readLong(arrayStartAddress + i * 8);
@@ -959,6 +964,9 @@ retryEnter:
             }
             if(name == "TimerText"){
                 TimerText = compPtr;
+            }
+            if(name == "CheckButton"){
+                CheckButton = compPtr;
             }
         }
     }
@@ -999,13 +1007,34 @@ retryEnter:
         {
             QString answer_text = value.toString();
             qDebug() << "答案：" << answer_text;
+            Helper::console("已匹配到答案：" + answer_text);
 
             QElapsedTimer start_execute_time;
             start_execute_time.start();
 
+            // 获取check按钮内存位置
+            cv::Point2f ui_check_btn_coor = {0,0};
+            if(CheckButton){
+                ui_check_btn_coor.x = readFloat(readLong(CheckButton + BASE::MODEntity::UITransformComponent) + BASE::UITransformComponent::position);
+                ui_check_btn_coor.y = readFloat(readLong(CheckButton + BASE::MODEntity::UITransformComponent) + BASE::UITransformComponent::position + 4);
+
+                int check_coor_x = static_cast<int>(ui_check_btn_coor.x);
+                int check_coor_y = static_cast<int>(ui_check_btn_coor.y);
+                check_coor_y = 720 - check_coor_y;
+                qDebug() << "内存中找到的check按钮位置:" << check_coor_x << "," << check_coor_y;
+                Helper::console("内存check按钮位置:" + QString("%1,%2").arg(check_coor_x).arg(check_coor_x));
+
+                int input_coor_x = check_coor_x + 70;
+                int input_coor_y = check_coor_y - 30;
+                qDebug() << "内存中找到的输入框位置:" << input_coor_x << "," << input_coor_y;
+                Helper::console("内存输入框位置:" + QString("%1,%2").arg(input_coor_x).arg(input_coor_y));
+            }
+
             qDebug() << "开始匹配check按钮位置";
+            Helper::console("开始匹配check按钮位置");
             cv::Point check_btn_coor = {0,0};
             while(true){
+                Helper::warningSound();
                 QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow(),
                                                             game_x + 8,
                                                             game_y + 31,
@@ -1020,7 +1049,8 @@ retryEnter:
                 cv::imwrite(save_path.toStdString(), bgr_frame);
 
                 if(start_execute_time.elapsed() > 60000){
-                    qDebug() << "答题超时";
+                    qDebug() << "匹配check按钮超时";
+                    Helper::console("匹配check按钮超时");
                     break;
                 }
 
@@ -1031,6 +1061,7 @@ retryEnter:
                 int expired = timer_text.toInt();
                 if(expired < 1 || expired > 60){
                     qDebug() << "答题计时器数值不符合预期";
+                    Helper::console("答题计时器数值不符合预期");
                     break;
                 }
 
@@ -1039,6 +1070,7 @@ retryEnter:
                 tempmatch.setThreshold(120,255);
                 tempmatch.setminVal(5000000);
                 if(tempmatch.match(check_btn_coor)){
+                    Helper::console("已匹配到check按钮：" + QString("%1,%2").arg(check_btn_coor.x).arg(check_btn_coor.y));
                     qDebug() << "已匹配到check按钮：" << check_btn_coor.x << "," << check_btn_coor.y;
                     break;
                 }
@@ -1046,6 +1078,7 @@ retryEnter:
 
             if(check_btn_coor.x == 0 || check_btn_coor.y == 0){
                 qDebug() << "未找到check按钮";
+                Helper::console("未找到check按钮");
                 break;
             }
 
@@ -1067,6 +1100,7 @@ retryEnter:
 
                 if(start_execute_time.elapsed() > 60000){
                     qDebug() << "答题超时";
+                    Helper::console("答题超时");
                     break;
                 }
 
@@ -1077,23 +1111,31 @@ retryEnter:
                 int expired = timer_text.toInt();
                 if(expired < 1 || expired > 60){
                     qDebug() << "答题计时器数值不符合预期";
+                    Helper::console("答题计时器数值不符合预期");
                     break;
                 }
 
                 // 点击输入框
+                Helper::console("点击输入框");
+                qDebug() << "点击输入框" << check_btn_coor.x + 70 << "," << check_btn_coor.y - 30;
                 MSDK::humanMove(check_btn_coor.x + 70, check_btn_coor.y - 30);
                 MSDK::LeftDoubleClick();
 
                 ProcessHelper::programDelay(500);
                 // 开始输入答案
+                qDebug() << "输入答案";
+                Helper::console("输入答案");
                 MSDK::KeyInputUnicode(answer_text);
                 ProcessHelper::programDelay(1000);
 
                 // 点击check按钮
+                Helper::console("点击check按钮");
+                qDebug() << "点击check按钮" << check_btn_coor.x + 20 << "," << check_btn_coor.y + 5;
                 MSDK::humanMove(check_btn_coor.x + 20, check_btn_coor.y + 5);
                 MSDK::LeftDoubleClick();
 
                 finded_answer = true;
+                break;
             }
             break;
         }
@@ -1103,6 +1145,7 @@ retryEnter:
         QString save_path = QString("%1/quiz_image_dataid_%2.png").arg(save_dir).arg(quiz_image_dataid);
         cv::imwrite(save_path.toStdString(), bgr_frame);
         qDebug() << "将问题上传到题库";
+        Helper::console("答题失败，将问题上传到题库");
     }
 
     ProcessHelper::programDelay(500);

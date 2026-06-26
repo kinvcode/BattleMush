@@ -4,6 +4,7 @@
 #include "utils/helper.h"
 #include "global/globalplayer.h"
 #include "utils/gamestruct.h"
+#include "driver/msdk/msdkDriver.h"
 
 NativeEventFilter::NativeEventFilter(MainWindow* window)
 {
@@ -46,6 +47,11 @@ bool NativeEventFilter::nativeEventFilter(const QByteArray& eventType, void* mes
                     Gplayer.show_warning = false;
                     main_win->m_alert->close();
                 }
+
+                MSDK::KeyUp(Keyboard_RightArrow);
+                MSDK::KeyUp(Keyboard_LeftArrow);
+                MSDK::KeyUp(Keyboard_UpArrow);
+                MSDK::KeyUp(Keyboard_DownArrow);
 
                 main_win->m_threadManager->pauseAll();
                 m_is_stop = true;

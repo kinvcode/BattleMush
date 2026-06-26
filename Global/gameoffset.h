@@ -90,6 +90,7 @@ namespace BASE {
         static int StateComponent = 0xF0;
         static int SpriteGUIRendererComponent = 0x110;
         static int ButtonComponent = 0x140;
+        static int UITransformComponent = 0x150;
         static int TransformComponent = 0x158;
         static int PlayerControllerComponent = 0x170;
         static int SpriteRendererComponent = 0x180;
@@ -198,6 +199,10 @@ namespace BASE {
         static int currentStatus = 0xD0;
         static int currentTick = 0xD8;
         static int readyTick = 0xE0;
+    };
+
+    namespace UITransformComponent{
+        static int position = 0x168;
     };
 };
 

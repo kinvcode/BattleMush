@@ -261,9 +261,11 @@ void UpdateGameData::UpdateUserStatus(quint64 statuspanel)
     Helper::parseHPString(player_hp, Gplayer.HP, Gplayer.MAX_HP);
     Helper::parseHPString(player_mp, Gplayer.MP, Gplayer.MAX_MP);
 
-    if(is_died){
+    if(is_died || Gplayer.HP == 0){
         Gplayer.DIED = true;
         Gplayer.HP = 0;
+    }else{
+        Gplayer.DIED = false;
     }
 
     // ProcessHelper::programDelay(500);

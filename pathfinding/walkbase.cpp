@@ -78,6 +78,7 @@ bool WalkBase::run()
 
         if(Gplayer.mousecheck_exists){
             DebugOutput::out("出现滑鼠验证，退出寻路");
+            clearXkey();
             return false;
         }
 
@@ -171,6 +172,7 @@ bool WalkBase::runY()
 
         if(Gplayer.mousecheck_exists){
             DebugOutput::out("出现滑鼠验证，退出寻路");
+            clearYkey();
             return false;
         }
 
@@ -251,6 +253,7 @@ void WalkBase::clearMonster(const Monster &monster)
         // DebugOutput::out("范围内存在怪物，无需寻路即可攻击。攻击中~");
         user_pos = getUserPos();
         attackMonster(user_pos, new_monster);
+        clearXkey();
         return;
     }
 
@@ -265,6 +268,7 @@ void WalkBase::clearMonster(const Monster &monster)
 
         if(Gplayer.mousecheck_exists){
             DebugOutput::out("出现滑鼠验证，退出寻路");
+            clearXkey();
             return;
         }
 
@@ -285,6 +289,7 @@ void WalkBase::clearMonster(const Monster &monster)
                 user_pos = getUserPos();
                 attackMonster(user_pos, new_monster); // 实际上必须依赖这里进行攻击怪物。攻击频率10帧
                 qDebug() << "寻怪提前完毕~";
+                clearXkey();
                 return;
             }
         }
@@ -334,6 +339,7 @@ void WalkBase::clearMonster(const Monster &monster)
             user_pos = getUserPos();
             attackMonster(user_pos, new_monster);
             qDebug() << "寻怪结束，最后一次攻击怪物~";
+            clearXkey();
             return;
         }
     }
@@ -391,6 +397,7 @@ bool WalkBase::moveToItem()
         DebugOutput::out("范围内存在怪物，无需寻路即可攻击。攻击中~");
         cv::Point user_pos = getUserPos();
         attackMonster(user_pos, new_monster);
+        clearXkey();
         return false; // 因为走路中断了，所以直接返回寻物失败即可
     }
 
@@ -398,6 +405,7 @@ bool WalkBase::moveToItem()
 
         if(Gplayer.mousecheck_exists){
             DebugOutput::out("出现滑鼠验证，退出寻路");
+            clearXkey();
             return false;
         }
 
@@ -476,6 +484,7 @@ bool WalkBase::moveToItem()
     }
 
     qDebug() << "拾取物品结束,失败~";
+    clearXkey();
     return false;
 }
 
@@ -571,6 +580,11 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
 
         if(Gplayer.mousecheck_exists){
             DebugOutput::out("出现滑鼠验证，退出寻路");
+            if(self_climb){
+                clearYkey();
+            }else{
+                clearXkey();
+            }
             return false;
         }
 
@@ -605,6 +619,11 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
                     // 存在物品直接退出
                     if(!Gcontroller.m_disable_recive){
                         if(itemExists(map_start)){
+                            if(self_climb){
+                                clearYkey();
+                            }else{
+                                clearXkey();
+                            }
                             DebugOutput::out("存在物品，退出平台移动");
                             return false;
                         }
