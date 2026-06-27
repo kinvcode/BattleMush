@@ -1293,7 +1293,6 @@ void KillMonster::autoCleanLine()
     // 检查药水
     if(Gplayer.need_hp_potion || Gplayer.need_mp_potion)
     {
-        qDebug() << "缺少药水，准备前往商店";
         buyPotion();
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
@@ -1525,7 +1524,6 @@ void KillMonster::excutePlatformSequence()
     // 检查药水
     if(Gplayer.need_hp_potion || Gplayer.need_mp_potion)
     {
-        qDebug() << "缺少药水，准备前往商店";
         buyPotion();
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
@@ -2032,6 +2030,8 @@ void KillMonster::moveToRoomByUUID(const QString &uuid)
 
 void KillMonster::buyPotion()
 {
+    qDebug() << "缺少药水，准备前往商店";
+    Helper::console("缺少药水，准备前往商店");
     retryEnter:
     if(m_paused || !m_running){
         return;
@@ -2039,6 +2039,7 @@ void KillMonster::buyPotion()
 
     if (Gplayer.room_nodes.find(Gplayer.curmapinfo.id) == Gplayer.room_nodes.end()) {
         qDebug() << "当前地图不支持寻路！";
+        Helper::console("当前地图不支持寻路！");
         return;
     }
 
@@ -2051,6 +2052,15 @@ void KillMonster::buyPotion()
         MSDK::keyPress(homekey,1);
         ProcessHelper::programDelay(1500);
         QApplication::processEvents();
+        return;
+    }
+
+    bool allow_buy_hp = Gconfig.getValue("potion_buy/hp_buy").toBool();
+    bool allow_buy_mp = Gconfig.getValue("potion_buy/mp_buy").toBool();
+
+    if(!allow_buy_hp && !allow_buy_mp){
+        qDebug() << "未启用购买药水，放弃前往商店";
+        Helper::console("未启用购买药水，放弃前往商店");
         return;
     }
 
@@ -2141,50 +2151,7 @@ void KillMonster::buyPotion()
 
     if(cur_roomnode.type == 2)
     {
-        HWND game_hwnd = FindWindow(NULL,TEXT("MapleStory Worlds-Artale (繁體中文版)"));
-        if(game_hwnd == NULL){
-            DebugOutput::out("游戏窗口不存在");
-            return;
-        }
-        RECT game_rect;
-        GetWindowRect(game_hwnd, &game_rect);
-
-        QScreen* m_pScreen  = QGuiApplication::primaryScreen();
-        QPixmap cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
-        int game_x          = game_rect.left;
-        int game_y          = game_rect.top;
-        int game_width      = game_rect.right - game_rect.left;
-        int game_height     = game_rect.bottom - game_rect.top;
-        cur_capture         = cur_capture.copy(game_x,game_y,game_width,game_height);
-        Gplayer.game_window.x = game_x;
-        Gplayer.game_window.y = game_y;
-        Gplayer.game_window.width = game_width;
-        Gplayer.game_window.height = game_height;
-
-        // 如果游戏窗口大小不是1296*759,调整至1296*759
-        if (game_width != BASE::game_width || game_height != BASE::game_height) {
-            // 调整窗口大小和位置（可选保持原位置）
-            SetWindowPos(game_hwnd,  // 窗口句柄
-                         NULL,                // 不改变Z顺序
-                         game_rect.left,      // X位置（保持不变）
-                         game_rect.top,       // Y位置（保持不变）
-                         BASE::game_width,    // 新宽度
-                         BASE::game_height,   // 新高度
-                         SWP_NOZORDER | SWP_NOACTIVATE);  // 标志位
-
-            GetWindowRect(game_hwnd, &game_rect);
-            m_pScreen  = QGuiApplication::primaryScreen();
-            cur_capture = m_pScreen->grabWindow((WId)GetDesktopWindow());
-            game_x          = game_rect.left;
-            game_y          = game_rect.top;
-            game_width      = game_rect.right - game_rect.left;
-            game_height     = game_rect.bottom - game_rect.top;
-            cur_capture     = cur_capture.copy(game_x,game_y,game_width,game_height);
-            Gplayer.game_window.x = game_x;
-            Gplayer.game_window.y = game_y;
-            Gplayer.game_window.width = game_width;
-            Gplayer.game_window.height = game_height;
-        }
+        Helper::updateGameWindow();
 
         qDebug() << "当前商店id:" << Gplayer.curmapinfo.id;
         QString npc_id;
@@ -2220,6 +2187,9 @@ void KillMonster::buyPotion()
 
 void KillMonster::potionShopBuyItem(QString npc)
 {
+    bool allow_buy_hp = Gconfig.getValue("potion_buy/hp_buy").toBool();
+    bool allow_buy_mp = Gconfig.getValue("potion_buy/mp_buy").toBool();
+
     // 找到当前NPC
     cv::Point screen_coor = RoomMap::npcScreenCoor(npc);
     if(screen_coor.x == -1){
@@ -2462,6 +2432,7 @@ void KillMonster::handleDied()
     }
 
     qDebug() << "角色已死亡即将返回城镇";
+    Helper::console("角色已死亡即将返回城镇");
 
     MatchTemp tempmatch(":assets/templat/main_pannel/user_died/died_ok");
     cv::Point died_ok;
@@ -2471,6 +2442,8 @@ void KillMonster::handleDied()
         ProcessHelper::programDelay(500);
         MSDK::LeftClick();
         ProcessHelper::programDelay(1500);
+    }else{
+        Helper::console("未匹配到确认按钮，无法死亡回城");
     }
 }
 
@@ -2505,7 +2478,6 @@ void KillMonster::taskCleanRoom()
     // 检查药水
     if(Gplayer.need_hp_potion || Gplayer.need_mp_potion)
     {
-        qDebug() << "缺少药水，准备前往商店";
         buyPotion();
         ProcessHelper::programDelay(100);
         QApplication::processEvents();
