@@ -1991,3 +1991,62 @@ void MainWindow::on_pushButton_answer_input_test_clicked()
     MSDK::KeyInputUnicode(answer_text);
 }
 
+
+void MainWindow::on_pushButton_print_monsters_list_clicked()
+{
+    if(!Gplayer.p_curmapentity){
+        return;
+    }
+
+    // 注意，当前地图的childList不断在变化，需要实时读取
+    quint64 map_entity_count = readInt(readLong(Gplayer.p_curmapentity + BASE::MODEntity::children) + BASE::List::size);
+    quint64 entity_head = readLong(readLong(Gplayer.p_curmapentity
+                                            + BASE::MODEntity::children)
+                                   + BASE::List::InternalArray)
+                          + BASE::InternalArray::Head;
+
+    std::vector<Monster> m_allmonster;
+    for(int i = 0; i < map_entity_count; i++){
+        // 节省遍历时间
+        quint64 cur_entity_address = entity_head + i * 8;
+        quint64 entity = readLong(cur_entity_address);
+
+        // 找到End标记位
+        QString name = GameStruct::readEntityName(entity);
+        if(name != "Monster"){
+            continue;
+        }
+
+        // 判断怪物是否存在
+        bool exists = readByte(readLong(entity + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::exists);
+        if(!exists){
+            continue;
+        }
+
+        QString modelid = readString(readLong(readLong(entity + BASE::MODEntity::MODModel) + BASE::MODModel::Id) + BASE::String::text, 100);
+
+        // 存放怪物信息:怪物指针，怪物所在地板，怪物所在平台
+        int foothold_id = readInt(readLong(readLong(entity + BASE::MODEntity::RigidbodyComponent)
+                                           + BASE::RigidbodyComponent::currentFoothold)
+                                  + BASE::Foothold::ID);
+        int line_id = RoomMap::getFootPlatform(foothold_id, Gplayer.curmapinfo.platform_list);
+        if(line_id == -1){
+            continue;
+        }
+
+        quint64 pos_p = readLong(entity + BASE::MODEntity::RigidbodyComponent);
+        float float_x = readFloat(pos_p + BASE::RigidbodyComponent::airPos);
+        float float_y = readFloat(pos_p + BASE::RigidbodyComponent::airPos + 4);
+        int monster_x = RoomMap::toMapPosX(float_x, Gplayer.curmapinfo.map_bounding.x_offset);
+        int monster_y = RoomMap::toMapPosY(float_y, Gplayer.curmapinfo.map_bounding.y_offset,Gplayer.curmapinfo.map_bounding.height);
+        qDebug() << QString::number(entity,16).toUpper() << modelid << "坐标:" << monster_x << monster_y;
+
+        if(monster_x == 0 && monster_y == 0){
+            continue;
+        }
+
+        Monster cur_monster = {entity, foothold_id, line_id, {monster_x, monster_y}};
+        m_allmonster.push_back(cur_monster);
+    }
+}
+

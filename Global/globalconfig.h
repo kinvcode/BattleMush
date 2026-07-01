@@ -2,7 +2,8 @@
 #define GLOBALCONFIG_H
 
 #include "utils/config.h"
-#include "driver/mskeycode.h"
+// #include "driver/mskeycode.h"
+#include "driver/msdk/usbhidkeycode.h"
 
 class GlobalConfig : public QObject
 {
@@ -26,23 +27,23 @@ public:
         {"add_mp", true},
         {"hp_rate", 50},
         {"mp_rate", 50},
-        {"hp_key", MSKeyboard_1},
-        {"mp_key", MSKeyboard_2},
+        {"hp_key", Keyboard_PageUp},
+        {"mp_key", Keyboard_PageDown},
         {"potion_num_switch",true},
-        {"potion_num",10}
+        {"potion_num",1}
         }
     },
     {"bindkey",QJsonObject{
-        {"general_atk",MSKeyboard_x},
-        {"skill_atk1",MSKeyboard_LeftControl},
-        {"buff1",MSKeyboard_1},
-        {"buff2",MSKeyboard_2},
-        {"buff3",MSKeyboard_3},
-        {"buff4",MSKeyboard_4},
-        {"buff5",MSKeyboard_5},
-        {"jump",MSKeyboard_c},
-        {"gohome",MSKeyboard_LeftControl},
-        {"skillteleport",MSKeyboard_f}
+        {"general_atk",Keyboard_x},
+        {"skill_atk1",Keyboard_LeftControl},
+        {"buff1",Keyboard_1},
+        {"buff2",Keyboard_2},
+        {"buff3",Keyboard_3},
+        {"buff4",Keyboard_4},
+        {"buff5",Keyboard_5},
+        {"jump",Keyboard_c},
+        {"gohome",Keyboard_Home},
+        {"skillteleport",Keyboard_f}
         }
     },
     {"atk_range",QJsonObject{
@@ -53,16 +54,16 @@ public:
         }
     },
     {"atk_recast",QJsonObject{
-        {"buff1",60},
-        {"buff2",60},
-        {"buff3",60},
-        {"buff4",60},
-        {"buff5",60},
-        {"buff1_max",60},
-        {"buff2_max",60},
-        {"buff3_max",60},
-        {"buff4_max",60},
-        {"buff5_max",60},
+        {"buff1",200},
+        {"buff2",200},
+        {"buff3",200},
+        {"buff4",200},
+        {"buff5",200},
+        {"buff1_max",300},
+        {"buff2_max",300},
+        {"buff3_max",300},
+        {"buff4_max",300},
+        {"buff5_max",300},
         }
     },
     {"potion_buy",QJsonObject{

@@ -29,12 +29,10 @@ private:
     void UpdateUserStatus(quint64 statuspanel);
     // 更新房间地图
     void UpdateRoomMap();
-    // 更新怪物
-    void UpdateMonsters();
     // 更新快捷栏信息
     void updateQuickSlot(quint64 ui_entity);
-    // 检测滑鼠
-    void checkMouseMove();
+    // 刷新怪物黑名单
+    void updateBlackMonsters();
 };
 
 #endif // UPDATEGAMEDATA_H

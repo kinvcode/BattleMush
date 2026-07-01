@@ -204,6 +204,10 @@ namespace BASE {
     namespace UITransformComponent{
         static int position = 0x168;
     };
+
+    namespace MODModel{
+        static int Id = 0x30;
+    };
 };
 
 #endif // GAMEOFFSET_H

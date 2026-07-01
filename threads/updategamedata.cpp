@@ -1,6 +1,7 @@
 #include "updategamedata.h"
 #include "driver/msdriverpro.h"
 #include "global/globalplayer.h"
+#include "global/controller.h"
 #include <QDebug>
 #include "process/process.h"
 #include "utils/helper.h"
@@ -193,6 +194,8 @@ void UpdateGameData::process()
                     Gplayer.last_mapentity = Gplayer.p_curmapentity;
                     // 更新地图信息
                     UpdateRoomMap();
+                    // 刷新怪物黑名单
+                    updateBlackMonsters();
                     continue;
                 }
 
@@ -340,6 +343,7 @@ void UpdateGameData::UpdateRoomMap()
     if(Gplayer.curmapinfo.path_nodes.empty()){
         Gplayer.curmapinfo.path_nodes = RoomMap::makeNodes(
             Gplayer.curmapinfo.platform_list,
+            Gplayer.curmapinfo.climbs,
             Gplayer.curmapinfo.wall_list,
             Gplayer.curmapinfo.map_mat,
             Gplayer.curmapinfo.map_bounding
@@ -370,11 +374,6 @@ void UpdateGameData::UpdateRoomMap()
     // qDebug() << "AStar算法用时:" << astar_times;
 }
 
-void UpdateGameData::UpdateMonsters()
-{
-
-}
-
 void UpdateGameData::updateQuickSlot(quint64 ui_entity)
 {
     quint64 main_group = Helper::findChild(ui_entity, "MainGroup");
@@ -382,6 +381,12 @@ void UpdateGameData::updateQuickSlot(quint64 ui_entity)
     quint64 quick_slot = Helper::findChild(back_ground,"QuickSlot");
     quint64 page_up = Helper::findChild(quick_slot,"PageUp");
     quint64 page_down = Helper::findChild(quick_slot,"PageDown");
+
+    if(page_up == 0 || page_down == 0){
+        qDebug() << "无法更新药水数量，请重新进入地图~";
+        return;
+    }
+
     quint64 page_up_count = Helper::findChild(page_up,"Count");
     quint64 page_down_count = Helper::findChild(page_down,"Count");
 
@@ -395,19 +400,20 @@ void UpdateGameData::updateQuickSlot(quint64 ui_entity)
     Gplayer.quick_slot_pagedown_count = mp_count;
 }
 
-void UpdateGameData::checkMouseMove()
+void UpdateGameData::updateBlackMonsters()
 {
-    if(Gplayer.mousecheck_exists){
+    Gcontroller.m_black_monster.clear();
+
+    qDebug() << Gplayer.curmapinfo.id;
+    if(Gplayer.curmapinfo.id == "27d886ad-d3d7-416e-b246-e49d3738e3dd")
+    {
+        qDebug() << "添加黑名单怪物";
+        // 幼魔精灵：f1a7f2f8-f6b4-4619-8422-2042b9e904e3
+        Gcontroller.m_black_monster.push_back("f1a7f2f8-f6b4-4619-8422-2042b9e904e3");
         return;
     }
-
-    // 判断是否存在
-    MatchTemp tempmatch(":assets/templat/main_pannel/mouse_move");
-    cv::Point title_coor;
-    if(tempmatch.match(title_coor)){
-        Gplayer.mousecheck_exists = true;
-    }
 }
+
 
 
 

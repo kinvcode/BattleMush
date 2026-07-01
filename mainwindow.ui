@@ -51,7 +51,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="tab_main">
          <attribute name="title">
@@ -350,7 +350,7 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-613</y>
+             <y>0</y>
              <width>635</width>
              <height>1142</height>
             </rect>
@@ -2482,6 +2482,19 @@
            </property>
            <property name="text">
             <string>服务列表</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton_print_monsters_list">
+           <property name="geometry">
+            <rect>
+             <x>210</x>
+             <y>70</y>
+             <width>80</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>怪物遍历</string>
            </property>
           </widget>
          </widget>

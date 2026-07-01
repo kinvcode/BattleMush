@@ -118,6 +118,8 @@ public:
 
     static bool isPointOnLine(const cv::Mat &map, const cv::Point &pos, const cv::Point &start, const cv::Point &end);
 
+    static bool isPointInClimbRect(const cv::Point& point, const ClimbRect& rect);
+
     static void screenshot();
 };
 
@@ -165,6 +167,7 @@ public:
     // 创建寻路节点
     static std::unordered_map<int, PathNode> makeNodes(
         const std::vector<Platform> &platform_list,
+        const std::vector<ClimbRect> &climb_list,
         const std::vector<Wall> &wall_list,
         const cv::Mat &cur_room_map,
         const MapBounding &map_bounding
@@ -239,6 +242,7 @@ public:
 
     static void jump_down(
         const std::vector<Platform> &platform_list,
+        const std::vector<ClimbRect> &climb_list,
         const cv::Mat &room_map,
         const MapBounding &map_bounding,
         std::unordered_map<int, PathNode> &path_nodes

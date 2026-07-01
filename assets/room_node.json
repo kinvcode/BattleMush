@@ -202,6 +202,26 @@
         "area": [122 , 2507 , 192 , 2527]
     }]
 },{
+    "uuid": "ff51af0c-3daf-4b60-8158-be6d16d30374",
+    "name": "石巨人寺院入口",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "9b433712-50e3-4a6a-96d3-44be696c16be",
+    "name": "石巨人寺院2",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
     "uuid": "c812231b-55cf-449c-879f-8d5674951c01",
     "name": "維多利亞港雜貨店",
     "type": 2,
@@ -220,6 +240,11 @@
         "name": "勇士之村雜貨店",
         "platform": 37,
         "area": [1200, 2817, 1270, 2930]
+    },{
+        "uuid": "4e30924e-99bd-4a5f-b414-e4f28cc2b6a7",
+        "name": "勇士之村東入口",
+        "platform": 4,
+        "area": [2788 , 3072 , 2887 , 3210]
     }]
 },{
     "uuid": "45681289-4726-447f-9aa6-d690072a3291",
@@ -230,6 +255,46 @@
         "name": "勇士之村",
         "platform": 3,
         "area": [657, 1611, 758, 1753]
+    }]
+},{
+    "uuid": "4e30924e-99bd-4a5f-b414-e4f28cc2b6a7",
+    "name": "勇士之村東入口",
+    "type": 0,
+    "targets": [{
+        "uuid": "618f79dd-e5c1-4159-9e77-187ab61454f7",
+        "name": "勇士之村",
+        "platform": 16,
+        "area": [283, 1455, 384, 1597]
+    },{
+        "uuid": "f6078a0d-d85d-404c-add5-7b728fd5b88e",
+        "name": "黑肥肥領土",
+        "platform": 0,
+        "area": [912 , 2154 , 991 , 2265]
+    }]
+},{
+    "uuid": "f6078a0d-d85d-404c-add5-7b728fd5b88e",
+    "name": "黑肥肥領土",
+    "type": 0,
+    "targets": [{
+        "uuid": "4e30924e-99bd-4a5f-b414-e4f28cc2b6a7",
+        "name": "勇士之村東入口",
+        "platform": 17,
+        "area": [263 , 1825 , 364 , 1967]
+    },{
+        "uuid": "294ed65c-b4e2-46ae-b868-4f052a903006",
+        "name": "鋼之黑肥肥之地",
+        "platform": 12,
+        "area": [1518 , 2249 , 1583 , 2340]
+    }]
+},{
+    "uuid": "294ed65c-b4e2-46ae-b868-4f052a903006",
+    "name": "鋼之黑肥肥之地",
+    "type": 0,
+    "targets": [{
+        "uuid": "f6078a0d-d85d-404c-add5-7b728fd5b88e",
+        "name": "黑肥肥領土",
+        "platform": 0,
+        "area": [1076 , 2015 , 1141 , 2107]
     }]
 },{
     "uuid": "dc87557c-2165-4962-bcbb-370e9a1f38a8",
@@ -262,6 +327,16 @@
         "area": [2, 2, 2, 2]
     }]
 },{
+    "uuid": "f50fca8c-a556-4adf-a6c5-1ca64914a71f",
+    "name": "2號線<2區>",
+    "type": 0,
+    "targets": [{
+        "uuid": "44",
+        "name": "44",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
     "uuid": "2c865a87-555b-4302-a328-f8d7b07ecc23",
     "name": "玩具工廠<主工程A>",
     "type": 0,
@@ -282,38 +357,28 @@
         "area": [2, 2, 2, 2]
     }]
 },{
+    "uuid": "96c299d1-c1bd-490a-86da-06f2ab231986",
+    "name": "時間之路<2>",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "63ff8f01-0b70-49e5-affd-cd008406075a",
+    "name": "時間之路<1>",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
     "uuid": "3f0fd016-a8b8-4d85-a06b-cfe30eebc336",
     "name": "雲彩公園3",
-    "type": 0,
-    "targets": [{
-        "uuid": "55",
-        "name": "55",
-        "platform": 0,
-        "area": [2, 2, 2, 2]
-    }]
-},{
-    "uuid": "294ed65c-b4e2-46ae-b868-4f052a903006",
-    "name": "鋼之黑肥肥之地",
-    "type": 0,
-    "targets": [{
-        "uuid": "55",
-        "name": "55",
-        "platform": 0,
-        "area": [2, 2, 2, 2]
-    }]
-},{
-    "uuid": "ff51af0c-3daf-4b60-8158-be6d16d30374",
-    "name": "石巨人寺院入口",
-    "type": 0,
-    "targets": [{
-        "uuid": "55",
-        "name": "55",
-        "platform": 0,
-        "area": [2, 2, 2, 2]
-    }]
-},{
-    "uuid": "ff51af0c-3daf-4b60-8158-be6d16d30374",
-    "name": "石巨人寺院入口",
     "type": 0,
     "targets": [{
         "uuid": "55",

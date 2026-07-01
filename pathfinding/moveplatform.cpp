@@ -272,6 +272,10 @@ bool MovePlatform::walkLeft(cv::Point range, int platform)
         if(check_time.elapsed() > 10000){
             break;
         }
+        if(platform == getUserPlatform()){
+            qDebug() << "向左走已到达指定平台";
+            return true;
+        }
     }
 
     if(platform == getUserPlatform()){
@@ -296,6 +300,10 @@ bool MovePlatform::walkRight(cv::Point range, int platform)
         foothold_p = getUserFootholdP();
         if(check_time.elapsed() > 10000){
             break;
+        }
+        if(platform == getUserPlatform()){
+            qDebug() << "向右走已到达指定平台";
+            return true;
         }
     }
 

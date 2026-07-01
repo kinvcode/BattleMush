@@ -92,6 +92,7 @@ void GameStruct::printEntityChild(quint64 entity, int depth)
             //                           .arg(compPtr, 0, 16)
             //                           .arg(name);
             Helper::console(name_str);
+            qDebug() << name_str;
             // 递归遍历下一层
             printEntityChild(compPtr, depth + 1);
         } else {
@@ -102,6 +103,7 @@ void GameStruct::printEntityChild(quint64 entity, int depth)
                                    .arg(indent)
                                    .arg(i);
             Helper::console(name_str);
+            qDebug() << name_str;
         }
     }
 }

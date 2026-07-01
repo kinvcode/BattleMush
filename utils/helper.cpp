@@ -411,6 +411,29 @@ std::vector<Wall> RoomMap::makeWallList(const std::vector<FootholdRect> &foothol
             id_set.erase(item.id);
             continue;
         }
+
+        // 如果是一个斜墙
+        if(item.x_left != item.x_right && item.y_left != item.y_right){
+            int height = abs(item.y_right - item.y_left);
+            if(height > 15){
+                int width = item.x_right - item.x_left;
+                int radio = 1.0 * width / height * 100;
+                if(radio < 30){
+                    qDebug() << "墙体：" << item.x_left << "," << item.y_left << item.x_right << "," << item.y_right << "radio" << radio;
+                    Wall wall;
+                    wall.foot_id = item.id;
+                    wall.x = item.x_left;
+                    wall.bottom = std::max(item.y_left, item.y_right);
+                    wall.top = std::min(item.y_left, item.y_right);
+                    wall_list.push_back(wall);
+                    // qDebug() << wall.foot_id << wall.x << wall.top << wall.bottom;
+
+                    wall.x = item.x_right;
+                    wall_list.push_back(wall); // 插入第二个墙
+                    id_set.erase(item.id);
+                }
+            }
+        }
     }
 
     return wall_list;
@@ -710,6 +733,7 @@ cv::Mat RoomMap::makeRoomMap(
 
 std::unordered_map<int, PathNode> RoomMap::makeNodes(
     const std::vector<Platform> &platform_list,
+    const std::vector<ClimbRect> &climb_list,
     const std::vector<Wall> &wall_list,
     const cv::Mat &cur_room_map,
     const MapBounding &map_bounding
@@ -736,7 +760,7 @@ std::unordered_map<int, PathNode> RoomMap::makeNodes(
 
     PathAlgo::jump_up(platform_list, cur_room_map, path_nodes);
 
-    PathAlgo::jump_down(platform_list, cur_room_map, map_bounding, path_nodes);
+    PathAlgo::jump_down(platform_list, climb_list, cur_room_map, map_bounding, path_nodes);
 
     PathAlgo::up(platform_list, cur_room_map, path_nodes);
 
@@ -1572,6 +1596,12 @@ bool ImageTool::isPointOnLine(const cv::Mat &map, const cv::Point &pos, const cv
         }
     }
     return false;
+}
+
+bool ImageTool::isPointInClimbRect(const cv::Point &point, const ClimbRect &rect)
+{
+    return point.x >= rect.x_left && point.x <= rect.x_right &&
+           point.y >= rect.y_top && point.y <= rect.y_bottom;
 }
 
 void ImageTool::screenshot()
@@ -2502,6 +2532,7 @@ void PathAlgo::jump_up(
 
 void PathAlgo::jump_down(
     const std::vector<Platform> &platform_list,
+    const std::vector<ClimbRect> &climb_list,
     const cv::Mat &room_map,
     const MapBounding &map_bounding,
     std::unordered_map<int, PathNode> &path_nodes)
@@ -2521,13 +2552,26 @@ void PathAlgo::jump_down(
 
             cv::LineIterator iterator(room_map, foot.start, foot.end, 8);
             for (int i = 0; i < iterator.count; i++, ++iterator) {
+                cv::Point start = iterator.pos();
+
+                // 检测攀爬物,判断是否在任何一个 ClimbRect 中
+                bool inClimb = false;
+                for (const auto& rect : climb_list) {
+                    if (ImageTool::isPointInClimbRect(start, rect)) {
+                        inClimb = true;
+                        break;
+                    }
+                }
+
+                if (inClimb) {
+                    continue;
+                }
 
                 // 跳跃到下一层
-                cv::Point start = iterator.pos();
                 cv::Point end = start;
                 end.y = map_bounding.y_bottom;
 
-                // 检测攀爬物
+                // 预测下跳轨迹
                 cv::Point target_pos = {-1, -1};
                 cv::LineIterator jump_iterator(room_map, start, end, 8);
                 for(int j = 0; j < jump_iterator.count; j++, ++jump_iterator)
@@ -2536,7 +2580,6 @@ void PathAlgo::jump_down(
                     cv::Vec3b cur_color = room_map.at<cv::Vec3b>(jump_iterator.pos());
 
                     // 下跳时不找攀爬物体
-
                     if(cur_color == COLOR_LINE)
                     {
                         // qDebug() << cur_pos.x << "," << cur_pos.y;

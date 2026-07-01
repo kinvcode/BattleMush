@@ -458,6 +458,16 @@ void KillMonster::updateAllMonsters()
             continue;
         }
 
+        // 判断黑名单怪物
+        if(!Gcontroller.m_black_monster.empty()){
+            QString modelid = readString(readLong(readLong(entity + BASE::MODEntity::MODModel) + BASE::MODModel::Id) + BASE::String::text, 100);
+            for(auto black : Gcontroller.m_black_monster){
+                if(black == modelid){
+                    continue;
+                }
+            }
+        }
+
         // 存放怪物信息:怪物指针，怪物所在地板，怪物所在平台
         int foothold_id = readInt(readLong(readLong(entity + BASE::MODEntity::RigidbodyComponent)
             + BASE::RigidbodyComponent::currentFoothold)

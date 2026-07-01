@@ -817,6 +817,21 @@ Monster WalkBase::monsterInRange(bool is_left, int &start_index)
             continue;
         }
 
+        // 判断黑名单怪物
+        bool is_black_monster = false;
+        if(!Gcontroller.m_black_monster.empty()){
+            QString modelid = readString(readLong(readLong(entity + BASE::MODEntity::MODModel) + BASE::MODModel::Id) + BASE::String::text, 100);
+            for(auto black : Gcontroller.m_black_monster){
+                if(black == modelid){
+                    // qDebug() << "modelid:" << modelid;
+                    // qDebug() << "发现黑名单怪物，忽略！";
+                    is_black_monster = true;
+                    break;
+                }
+            }
+        }
+        if(is_black_monster) continue;
+
         quint64 pos_p = readLong(entity + BASE::MODEntity::RigidbodyComponent);
         float float_x = readFloat(pos_p + BASE::RigidbodyComponent::airPos);
         float float_y = readFloat(pos_p + BASE::RigidbodyComponent::airPos + 4);

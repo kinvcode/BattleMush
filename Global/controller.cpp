@@ -19,6 +19,8 @@ std::vector<MapRoomPath> Controller::m_rest_point_list = {};
 
 std::vector<NPCQuest> Controller::m_quest_list = {};
 
+std::vector<QString> Controller::m_black_monster = {};
+
 std::vector<Task> Controller::m_tasks = {};
 
 bool Controller::m_disable_attack = false;
@@ -364,7 +366,7 @@ void Controller::initTaskList()
     RoomRest map0009_rest00;
     map0009_rest00.id = 0;
     map0009_rest00.name = "【休息点A】地图入口右侧平台";
-    map0009_rest00.platform = 11;
+    map0009_rest00.platform = 8;
 
     RoomPath map0009_path00;
     map0009_path00.id = 0;
@@ -373,7 +375,7 @@ void Controller::initTaskList()
     RoomPath map0009_path01;
     map0009_path01.id = 1;
     map0009_path01.name = "【路线A】只刷下面一层";
-    map0009_path01.platforms = {25};
+    map0009_path01.platforms = {22};
 
     map0009.paths.push_back(map0009_path00);
     map0009.paths.push_back(map0009_path01);
@@ -598,12 +600,137 @@ void Controller::initTaskList()
     RoomPath map0018_path01;
     map0018_path01.id = 1;
     map0018_path01.name = "【路线A】刷全图";
-    map0018_path01.platforms = {9,10,11,1};
+    map0018_path01.platforms = {2,1};
 
     map0018.paths.push_back(map0018_path00);
     map0018.paths.push_back(map0018_path01);
 
     map0018.rests.push_back(map0018_rest00);
+
+    /* ============【 時 間 之 路 <2> 】============= */
+    MapRoomPath map0019;
+    map0019.id = 19;
+    map0019.name = "(Lv37~37)時間之路<2>";
+    map0019.uuid = "96c299d1-c1bd-490a-86da-06f2ab231986";
+
+    RoomRest map0019_rest00;
+    map0019_rest00.id = 0;
+    map0019_rest00.name = "【休息点A】地图右侧传送阵下方平台";
+    map0019_rest00.platform = 26;
+
+    RoomPath map0019_path00;
+    map0019_path00.id = 0;
+    map0019_path00.name = "自动规划路线";
+
+    RoomPath map0019_path01;
+    map0019_path01.id = 1;
+    map0019_path01.name = "【路线A】刷全图";
+    map0019_path01.platforms = {28,65,66,36};
+
+    map0019.paths.push_back(map0019_path00);
+    map0019.paths.push_back(map0019_path01);
+
+    map0019.rests.push_back(map0019_rest00);
+
+    /* ============【 時 間 之 路 <1> 】============= */
+    MapRoomPath map0020;
+    map0020.id = 20;
+    map0020.name = "(Lv41~41)時間之路<1>";
+    map0020.uuid = "63ff8f01-0b70-49e5-affd-cd008406075a";
+
+    RoomRest map0020_rest00;
+    map0020_rest00.id = 0;
+    map0020_rest00.name = "【休息点A】地图右侧传送阵左方小平台";
+    map0020_rest00.platform = 20;
+
+    RoomPath map0020_path00;
+    map0020_path00.id = 0;
+    map0020_path00.name = "自动规划路线";
+
+    RoomPath map0020_path01;
+    map0020_path01.id = 1;
+    map0020_path01.name = "【路线A】刷全图";
+    map0020_path01.platforms = {46,47,48};
+
+    map0020.paths.push_back(map0020_path00);
+    map0020.paths.push_back(map0020_path01);
+
+    map0020.rests.push_back(map0020_rest00);
+
+    /* ============【 2號線<2區> 】============= */
+    MapRoomPath map0021;
+    map0021.id = 21;
+    map0021.name = "(Lv48~48)2號線<2區>";
+    map0021.uuid = "63ff8f01-0b70-49e5-affd-cd008406075a";
+
+    RoomRest map0021_rest00;
+    map0021_rest00.id = 0;
+    map0021_rest00.name = "【休息点A】地图左侧上方平台";
+    map0021_rest00.platform = 14;
+
+    RoomPath map0021_path00;
+    map0021_path00.id = 0;
+    map0021_path00.name = "自动规划路线";
+
+    RoomPath map0021_path01;
+    map0021_path01.id = 1;
+    map0021_path01.name = "【路线A】刷全图";
+    map0021_path01.platforms = {0,23,22,12,20,19,17,15};
+
+    map0021.paths.push_back(map0021_path00);
+    map0021.paths.push_back(map0021_path01);
+
+    map0021.rests.push_back(map0021_rest00);
+
+    /* ============【 石 巨 人 寺 院 2 】============= */
+    MapRoomPath map0022;
+    map0022.id = 22;
+    map0022.name = "(Lv55~55)石巨人寺院2";
+    map0022.uuid = "9b433712-50e3-4a6a-96d3-44be696c16be";
+
+    RoomRest map0022_rest00;
+    map0022_rest00.id = 0;
+    map0022_rest00.name = "【休息点A】地图上方平台";
+    map0022_rest00.platform = 3;
+
+    RoomPath map0022_path00;
+    map0022_path00.id = 0;
+    map0022_path00.name = "自动规划路线";
+
+    RoomPath map0022_path01;
+    map0022_path01.id = 1;
+    map0022_path01.name = "【路线A】刷全图";
+    map0022_path01.platforms = {0,1,2,4};
+
+    map0022.paths.push_back(map0022_path00);
+    map0022.paths.push_back(map0022_path01);
+
+    map0022.rests.push_back(map0022_rest00);
+
+    /* ============【 黑 肥 肥 領 土 】============= */
+    MapRoomPath map0023;
+    map0023.id = 23;
+    map0023.name = "(Lv25~27)黑肥肥領土";
+    map0023.uuid = "f6078a0d-d85d-404c-add5-7b728fd5b88e";
+
+    RoomRest map0023_rest00;
+    map0023_rest00.id = 0;
+    map0023_rest00.name = "【休息点A】地图右侧平台";
+    map0023_rest00.platform = 23;
+
+    RoomPath map0023_path00;
+    map0023_path00.id = 0;
+    map0023_path00.name = "自动规划路线";
+
+    RoomPath map0023_path01;
+    map0023_path01.id = 1;
+    map0023_path01.name = "【路线A】刷全图";
+    map0023_path01.platforms = {12,30,0};
+
+    map0023.paths.push_back(map0023_path00);
+    map0023.paths.push_back(map0023_path01);
+
+    map0023.rests.push_back(map0023_rest00);
 
     /* ============【 加 入 刷 图 列 表】============= */
     m_clean_room_list.push_back(map0000); // 菇菇山丘
@@ -625,6 +752,11 @@ void Controller::initTaskList()
     m_clean_room_list.push_back(map0016); // 青螃蟹海灘Ⅱ
     m_clean_room_list.push_back(map0017); // 龍族狩獵場
     m_clean_room_list.push_back(map0018); // 魔龍領土
+    m_clean_room_list.push_back(map0019); // 時間之路<2>
+    m_clean_room_list.push_back(map0020); // 時間之路<1>
+    m_clean_room_list.push_back(map0021); // 2號線<2區>
+    m_clean_room_list.push_back(map0022); // 石巨人寺院2
+    m_clean_room_list.push_back(map0023); // 黑肥肥領土
 
 
 
@@ -648,6 +780,11 @@ void Controller::initTaskList()
     m_rest_point_list.push_back(map0016);
     m_rest_point_list.push_back(map0017);
     m_rest_point_list.push_back(map0018);
+    m_rest_point_list.push_back(map0019);
+    m_rest_point_list.push_back(map0020);
+    m_rest_point_list.push_back(map0021);
+    m_rest_point_list.push_back(map0022);
+    m_rest_point_list.push_back(map0023);
 
 
     // 初始化NPC任务列表
@@ -812,7 +949,7 @@ void Controller::loadTaskConfig()
             task.option2_value = Gcontroller.m_clean_room_list.at(task.option1_key).paths.at(task.option2_key).name;
         }else if(task.type == 1){
             task.option1_value = Gcontroller.m_rest_point_list.at(task.option1_key).name;
-            task.option2_value = Gcontroller.m_rest_point_list.at(task.option1_key).paths.at(task.option2_key).name;
+            task.option2_value = Gcontroller.m_rest_point_list.at(task.option1_key).rests.at(task.option2_key).name;
         }else if(task.type == 2){
             task.option1_value = Gcontroller.m_quest_list.at(task.option1_key).name;
         }
@@ -820,13 +957,13 @@ void Controller::loadTaskConfig()
         Gcontroller.m_tasks.push_back(task);
 
         qDebug() << "=================================";
-        qDebug() << task.id;
-        qDebug() << task.type;
-        qDebug() << task.option1_key;
-        qDebug() << task.option1_value;
-        qDebug() << task.option2_key;
-        qDebug() << task.option2_value;
-        qDebug() << task.runTime;
+        qDebug() << "task_id" << task.id;
+        qDebug() << "task_type" << task.type;
+        qDebug() << "task_option1_key" << task.option1_key;
+        qDebug() << "task_option1_value" << task.option1_value;
+        qDebug() << "task_option2_key" << task.option2_key;
+        qDebug() << "task_option2_value" << task.option2_value;
+        qDebug() << "task_runTime" << task.runTime;
     }
 }
 

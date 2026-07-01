@@ -204,6 +204,8 @@ private slots:
 
     void on_pushButton_answer_input_test_clicked();
 
+    void on_pushButton_print_monsters_list_clicked();
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

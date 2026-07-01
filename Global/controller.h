@@ -32,6 +32,9 @@ public:
     // NPC任务列表
     static std::vector<NPCQuest> m_quest_list;
 
+    // 黑名单怪物列表
+    static std::vector<QString> m_black_monster;
+
     // 计划列表
     static std::vector<Task> m_tasks;
 
