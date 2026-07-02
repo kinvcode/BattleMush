@@ -7,21 +7,21 @@
 namespace BASE {
     static int game_width = 1296;
     static int game_height = 759;
-    static int ClientCoreThreadManager_base = 0xA891BE8;
+    static int ClientCoreThreadManager_base = 0xA894780;//0xA894780
     static int ClientCoreThreadManager_offset_lv1 = 0xB8;
     static int ClientCoreThreadManager_offset_lv2 = 0x0;
     static int ClientCoreThreadManager_GameDictionary = 0x10;
 
-    static int Camera_base = 0xA926E88;
+    static int Camera_base = 0xA929E48; //0xA929E48
     static int Camera_offset_lv1 = 0xB8;
     static int Camera_offset_lv2 = 0x0;
 
-    static int TMP_UpdateManager_base = 0xA98BD18;
+    static int TMP_UpdateManager_base = 0xA98ED98;// 0xA98ED98
     static int TMP_UpdateManager_offset_lv1 = 0xB8;
     static int TMP_UpdateManager_offset_lv2 = 0x0;
     static int TMP_UpdateManager_List = 0x38;
 
-    static int UIPopupManager_base = 0xA8BF178;
+    static int UIPopupManager_base = 0xA8C1E30; // 0xA8C1E30
     static int UIPopupManager_offset_lv1 = 0xB8;
     static int UIPopupManager_offset_lv2 = 0x0;
 
