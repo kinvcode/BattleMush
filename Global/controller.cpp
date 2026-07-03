@@ -591,7 +591,7 @@ void Controller::initTaskList()
     RoomRest map0018_rest00;
     map0018_rest00.id = 0;
     map0018_rest00.name = "【休息点A】地图下方平台";
-    map0018_rest00.platform = 1;
+    map0018_rest00.platform = 11;
 
     RoomPath map0018_path00;
     map0018_path00.id = 0;

@@ -488,7 +488,7 @@ bool WalkBase::moveToItem()
     return false;
 }
 
-bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
+bool WalkBase::moveToPlatform(int platform,cv::Point range, bool self_climb)
 {
     m_transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
     Controller::updateAttackInfo();
@@ -551,6 +551,7 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
     begin_timer.restart();
 
     int last_time = begin_timer.elapsed();
+    int chek_plat_time = last_time;
 
     // 开始移动
     MSDK::KeyDown(direction_arrow);
@@ -610,9 +611,22 @@ bool WalkBase::moveToPlatform(cv::Point range, bool self_climb)
             }
         }
 
+        // 每0.1秒检测一次是否到达目标平台
+        cur_time = begin_timer.elapsed();
+        if(cur_time - chek_plat_time > 100){
+            chek_plat_time = cur_time;
+           int cur_plat = getUserPlatform();
+            if(cur_plat == platform){
+                qDebug() << "已到达目标平台，退出寻路";
+               return true;
+            }
+        }
+
+
         // 每0.1秒检测一次怪物和物品
         if(!Gcontroller.m_disable_attack){
             if(!self_climb){
+                cur_time = begin_timer.elapsed();
                 if(cur_time - last_time > 100){
                     last_time = cur_time;
 
@@ -936,5 +950,42 @@ void WalkBase::attackMonster(cv::Point user_pos, const Monster &monster)
     while(isAttaking()){
         ProcessHelper::programDelay(50);
         QApplication::processEvents();
+    }
+}
+
+quint64 WalkBase::getUserFootholdP()
+{
+    return readLong(readLong(Gplayer.p_localplayer
+                             + BASE::MODEntity::RigidbodyComponent)
+                    + BASE::RigidbodyComponent::currentFoothold);
+}
+
+quint64 WalkBase::getUserClimbP()
+{
+    return readLong(readLong(Gplayer.p_localplayer
+                             + BASE::MODEntity::RigidbodyComponent)
+                    + BASE::RigidbodyComponent::attachEntity);
+}
+
+int WalkBase::getUserPlatform(bool is_climb)
+{
+    if(is_climb){
+        quint64 user_attach_p = getUserClimbP();
+        if(user_attach_p == 0){
+            return -1;
+        }
+        cv::Point pos = getUserPos();
+        int platform = RoomMap::getClimbPlatform(pos, Gplayer.curmapinfo.platform_list, Gplayer.curmapinfo.map_mat);
+        return platform;
+
+    }else{
+        quint64 user_foothold_p = getUserFootholdP();
+        if(user_foothold_p == 0){
+            return -1;
+        }
+
+        int user_foothold_id = readInt(user_foothold_p + BASE::Foothold::ID);
+        int user_in_lineid = RoomMap::getFootPlatform(user_foothold_id, Gplayer.curmapinfo.platform_list);
+        return user_in_lineid;
     }
 }

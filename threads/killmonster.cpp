@@ -376,7 +376,7 @@ Item KillMonster::findDropItem()
 
         // qDebug() << "物品坐标" << x << "," << y;
 
-        int line_id = RoomMap::getPosPlatform(item_pos, Gplayer.curmapinfo.platform_list, Gplayer.curmapinfo.map_mat);
+        int line_id = RoomMap::getPosPlatformByMAP(item_pos);
         if(line_id == -1){
             qDebug() << "物品坐标" << x << "," << y << "找不到平台，已忽略";
             continue;
@@ -778,7 +778,7 @@ retryEnter:
         WalkBase walk_to_platform(0);
         qDebug() << "寻路到符文位置:" << area.x << "," << area.y;
         Gcontroller.m_disable_attack = true;
-        bool success = walk_to_platform.moveToPlatform(area); // 走到范围
+        bool success = walk_to_platform.moveToPlatform(platform,area); // 走到范围
         Gcontroller.m_disable_attack = false;
         if(success){
             qDebug() << "已到达符文解除位置";
@@ -1708,7 +1708,7 @@ void KillMonster::excutePlatformSequence()
     if(plat_id == user_in_lineid) goto retryEnter;
 
     std::vector<int> paths = PathAlgo::findAStarPath(user_in_lineid, plat_id, Gplayer.curmapinfo.path_nodes);
-    qDebug() << "======寻找下个节点，A星路径======";
+    qDebug() << "======人物当前节点：" << user_in_lineid <<",寻找下个节点，A星路径======";
     for(auto const &path : paths){
         qDebug() << path;
     }
@@ -1810,7 +1810,7 @@ void KillMonster::excutePlatformSequence()
         }
 
         PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
-        qDebug() << "寻找路径节点，准备前往平台:" << platform;
+        qDebug() << "人物当前节点：" << user_in_lineid << ",寻找路径节点，准备前往平台:" << platform;
 
         bool move_success = MovePlatform::toPlatform(node, platform);
         if(!move_success){
@@ -1977,7 +1977,7 @@ void KillMonster::moveToRoomByUUID(const QString &uuid)
         Gcontroller.m_disable_attack = true;
         // 判断自身是否在攀爬物体中
         bool is_climb = Gplayer.curmapinfo.platform_list[platform].type == 1;
-        bool success = walk_to_platform.moveToPlatform(area,is_climb); // 走到范围
+        bool success = walk_to_platform.moveToPlatform(platform,area,is_climb); // 走到范围
         Gcontroller.m_disable_attack = false;
         if(success){
             qDebug() << "已到达传送阵位置";
@@ -2099,7 +2099,7 @@ void KillMonster::buyPotion()
             WalkBase walk_to_platform(0);
             qDebug() << "寻路到传送阵";
             Gcontroller.m_disable_attack = true;
-            bool success = walk_to_platform.moveToPlatform(area); // 走到范围
+            bool success = walk_to_platform.moveToPlatform(platform,area); // 走到范围
             Gcontroller.m_disable_attack = false;
             if(success){
                 qDebug() << "已到达传送阵位置";

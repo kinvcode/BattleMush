@@ -53,6 +53,9 @@ public:
     // 当前地图信息
     MapInfo curmapinfo;
 
+    // 地图平台坐标映射
+    std::vector<std::vector<PlatCoor>> plat_map;
+
     // 地图节点列表
     std::unordered_map<QString, RoomNode> room_nodes;
 

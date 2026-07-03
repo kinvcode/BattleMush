@@ -113,7 +113,7 @@ void Data::Game::roomMapItems()
 
         qDebug() << "物品坐标" << x << "," << y;
 
-        int line_id = RoomMap::getPosPlatform(item_pos, Gplayer.curmapinfo.platform_list, Gplayer.curmapinfo.map_mat);
+        int line_id = RoomMap::getPosPlatformByMAP(item_pos);
 
         qDebug() << "物品平台" << line_id;
 

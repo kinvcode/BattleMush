@@ -259,7 +259,7 @@ bool MovePlatform::toPlatform(const PathNode &node, int platform, bool is_town)
 bool MovePlatform::walkLeft(cv::Point range, int platform)
 {
     WalkBase walk_to_platform(0);
-    walk_to_platform.moveToPlatform(range); // 走到范围
+    walk_to_platform.moveToPlatform(platform,range); // 走到范围
 
     // 这时候读人物的坐标
     quint64 foothold_p = getUserFootholdP();
@@ -288,7 +288,7 @@ bool MovePlatform::walkLeft(cv::Point range, int platform)
 bool MovePlatform::walkRight(cv::Point range, int platform)
 {
     WalkBase walk_to_platform(0);
-    walk_to_platform.moveToPlatform(range); // 走到范围
+    walk_to_platform.moveToPlatform(platform,range); // 走到范围
 
     // 这时候读人物的坐标
     quint64 foothold_p = getUserFootholdP();
@@ -322,7 +322,7 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
     if(!is_climb && range.y - range.x > 15){
         range.y = range.x + 15;
     }
-    bool arrived = walk_to_platform.moveToPlatform(range, self_climb); // 走到范围
+    bool arrived = walk_to_platform.moveToPlatform(platform,range, self_climb); // 走到范围
     if(!arrived) {
         qDebug() << "到达区域失败，取消向左跳跃";
         return false;
@@ -401,7 +401,7 @@ bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool 
     if(!is_climb && range.y - range.x > 15){
         range.x = range.y - 15;
     }
-    bool arrived = walk_to_platform.moveToPlatform(range, self_climb); // 走到范围
+    bool arrived = walk_to_platform.moveToPlatform(platform,range, self_climb); // 走到范围
     if(!arrived) return false;
 
     qDebug() << "延迟后向右跳跃";
@@ -469,7 +469,7 @@ bool MovePlatform::jumpUP(cv::Point range, int platform, bool is_climb)
     int jump_key = Gplayer.m_bindkey.jump;
 
     WalkBase walk_to_platform(0);
-    bool arrived = walk_to_platform.moveToPlatform(range); // 走到范围
+    bool arrived = walk_to_platform.moveToPlatform(platform,range); // 走到范围
     if(!arrived) return false;
     // 这时候读人物的坐标
     if(is_climb){
@@ -533,7 +533,7 @@ bool MovePlatform::jumpDown(cv::Point range, int platform)
     int jump_key = Gplayer.m_bindkey.jump;
 
     WalkBase walk_to_platform(0);
-    bool arrived = walk_to_platform.moveToPlatform(range); // 走到范围
+    bool arrived = walk_to_platform.moveToPlatform(platform,range); // 走到范围
     if(!arrived) return false;
 
     ProcessHelper::programDelay(250);
@@ -595,7 +595,7 @@ bool MovePlatform::up(cv::Point range, int platform, bool self_climb)
 
     }else{
         WalkBase walk_to_platform(0);
-        bool arrived = walk_to_platform.moveToPlatform(range, self_climb); // 走到范围
+        bool arrived = walk_to_platform.moveToPlatform(platform,range, self_climb); // 走到范围
         if(!arrived) return false;
 
         qDebug() << "延迟后向上攀爬";
@@ -653,7 +653,7 @@ bool MovePlatform::down(cv::Point range, int platform, bool self_climb)
         }
     }else{
         WalkBase walk_to_platform(0);
-        bool arrived = walk_to_platform.moveToPlatform(range, self_climb); // 走到范围
+        bool arrived = walk_to_platform.moveToPlatform(platform,range, self_climb); // 走到范围
         if(!arrived) return false;
 
         // 到达地点之后按下方向键
@@ -682,7 +682,7 @@ bool MovePlatform::down(cv::Point range, int platform, bool self_climb)
 bool MovePlatform::teleport(cv::Point range, int platform)
 {
     WalkBase walk_to_platform(0);
-    bool arrived = walk_to_platform.moveToPlatform(range); // 走到范围
+    bool arrived = walk_to_platform.moveToPlatform(platform,range); // 走到范围
     if(!arrived) return false;
 
     // 到达地点之后按向上方向键
@@ -732,8 +732,6 @@ quint64 MovePlatform::getUserClimbP()
         + BASE::RigidbodyComponent::attachEntity);
 }
 
-
-
 int MovePlatform::getUserPlatform(bool is_climb)
 {
     quint64 transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
@@ -757,17 +755,6 @@ int MovePlatform::getUserPlatform(bool is_climb)
         int user_in_lineid = RoomMap::getFootPlatform(user_foothold_id, Gplayer.curmapinfo.platform_list);
         return user_in_lineid;
     }
-
-
-    // quint64 user_attach_p = readLong(readLong(Gplayer.p_localplayer + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::attachEntity);
-    // int user_foothold_id = 0;
-    // int user_climb_id = 0;
-    // int user_in_lineid = -1;
-
-    // if(user_foothold_p){
-    //     user_foothold_id = readInt(user_foothold_p + BASE::Foothold::ID);
-    //     user_in_lineid = RoomMap::getFootPlatform(user_foothold_id, Gplayer.curmapinfo.platform_list);
-    // }
 }
 
 int MovePlatform::getUserX(quint64 transform)

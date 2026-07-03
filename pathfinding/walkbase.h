@@ -26,11 +26,17 @@ public:
 
     bool moveToItem();
 
-    bool moveToPlatform(cv::Point range, bool self_climb = false);
+    bool moveToPlatform(int platform,cv::Point range, bool self_climb = false);
 
     bool moveToPortal(cv::Point range);
 
 private:
+    quint64 getUserFootholdP();
+
+    quint64 getUserClimbP();
+
+    int getUserPlatform(bool is_climb = false);
+
     int getUserX();
 
     int getUserY();

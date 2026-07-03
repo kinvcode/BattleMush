@@ -157,7 +157,8 @@ public:
     );
 
     // 创建房间地图
-    static cv::Mat makeRoomMap(
+    static MapPlat makeRoomMap(
+        const std::vector<Platform> &platform_list,
         const std::vector<ClimbRect> &climb_list,
         const std::vector<FootholdRect> &foothold_list,
         const std::vector<Wall> &wall_list,
@@ -179,8 +180,8 @@ public:
     // 计算地板所在平台
     static int getFootPlatform(int foothold, const std::vector<Platform>& platform_list);
 
-    // 计算坐标所在平台
-    static int getPosPlatform(cv::Point pos, const std::vector<Platform> &platform_list, const cv::Mat &room_map);
+    // 计算坐标在当前映射中的平台
+    static int getPosPlatformByMAP(cv::Point pos);
 
     // 计算坐标所在攀爬平台
     static int getClimbPlatform(cv::Point pos, const std::vector<Platform> &platform_list, const cv::Mat &room_map);

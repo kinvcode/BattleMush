@@ -8,7 +8,6 @@ namespace Data{
 class Game
 {
 public:
-
     // 获取gamecontext
     static quint64 gamecontext();
 

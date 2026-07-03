@@ -426,4 +426,54 @@
         "platform": 0,
         "area": [2, 2, 2, 2]
     }]
+},{
+    "uuid": "8ded358a-8cd6-4dde-8b93-018b5650b5c0",
+    "name": "維多利亞港外圍",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "d26fc64e-2ff3-4f66-978e-f606f286ddf9",
+    "name": "遺跡發掘地1",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "ccbb98d2-61f6-4b4a-8e88-67cfa921fc32",
+    "name": "遺跡發掘地2",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "258b9b4d-dd3f-4147-8aae-b31272c57e91",
+    "name": "遺跡發掘地3",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "9521b27c-d545-4ba8-bf22-fd1d6246d2f8",
+    "name": "巨人之森",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
 }]

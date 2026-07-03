@@ -196,6 +196,17 @@ typedef struct{
     cv::Mat map_mat; // 二次处理数据
 }MapInfo;
 
+typedef struct{
+    int platform_id;
+    int type;// -1空气；0地板；1攀爬；2墙体
+    int x;
+    int y;
+}PlatCoor;
+
+struct MapPlat {
+    cv::Mat room_map;                          // 可视化地图
+    std::vector<std::vector<PlatCoor>> plat_map;  // 坐标数据
+};
 
 typedef struct {
     int general_atk;

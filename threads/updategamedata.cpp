@@ -281,10 +281,21 @@ void UpdateGameData::UpdateRoomMap()
 
     RoomMap::loadLocalMap(map_id);
 
-    if(!Gplayer.curmapinfo.path_nodes.empty() && !Gplayer.curmapinfo.map_mat.empty())
+    if(!Gplayer.curmapinfo.path_nodes.empty())
     {
         DebugOutput::out("地图数据加载成功~");
         Gplayer.m_map_loaded = true;
+        // 刷新地图映射
+        MapPlat map_plat = RoomMap::makeRoomMap(
+            Gplayer.curmapinfo.platform_list,
+            Gplayer.curmapinfo.climbs,
+            Gplayer.curmapinfo.footholds,
+            Gplayer.curmapinfo.wall_list,
+            Gplayer.curmapinfo.map_bounding
+            );
+        Gplayer.curmapinfo.map_mat = map_plat.room_map;
+        Gplayer.plat_map = map_plat.plat_map;
+        qDebug() << "地图平台坐标已完成映射！";
         return;
     }
 
@@ -332,12 +343,16 @@ void UpdateGameData::UpdateRoomMap()
 
     // 绘制地图框架
     if(Gplayer.curmapinfo.map_mat.empty()){
-        Gplayer.curmapinfo.map_mat = RoomMap::makeRoomMap(
+        MapPlat map_plat = RoomMap::makeRoomMap(
+            Gplayer.curmapinfo.platform_list,
             Gplayer.curmapinfo.climbs,
             Gplayer.curmapinfo.footholds,
             Gplayer.curmapinfo.wall_list,
             Gplayer.curmapinfo.map_bounding
         );
+        Gplayer.curmapinfo.map_mat = map_plat.room_map;
+        Gplayer.plat_map = map_plat.plat_map;
+        qDebug() << "地图平台坐标已完成映射！";
     }
 
     if(Gplayer.curmapinfo.path_nodes.empty()){
