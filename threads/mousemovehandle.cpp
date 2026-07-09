@@ -72,9 +72,6 @@ void MouseMoveHandle::process()
             continue;
         }
 
-#ifdef VERIFY
-        AIcheckMouseMove();
-#else
         try{
             // 检测鼠标验证
             checkMouseMove();
@@ -85,7 +82,6 @@ void MouseMoveHandle::process()
             // 捕获所有其他异常
             // LOG("ERROR自动线程发生未知异常");
         }
-#endif
 
     }
 }

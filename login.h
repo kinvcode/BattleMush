@@ -29,8 +29,12 @@ private slots:
 
 private:
     Ui::Login *ui;
+protected:
+    void showEvent(QShowEvent *event) override;
 signals:
     void processingFinished();
+public slots:
+    void checkUpdate();
 };
 
 #endif // LOGIN_H

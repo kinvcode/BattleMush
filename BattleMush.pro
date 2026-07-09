@@ -13,11 +13,16 @@ CONFIG += c++20
 #保护版本
 # DEFINES += PROTECT=TRUE
 
-# DEFINES += VERIFY=TRUE
+DEFINES += VERIFY=TRUE
 
-DEFINES += APP_VERSION=1
+DEFINES += APP_VERSION=3
 
-DEFINES += API_URL=\"http://www.battle.test/api/\"
+CONFIG(debug, debug|release) {
+    DEFINES += API_URL=\"http://www.battle.test/api/\"
+    DEFINES += ISDEBUG= TRUE
+} else {
+    DEFINES += API_URL=\"http://battle.kinvcode.cn/api/\"
+}
 
 OPENCV_PATH = D:/CodeRepos/3th/opencv/           #opencv目录
 ONNXRUNTIME_DIR = D:/CodeRepos/3th/onnxruntime-win-x64-1.23.2/ #onnxruntime v1.23.2 https://github.com/microsoft/onnxruntime/releases

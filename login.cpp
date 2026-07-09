@@ -47,27 +47,27 @@ void Login::on_pushButton_querycard_btn_clicked()
 
     switch (code) {
     case 0:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","卡密可以正常使用");
+        QMessageBox::information(NULL,"BattleMush","卡密可以正常使用");
         return;
         break;
     case 1:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","非法数据！");
+        QMessageBox::information(NULL,"BattleMush","非法数据！");
         return;
         break;
     case 2:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","非法参数！");
+        QMessageBox::information(NULL,"BattleMush","非法参数！");
         return;
         break;
     case 3:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","卡密不存在！");
+        QMessageBox::information(NULL,"BattleMush","卡密不存在！");
         return;
         break;
     case 4:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","该卡密已被使用");
+        QMessageBox::information(NULL,"BattleMush","该卡密已被使用");
         return;
         break;
     default:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","未知错误！");
+        QMessageBox::information(NULL,"BattleMush","未知错误！");
         return;
         break;
     }
@@ -88,12 +88,12 @@ void Login::on_pushButton_login_btn_clicked()
     {
         switch (code) {
         case 1:
-            QMessageBox::information(NULL,"MicrosoftFastSearch","会员已到期！");
+            QMessageBox::information(NULL,"BattleMush","会员已到期！");
             ui->pushButton_login_btn->setEnabled(true);
             return;
             break;
         case 2:
-            QMessageBox::information(NULL,"MicrosoftFastSearch","机器码已变更");
+            QMessageBox::information(NULL,"BattleMush","机器码已变更");
             ui->pushButton_login_btn->setEnabled(true);
             return;
             break;
@@ -129,10 +129,10 @@ void Login::on_pushButton_login_btn_clicked()
         config->m_jsonObject = logindata;
         config->save();
 
-        QMessageBox::information(NULL,"MicrosoftFastSearch",Gcontroller.m_vip_expired_date + "到期");
+        QMessageBox::information(NULL,"BattleMush",Gcontroller.m_vip_expired_date + "到期");
         emit processingFinished();
     }else{
-        QMessageBox::information(NULL,"MicrosoftFastSearch","认证失败,请检查用户名和密码");
+        QMessageBox::information(NULL,"BattleMush","认证失败,请检查用户名和密码");
     }
 
     ui->pushButton_login_btn->setEnabled(true);
@@ -155,31 +155,31 @@ void Login::on_pushButton_register_btn_clicked()
 
     switch (code) {
     case 0:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","注册成功！");
+        QMessageBox::information(NULL,"BattleMush","注册成功！");
         return;
         break;
     case 1:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","非法数据！");
+        QMessageBox::information(NULL,"BattleMush","非法数据！");
         return;
         break;
     case 2:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","非法参数！");
+        QMessageBox::information(NULL,"BattleMush","非法参数！");
         return;
         break;
     case 3:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","账号或密码格式不正确，请使用3~15位英文和数字");
+        QMessageBox::information(NULL,"BattleMush","账号或密码格式不正确，请使用3~15位英文和数字");
         return;
         break;
     case 4:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","该卡密无效");
+        QMessageBox::information(NULL,"BattleMush","该卡密无效");
         return;
         break;
     case 5:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","该用户已存在");
+        QMessageBox::information(NULL,"BattleMush","该用户已存在");
         return;
         break;
     default:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","未知错误！");
+        QMessageBox::information(NULL,"BattleMush","未知错误！");
         return;
         break;
     }
@@ -195,27 +195,27 @@ void Login::on_pushButton_unbind_btn_clicked()
 
     switch (code) {
     case 0:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","已成功解绑！");
+        QMessageBox::information(NULL,"BattleMush","已成功解绑！");
         return;
         break;
     case 1:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","非法数据！");
+        QMessageBox::information(NULL,"BattleMush","非法数据！");
         return;
         break;
     case 2:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","非法账号密码！");
+        QMessageBox::information(NULL,"BattleMush","非法账号密码！");
         return;
         break;
     case 3:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","账号不存在");
+        QMessageBox::information(NULL,"BattleMush","账号不存在");
         return;
         break;
     case 4:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","账号密码不匹配");
+        QMessageBox::information(NULL,"BattleMush","账号密码不匹配");
         return;
         break;
     default:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","未知错误！");
+        QMessageBox::information(NULL,"BattleMush","未知错误！");
         return;
         break;
     }
@@ -234,29 +234,81 @@ void Login::on_pushButton_renewal_btn_clicked()
 
     switch (code) {
     case 0:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","续费成功！");
+        QMessageBox::information(NULL,"BattleMush","续费成功！");
         return;
         break;
     case 1:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","非法数据！");
+        QMessageBox::information(NULL,"BattleMush","非法数据！");
         return;
         break;
     case 2:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","非法参数！");
+        QMessageBox::information(NULL,"BattleMush","非法参数！");
         return;
         break;
     case 3:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","该卡密无效！");
+        QMessageBox::information(NULL,"BattleMush","该卡密无效！");
         return;
         break;
     case 4:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","该用户不存在！");
+        QMessageBox::information(NULL,"BattleMush","该用户不存在！");
         return;
         break;
     default:
-        QMessageBox::information(NULL,"MicrosoftFastSearch","未知错误！");
+        QMessageBox::information(NULL,"BattleMush","未知错误！");
         return;
         break;
     }
+}
+
+void Login::showEvent(QShowEvent *event)
+{
+    QTimer::singleShot(100,this,SLOT(checkUpdate()));
+}
+
+void Login::checkUpdate()
+{
+    VMProtectBegin("__FUNCTION__");
+    qDebug() << "检查更新中...";
+
+    int version = APIRequest::getVersion();
+#ifdef PROTECT
+    version = 0;
+#endif
+    if(version > APP_VERSION)
+    {
+        QMessageBox::warning(NULL,"BattleMush","当前非最新版本，即将启动自动更新程序！");
+
+        // 获取当前程序运行目录
+        QString currentDir = QCoreApplication::applicationDirPath();
+
+        // // 拼接文件路径
+        QString filePath = currentDir + "/BattleMushUpdate.exe";
+
+        // 使用 QFile 判断文件是否存在
+        QFile file(filePath);
+        if (!file.exists()) {
+            QMessageBox::information(NULL,"BattleMush","更新组件缺失!");
+            qApp->quit();
+        }
+
+        // 运行更新程序
+        QProcess process;
+        QString programPath = filePath;
+        QProcess::startDetached(filePath);
+
+        // 退出
+        qApp->quit();
+    }else{
+        if(version == -1){
+            // 无法获取版本信息
+            QMessageBox::information(NULL,"BattleMush","无法获取版本信息!");
+            qApp->quit();
+        }
+    }
+
+    // 检测完毕，加载主程序
+    ProcessHelper::programDelay(1000);
+    // emit processingFinished();
+    VMProtectEnd();
 }
 
