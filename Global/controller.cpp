@@ -460,8 +460,26 @@ void Controller::initTaskList()
     map0012_path01.name = "【路线A】刷全图";
     map0012_path01.platforms = {6,5,4};
 
+    RoomPath map0012_path02;
+    map0012_path02.id = 2;
+    map0012_path02.name = "【路线B】刷上面一层";
+    map0012_path02.platforms = {6};
+
+    RoomPath map0012_path03;
+    map0012_path03.id = 3;
+    map0012_path03.name = "【路线C】刷中间一层";
+    map0012_path03.platforms = {5};
+
+    RoomPath map0012_path04;
+    map0012_path04.id = 4;
+    map0012_path04.name = "【路线D】刷下面一层";
+    map0012_path04.platforms = {4};
+
     map0012.paths.push_back(map0012_path00);
     map0012.paths.push_back(map0012_path01);
+    map0012.paths.push_back(map0012_path02);
+    map0012.paths.push_back(map0012_path03);
+    map0012.paths.push_back(map0012_path04);
 
     map0012.rests.push_back(map0012_rest00);
 
@@ -940,7 +958,7 @@ void Controller::initTaskList()
 
     map0031.rests.push_back(map0031_rest00);
 
-    /* ============【 藍菇菇樹林 】============= */
+    /* ============【 藍 菇 菇 樹 林 】============= */
     MapRoomPath map0032;
     map0032.id = 32;
     map0032.name = "(Lv20~20)藍菇菇樹林";
@@ -964,6 +982,31 @@ void Controller::initTaskList()
     map0032.paths.push_back(map0032_path01);
 
     map0032.rests.push_back(map0032_rest00);
+
+    /* ============【 濃 霧 森 林 】============= */
+    MapRoomPath map0033;
+    map0033.id = 33;
+    map0033.name = "(Lv55~55)濃霧森林";
+    map0033.uuid = "ba208704-12a6-4e6f-9c9c-4b9d82586b28";
+
+    RoomRest map0033_rest00;
+    map0033_rest00.id = 0;
+    map0033_rest00.name = "【休息点A】地图右边平台";
+    map0033_rest00.platform = 3;
+
+    RoomPath map0033_path00;
+    map0033_path00.id = 0;
+    map0033_path00.name = "自动规划路线";
+
+    RoomPath map0033_path01;
+    map0033_path01.id = 1;
+    map0033_path01.name = "【路线A】刷中间两层";
+    map0033_path01.platforms = {1,2};
+
+    map0033.paths.push_back(map0033_path00);
+    map0033.paths.push_back(map0033_path01);
+
+    map0033.rests.push_back(map0033_rest00);
 
     /* ============【 加 入 刷 图 列 表】============= */
     m_clean_room_list.push_back(map0000); // 菇菇山丘
@@ -999,6 +1042,7 @@ void Controller::initTaskList()
     m_clean_room_list.push_back(map0030); // 試煉洞窟3
     m_clean_room_list.push_back(map0031); // 金勾海賊團基地3
     m_clean_room_list.push_back(map0032); // 藍菇菇樹林
+    m_clean_room_list.push_back(map0033); // 濃霧森林
 
 
     /* ============【 加 入 休 息 列 表】============= */
@@ -1035,6 +1079,7 @@ void Controller::initTaskList()
     m_rest_point_list.push_back(map0030);
     m_rest_point_list.push_back(map0031);
     m_rest_point_list.push_back(map0032);
+    m_rest_point_list.push_back(map0033);
 
     // 初始化NPC任务列表
     /**

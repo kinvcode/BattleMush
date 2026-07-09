@@ -417,6 +417,14 @@ void MainWindow::initConfig()
     ui->lineEdit_recast_buff3_max->blockSignals(false);
     ui->lineEdit_recast_buff4_max->blockSignals(false);
     ui->lineEdit_recast_buff5_max->blockSignals(false);
+
+    // 拾取
+    ui->checkBox_pickup_onlymyplat->blockSignals(true);
+    ui->checkBox_pickup_forceatk->blockSignals(true);
+    ui->checkBox_pickup_onlymyplat->setChecked(Gconfig.getValue("pickup/onlymyplat").toBool());
+    ui->checkBox_pickup_forceatk->setChecked(Gconfig.getValue("pickup/forceatk").toBool());
+    ui->checkBox_pickup_onlymyplat->blockSignals(false);
+    ui->checkBox_pickup_forceatk->blockSignals(false);
 }
 
 void MainWindow::initDir()
@@ -2067,5 +2075,29 @@ void MainWindow::on_pushButton_answerinfo_upload_clicked()
 {
     qDebug() << "上传问答信息~";
     APIRequest::getVersion();
+}
+
+
+void MainWindow::on_checkBox_pickup_onlymyplat_stateChanged(int arg1)
+{
+    if(ui->checkBox_pickup_onlymyplat->isChecked()){
+        showNotice("仅本平台拾取已开启");
+        Gconfig.setValue("pickup/onlymyplat", true);
+    }else{
+        showNotice("仅本平台拾取已关闭");
+        Gconfig.setValue("pickup/onlymyplat", false);
+    }
+}
+
+
+void MainWindow::on_checkBox_pickup_forceatk_stateChanged(int arg1)
+{
+    if(ui->checkBox_pickup_forceatk->isChecked()){
+        showNotice("拾取强制攻击已开启");
+        Gconfig.setValue("pickup/forceatk", true);
+    }else{
+        showNotice("拾取强制攻击已关闭");
+        Gconfig.setValue("pickup/forceatk", false);
+    }
 }
 

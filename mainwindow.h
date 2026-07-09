@@ -209,6 +209,10 @@ private slots:
 
     void on_pushButton_answerinfo_upload_clicked();
 
+    void on_checkBox_pickup_onlymyplat_stateChanged(int arg1);
+
+    void on_checkBox_pickup_forceatk_stateChanged(int arg1);
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

@@ -95,6 +95,12 @@ void GlobalConfig::loadFromJson()
     atkRecast["buff4_max"] = config->getValue("atk_recast/buff4_max", atkRecast["buff4_max"].toVariant()).toInt();
     atkRecast["buff5_max"] = config->getValue("atk_recast/buff5_max", atkRecast["buff5_max"].toVariant()).toInt();
     data["atk_recast"] = atkRecast;
+
+    // 拾取配置
+    QJsonObject pickup = data["pickup"].toObject();
+    pickup["onlymyplat"] = config->getValue("pickup/onlymyplat", pickup["onlymyplat"].toVariant()).toBool();
+    pickup["forceatk"] = config->getValue("pickup/forceatk", pickup["forceatk"].toVariant()).toBool();
+    data["pickup"] = pickup;
 }
 
 QVariant GlobalConfig::getValue(const QString &keyPath, const QVariant& defaultValue) const

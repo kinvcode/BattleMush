@@ -51,7 +51,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>3</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="tab_main">
          <attribute name="title">
@@ -350,9 +350,9 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
+             <y>-819</y>
              <width>635</width>
-             <height>1142</height>
+             <height>1348</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -2094,12 +2094,52 @@
               </widget>
              </widget>
             </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_12">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>200</height>
+               </size>
+              </property>
+              <property name="title">
+               <string>拾取设置</string>
+              </property>
+              <widget class="QCheckBox" name="checkBox_pickup_onlymyplat">
+               <property name="geometry">
+                <rect>
+                 <x>20</x>
+                 <y>50</y>
+                 <width>191</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>只拾取本平台物品</string>
+               </property>
+              </widget>
+              <widget class="QCheckBox" name="checkBox_pickup_forceatk">
+               <property name="geometry">
+                <rect>
+                 <x>20</x>
+                 <y>90</y>
+                 <width>191</width>
+                 <height>21</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>拾取途中强制攻击</string>
+               </property>
+              </widget>
+             </widget>
+            </item>
            </layout>
            <zorder>groupBox_attack</zorder>
            <zorder>groupBox_key_binding</zorder>
            <zorder>HealthBox</zorder>
            <zorder>groupBox_attack_switch</zorder>
            <zorder>groupBox_7</zorder>
+           <zorder>groupBox_12</zorder>
           </widget>
          </widget>
         </widget>

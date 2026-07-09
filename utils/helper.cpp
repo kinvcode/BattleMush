@@ -58,7 +58,7 @@ quint64 Helper::findChild(quint64 parent, QString name)
     quint64 list = Mem::readLong(parent + BASE::MODEntity::children);
     int list_num = Mem::readLong(list + BASE::List::size);
     if(list_num == 0){
-        qDebug() << "不存在子模块" << name;
+        // qDebug() << "不存在子模块" << name;
         return child_entity;
     }
 
@@ -2561,7 +2561,7 @@ void PathAlgo::jump_up(
                 cv::Point start = iterator.pos();
                 // start.y -= 1;
                 cv::Point end = start;
-                end.y -= 100;
+                end.y -= 110;
 
                 // 检测攀爬物
                 cv::Point target_pos = {-1, -1};

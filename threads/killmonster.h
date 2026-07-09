@@ -73,6 +73,10 @@ private:
     int m_recast_buff4_keycode;
     int m_recast_buff5_keycode;
 
+    // 拾取
+    bool m_pickup_onlymyplat = false;
+    bool m_pickup_forceatk = false;
+
     // 符文信息
     struct{
         int platform;

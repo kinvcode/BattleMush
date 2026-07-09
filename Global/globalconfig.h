@@ -75,6 +75,11 @@ public:
         {"mp_type",0},
         }
     },
+    {"pickup",QJsonObject{
+        {"onlymyplat",false},
+        {"forceatk",false},
+        }
+    },
     {"model","uplevel"}
 };
 

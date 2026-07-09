@@ -98,6 +98,9 @@ void KillMonster::resume()
 
     Gplayer.use_skillteleport = Gconfig.getValue("atk_swtich/skillteleport").toBool();
 
+    m_pickup_onlymyplat = Gconfig.getValue("pickup/onlymyplat").toBool();
+    m_pickup_forceatk = Gconfig.getValue("pickup/forceatk").toBool();
+
     m_paused = false;
 }
 
@@ -140,6 +143,9 @@ void KillMonster::process()
     m_recast_buff5_max_time = Gconfig.getValue("atk_recast/buff5_max").toInt();
 
     Gplayer.use_skillteleport = Gconfig.getValue("atk_swtich/skillteleport").toBool();
+
+    m_pickup_onlymyplat = Gconfig.getValue("pickup/onlymyplat").toBool();
+    m_pickup_forceatk = Gconfig.getValue("pickup/forceatk").toBool();
 
     // 初始化任务
     m_task_id = 0;
@@ -400,6 +406,7 @@ Item KillMonster::findDropItem()
     int user_platform = userPlatform();
     int user_x = userX();
     int distance = 999999;
+    bool myplat_exists = false;
     for(const auto &item : m_allItem){
         if (m_black_item_pro.find(item.entity) != m_black_item_pro.end()) {
             m_black_item_pro.erase(item.entity);
@@ -411,15 +418,24 @@ Item KillMonster::findDropItem()
             if( diff < distance){
                 distance = diff;
                 target_item = item;
+                myplat_exists = true;
                 // qDebug() << "发现本平台物品,距离自己:" << distance << "坐标:" << item.pos.x << "," << item.pos.y;
             }
         }
     }
 
+    if(!myplat_exists){
+        target_item.entity = 0;
+    }
+
     // 如果没找本平台物品
     if(target_item.entity == 0){
         qDebug() << "本平台未发现物品！";
-        target_item = m_allItem.front();
+        if(m_pickup_onlymyplat){
+            return target_item;
+        }else{
+            target_item = m_allItem.front();
+        }
     }
 
     return target_item;
@@ -1363,30 +1379,32 @@ void KillMonster::autoCleanLine()
             DebugOutput::out("人物所在平台存在物品，开始拾取~");
             reciveItem(cur_item);
         }else{
-            DebugOutput::out("人物平台没有物品，开始寻路~");
-            std::vector<int> paths = PathAlgo::findAStarPath(user_in_lineid, cur_item.line_id, Gplayer.curmapinfo.path_nodes);
+            if(!m_pickup_onlymyplat){
+                DebugOutput::out("人物平台没有物品，开始寻路~");
+                std::vector<int> paths = PathAlgo::findAStarPath(user_in_lineid, cur_item.line_id, Gplayer.curmapinfo.path_nodes);
 
-            qDebug() << "======A星路径======";
-            for(auto const &path : paths){
-                qDebug() << path;
-            }
-            qDebug() << "======A星路径======";
+                qDebug() << "======A星路径======";
+                for(auto const &path : paths){
+                    qDebug() << path;
+                }
+                qDebug() << "======A星路径======";
 
-            if(paths.empty()){
-                qDebug() << "无法找到前往该物品平台的路径";
-            }else{
-                for(auto plat : paths){
-                    user_in_lineid = userPlatform();
-                    PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
-                    qDebug() << "准备前往平台:" << plat;
+                if(paths.empty()){
+                    qDebug() << "无法找到前往该物品平台的路径";
+                }else{
+                    for(auto plat : paths){
+                        user_in_lineid = userPlatform();
+                        PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
+                        qDebug() << "准备前往平台:" << plat;
 
-                    bool move_success = MovePlatform::toPlatform(node, plat);
-                    if(!move_success){
-                        qDebug() << "A星移动平台失败 平台:" << plat;
+                        bool move_success = MovePlatform::toPlatform(node, plat);
+                        if(!move_success){
+                            qDebug() << "A星移动平台失败 平台:" << plat;
 
-                        ProcessHelper::programDelay(100);
-                        QApplication::processEvents();
-                        return;
+                            ProcessHelper::programDelay(100);
+                            QApplication::processEvents();
+                            return;
+                        }
                     }
                 }
             }
@@ -1578,31 +1596,38 @@ void KillMonster::excutePlatformSequence()
                 DebugOutput::out("人物所在平台存在物品，开始拾取~");
                 reciveItem(cur_item);
             }else{
-                DebugOutput::out("人物平台没有物品，开始寻路~");
-                std::vector<int> paths = PathAlgo::findAStarPath(user_in_lineid, cur_item.line_id, Gplayer.curmapinfo.path_nodes);
+                if(!m_pickup_onlymyplat){
+                    DebugOutput::out("人物平台没有物品，开始寻路~");
+                    std::vector<int> paths = PathAlgo::findAStarPath(user_in_lineid, cur_item.line_id, Gplayer.curmapinfo.path_nodes);
 
-                qDebug() << "======寻找其他平台物品，A星路径======";
-                for(auto const &path : paths){
-                    qDebug() << path;
-                }
-                qDebug() << "======A星路径======";
+                    qDebug() << "======寻找其他平台物品，A星路径======";
+                    for(auto const &path : paths){
+                        qDebug() << path;
+                    }
+                    qDebug() << "======A星路径======";
 
-                if(paths.empty()){
-                    qDebug() << "无法找到前往该物品平台的路径";
-                }else{
-                    for(auto plat : paths){
-                        user_in_lineid = userPlatform();
-                        PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
-                        qDebug() << "寻找物品，准备前往平台:" << plat;
-                        Gcontroller.m_disable_attack = true;
-                        bool move_success = MovePlatform::toPlatform(node, plat);
-                        Gcontroller.m_disable_attack = false;
-                        if(!move_success){
-                            qDebug() << "A星移动平台失败 平台:" << plat;
+                    if(paths.empty()){
+                        qDebug() << "无法找到前往该物品平台的路径";
+                    }else{
+                        for(auto plat : paths){
+                            user_in_lineid = userPlatform();
+                            PathNode node = Gplayer.curmapinfo.path_nodes[user_in_lineid];
+                            qDebug() << "寻找物品，准备前往平台:" << plat;
+                            bool move_success = false;
+                            if(m_pickup_forceatk){
+                                move_success = MovePlatform::toPlatform(node, plat);
+                            }else{
+                                Gcontroller.m_disable_attack = true;
+                                move_success = MovePlatform::toPlatform(node, plat);
+                                Gcontroller.m_disable_attack = false;
+                            }
+                            if(!move_success){
+                                qDebug() << "A星移动平台失败 平台:" << plat;
 
-                            ProcessHelper::programDelay(100);
-                            QApplication::processEvents();
-                            goto retryEnter;
+                                ProcessHelper::programDelay(100);
+                                QApplication::processEvents();
+                                goto retryEnter;
+                            }
                         }
                     }
                 }
