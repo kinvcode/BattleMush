@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui network concurrent
 
 RC_ICONS = assets/images/icons/abc.ico
 
@@ -17,7 +17,7 @@ CONFIG += c++20
 
 DEFINES += APP_VERSION=1
 
-DEFINES += API_URL=\"http://vega.kinvcode.cn/api/\"
+DEFINES += API_URL=\"http://www.battle.test/api/\"
 
 OPENCV_PATH = D:/CodeRepos/3th/opencv/           #opencv目录
 ONNXRUNTIME_DIR = D:/CodeRepos/3th/onnxruntime-win-x64-1.23.2/ #onnxruntime v1.23.2 https://github.com/microsoft/onnxruntime/releases
@@ -25,6 +25,7 @@ ONNXRUNTIME_DIR = D:/CodeRepos/3th/onnxruntime-win-x64-1.23.2/ #onnxruntime v1.2
 INCLUDEPATH +=  $${OPENCV_PATH}/include \
                 $$ONNXRUNTIME_DIR/include \
                 $$PYTHON_BASE/include \
+                $$PWD/include \
 
 CONFIG(debug, debug|release) {
     LIBS += $${OPENCV_PATH}/x64/vc16/lib/opencv_core460d.lib \
@@ -60,6 +61,8 @@ LIBS += -lSetupAPI
 LIBS += -lUser32 -lKernel32
 LIBS += $$PWD/lib/msdk/msdkLib.lib
 LIBS += $$PWD/lib/msdk/hid.lib
+LIBS += $$PWD/lib/openssl/libssl.lib
+LIBS += $$PWD/lib/openssl/libcrypto.lib
 
 LIBS += setupapi.lib \
         gdi32.lib \
@@ -82,7 +85,11 @@ SOURCES += \
     global/globalplayer.cpp \
     driver/driverload.cpp \
     helper/rand.cpp \
+    http/apirequest.cpp \
+    http/request.cpp \
+    http/requestsync.cpp \
     keyboard/nativeeventfilter.cpp \
+    login.cpp \
     logviewer.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -99,7 +106,9 @@ SOURCES += \
     threads/updategamedata.cpp \
     utils/config.cpp \
     utils/data.cpp \
+    utils/decrypt.cpp \
     utils/gamestruct.cpp \
+    utils/hardware.cpp \
     utils/helper.cpp \
     utils/mapserializer.cpp \
     utils/matchtemp.cpp \
@@ -125,7 +134,11 @@ HEADERS += \
     driver/msstruct.h \
     global/struct.h \
     helper/rand.h \
+    http/apirequest.h \
+    http/request.h \
+    http/requestsync.h \
     keyboard/nativeeventfilter.h \
+    login.h \
     logviewer.h \
     mainwindow.h \
     pathfinding/moveplatform.h \
@@ -141,7 +154,9 @@ HEADERS += \
     threads/updategamedata.h \
     utils/config.h \
     utils/data.h \
+    utils/decrypt.h \
     utils/gamestruct.h \
+    utils/hardware.h \
     utils/helper.h \
     utils/mapserializer.h \
     utils/matchtemp.h \
@@ -155,6 +170,7 @@ HEADERS += \
 
 FORMS += \
     TaskEditDialog.ui \
+    login.ui \
     mainwindow.ui
 
 

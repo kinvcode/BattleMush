@@ -2799,6 +2799,31 @@
             <string>乱码测试</string>
            </property>
           </widget>
+          <widget class="QPushButton" name="pushButton_answerinfo_upload">
+           <property name="geometry">
+            <rect>
+             <x>110</x>
+             <y>40</y>
+             <width>80</width>
+             <height>31</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>31</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>31</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>上传问答</string>
+           </property>
+          </widget>
          </widget>
          <widget class="QGroupBox" name="groupBox_11">
           <property name="geometry">

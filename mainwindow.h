@@ -22,6 +22,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void initAll();
     // 线程管理器
     ThreadManager* m_threadManager;
     QPointer<AlertWindow> m_alert;  // 警报组件指针
@@ -205,6 +206,8 @@ private slots:
     void on_pushButton_answer_input_test_clicked();
 
     void on_pushButton_print_monsters_list_clicked();
+
+    void on_pushButton_answerinfo_upload_clicked();
 
 public slots:
     void console(QString msg);

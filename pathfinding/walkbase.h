@@ -26,6 +26,8 @@ public:
 
     bool moveToItem();
 
+    bool moveToArea(cv::Point range, bool self_climb = false);
+
     bool moveToPlatform(int platform,cv::Point range, bool self_climb = false);
 
     bool moveToPortal(cv::Point range);

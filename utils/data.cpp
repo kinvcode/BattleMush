@@ -98,6 +98,10 @@ void Data::Game::roomMapItems()
         }
 
         qDebug() << "物品:" << QString::number(entity,16).toUpper();
+        int visible_flag = readInt(entity + 0x32C);
+        int enabled = (visible_flag >> 8) & 255;
+        qDebug() << "visible_flag:" << visible_flag;
+        qDebug() << "enabled:" << enabled;
         float item_x = readFloat(readLong(entity + BASE::MODEntity::TransformComponent)+BASE::TransformComponent::PositionX);
         float item_y = readFloat(readLong(entity + BASE::MODEntity::TransformComponent)+BASE::TransformComponent::PositionY);
         qDebug() << "浮点坐标:" << item_x << "," << item_y;

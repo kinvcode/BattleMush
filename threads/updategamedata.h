@@ -33,6 +33,9 @@ private:
     void updateQuickSlot(quint64 ui_entity);
     // 刷新怪物黑名单
     void updateBlackMonsters();
+
+    // token维护
+    static void flushToken();
 };
 
 #endif // UPDATEGAMEDATA_H

@@ -194,10 +194,7 @@ void MSDK::KeyDown(int code)
 // 弹起某个按键
 void MSDK::KeyUp(int code)
 {
-    if (rFpti6KthJ(Gplayer.MSDK_HANDLE, code) == 1)
-    {
-        oihUU7DIfVcX(Gplayer.MSDK_HANDLE, code);
-    }
+    oihUU7DIfVcX(Gplayer.MSDK_HANDLE, code);
 }
 
 void MSDK::KeyUp2(int code)

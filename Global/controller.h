@@ -17,6 +17,15 @@ public:
 
 // ====== 成员属性 ======
 public:
+    /* HTTP开始 */
+    static QString m_http_token;
+    static qint64 m_http_token_timestamp;
+    // 到期日期
+    static QString m_vip_expired_date;
+    // 到期时间戳
+    static qint64 m_vip_expired_timestamp;
+    /* HTTP结束 */
+
     static AttackInfo m_attack_info;
 
     static cv::Point m_attack_range_general;

@@ -29,6 +29,7 @@
 #include "driver/msdk/msdkDriver.h"
 #include <dbghelp.h>
 #include "process/exception.h"
+#include "http/apirequest.h"
 
 // 测试头文件
 #include "global/globalplayer.h"
@@ -44,6 +45,22 @@ MainWindow::MainWindow(QWidget *parent)
 
     SetUnhandledExceptionFilter(BattleCrashHandler);
 
+    console("系统初始化完毕！");
+
+    // 线程操作
+    // 主线程:FPS限制，检测是否登录，自动登录，是否创建队伍、
+    // 键盘按键线程：buff\
+    // 开启一个血蓝检测线程
+    // 窗口截图线程
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+void MainWindow::initAll()
+{
     loadDriver();
 
     initMSDK();
@@ -66,20 +83,15 @@ MainWindow::MainWindow(QWidget *parent)
     // 初始化线程
     initThreads();
 
-
-
-    console("系统初始化完毕！");
-
-    // 线程操作
-    // 主线程:FPS限制，检测是否登录，自动登录，是否创建队伍、
-    // 键盘按键线程：buff\
-    // 开启一个血蓝检测线程
-    // 窗口截图线程
-}
-
-MainWindow::~MainWindow()
-{
-    delete ui;
+#ifdef VERIFY
+    qDebug() << "过期时间：" << Gcontroller.m_vip_expired_date;
+    // 获取当前标题
+    QString currentTitle = this->windowTitle();
+    // 添加会员信息
+    QString newTitle = currentTitle + " | 会员到期时间：" + Gcontroller.m_vip_expired_date;
+    // 设置新标题
+    this->setWindowTitle(newTitle);
+#endif
 }
 
 MainWindow *MainWindow::getInstance()
@@ -2048,5 +2060,12 @@ void MainWindow::on_pushButton_print_monsters_list_clicked()
         Monster cur_monster = {entity, foothold_id, line_id, {monster_x, monster_y}};
         m_allmonster.push_back(cur_monster);
     }
+}
+
+
+void MainWindow::on_pushButton_answerinfo_upload_clicked()
+{
+    qDebug() << "上传问答信息~";
+    APIRequest::getVersion();
 }
 

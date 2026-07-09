@@ -222,6 +222,16 @@
         "area": [2, 2, 2, 2]
     }]
 },{
+    "uuid": "f20f4a99-e3f4-4ea3-bbf1-8b896c26a4d2",
+    "name": "藍菇菇樹林",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
     "uuid": "c812231b-55cf-449c-879f-8d5674951c01",
     "name": "維多利亞港雜貨店",
     "type": 2,
@@ -469,6 +479,86 @@
 },{
     "uuid": "9521b27c-d545-4ba8-bf22-fd1d6246d2f8",
     "name": "巨人之森",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "74306589-6933-4cd1-ac68-a9f36c8257e1",
+    "name": "王冠之地",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "0431e3d5-3d6e-464f-a9df-3dd7c5ecb8a9",
+    "name": "寒冰平原",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "a4394d43-ce06-45df-ad80-277d18683a2b",
+    "name": "冰雪峽谷2",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "f9231fa6-4bd6-44ec-b348-01e55c728e22",
+    "name": "險峻懸崖",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "bff2a86e-965d-4092-bee7-52a4d1e1e323",
+    "name": "惡狼領域5",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "67141014-5fb0-48b3-be2e-52e81c2ffbea",
+    "name": "死亡森林2",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "2b5fbd2e-a99f-40b7-9f06-48fdea2379c4",
+    "name": "試煉洞窟3",
+    "type": 0,
+    "targets": [{
+        "uuid": "55",
+        "name": "55",
+        "platform": 0,
+        "area": [2, 2, 2, 2]
+    }]
+},{
+    "uuid": "dcac5adb-64fb-42f3-89aa-867a436db936",
+    "name": "金勾海賊團基地3",
     "type": 0,
     "targets": [{
         "uuid": "55",

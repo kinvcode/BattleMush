@@ -711,9 +711,16 @@ MapPlat RoomMap::makeRoomMap(
 
         int platform_id = -1;
         for(const auto& platform : platform_list) {
-            if(platform.start.x == item.x_left && platform.end.x == item.x_right &&
-                platform.start.y == item.y_top && platform.end.y == item.y_bottom) {
-                platform_id = platform.id;
+            bool find_id = false;
+            for(const auto& child : platform.line_child){
+                if(child.start.x == item.x_left && child.end.x == item.x_right &&
+                    child.start.y == item.y_top && child.end.y == item.y_bottom){
+                    platform_id = platform.id;
+                    find_id = true;
+                    break;
+                }
+            }
+            if(find_id){
                 break;
             }
         }
@@ -895,10 +902,11 @@ std::unordered_map<int, PathNode> RoomMap::makeNodes(
                 }
 
                 // 存在jumpup的时候，直接删掉jumpleft，right
+                // 但是雪域地图不能这样，否则会一直跳不上去
                 is_exists = false;
                 for(const auto &visit : target.second.visit_list){
                     if(visit.visit_type == JUMP_UP) {
-                        is_exists = true;
+                        is_exists = true; // 如果是雪域地图，则注释该行
                     }
                 }
                 if(is_exists){

@@ -729,6 +729,7 @@ bool KillMonster::isExistsRune()
                 // 记录当前符文位置：平台坐标
                 m_rune_info.platform = line_id;
                 m_rune_info.area = {rune_x - 10, rune_x + 10};
+                qDebug() << "符文坐标已更新";
                 return true;
             }
         }
@@ -761,6 +762,8 @@ retryEnter:
     }
     // DebugOutput::out("处理解除符文~，暂时没有相关解决方式");
 
+    isExistsRune(); // 再次调用，用于更新符文坐标数据
+
     // 前往符文位置：平台坐标
     int platform = m_rune_info.platform;
     cv::Point area = m_rune_info.area;
@@ -778,7 +781,7 @@ retryEnter:
         WalkBase walk_to_platform(0);
         qDebug() << "寻路到符文位置:" << area.x << "," << area.y;
         Gcontroller.m_disable_attack = true;
-        bool success = walk_to_platform.moveToPlatform(platform,area); // 走到范围
+        bool success = walk_to_platform.moveToArea(area); // 走到范围
         Gcontroller.m_disable_attack = false;
         if(success){
             qDebug() << "已到达符文解除位置";
@@ -1165,6 +1168,8 @@ retryEnter:
 
 void KillMonster::runneKeyboard()
 {
+    MSDK::KeyUp(Keyboard_UpArrow);
+    ProcessHelper::programDelay(300);
     // 按上键触发指令
     MSDK::keyPress(Keyboard_UpArrow,1);
 
@@ -1977,7 +1982,7 @@ void KillMonster::moveToRoomByUUID(const QString &uuid)
         Gcontroller.m_disable_attack = true;
         // 判断自身是否在攀爬物体中
         bool is_climb = Gplayer.curmapinfo.platform_list[platform].type == 1;
-        bool success = walk_to_platform.moveToPlatform(platform,area,is_climb); // 走到范围
+        bool success = walk_to_platform.moveToArea(area,is_climb); // 走到范围
         Gcontroller.m_disable_attack = false;
         if(success){
             qDebug() << "已到达传送阵位置";
@@ -2099,7 +2104,7 @@ void KillMonster::buyPotion()
             WalkBase walk_to_platform(0);
             qDebug() << "寻路到传送阵";
             Gcontroller.m_disable_attack = true;
-            bool success = walk_to_platform.moveToPlatform(platform,area); // 走到范围
+            bool success = walk_to_platform.moveToArea(area); // 走到范围
             Gcontroller.m_disable_attack = false;
             if(success){
                 qDebug() << "已到达传送阵位置";

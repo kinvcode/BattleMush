@@ -3,6 +3,7 @@
 #include "global/globalplayer.h"
 #include "global/controller.h"
 #include <QDebug>
+#include <QtConcurrent>
 #include "process/process.h"
 #include "utils/helper.h"
 #include "driver/mem.h"
@@ -12,6 +13,8 @@
 #include "driver/msdriverpro.h"
 #include "utils/matchtemp.h"
 #include "driver/msdk/msdkDriver.h"
+#include "http/apirequest.h"
+#include "mainwindow.h"
 
 using namespace Mem;
 
@@ -62,10 +65,30 @@ void UpdateGameData::process()
     while (m_running) {
         // 处理暂停状态
         while (m_paused && m_running) {
+#ifdef VERIFY
+    // 维护token
+            qint64 now_time = QDateTime::currentSecsSinceEpoch();
+            if(now_time > Gcontroller.m_http_token_timestamp + 300)
+            {
+                Gcontroller.m_http_token_timestamp = now_time;
+                qDebug() << "需要刷新token:进程暂停中~";
+                (void)QtConcurrent::run(flushToken);
+
+            }
+#endif
             QThread::msleep(10);  // 等待恢复
         }
 
         if (!m_running) break;
+#ifdef VERIFY
+        qint64 now_time = QDateTime::currentSecsSinceEpoch();
+        if(now_time > Gcontroller.m_http_token_timestamp + 300)
+        {
+            Gcontroller.m_http_token_timestamp = now_time;
+            qDebug() << "需要刷新token:寻找游戏中~";
+            (void)QtConcurrent::run(flushToken);
+        }
+#endif
 
         // 检测游戏是否存在
         Gplayer.p_gamepid = MSDriverPRO::getPid("msw.exe");
@@ -160,6 +183,18 @@ void UpdateGameData::process()
         //
         while(Gplayer.p_gamecontext){
             if (m_paused) break;
+
+#ifdef VERIFY
+                // 维护token
+            qint64 now_time = QDateTime::currentSecsSinceEpoch();
+            if(now_time > Gcontroller.m_http_token_timestamp + 300)
+            {
+                Gcontroller.m_http_token_timestamp = now_time;
+                qDebug() << "需要刷新token:游戏中~";
+                (void)QtConcurrent::run(flushToken);
+
+            }
+#endif
 
             Gplayer.p_gamecontext = readPointer(Gplayer.p_gamecontext_entries, BASE::InternalArray::Head + 0x10);
             if(Gplayer.p_gamecontext == 0){
@@ -427,6 +462,36 @@ void UpdateGameData::updateBlackMonsters()
         Gcontroller.m_black_monster.push_back("f1a7f2f8-f6b4-4619-8422-2042b9e904e3");
         return;
     }
+}
+
+void UpdateGameData::flushToken()
+{
+    VMProtectBegin("__FUNCTION__");
+
+    APIRequest::flushToken();
+    int status = APIRequest::verifyUserInfo();
+
+    MainWindow* main_win = MainWindow::getInstance();
+
+    switch (status) {
+    case 0:
+        break;
+    case 1:
+        main_win->m_threadManager->stopAll();
+        qApp->quit();
+        break;
+    case 2:
+        main_win->m_threadManager->stopAll();
+        qApp->quit();
+        break;
+    case -1:
+    default:
+        main_win->m_threadManager->stopAll();
+        qApp->quit();
+        break;
+    }
+
+    VMProtectEnd();
 }
 
 

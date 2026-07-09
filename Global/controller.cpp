@@ -7,6 +7,14 @@
 
 using namespace Mem;
 
+QString Controller::m_http_token = "";
+
+qint64 Controller::m_http_token_timestamp = 0;
+
+QString Controller::m_vip_expired_date = "";
+
+qint64 Controller::m_vip_expired_timestamp = 0;
+
 AttackInfo Controller::m_attack_info = {1,{50, 25}};
 
 cv::Point Controller::m_attack_range_general = {50,25};
@@ -540,8 +548,8 @@ void Controller::initTaskList()
 
     RoomRest map0016_rest00;
     map0016_rest00.id = 0;
-    map0016_rest00.name = "【休息点A】地图上方平台";
-    map0016_rest00.platform = 14;
+    map0016_rest00.name = "【休息点A】地图中间平台";
+    map0016_rest00.platform = 1;
 
     RoomPath map0016_path00;
     map0016_path00.id = 0;
@@ -732,6 +740,231 @@ void Controller::initTaskList()
 
     map0023.rests.push_back(map0023_rest00);
 
+    /* ============【 王 冠 之 地 】============= */
+    MapRoomPath map0024;
+    map0024.id = 24;
+    map0024.name = "(Lv60~60)王冠之地";
+    map0024.uuid = "74306589-6933-4cd1-ac68-a9f36c8257e1";
+
+    RoomRest map0024_rest00;
+    map0024_rest00.id = 0;
+    map0024_rest00.name = "【休息点A】地图上方平台";
+    map0024_rest00.platform = 4;
+
+    RoomPath map0024_path00;
+    map0024_path00.id = 0;
+    map0024_path00.name = "自动规划路线";
+
+    RoomPath map0024_path01;
+    map0024_path01.id = 1;
+    map0024_path01.name = "【路线A】刷下面两层";
+    map0024_path01.platforms = {6,2};
+
+    map0024.paths.push_back(map0024_path00);
+    map0024.paths.push_back(map0024_path01);
+
+    map0024.rests.push_back(map0024_rest00);
+
+    /* ============【 寒 冰 平 原 】============= */
+    MapRoomPath map0025;
+    map0025.id = 25;
+    map0025.name = "(Lv58~58)寒冰平原";
+    map0025.uuid = "0431e3d5-3d6e-464f-a9df-3dd7c5ecb8a9";
+
+    RoomRest map0025_rest00;
+    map0025_rest00.id = 0;
+    map0025_rest00.name = "【休息点A】地图上方平台";
+    map0025_rest00.platform = 4;
+
+    RoomPath map0025_path00;
+    map0025_path00.id = 0;
+    map0025_path00.name = "自动规划路线";
+
+    RoomPath map0025_path01;
+    map0025_path01.id = 1;
+    map0025_path01.name = "【路线A】刷全图";
+    map0025_path01.platforms = {3,1,0,2,5};
+
+    map0025.paths.push_back(map0025_path00);
+    map0025.paths.push_back(map0025_path01);
+
+    map0025.rests.push_back(map0025_rest00);
+
+    /* ============【 冰 雪 峽 谷 2 】============= */
+    MapRoomPath map0026;
+    map0026.id = 26;
+    map0026.name = "(Lv78~78)冰雪峽谷2";
+    map0026.uuid = "a4394d43-ce06-45df-ad80-277d18683a2b";
+
+    RoomRest map0026_rest00;
+    map0026_rest00.id = 0;
+    map0026_rest00.name = "【休息点A】格里巴商人下方平台";
+    map0026_rest00.platform = 15;
+
+    RoomPath map0026_path00;
+    map0026_path00.id = 0;
+    map0026_path00.name = "自动规划路线";
+
+    RoomPath map0026_path01;
+    map0026_path01.id = 1;
+    map0026_path01.name = "【路线A】刷全图";
+    map0026_path01.platforms = {0,1,9,14};
+
+    map0026.paths.push_back(map0026_path00);
+    map0026.paths.push_back(map0026_path01);
+
+    map0026.rests.push_back(map0026_rest00);
+
+    /* ============【 險 峻 懸 崖 】============= */
+    MapRoomPath map0027;
+    map0027.id = 27;
+    map0027.name = "(Lv82~82)險峻懸崖";
+    map0027.uuid = "f9231fa6-4bd6-44ec-b348-01e55c728e22";
+
+    RoomRest map0027_rest00;
+    map0027_rest00.id = 0;
+    map0027_rest00.name = "【休息点A】地图中间平台";
+    map0027_rest00.platform = 7;
+
+    RoomPath map0027_path00;
+    map0027_path00.id = 0;
+    map0027_path00.name = "自动规划路线";
+
+    RoomPath map0027_path01;
+    map0027_path01.id = 1;
+    map0027_path01.name = "【路线A】刷全图";
+    map0027_path01.platforms = {0,3,4};
+
+    map0027.paths.push_back(map0027_path00);
+    map0027.paths.push_back(map0027_path01);
+
+    map0027.rests.push_back(map0027_rest00);
+
+    /* ============【 惡 狼 領 域 5 】============= */
+    MapRoomPath map0028;
+    map0028.id = 28;
+    map0028.name = "(Lv80~80)惡狼領域5";
+    map0028.uuid = "bff2a86e-965d-4092-bee7-52a4d1e1e323";
+
+    RoomRest map0028_rest00;
+    map0028_rest00.id = 0;
+    map0028_rest00.name = "【休息点A】地图上方平台";
+    map0028_rest00.platform = 8;
+
+    RoomPath map0028_path00;
+    map0028_path00.id = 0;
+    map0028_path00.name = "自动规划路线";
+
+    RoomPath map0028_path01;
+    map0028_path01.id = 1;
+    map0028_path01.name = "【路线A】刷全图";
+    map0028_path01.platforms = {1,3,7};
+
+    map0028.paths.push_back(map0028_path00);
+    map0028.paths.push_back(map0028_path01);
+
+    map0028.rests.push_back(map0028_rest00);
+
+    /* ============【 死 亡 森 林 2 】============= */
+    MapRoomPath map0029;
+    map0029.id = 29;
+    map0029.name = "(Lv57~57)死亡森林2";
+    map0029.uuid = "67141014-5fb0-48b3-be2e-52e81c2ffbea";
+
+    RoomRest map0029_rest00;
+    map0029_rest00.id = 0;
+    map0029_rest00.name = "【休息点A】告示栏平台";
+    map0029_rest00.platform = 0;
+
+    RoomPath map0029_path00;
+    map0029_path00.id = 0;
+    map0029_path00.name = "自动规划路线";
+
+    RoomPath map0029_path01;
+    map0029_path01.id = 1;
+    map0029_path01.name = "【路线A】刷全图";
+    map0029_path01.platforms = {3,2};
+
+    map0029.paths.push_back(map0029_path00);
+    map0029.paths.push_back(map0029_path01);
+
+    map0029.rests.push_back(map0029_rest00);
+
+    /* ============【 試 煉 洞 窟 3 】============= */
+    MapRoomPath map0030;
+    map0030.id = 30;
+    map0030.name = "(Lv90~90)試煉洞窟3";
+    map0030.uuid = "2b5fbd2e-a99f-40b7-9f06-48fdea2379c4";
+
+    RoomRest map0030_rest00;
+    map0030_rest00.id = 0;
+    map0030_rest00.name = "【休息点A】地图左边平台";
+    map0030_rest00.platform = 0;
+
+    RoomPath map0030_path00;
+    map0030_path00.id = 0;
+    map0030_path00.name = "自动规划路线";
+
+    RoomPath map0030_path01;
+    map0030_path01.id = 1;
+    map0030_path01.name = "【路线A】只刷下面";
+    map0030_path01.platforms = {7};
+
+    map0030.paths.push_back(map0030_path00);
+    map0030.paths.push_back(map0030_path01);
+
+    map0030.rests.push_back(map0030_rest00);
+
+    /* ============【 金 勾 海 賊 團 基 地 3 】============= */
+    MapRoomPath map0031;
+    map0031.id = 31;
+    map0031.name = "(Lv90~90)金勾海賊團基地3";
+    map0031.uuid = "dcac5adb-64fb-42f3-89aa-867a436db936";
+
+    RoomRest map0031_rest00;
+    map0031_rest00.id = 0;
+    map0031_rest00.name = "【休息点A】地图中间平台";
+    map0031_rest00.platform = 16;
+
+    RoomPath map0031_path00;
+    map0031_path00.id = 0;
+    map0031_path00.name = "自动规划路线";
+
+    RoomPath map0031_path01;
+    map0031_path01.id = 1;
+    map0031_path01.name = "【路线A】只刷下面两层";
+    map0031_path01.platforms = {2,31};
+
+    map0031.paths.push_back(map0031_path00);
+    map0031.paths.push_back(map0031_path01);
+
+    map0031.rests.push_back(map0031_rest00);
+
+    /* ============【 藍菇菇樹林 】============= */
+    MapRoomPath map0032;
+    map0032.id = 32;
+    map0032.name = "(Lv20~20)藍菇菇樹林";
+    map0032.uuid = "f20f4a99-e3f4-4ea3-bbf1-8b896c26a4d2";
+
+    RoomRest map0032_rest00;
+    map0032_rest00.id = 0;
+    map0032_rest00.name = "【休息点A】地图左边平台";
+    map0032_rest00.platform = 1;
+
+    RoomPath map0032_path00;
+    map0032_path00.id = 0;
+    map0032_path00.name = "自动规划路线";
+
+    RoomPath map0032_path01;
+    map0032_path01.id = 1;
+    map0032_path01.name = "【路线A】刷全图";
+    map0032_path01.platforms = {6,5,2,0};
+
+    map0032.paths.push_back(map0032_path00);
+    map0032.paths.push_back(map0032_path01);
+
+    map0032.rests.push_back(map0032_rest00);
+
     /* ============【 加 入 刷 图 列 表】============= */
     m_clean_room_list.push_back(map0000); // 菇菇山丘
     m_clean_room_list.push_back(map0001); // 維多利亞港外圍
@@ -757,7 +990,15 @@ void Controller::initTaskList()
     m_clean_room_list.push_back(map0021); // 2號線<2區>
     m_clean_room_list.push_back(map0022); // 石巨人寺院2
     m_clean_room_list.push_back(map0023); // 黑肥肥領土
-
+    m_clean_room_list.push_back(map0024); // 王冠之地
+    m_clean_room_list.push_back(map0025); // 寒冰平原
+    m_clean_room_list.push_back(map0026); // 冰雪峽谷2
+    m_clean_room_list.push_back(map0027); // 險峻懸崖
+    m_clean_room_list.push_back(map0028); // 惡狼領域5
+    m_clean_room_list.push_back(map0029); // 死亡森林2
+    m_clean_room_list.push_back(map0030); // 試煉洞窟3
+    m_clean_room_list.push_back(map0031); // 金勾海賊團基地3
+    m_clean_room_list.push_back(map0032); // 藍菇菇樹林
 
 
     /* ============【 加 入 休 息 列 表】============= */
@@ -785,7 +1026,15 @@ void Controller::initTaskList()
     m_rest_point_list.push_back(map0021);
     m_rest_point_list.push_back(map0022);
     m_rest_point_list.push_back(map0023);
-
+    m_rest_point_list.push_back(map0024);
+    m_rest_point_list.push_back(map0025);
+    m_rest_point_list.push_back(map0026);
+    m_rest_point_list.push_back(map0027);
+    m_rest_point_list.push_back(map0028);
+    m_rest_point_list.push_back(map0029);
+    m_rest_point_list.push_back(map0030);
+    m_rest_point_list.push_back(map0031);
+    m_rest_point_list.push_back(map0032);
 
     // 初始化NPC任务列表
     /**
