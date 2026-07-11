@@ -1008,6 +1008,106 @@ void Controller::initTaskList()
 
     map0033.rests.push_back(map0033_rest00);
 
+    /* ============【 妖 怪 之 林 2 】============= */
+    MapRoomPath map0034;
+    map0034.id = 34;
+    map0034.name = "(Lv66~66)妖怪之林2";
+    map0034.uuid = "0a929796-877b-44ac-bd48-039c1e952e7a";
+
+    RoomRest map0034_rest00;
+    map0034_rest00.id = 0;
+    map0034_rest00.name = "【休息点A】地图上边平台";
+    map0034_rest00.platform = 0;
+
+    RoomPath map0034_path00;
+    map0034_path00.id = 0;
+    map0034_path00.name = "自动规划路线";
+
+    RoomPath map0034_path01;
+    map0034_path01.id = 1;
+    map0034_path01.name = "【路线A】刷两层";
+    map0034_path01.platforms = {4,5};
+
+    map0034.paths.push_back(map0034_path00);
+    map0034.paths.push_back(map0034_path01);
+
+    map0034.rests.push_back(map0034_rest00);
+
+    /* ============【 毀 壞 的 時 間 】============= */
+    MapRoomPath map0035;
+    map0035.id = 35;
+    map0035.name = "(Lv89~89)毀壞的時間";
+    map0035.uuid = "4fef63fb-861c-44e3-8221-6dc1df7d6b9d";
+
+    RoomRest map0035_rest00;
+    map0035_rest00.id = 0;
+    map0035_rest00.name = "【休息点A】地图上边平台";
+    map0035_rest00.platform = 14;
+
+    RoomPath map0035_path00;
+    map0035_path00.id = 0;
+    map0035_path00.name = "自动规划路线";
+
+    RoomPath map0035_path01;
+    map0035_path01.id = 1;
+    map0035_path01.name = "【路线A】刷半图";
+    map0035_path01.platforms = {19,11,9,7,6,4};
+
+    map0035.paths.push_back(map0035_path00);
+    map0035.paths.push_back(map0035_path01);
+
+    map0035.rests.push_back(map0035_rest00);
+
+    /* ============【 漂 浮 幽 靈 墓 地 】============= */
+    MapRoomPath map0036;
+    map0036.id = 36;
+    map0036.name = "(Lv60~60)漂浮幽靈墓地";
+    map0036.uuid = "cf4bedec-6bde-4238-9781-86e48b2f7f2d";
+
+    RoomRest map0036_rest00;
+    map0036_rest00.id = 0;
+    map0036_rest00.name = "【休息点A】地图右边平台";
+    map0036_rest00.platform = 3;
+
+    RoomPath map0036_path00;
+    map0036_path00.id = 0;
+    map0036_path00.name = "自动规划路线";
+
+    RoomPath map0036_path01;
+    map0036_path01.id = 1;
+    map0036_path01.name = "【路线A】刷全图";
+    map0036_path01.platforms = {0,2,4};
+
+    map0036.paths.push_back(map0036_path00);
+    map0036.paths.push_back(map0036_path01);
+
+    map0036.rests.push_back(map0036_rest00);
+
+    /* ============【 與 大 佛 的 邂 逅 】============= */
+    MapRoomPath map0037;
+    map0037.id = 37;
+    map0037.name = "(Lv100~100)與大佛的邂逅";
+    map0037.uuid = "1570a1af-b89c-45b9-a46b-ce863e0cb4fb";
+
+    RoomRest map0037_rest00;
+    map0037_rest00.id = 0;
+    map0037_rest00.name = "【休息点A】地图上边平台";
+    map0037_rest00.platform = 1;
+
+    RoomPath map0037_path00;
+    map0037_path00.id = 0;
+    map0037_path00.name = "自动规划路线";
+
+    RoomPath map0037_path01;
+    map0037_path01.id = 1;
+    map0037_path01.name = "【路线A】刷全图";
+    map0037_path01.platforms = {0};
+
+    map0037.paths.push_back(map0037_path00);
+    map0037.paths.push_back(map0037_path01);
+
+    // map0037.rests.push_back(map0037_rest00);
+
     /* ============【 加 入 刷 图 列 表】============= */
     m_clean_room_list.push_back(map0000); // 菇菇山丘
     m_clean_room_list.push_back(map0001); // 維多利亞港外圍
@@ -1043,6 +1143,11 @@ void Controller::initTaskList()
     m_clean_room_list.push_back(map0031); // 金勾海賊團基地3
     m_clean_room_list.push_back(map0032); // 藍菇菇樹林
     m_clean_room_list.push_back(map0033); // 濃霧森林
+    m_clean_room_list.push_back(map0034); // 妖怪之林2
+    m_clean_room_list.push_back(map0035); // 毀壞的時間
+    m_clean_room_list.push_back(map0036); // 漂浮幽靈墓地
+    m_clean_room_list.push_back(map0037); // 與大佛的邂逅
+
 
 
     /* ============【 加 入 休 息 列 表】============= */
@@ -1080,6 +1185,10 @@ void Controller::initTaskList()
     m_rest_point_list.push_back(map0031);
     m_rest_point_list.push_back(map0032);
     m_rest_point_list.push_back(map0033);
+    m_rest_point_list.push_back(map0034);
+    m_rest_point_list.push_back(map0035);
+    m_rest_point_list.push_back(map0036);
+    m_rest_point_list.push_back(map0037);
 
     // 初始化NPC任务列表
     /**
