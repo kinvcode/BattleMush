@@ -186,6 +186,9 @@ private:
 
     // 滑鼠验证
     void handleMousemove();
+
+    // 进入特殊房间
+    bool handleToSpecialRoom(const QString &uuid);
 private:
     // 刷图计划
     void taskCleanRoom();

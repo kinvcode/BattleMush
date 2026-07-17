@@ -351,40 +351,80 @@
     "name": "玩具工廠<主工程A>",
     "type": 0,
     "targets": [{
-        "uuid": "55",
-        "name": "55",
-        "platform": 0,
-        "area": [2, 2, 2, 2]
+        "uuid": "3cbeea7e-54f5-463f-b72f-0dd958272f99",
+        "name": "玩具工廠<主工程B>",
+        "platform": 2,
+        "area": [1924 , 386 , 1968 , 430]
+    }]
+},{
+    "uuid": "3cbeea7e-54f5-463f-b72f-0dd958272f99",
+    "name": "玩具工廠<主工程B>",
+    "type": 0,
+    "targets": [{
+        "uuid": "2c865a87-555b-4302-a328-f8d7b07ecc23",
+        "name": "玩具工廠<主工程A>",
+        "platform": 8,
+        "area": [1928 , 60 , 1972 , 104]
+    },{
+        "uuid": "3150a2a0-128c-42c6-bbc9-d2305546fd18",
+        "name": "時間分岔道",
+        "platform": 10,
+        "area": [2210 , 305 , 2254 , 349]
     }]
 },{
     "uuid": "3150a2a0-128c-42c6-bbc9-d2305546fd18",
     "name": "時間分岔道",
     "type": 0,
     "targets": [{
-        "uuid": "55",
-        "name": "55",
-        "platform": 0,
-        "area": [2, 2, 2, 2]
+        "uuid": "3cbeea7e-54f5-463f-b72f-0dd958272f99",
+        "name": "玩具工廠<主工程B>",
+        "platform": 15,
+        "area": [969 , 1412 , 1013 , 1456]
+    },{
+        "uuid": "2696b590-5505-4d57-b3be-c4f33df420c9",
+        "name": "時間漩渦",
+        "platform": 34,
+        "area": [702 , 2445 , 746 , 2475]
+    },{
+        "uuid": "96c299d1-c1bd-490a-86da-06f2ab231986",
+        "name": "時間之路<2>",
+        "platform": 6,
+        "area": [13 , 2000 , 56 , 2044]
+    }]
+},{
+    "uuid": "2696b590-5505-4d57-b3be-c4f33df420c9",
+    "name": "時間漩渦",
+    "type": 0,
+    "targets": [{
+        "uuid": "3150a2a0-128c-42c6-bbc9-d2305546fd18",
+        "name": "時間分岔道",
+        "platform": 18,
+        "area": [738 , 1526 , 782 , 1570]
     }]
 },{
     "uuid": "96c299d1-c1bd-490a-86da-06f2ab231986",
     "name": "時間之路<2>",
     "type": 0,
     "targets": [{
-        "uuid": "55",
-        "name": "55",
-        "platform": 0,
-        "area": [2, 2, 2, 2]
+        "uuid": "3150a2a0-128c-42c6-bbc9-d2305546fd18",
+        "name": "時間分岔道",
+        "platform": 17,
+        "area": [1835 , 1816 , 1879 , 1860]
+    },{
+        "uuid": "63ff8f01-0b70-49e5-affd-cd008406075a",
+        "name": "時間之路<1>",
+        "platform": 38,
+        "area": [17 , 1634 , 61 , 1678]
     }]
 },{
     "uuid": "63ff8f01-0b70-49e5-affd-cd008406075a",
     "name": "時間之路<1>",
     "type": 0,
     "targets": [{
-        "uuid": "55",
-        "name": "55",
-        "platform": 0,
-        "area": [2, 2, 2, 2]
+        "uuid": "96c299d1-c1bd-490a-86da-06f2ab231986",
+        "name": "時間之路<2>",
+        "platform": 19,
+        "area": [1674 , 1453 , 1718 , 1497]
     }]
 },{
     "uuid": "4fef63fb-861c-44e3-8221-6dc1df7d6b9d",
@@ -407,14 +447,34 @@
         "area": [2, 2, 2, 2]
     }]
 },{
+    "uuid": "59e21abc-1e41-4c49-aa4e-14c9f1d472a3",
+    "name": "紅螃蟹海灘Ⅱ",
+    "type": 0,
+    "targets": [{
+        "uuid": "9",
+        "name": "青",
+        "platform": 31,
+        "area": [559 , 1653 , 660 , 1795]
+    }]
+},{
+    "uuid": "e2b20ade-68ba-424c-a021-f542831cfc21",
+    "name": "青螃蟹海灘Ⅰ",
+    "type": 0,
+    "targets": [{
+        "uuid": "9cef013d-5021-4314-92a7-f535bb27f3fd",
+        "name": "青螃蟹海灘Ⅱ",
+        "platform": 1,
+        "area": [2757 , 2254 , 2844 , 2377]
+    }]
+},{
     "uuid": "9cef013d-5021-4314-92a7-f535bb27f3fd",
     "name": "青螃蟹海灘Ⅱ",
     "type": 0,
     "targets": [{
-        "uuid": "55",
-        "name": "55",
-        "platform": 0,
-        "area": [2, 2, 2, 2]
+        "uuid": "e2b20ade-68ba-424c-a021-f542831cfc21",
+        "name": "青螃蟹海灘Ⅰ",
+        "platform": 14,
+        "area": [711 , 1482 , 812 , 1624]
     }]
 },{
     "uuid": "27d886ad-d3d7-416e-b246-e49d3738e3dd",
@@ -437,14 +497,24 @@
         "area": [2, 2, 2, 2]
     }]
 },{
+    "uuid": "a56f84e7-1053-4e93-ad5a-e5eaaf057411",
+    "name": "名人大道東部區域",
+    "type": 0,
+    "targets": [{
+        "uuid": "b4cf7e17-50e3-44db-affa-df917364c7de",
+        "name": "名人大道南部區域",
+        "platform": 10,
+        "area": [4 , 540 , 73 , 580]
+    }]
+},{
     "uuid": "b4cf7e17-50e3-44db-affa-df917364c7de",
     "name": "名人大道南部區域",
     "type": 0,
     "targets": [{
-        "uuid": "55",
-        "name": "55",
-        "platform": 0,
-        "area": [2, 2, 2, 2]
+        "uuid": "a56f84e7-1053-4e93-ad5a-e5eaaf057411",
+        "name": "名人大道東部區域",
+        "platform": 6,
+        "area": [2090 , 540 , 2160 , 580]
     }]
 },{
     "uuid": "8ded358a-8cd6-4dde-8b93-018b5650b5c0",
@@ -581,10 +651,20 @@
     "name": "濃霧森林",
     "type": 0,
     "targets": [{
-        "uuid": "55",
-        "name": "55",
-        "platform": 0,
-        "area": [2, 2, 2, 2]
+        "uuid": "75654031-fe2f-4868-8a2a-74926e06162d",
+        "name": "仙人的森林",
+        "platform": 3,
+        "area": [1577 , 1445 , 1621 , 1489]
+    }]
+},{
+    "uuid": "75654031-fe2f-4868-8a2a-74926e06162d",
+    "name": "仙人的森林",
+    "type": 0,
+    "targets": [{
+        "uuid": "ba208704-12a6-4e6f-9c9c-4b9d82586b28",
+        "name": "濃霧森林",
+        "platform": 5,
+        "area": [59 , 1429 , 102 , 1473]
     }]
 },{
     "uuid": "0a929796-877b-44ac-bd48-039c1e952e7a",

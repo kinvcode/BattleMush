@@ -2010,6 +2010,11 @@ void KillMonster::moveToRoomByUUID(const QString &uuid)
         bool success = walk_to_platform.moveToArea(area,is_climb); // 走到范围
         Gcontroller.m_disable_attack = false;
         if(success){
+            // 这里需要进行特殊地图处理
+            if(handleToSpecialRoom(uuid)){
+                return;
+            }
+
             qDebug() << "已到达传送阵位置";
             ProcessHelper::programDelay(100);
             QApplication::processEvents();
@@ -2494,6 +2499,32 @@ void KillMonster::handleMousemove()
     // tracktest.test();
     // qDebug() << "滑鼠验证结束~";
     ProcessHelper::programDelay(3000);
+}
+
+bool KillMonster::handleToSpecialRoom(const QString &uuid)
+{
+    if(Gplayer.curmapinfo.id == "e2b20ade-68ba-424c-a021-f542831cfc21")
+    {
+        if(uuid == "9cef013d-5021-4314-92a7-f535bb27f3fd")
+        {
+            qDebug() << "青螃蟹海灘Ⅰ 前往 青螃蟹海灘Ⅱ，需要跳跃一下";
+
+            qDebug() << "已到达传送阵位置";
+            ProcessHelper::programDelay(200);
+            QApplication::processEvents();
+
+            qDebug() << "跳跃中...";
+            MSDK::keyPress(Gplayer.m_bindkey.jump, 1);
+            ProcessHelper::programDelay(200);
+
+            qDebug() << "切换地图中...";
+            MSDK::keyPress(Keyboard_UpArrow, 1);
+            ProcessHelper::programDelay(1500);
+            QApplication::processEvents();
+            return true;
+        }
+    }
+    return false;
 }
 
 void KillMonster::updateTaskID()

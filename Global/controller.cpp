@@ -1108,6 +1108,174 @@ void Controller::initTaskList()
 
     // map0037.rests.push_back(map0037_rest00);
 
+    /* ============【 青 螃 蟹 海 灘Ⅰ 】============= */
+    MapRoomPath map0038;
+    map0038.id = 38;
+    map0038.name = "(Lv48~48)青螃蟹海灘Ⅰ";
+    map0038.uuid = "e2b20ade-68ba-424c-a021-f542831cfc21";
+
+    RoomRest map0038_rest00;
+    map0038_rest00.id = 0;
+    map0038_rest00.name = "【休息点A】地图上边平台";
+    map0038_rest00.platform = 10;
+
+    RoomPath map0038_path00;
+    map0038_path00.id = 0;
+    map0038_path00.name = "自动规划路线";
+
+    RoomPath map0038_path01;
+    map0038_path01.id = 1;
+    map0038_path01.name = "【路线A】刷全图";
+    map0038_path01.platforms = {3,4,5,9,2,6,7,8};
+
+    map0038.paths.push_back(map0038_path00);
+    map0038.paths.push_back(map0038_path01);
+
+    map0038.rests.push_back(map0038_rest00);
+
+    /* ============【 紅 螃 蟹 海 灘 Ⅱ 】============= */
+    MapRoomPath map0039;
+    map0039.id = 39;
+    map0039.name = "(Lv37~37)紅螃蟹海灘Ⅱ";
+    map0039.uuid = "59e21abc-1e41-4c49-aa4e-14c9f1d472a3";
+
+    RoomRest map0039_rest00;
+    map0039_rest00.id = 0;
+    map0039_rest00.name = "【休息点A】地图上边平台";
+    map0039_rest00.platform = 31;
+
+    RoomPath map0039_path00;
+    map0039_path00.id = 0;
+    map0039_path00.name = "自动规划路线";
+
+    RoomPath map0039_path01;
+    map0039_path01.id = 1;
+    map0039_path01.name = "【路线A】刷全图";
+    map0039_path01.platforms = {1,20,30};
+
+    map0039.paths.push_back(map0039_path00);
+    map0039.paths.push_back(map0039_path01);
+
+    map0039.rests.push_back(map0039_rest00);
+
+    /* ============【 仙 人 的 森 林 】============= */
+    MapRoomPath map0040;
+    map0040.id = 40;
+    map0040.name = "(Lv55~55)仙人的森林";
+    map0040.uuid = "75654031-fe2f-4868-8a2a-74926e06162d";
+
+    RoomRest map0040_rest00;
+    map0040_rest00.id = 0;
+    map0040_rest00.name = "【休息点A】地图上边平台";
+    map0040_rest00.platform = 5;
+
+    RoomPath map0040_path00;
+    map0040_path00.id = 0;
+    map0040_path00.name = "自动规划路线";
+
+    RoomPath map0040_path01;
+    map0040_path01.id = 1;
+    map0040_path01.name = "【路线A】刷全图";
+    map0040_path01.platforms = {1,7,0,2,4};
+
+    map0040.paths.push_back(map0040_path00);
+    map0040.paths.push_back(map0040_path01);
+
+    map0040.rests.push_back(map0040_rest00);
+
+    /* ============【 名 人 大 道 東 部 區 域 】============= */
+    MapRoomPath map0041;
+    map0041.id = 41;
+    map0041.name = "(Lv70~70)名人大道東部區域";
+    map0041.uuid = "a56f84e7-1053-4e93-ad5a-e5eaaf057411";
+
+    RoomRest map0041_rest00;
+    map0041_rest00.id = 0;
+    map0041_rest00.name = "【休息点A】地图上边平台";
+    map0041_rest00.platform = 6;
+
+    RoomPath map0041_path00;
+    map0041_path00.id = 0;
+    map0041_path00.name = "自动规划路线";
+
+    RoomPath map0041_path01;
+    map0041_path01.id = 1;
+    map0041_path01.name = "【路线A】刷全图";
+    map0041_path01.platforms = {10,9,8};
+
+    RoomPath map0041_path02;
+    map0041_path02.id = 2;
+    map0041_path02.name = "【路线B】刷上面";
+    map0041_path02.platforms = {10};
+
+    RoomPath map0041_path03;
+    map0041_path03.id = 3;
+    map0041_path03.name = "【路线C】刷中间";
+    map0041_path03.platforms = {9};
+
+    RoomPath map0041_path04;
+    map0041_path04.id = 4;
+    map0041_path04.name = "【路线D】刷下面";
+    map0041_path04.platforms = {8};
+
+    map0041.paths.push_back(map0041_path00);
+    map0041.paths.push_back(map0041_path01);
+    map0041.paths.push_back(map0041_path02);
+    map0041.paths.push_back(map0041_path03);
+    map0041.paths.push_back(map0041_path04);
+
+    map0041.rests.push_back(map0041_rest00);
+
+    /* ============【 玩 具 工 廠 < 主 工 程 B > 】============= */
+    MapRoomPath map0042;
+    map0042.id = 42;
+    map0042.name = "(Lv36~36)玩具工廠<主工程B>";
+    map0042.uuid = "3cbeea7e-54f5-463f-b72f-0dd958272f99";
+
+    RoomRest map0042_rest00;
+    map0042_rest00.id = 0;
+    map0042_rest00.name = "【休息点A】地图上边平台";
+    map0042_rest00.platform = 3;
+
+    RoomPath map0042_path00;
+    map0042_path00.id = 0;
+    map0042_path00.name = "自动规划路线";
+
+    RoomPath map0042_path01;
+    map0042_path01.id = 1;
+    map0042_path01.name = "【路线A】刷全图";
+    map0042_path01.platforms = {4,1,0,17,6,7};
+
+    map0042.paths.push_back(map0042_path00);
+    map0042.paths.push_back(map0042_path01);
+
+    map0042.rests.push_back(map0042_rest00);
+
+    /* ============【 時 間 漩 渦 】============= */
+    MapRoomPath map0043;
+    map0043.id = 43;
+    map0043.name = "(Lv40~40)時間漩渦";
+    map0043.uuid = "2696b590-5505-4d57-b3be-c4f33df420c9";
+
+    RoomRest map0043_rest00;
+    map0043_rest00.id = 0;
+    map0043_rest00.name = "【休息点A】地图上边平台";
+    map0043_rest00.platform = 15;
+
+    RoomPath map0043_path00;
+    map0043_path00.id = 0;
+    map0043_path00.name = "自动规划路线";
+
+    RoomPath map0043_path01;
+    map0043_path01.id = 1;
+    map0043_path01.name = "【路线A】刷全图";
+    map0043_path01.platforms = {5,3,17,4,0};
+
+    map0043.paths.push_back(map0043_path00);
+    map0043.paths.push_back(map0043_path01);
+
+    map0043.rests.push_back(map0043_rest00);
+
     /* ============【 加 入 刷 图 列 表】============= */
     m_clean_room_list.push_back(map0000); // 菇菇山丘
     m_clean_room_list.push_back(map0001); // 維多利亞港外圍
@@ -1147,6 +1315,12 @@ void Controller::initTaskList()
     m_clean_room_list.push_back(map0035); // 毀壞的時間
     m_clean_room_list.push_back(map0036); // 漂浮幽靈墓地
     m_clean_room_list.push_back(map0037); // 與大佛的邂逅
+    m_clean_room_list.push_back(map0038); // 青螃蟹海灘Ⅰ
+    m_clean_room_list.push_back(map0039); // 紅螃蟹海灘Ⅱ
+    m_clean_room_list.push_back(map0040); // 仙人的森林
+    m_clean_room_list.push_back(map0041); // 名人大道東部區域
+    m_clean_room_list.push_back(map0042); // 玩具工廠<主工程B>
+    m_clean_room_list.push_back(map0043); // 時間漩渦
 
 
 
@@ -1164,7 +1338,7 @@ void Controller::initTaskList()
     m_rest_point_list.push_back(map0010);
     m_rest_point_list.push_back(map0011);
     m_rest_point_list.push_back(map0012);
-    // m_rest_point_list.push_back(map0013); // 没有休息点
+    m_rest_point_list.push_back(map0013); // 没有休息点
     m_rest_point_list.push_back(map0014);
     m_rest_point_list.push_back(map0015);
     m_rest_point_list.push_back(map0016);
@@ -1189,6 +1363,12 @@ void Controller::initTaskList()
     m_rest_point_list.push_back(map0035);
     m_rest_point_list.push_back(map0036);
     m_rest_point_list.push_back(map0037);
+    m_rest_point_list.push_back(map0038);
+    m_rest_point_list.push_back(map0039);
+    m_rest_point_list.push_back(map0040);
+    m_rest_point_list.push_back(map0041);
+    m_rest_point_list.push_back(map0042);
+    m_rest_point_list.push_back(map0043);
 
     // 初始化NPC任务列表
     /**
@@ -1337,36 +1517,41 @@ void Controller::loadTaskConfig()
 
     Gcontroller.m_tasks.clear();
 
-    for (const QJsonValue &value : taskArray) {
-        QJsonObject taskObj = value.toObject();
+    try{
+        for (const QJsonValue &value : taskArray) {
+            QJsonObject taskObj = value.toObject();
 
-        Task task;
-        task.id = taskObj["id"].toInt();
-        task.type = static_cast<TaskType>(taskObj["type"].toInt());
-        task.option1_key = taskObj["option1_key"].toInt();
-        task.option2_key = taskObj["option2_key"].toInt();
-        task.runTime = taskObj["runTime"].toInt();
+            Task task;
+            task.id = taskObj["id"].toInt();
+            task.type = static_cast<TaskType>(taskObj["type"].toInt());
+            task.option1_key = taskObj["option1_key"].toInt();
+            task.option2_key = taskObj["option2_key"].toInt();
+            task.runTime = taskObj["runTime"].toInt();
 
-        if(task.type == 0){
-            task.option1_value = Gcontroller.m_clean_room_list.at(task.option1_key).name;
-            task.option2_value = Gcontroller.m_clean_room_list.at(task.option1_key).paths.at(task.option2_key).name;
-        }else if(task.type == 1){
-            task.option1_value = Gcontroller.m_rest_point_list.at(task.option1_key).name;
-            task.option2_value = Gcontroller.m_rest_point_list.at(task.option1_key).rests.at(task.option2_key).name;
-        }else if(task.type == 2){
-            task.option1_value = Gcontroller.m_quest_list.at(task.option1_key).name;
+            if(task.type == 0){
+                task.option1_value = Gcontroller.m_clean_room_list.at(task.option1_key).name;
+                task.option2_value = Gcontroller.m_clean_room_list.at(task.option1_key).paths.at(task.option2_key).name;
+            }else if(task.type == 1){
+                task.option1_value = Gcontroller.m_rest_point_list.at(task.option1_key).name;
+                task.option2_value = Gcontroller.m_rest_point_list.at(task.option1_key).rests.at(task.option2_key).name;
+            }else if(task.type == 2){
+                task.option1_value = Gcontroller.m_quest_list.at(task.option1_key).name;
+            }
+
+            Gcontroller.m_tasks.push_back(task);
+
+            qDebug() << "=================================";
+            qDebug() << "task_id" << task.id;
+            qDebug() << "task_type" << task.type;
+            qDebug() << "task_option1_key" << task.option1_key;
+            qDebug() << "task_option1_value" << task.option1_value;
+            qDebug() << "task_option2_key" << task.option2_key;
+            qDebug() << "task_option2_value" << task.option2_value;
+            qDebug() << "task_runTime" << task.runTime;
         }
-
-        Gcontroller.m_tasks.push_back(task);
-
-        qDebug() << "=================================";
-        qDebug() << "task_id" << task.id;
-        qDebug() << "task_type" << task.type;
-        qDebug() << "task_option1_key" << task.option1_key;
-        qDebug() << "task_option1_value" << task.option1_value;
-        qDebug() << "task_option2_key" << task.option2_key;
-        qDebug() << "task_option2_value" << task.option2_value;
-        qDebug() << "task_runTime" << task.runTime;
+    }catch (...) {
+        // 捕获所有标准异常
+        qDebug() << "任务异常，Exception";
     }
 }
 

@@ -502,7 +502,7 @@ bool WalkBase::moveToArea(cv::Point range, bool self_climb)
         user_pos = getUserX();
     }
 
-    // qDebug() << "移动平台连接点开始 人物X：" << user_pos;
+    qDebug() << "移动平台连接点开始 人物X：" << user_pos;
 
     if(user_pos >= range.x && user_pos <= range.y)
     {
@@ -577,7 +577,7 @@ bool WalkBase::moveToArea(cv::Point range, bool self_climb)
     }
 
     while(true){
-
+        // qDebug() << "坐标：" << user_pos;
         if(Gplayer.mousecheck_exists){
             DebugOutput::out("出现滑鼠验证，退出寻路");
             if(self_climb){
@@ -685,6 +685,7 @@ bool WalkBase::moveToArea(cv::Point range, bool self_climb)
             }else{
                 clearXkey();
             }
+            qDebug() << "已到达指定范围：" << user_pos;
             return true;
         }
     }

@@ -330,6 +330,7 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
 
     qDebug() << "延迟后向左跳跃";
     ProcessHelper::programDelay(250);
+    ProcessHelper::programDelay(1500);
     QApplication::processEvents();
 
     // 这时候读人物的坐标
