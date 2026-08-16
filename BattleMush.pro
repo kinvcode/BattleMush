@@ -13,9 +13,9 @@ CONFIG += c++20
 #保护版本
 # DEFINES += PROTECT=TRUE
 
-# DEFINES += VERIFY=TRUE
+DEFINES += VERIFY=TRUE
 
-DEFINES += APP_VERSION=5
+DEFINES += APP_VERSION=7
 
 CONFIG(debug, debug|release) {
     DEFINES += API_URL=\"http://www.battle.test/api/\"

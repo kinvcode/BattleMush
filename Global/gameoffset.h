@@ -1,27 +1,24 @@
 #ifndef GAMEOFFSET_H
 #define GAMEOFFSET_H
 
-#define C_Entity_Name 0x270; // Entity名称
-#define C_Entity_Child 0x3A8; // Entity子组件
-
 namespace BASE {
     static int game_width = 1296;
     static int game_height = 759;
-    static int ClientCoreThreadManager_base = 0xA894780;//0xA894780
+    static int ClientCoreThreadManager_base = 0xA894798;//0xA894780
     static int ClientCoreThreadManager_offset_lv1 = 0xB8;
     static int ClientCoreThreadManager_offset_lv2 = 0x0;
     static int ClientCoreThreadManager_GameDictionary = 0x10;
 
-    static int Camera_base = 0xA929E48; //0xA929E48
+    static int Camera_base = 0xA929F60; //0xA929E48
     static int Camera_offset_lv1 = 0xB8;
     static int Camera_offset_lv2 = 0x0;
 
-    static int TMP_UpdateManager_base = 0xA98ED98;// 0xA98ED98
+    static int TMP_UpdateManager_base = 0xA98EA78;// 0xA98ED98
     static int TMP_UpdateManager_offset_lv1 = 0xB8;
     static int TMP_UpdateManager_offset_lv2 = 0x0;
     static int TMP_UpdateManager_List = 0x38;
 
-    static int UIPopupManager_base = 0xA8C1E30; // 0xA8C1E30
+    static int UIPopupManager_base = 0xA8C1EF8; // 0xA8C1E30
     static int UIPopupManager_offset_lv1 = 0xB8;
     static int UIPopupManager_offset_lv2 = 0x0;
 
