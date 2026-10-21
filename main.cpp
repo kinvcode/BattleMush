@@ -13,19 +13,19 @@
 #include "login.h"
 
 void setStyle(const QString &style);
+void loadDriver();
+bool loadPeaceDRV();
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    // _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
-
     // 使用QSharedMemory来实现互斥锁，禁止重复运行
-    // QSharedMemory sharedMemory;
-    // sharedMemory.setKey("BattleMushKey");
-    // if (!sharedMemory.create(1)) {
-    //     return 1;
-    // }
+    QSharedMemory sharedMemory;
+    sharedMemory.setKey("BattleMushKey");
+    if (!sharedMemory.create(1)) {
+        return 1;
+    }
 
     SetUnhandledExceptionFilter(BattleCrashHandler);
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     NativeEventFilter filter(mainWindow);
     a.installNativeEventFilter(&filter);
 
-#ifdef VERIFY
+// #ifdef VERIFY
     // 加载窗口
     Login login_pannel;
     login_pannel.show();
@@ -69,14 +69,14 @@ int main(int argc, char *argv[])
         RegisterHotKey(NULL, VK_F2, NULL, VK_F2);
         RegisterHotKey(NULL, VK_F3, NULL, VK_F3);
     });
-#else
-    mainWindow->initAll();
-    mainWindow->show();
-    // 注册热键
-    RegisterHotKey(NULL, VK_F1, NULL, VK_F1);
-    RegisterHotKey(NULL, VK_F2, NULL, VK_F2);
-    RegisterHotKey(NULL, VK_F3, NULL, VK_F3);
-#endif
+// #else
+//     mainWindow->initAll();
+//     mainWindow->show();
+//     // 注册热键
+//     RegisterHotKey(NULL, VK_F1, NULL, VK_F1);
+//     RegisterHotKey(NULL, VK_F2, NULL, VK_F2);
+//     RegisterHotKey(NULL, VK_F3, NULL, VK_F3);
+// #endif
 
     // 组件更新
     QObject::connect(&filter, &NativeEventFilter::sendControleStatus, mainWindow, &MainWindow::updateCompoment);
@@ -86,6 +86,9 @@ int main(int argc, char *argv[])
         mainWindow->onApplicationQuit();
     });
 
+    // 启动驱动
+    loadDriver();
+
     return a.exec();
 }
 
@@ -94,4 +97,53 @@ void setStyle(const QString &style) {
     qss.open(QFile::ReadOnly);
     qApp->setStyleSheet(qss.readAll());
     qss.close();
+}
+
+void loadDriver()
+{
+    VMProtectBegin(__FUNCSIG__);
+
+    // 检测驱动是否已开启
+    if(!PeaceDriver::pingREG()){
+        // 初始化驱动
+        bool driver_success = loadPeaceDRV();
+        if(!driver_success)
+        {
+            qApp->quit();
+            return;
+        }
+    }
+    // 保护自身
+    PeaceDriver::protectPid((ULONG64)GetCurrentProcessId());
+
+// 伪装进程
+#ifdef PROTECT
+    // 隐藏进程
+    int csrss_pid = ProcessHelper::getProcessPID("csrss.exe");
+    PeaceDriver::fakeProcess((ULONG64)GetCurrentProcessId(), csrss_pid);
+#endif
+
+    qDebug() << "驱动初始化完毕！";
+
+    VMProtectEnd();
+}
+
+bool loadPeaceDRV()
+{
+    PeaceDriverLoad drv;
+    if (!drv.driverIsLoaded()) {
+        // 加载驱动
+        PeaceDriverLoad::LoadDriverResult load_result = drv.loadPeaceDriver();
+        if (!load_result.success) {
+            qDebug() << "VT驱动安装失败";
+            qDebug() << (QString::fromWCharArray(load_result.message));
+            QMessageBox::information(NULL, "MSF", QString::fromWCharArray(load_result.message));
+            return false;
+        }
+    }
+
+    if (drv.driverIsLoaded())
+        return true;
+
+    return false;
 }

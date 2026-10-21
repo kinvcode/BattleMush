@@ -61,7 +61,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::initAll()
 {
-    loadDriver();
+    // loadDriver();
 
     initMSDK();
 
