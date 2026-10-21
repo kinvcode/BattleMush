@@ -305,10 +305,13 @@ void Login::checkUpdate()
             qApp->quit();
         }
     }
-
+#ifdef VERIFY
     // 检测完毕，加载主程序
     ProcessHelper::programDelay(1000);
-    // emit processingFinished();
+#else
+    emit processingFinished();
+#endif
+
     VMProtectEnd();
 }
 

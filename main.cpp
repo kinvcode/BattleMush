@@ -5,9 +5,14 @@
 #include <QSharedMemory>
 #include "keyboard/nativeeventfilter.h"
 #include <windows.h>
+#include <QMessageBox>
+#include <QDebug>
 #include "global/controller.h"
 #include "process/process.h"
 #include "driver/msdk/msdkDriver.h"
+#include "driver/PeaceDriverAPI.h"
+#include "driver/peacedriverload.h"
+#include "vmp/VMProtectSDK.h"
 #include <dbghelp.h>
 #include "process/exception.h"
 #include "login.h"
@@ -137,7 +142,7 @@ bool loadPeaceDRV()
         if (!load_result.success) {
             qDebug() << "VT驱动安装失败";
             qDebug() << (QString::fromWCharArray(load_result.message));
-            QMessageBox::information(NULL, "MSF", QString::fromWCharArray(load_result.message));
+            QMessageBox::information(NULL, "BattleMush", QString::fromWCharArray(load_result.message));
             return false;
         }
     }

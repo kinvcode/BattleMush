@@ -15,9 +15,6 @@ public:
         return &instance;
     }
 
-    // 键鼠驱动句柄
-    HANDLE MSDK_HANDLE = NULL;
-
     // 警报
     bool show_warning = false;
 

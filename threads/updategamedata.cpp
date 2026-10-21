@@ -1,5 +1,5 @@
 #include "updategamedata.h"
-#include "driver/msdriverpro.h"
+#include "driver/PeaceDriverAPI.h"
 #include "global/globalplayer.h"
 #include "global/controller.h"
 #include <QDebug>
@@ -10,7 +10,6 @@
 #include "global/gameoffset.h"
 #include "utils/gamestruct.h"
 #include "utils/mapserializer.h"
-#include "driver/msdriverpro.h"
 #include "utils/matchtemp.h"
 #include "driver/msdk/msdkDriver.h"
 #include "http/apirequest.h"
@@ -91,7 +90,7 @@ void UpdateGameData::process()
 #endif
 
         // 检测游戏是否存在
-        Gplayer.p_gamepid = MSDriverPRO::getPid("msw.exe");
+        Gplayer.p_gamepid = PeaceDriver::getPid(L"msw.exe");
 
         if(Gplayer.p_gamepid == 0){
             // qDebug << "";
@@ -104,7 +103,7 @@ void UpdateGameData::process()
         }
 
         DebugOutput::out("游戏进程:" + QString::number(Gplayer.p_gamepid));
-        Gplayer.p_assemblybase = MSDriverPRO::getModuleAddr(Gplayer.p_gamepid, "GameAssembly.dll");
+        Gplayer.p_assemblybase = PeaceDriver::getModuleBase(static_cast<DWORD>(Gplayer.p_gamepid), L"GameAssembly.dll");
         DebugOutput::out("模块基址:" + QString::number(Gplayer.p_assemblybase, 16).toUpper());
 
         Gplayer.p_gamecontext_entries = readPointer(Gplayer.p_assemblybase,
@@ -170,7 +169,7 @@ void UpdateGameData::process()
             statuspanel = Helper::findChild(localusergroup,"StatusPanel");
             if( statuspanel == 0){
                 DebugOutput::out("找不到statuspanel模块，确保打开过能力值面板。即将尝试打开能力值面板");
-                MSDK::keyPress(MSKeyboard_s,1);
+                MSDK::keyPress(Keyboard_s,1);
                 ProcessHelper::programDelay(3000);
                 QApplication::processEvents();
                 continue;

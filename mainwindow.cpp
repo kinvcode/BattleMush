@@ -11,8 +11,8 @@
 #include <QDirIterator>
 
 #include <vmp/VMProtectSDK.h>
-#include "driver/msdriverpro.h"
-#include "driver/driverload.h"
+#include "driver/PeaceDriverAPI.h"
+#include "driver/peacedriverload.h"
 #include "global/globalconfig.h"
 #include "global/gameoffset.h"
 #include "global/controller.h"
@@ -61,8 +61,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::initAll()
 {
-    // loadDriver();
-
     initMSDK();
 
     // 初始化组件
@@ -120,34 +118,6 @@ void MainWindow::showNotice(const QString &message)
 
     notice->move(pos);
     notice->show();
-}
-
-void MainWindow::loadDriver()
-{
-    if (!MSDriverPRO::isLoadDriver())
-    {
-        DriverLoad driver_loader;
-        bool driver_success = driver_loader.loadCommonDriver();
-        if(!driver_success)
-        {
-            qApp->quit();
-            return;
-        }
-    }
-    if (MSDriverPRO::isLoadDriver()){
-        console("变色龙安全驱动加载完毕~");
-
-        #ifdef PROTECT
-        // 保护自身
-        MSDriverPRO::protect((ULONG64)GetCurrentProcessId());
-        // 隐藏进程
-        MSDriverPRO::hide((ULONG64)GetCurrentProcessId());
-        m_hide_process = true;
-        #endif
-
-        // 初始化键盘状态，打开小键盘
-        // if ((GetKeyState(VK_NUMLOCK) & 1)) MSDriverPRO::keyboardClick(0x45);
-    }
 }
 
 void MainWindow::initCompomentUI()
@@ -513,53 +483,63 @@ void MainWindow::initTask()
 
 void MainWindow::initMSDK()
 {
-    if(Gplayer.MSDK_HANDLE != NULL)
+    VMProtectBegin(__FUNCSIG__);
+
+    if(Controller::m_msdk_handle != NULL)
     {
         console("键鼠设备已存在，无需安装");
+        VMProtectEnd();
         return;
     }
 
-    Gplayer.MSDK_HANDLE = MSDK::Open(1);
-    if ((__int64)Gplayer.MSDK_HANDLE != -1)
+    HDC hdc = GetDC(NULL);
+    int iScrWidth = GetDeviceCaps(hdc, HORZRES);
+    int iScrHeight = GetDeviceCaps(hdc, VERTRES);
+    double gdi = Helper::getSystemGDI();
+    Controller::m_system_gdi = gdi;
+    int real_width = iScrWidth;
+    int real_height = iScrHeight;
+
+    if(gdi > 1){
+        real_width = (int)iScrWidth*gdi;
+        real_height = (int)iScrHeight*gdi;
+
+        switch(iScrWidth){
+        case 2560:
+            if(real_height == 2100){
+                real_height = 2160;
+            }
+            break;
+        }
+    }
+    console("分辨率为:" + QString::number(real_width) + "x" + QString::number(real_height));
+    ReleaseDC(NULL, hdc);
+
+    Controller::m_msdk_handle = MSDK::Open(1);
+    if ((__int64)Controller::m_msdk_handle != -1 && Controller::m_msdk_handle != NULL)
     {
-        // 设置鼠标移动延迟为0
+        Controller::m_msdk_installed = true;
         MSDK::setParam(20,0,0);
 
-        HDC hdc = GetDC(NULL); //获得屏幕设备描述表句柄;
-        int iScrWidth = GetDeviceCaps(hdc, HORZRES); //获取屏幕水平分辨率;
-        int iScrHeight = GetDeviceCaps(hdc, VERTRES); //获取屏幕垂直分辨率;
-        double gdi = Helper::getSystemGDI();
-        int real_width = iScrWidth;
-        int real_height = iScrHeight;
-
-        // 兼容多个分辨率屏幕,如果是放大界面
-        if(gdi > 1){
-            real_width = (int)iScrWidth*gdi;
-            real_height = (int)iScrHeight*gdi;
-
-            switch(iScrWidth){
-            case 2560:
-                if(real_height == 2100){
-                    real_height = 2160;
-                }
-                break;
-            }
-
-        }
-        console("分辨率为:" + QString::number(real_width) + "x" + QString::number(real_height));
         int res = MSDK::ResolutionUsed(real_width, real_height);
         if (res == -10)
         {
-            Gplayer.MSDK_HANDLE = NULL;
+            Controller::m_msdk_handle = NULL;
+            Controller::m_msdk_installed = false;
+            MSDK::ResolutionUsed(real_width, real_height);
             console("易键鼠驱动设备初始化失败");
+            console("键鼠改用PeaceDriver");
         }else{
             console("易键鼠驱动设备已安装");
         }
-        ReleaseDC(NULL, hdc); //释放屏幕设备描述表
     } else {
-        Gplayer.MSDK_HANDLE = NULL;
+        Controller::m_msdk_handle = NULL;
+        Controller::m_msdk_installed = false;
+        MSDK::ResolutionUsed(real_width, real_height);
         console("易键鼠驱动设备未安装");
+        console("键鼠改用PeaceDriver");
     }
+    VMProtectEnd();
 }
 
 void MainWindow::onStartAll()
@@ -684,59 +664,18 @@ void MainWindow::warning(QString msg)
 void MainWindow::onApplicationQuit()
 {
     DebugOutput::out("安全关闭程序中... ...");
-    // if(!GetKeyState(VK_NUMLOCK)) MSDriverPRO::keyboardClick(0x45); // 打开小键盘
 
-    if(MSDriverPRO::isLoadDriver())
-    {
-        #ifdef PROTECT
-        if(m_hide_process){
-            MSDriverPRO::restore();
-        }
-        #endif
-    }
-
-    // 卸载驱动
-    DriverLoad drvLoad;
-    // 如果驱动已加载
-    if (MSDriverPRO::isLoadDriver())
-    {
-        QString service_name = "MicrosoftGuard";
-        // 停止驱动
-        bool stoped = drvLoad.stopDriver(service_name);
-        if(stoped)
-        {
-            qDebug() << "MS驱动已完成停止";
-        }
-        if(drvLoad.unInstallDriver(service_name)){
-            qDebug() << "MS驱动已完成卸载";
+    PeaceDriverLoad drv;
+    if (drv.driverIsLoaded()) {
+        PeaceDriverLoad::LoadDriverResult unload_result = drv.unloadPeaceDriver();
+        if (!unload_result.success) {
+            console("VT驱动卸载失败");
+            console(QString::fromWCharArray(unload_result.message));
+        } else {
+            console("VT驱动卸载成功");
         }
     }
 
-    QString drvPath = "C:/Windows/System32/drivers/MicrosoftGuard.sys"; // 驱动文件路径
-
-    QFile local_driver_file(drvPath);
-    if(local_driver_file.exists()){
-
-        // 判断是否可写
-        if (!local_driver_file.isWritable()) {
-            QFile::Permissions currentPerms = local_driver_file.permissions();
-
-            // 添加写权限（移除非写权限）
-            if (local_driver_file.setPermissions(currentPerms | QFile::WriteOwner)) {
-            } else {
-                qDebug() << "使用Qt修改权限失败：" << local_driver_file.errorString();
-            }
-        }
-
-        bool removed = local_driver_file.remove();
-        if(removed){
-            qDebug() << "MS驱动文件已删除";
-        }else{
-            qDebug() << "MS驱动文件无法删除";
-        }
-    }
-
-    // ProcessHelper::programDelay(3000);
     QApplication::processEvents();
 }
 
@@ -951,7 +890,7 @@ void MainWindow::on_pushButton_waring_alert_clicked()
 void MainWindow::on_pushButton_print_ui_child_clicked()
 {
     // 检测游戏是否存在
-    Gplayer.p_gamepid = MSDriverPRO::getPid("msw.exe");
+    Gplayer.p_gamepid = PeaceDriver::getPid(L"msw.exe");
 
     if(Gplayer.p_gamepid == 0){
         DebugOutput::out("游戏进程不存在");
@@ -960,7 +899,7 @@ void MainWindow::on_pushButton_print_ui_child_clicked()
     }
 
     DebugOutput::out("游戏进程:" + QString::number(Gplayer.p_gamepid));
-    Gplayer.p_assemblybase = MSDriverPRO::getModuleAddr(Gplayer.p_gamepid, "GameAssembly.dll");
+    Gplayer.p_assemblybase = PeaceDriver::getModuleBase(static_cast<DWORD>(Gplayer.p_gamepid), L"GameAssembly.dll");
     DebugOutput::out("模块基址:" + QString::number(Gplayer.p_assemblybase, 16).toUpper());
 
     Gplayer.p_gamecontext_entries = readPointer(Gplayer.p_assemblybase,
@@ -1209,7 +1148,7 @@ void MainWindow::on_tableWidget_customContextMenuRequested(const QPoint &pos)
 void MainWindow::on_pushButton_print_map_child_clicked()
 {
     // 检测游戏是否存在
-    Gplayer.p_gamepid = MSDriverPRO::getPid("msw.exe");
+    Gplayer.p_gamepid = PeaceDriver::getPid(L"msw.exe");
 
     if(Gplayer.p_gamepid == 0){
         DebugOutput::out("游戏进程不存在");
@@ -1218,7 +1157,7 @@ void MainWindow::on_pushButton_print_map_child_clicked()
     }
 
     DebugOutput::out("游戏进程:" + QString::number(Gplayer.p_gamepid));
-    Gplayer.p_assemblybase = MSDriverPRO::getModuleAddr(Gplayer.p_gamepid, "GameAssembly.dll");
+    Gplayer.p_assemblybase = PeaceDriver::getModuleBase(static_cast<DWORD>(Gplayer.p_gamepid), L"GameAssembly.dll");
     DebugOutput::out("模块基址:" + QString::number(Gplayer.p_assemblybase, 16).toUpper());
 
     Gplayer.p_gamecontext_entries = readPointer(Gplayer.p_assemblybase,
@@ -1850,7 +1789,7 @@ void MainWindow::on_pushButton_answer_check_info_clicked()
 void MainWindow::on_pushButton_print_modentity_list_clicked()
 {
     // 检测游戏是否存在
-    Gplayer.p_gamepid = MSDriverPRO::getPid("msw.exe");
+    Gplayer.p_gamepid = PeaceDriver::getPid(L"msw.exe");
 
     if(Gplayer.p_gamepid == 0){
         DebugOutput::out("游戏进程不存在");
@@ -1859,7 +1798,7 @@ void MainWindow::on_pushButton_print_modentity_list_clicked()
     }
 
     DebugOutput::out("游戏进程:" + QString::number(Gplayer.p_gamepid));
-    Gplayer.p_assemblybase = MSDriverPRO::getModuleAddr(Gplayer.p_gamepid, "GameAssembly.dll");
+    Gplayer.p_assemblybase = PeaceDriver::getModuleBase(static_cast<DWORD>(Gplayer.p_gamepid), L"GameAssembly.dll");
     DebugOutput::out("模块基址:" + QString::number(Gplayer.p_assemblybase, 16).toUpper());
 
     Gplayer.p_gamecontext_entries = readPointer(
@@ -1909,7 +1848,7 @@ void MainWindow::on_pushButton_print_modentity_list_clicked()
 void MainWindow::on_pushButton_print_allservice_clicked()
 {
     // 检测游戏是否存在
-    Gplayer.p_gamepid = MSDriverPRO::getPid("msw.exe");
+    Gplayer.p_gamepid = PeaceDriver::getPid(L"msw.exe");
 
     if(Gplayer.p_gamepid == 0){
         DebugOutput::out("游戏进程不存在");
@@ -1918,7 +1857,7 @@ void MainWindow::on_pushButton_print_allservice_clicked()
     }
 
     DebugOutput::out("游戏进程:" + QString::number(Gplayer.p_gamepid));
-    Gplayer.p_assemblybase = MSDriverPRO::getModuleAddr(Gplayer.p_gamepid, "GameAssembly.dll");
+    Gplayer.p_assemblybase = PeaceDriver::getModuleBase(static_cast<DWORD>(Gplayer.p_gamepid), L"GameAssembly.dll");
     DebugOutput::out("模块基址:" + QString::number(Gplayer.p_assemblybase, 16).toUpper());
 
     Gplayer.p_gamecontext_entries = readPointer(

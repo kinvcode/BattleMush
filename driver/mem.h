@@ -4,40 +4,72 @@
 #include <vector>
 #include <string>
 #include <QString>
-#include "atlstr.h"
-#include "process/process.h"
-#include "driver/msdriverpro.h"
+#include <windows.h>
 
 std::vector<byte> operator+(std::vector<byte> a, std::vector<byte> b);
 
-namespace Mem{
-
+namespace Mem
+{
     bool readMemory(ULONG64 addr, PBYTE pDataBuffer, ULONG size);
 
-    byte readByte(ULONG64 address);
+    bool writeMemory(ULONG64 addr, PBYTE pDataBuffer, ULONG size);
 
-    WORD readWord(ULONG64 address);
+    byte readByte(__int64 address);
 
-    int readInt(ULONG64 address);
+    WORD readWord(__int64 address);
 
-    __int64 readLong(ULONG64 address);
+    bool writeByte(__int64 address, BYTE value);
 
-    // 可变参数版本 - 支持任意数量偏移
+    bool writeWord(__int64 address, WORD value);
+
+    int readInt(__int64 address);
+
+    bool writeInt(__int64 address, __int64 value);
+
+    __int64 readLong(__int64 address);
+
+    bool writeLong(__int64 address, __int64 value);
+
+    float readFloat(__int64 address);
+
+    bool writeFloat(__int64 address, float value);
+
+    std::vector<byte> readByteArray(__int64 address, int length);
+
+    bool writeByteArray(__int64 address, std::vector<byte> Data);
+
+    QString readString(__int64 address, int length);
+
+    QString readAnsiString(ULONG64 address, int maxLength);
+
+    bool writeString(__int64 address, QString text);
+
+    std::vector<byte> wstringToBytes(std::wstring w_string);
+
+    std::wstring bytesToWstring(std::vector<byte> data);
+
+    float intToFloat(int value);
+
+    std::vector<byte> makeByteArray(std::vector<byte> data);
+
+    std::vector<byte> makeEmptyByteArray(int length);
+
+    std::vector<byte> intToBytes(int length);
+
+    std::vector<byte> longToBytes(__int64 length);
+
+    std::vector<byte> reverseBytes(std::vector<byte> data);
+
+    __int64 allocMemory(ULONG size);
+
+    void freeMemory(__int64 address);
+
     template<typename... Offsets>
     quint64 readPointer(quint64 base, Offsets... offsets) {
         quint64 current = base;
-        // C++17 折叠表达式
         ((current = readLong(current + offsets)), ...);
         return current;
     }
-
-    float readFloat(ULONG64 address);
-
-    std::vector<byte> readByteArray(ULONG64 address, int length);
-
-    QString readString(ULONG64 address, int length);
-
-    QString readAnsiString(ULONG64 address, int maxLength);
 };
 
 #endif // MEM_H

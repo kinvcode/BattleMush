@@ -7,7 +7,6 @@
 #include "driver/mem.h"
 #include "utils/gamestruct.h"
 #include "pathfinding/walkbase.h"
-#include "driver/mskeycode.h"
 #include "global/globalconfig.h"
 #include "pathfinding/moveplatform.h"
 #include "global/controller.h"

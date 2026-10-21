@@ -6,6 +6,7 @@
 #pragma once
 #ifndef USBHIDKEYCODE_H
 #define USBHIDKEYCODE_H
+
 #define Keyboard_a                4   // Keyboard a and A
 #define Keyboard_b                5   // Keyboard b and B
 #define Keyboard_c                6   // Keyboard c and C

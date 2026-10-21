@@ -2,13 +2,14 @@
 #ifndef MSDK_H
 #define MSDK_H
 #include <QRandomGenerator>
+#include <QThread>
 #include "windows.h"
 #include "msdk.h"
-#include "global/struct.h"
+#include "global/controller.h"
+#include "global/globalplayer.h"
 #include "driver/msdk/usbhidkeycode.h"
 #include "process/process.h"
 #include "helper/rand.h"
-#include <QThread>
 
 class MSDK
 {
@@ -66,6 +67,9 @@ public:
     // 移动到RECT
     static void MoveToRect(cv::Rect range);
 
+    // 移动到空白区域
+    static void MoveToFree();
+
     // 仿真移动
     static void humanMove(int targetX, int targetY);
 
@@ -92,7 +96,7 @@ public:
     // 输入指定字符
     static void KeyInputWord(char word);
 
-    // 输入Unicode
+    // 输入 Unicode
     static void KeyInputUnicode(QString str);
 
     // 随机延迟

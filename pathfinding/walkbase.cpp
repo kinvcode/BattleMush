@@ -2,7 +2,6 @@
 #include "global/gameoffset.h"
 #include "global/globalplayer.h"
 #include "driver/mem.h"
-#include "driver/mskeycode.h"
 #include "utils/helper.h"
 #include <QElapsedTimer>
 #include "global/struct.h"

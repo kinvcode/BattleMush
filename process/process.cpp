@@ -11,7 +11,7 @@ int ProcessHelper::getProcessPID(QString Name)
     Processsnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
     if (Processsnapshot == INVALID_HANDLE_VALUE) {
-        QMessageBox::warning(NULL,"幻境龙","创建进程快照失败");
+        QMessageBox::warning(NULL,"BattleMush","创建进程快照失败");
         return 0;
     }
 
@@ -63,7 +63,7 @@ int ProcessHelper::asSystem(int Pid, char FileName[])
     // 更新权限为131072
     if (!UpdateProcThreadAttribute(AttributeList, 0, 131072, &ProcessHandle, sizeof(HANDLE), NULL, NULL))
     {
-        QMessageBox::warning(NULL,"幻境龙","更新进程属性失败 !");
+        QMessageBox::warning(NULL,"BattleMush","更新进程属性失败 !");
         ExitProcess(0);
     }
     //
@@ -82,7 +82,7 @@ int ProcessHelper::asSystem(int Pid, char FileName[])
     }
     else
     {
-        QMessageBox::warning(NULL,"幻境龙","创建新进程失败!");
+        QMessageBox::warning(NULL,"BattleMush","创建新进程失败!");
         ExitProcess(0);
     }
     CloseHandle(ProcessHandle);
@@ -99,7 +99,7 @@ void ProcessHelper::asGameChild()
     int dnf_pid = getProcessPID("DNF.exe");
     if (dnf_pid == 0)
     {
-        QMessageBox::warning(NULL,"幻境龙","游戏尚未启动!");
+        QMessageBox::warning(NULL,"BattleMush","游戏尚未启动!");
         ExitProcess(0);
     }
 
@@ -160,12 +160,12 @@ bool ProcessHelper::deleteSelf()
     VMProtectBegin("__FUNCTION__");
     // 删除源程序
     QString currentDir = QCoreApplication::applicationDirPath();
-    QString filePath = currentDir + "/MicrosoftFastSearch.exe";
+    QString filePath = currentDir + "/BattleMush.exe";
     QFile file(filePath);
     if (file.exists())
     {
         if (!file.remove()) {
-            QMessageBox::information(NULL,"MicrosoftFastSearch","源程序删除失败!");
+            QMessageBox::information(NULL,"BattleMush","源程序删除失败!");
             ExitProcess(0);
         }
     }
@@ -176,7 +176,7 @@ bool ProcessHelper::deleteSelf()
     // 获取当前可执行文件的路径
     if (GetModuleFileNameW(NULL, szPath, MAX_PATH * 2) == 0) {
         // std::wcerr << L"[!] GetModuleFileNameW fail , code is  " << GetLastError() << std::endl;
-        QMessageBox::information(NULL,"MicrosoftFastSearch","GetModuleFileNameW fail!");
+        QMessageBox::information(NULL,"BattleMush","GetModuleFileNameW fail!");
         return FALSE;
     }
 
@@ -189,7 +189,7 @@ bool ProcessHelper::deleteSelf()
                                NULL, NULL);
     if (hFile == INVALID_HANDLE_VALUE) {
         // std::wcerr << L"[!] CreateFileW fail , code is " << GetLastError() << std::endl;
-        QMessageBox::information(NULL,"MicrosoftFastSearch","CreateFileW fail!");
+        QMessageBox::information(NULL,"BattleMush","CreateFileW fail!");
         return FALSE;
     }
 
@@ -199,7 +199,7 @@ bool ProcessHelper::deleteSelf()
     if (!pRename) {
         CloseHandle(hFile);
         // std::wcerr << L"[!] HeapAlloc fail , code is " << GetLastError() << std::endl;
-        QMessageBox::information(NULL,"MicrosoftFastSearch","HeapAlloc fail!");
+        QMessageBox::information(NULL,"BattleMush","HeapAlloc fail!");
         return FALSE;
     }
 
@@ -209,7 +209,7 @@ bool ProcessHelper::deleteSelf()
 
     if (!SetFileInformationByHandle(hFile, FileRenameInfo, pRename, sRename)) {
         // std::wcerr << L"[!] SetFileInformationByHandle fail, code is" << GetLastError() << std::endl;
-        QMessageBox::information(NULL,"MicrosoftFastSearch","SetFileInformationByHandle fail!");
+        QMessageBox::information(NULL,"BattleMush","SetFileInformationByHandle fail!");
         CloseHandle(hFile);
         HeapFree(GetProcessHeap(), 0, pRename);
         return FALSE;
@@ -238,7 +238,7 @@ bool ProcessHelper::deleteSelf()
 
     if (!SetFileInformationByHandle(hFile, FileDispositionInfo, &Delete, sizeof(Delete))) {
         // std::wcerr << L"[!] SetFileInformationByHandle fail, code is  " << GetLastError() << std::endl;
-        QMessageBox::information(NULL,"MicrosoftFastSearch","SetFileInformationByHandle fail!");
+        QMessageBox::information(NULL,"BattleMush","SetFileInformationByHandle fail!");
         CloseHandle(hFile);
         HeapFree(GetProcessHeap(), 0, pRename);
         return FALSE;
@@ -260,18 +260,18 @@ void ProcessHelper::renameSelf()
     QString name = QCoreApplication::applicationName();
 
     // 判断本程序名称
-    if(name == "MicrosoftFastSearch")
+    if(name == "BattleMush")
     {
         // 获取当前程序运行目录
         QString currentDir = QCoreApplication::applicationDirPath();
 
         // 拼接文件路径
-        QString filePath = currentDir + "/MicrosoftFastSearch.exe";
+        QString filePath = currentDir + "/BattleMush.exe";
 
         // 使用 QFile 判断文件是否存在
         QFile file(filePath);
         if (!file.exists()) {
-            QMessageBox::information(NULL,"MicrosoftFastSearch","主程序丢失!");
+            QMessageBox::information(NULL,"BattleMush","主程序丢失!");
             qApp->quit();
         }
 
@@ -287,21 +287,21 @@ void ProcessHelper::renameSelf()
 
         // 检查新文件是否已存在
         if (QFile::exists(targetPath)) {
-            QMessageBox::information(NULL,"MicrosoftFastSearch","新文件名被暂用");
+            QMessageBox::information(NULL,"BattleMush","新文件名被暂用");
             ExitProcess(0);
         }
 
         // 打开源文件
         QFile sourceFile(appPath);
         if (!sourceFile.open(QIODevice::ReadOnly)) {
-            QMessageBox::information(NULL,"MicrosoftFastSearch","无法打开源程序");
+            QMessageBox::information(NULL,"BattleMush","无法打开源程序");
             ExitProcess(0);
         }
 
         // 打开目标文件
         QFile targetFile(targetPath);
         if (!targetFile.open(QIODevice::WriteOnly)) {
-            QMessageBox::information(NULL,"MicrosoftFastSearch","无法打开目标程序");
+            QMessageBox::information(NULL,"BattleMush","无法打开目标程序");
             ExitProcess(0);
         }
 

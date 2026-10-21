@@ -3,6 +3,10 @@
 
 #include <QObject>
 #include "global/struct.h"
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
 
 class Controller : public QObject
 {
@@ -50,6 +54,11 @@ public:
     static bool m_disable_attack;
 
     static bool m_disable_recive;
+
+    // 易键鼠句柄。未安装时键鼠走 PeaceDriver
+    static HANDLE m_msdk_handle;
+    static bool m_msdk_installed;
+    static double m_system_gdi;
 
 // ====== 便捷函数 ======
 public:

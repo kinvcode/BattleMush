@@ -31,7 +31,6 @@ private:
     Ui::MainWindow *ui;
     LogViewer* logger = nullptr;
     QMutex consoleMutex;// 调试台锁
-    bool m_hide_process = false;
 
     // 数据更新线程ID
     const int m_UpdateGameData_tid = 1;
@@ -46,8 +45,6 @@ private:
 
     // 提示框
     void showNotice(const QString& message);
-    // 加载驱动
-    void loadDriver();
     void initCompomentUI();
     void initConfig();
     void initDir();

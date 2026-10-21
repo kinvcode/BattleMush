@@ -35,6 +35,12 @@ bool Controller::m_disable_attack = false;
 
 bool Controller::m_disable_recive = false;
 
+HANDLE Controller::m_msdk_handle = NULL;
+
+bool Controller::m_msdk_installed = false;
+
+double Controller::m_system_gdi = 1;
+
 void Controller::updateAttackInfo()
 {
     cv::Point atk_range;

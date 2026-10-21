@@ -54,10 +54,10 @@ CONFIG(release, debug|release) {
 }
 
 CONFIG(debug, debug|release) {
-    LIBS += $$PWD/lib/debug/MSDriverPRO.lib
+    LIBS += $$PWD/lib/peace/PeaceDriverAPI_d.lib
     DEFINES += ISDEBUG= TRUE
 } else {
-    LIBS += $$PWD/lib/MSDriverPRO.lib
+    LIBS += $$PWD/lib/peace/PeaceDriverAPI.lib
 }
 
 LIBS += $$PWD/lib/vmp/VMProtectSDK64.lib
@@ -85,10 +85,12 @@ LIBS += setupapi.lib \
 SOURCES += \
     driver/mem.cpp \
     driver/msdk/msdkDriver.cpp \
+    driver/peacedriverload.cpp \
+    driver/peacedrivertool.cpp \
     global/controller.cpp \
     global/globalconfig.cpp \
     global/globalplayer.cpp \
-    driver/driverload.cpp \
+    helper/Utils.cpp \
     helper/rand.cpp \
     http/apirequest.cpp \
     http/request.cpp \
@@ -129,14 +131,15 @@ HEADERS += \
     driver/msdk/msdk.h \
     driver/msdk/msdkDriver.h \
     driver/msdk/usbhidkeycode.h \
-    driver/mskeycode.h \
+    driver/PeaceDriverAPI.h \
+    driver/peacedriverload.h \
+    driver/peacedrivertool.h \
+    driver/peacesys.h \
     global/controller.h \
     global/gameoffset.h \
     global/globalconfig.h \
     global/globalplayer.h \
-    driver/driverload.h \
-    driver/msdriverpro.h \
-    driver/msstruct.h \
+    helper/Utils.h \
     global/struct.h \
     helper/rand.h \
     http/apirequest.h \

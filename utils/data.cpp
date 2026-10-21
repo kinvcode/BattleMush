@@ -1,6 +1,6 @@
 #include "data.h"
 #include "global/globalplayer.h"
-#include "driver/msdriverpro.h"
+#include "driver/PeaceDriverAPI.h"
 #include "driver/mem.h"
 #include "utils/helper.h"
 #include "global/gameoffset.h"
@@ -13,7 +13,7 @@ quint64 Data::Game::gamecontext()
 {
     quint64 pointer = 0;
     // 检测游戏是否存在
-    Gplayer.p_gamepid = MSDriverPRO::getPid("msw.exe");
+    Gplayer.p_gamepid = PeaceDriver::getPid(L"msw.exe");
 
     if(Gplayer.p_gamepid == 0){
         DebugOutput::out("游戏进程不存在");
@@ -22,7 +22,7 @@ quint64 Data::Game::gamecontext()
     }
 
     // DebugOutput::out("游戏进程:" + QString::number(Gplayer.p_gamepid));
-    Gplayer.p_assemblybase = MSDriverPRO::getModuleAddr(Gplayer.p_gamepid, "GameAssembly.dll");
+    Gplayer.p_assemblybase = PeaceDriver::getModuleBase(static_cast<DWORD>(Gplayer.p_gamepid), L"GameAssembly.dll");
     // DebugOutput::out("模块基址:" + QString::number(Gplayer.p_assemblybase, 16).toUpper());
 
     Gplayer.p_gamecontext_entries = readPointer(Gplayer.p_assemblybase,
