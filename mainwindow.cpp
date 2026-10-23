@@ -1953,7 +1953,10 @@ void MainWindow::on_pushButton_answer_input_test_clicked()
 
 void MainWindow::on_pushButton_print_monsters_list_clicked()
 {
+    Data::Game::updateGlobalData();
+
     if(!Gplayer.p_curmapentity){
+        Helper::console("更新数据失败~");
         return;
     }
 
@@ -1965,10 +1968,15 @@ void MainWindow::on_pushButton_print_monsters_list_clicked()
                           + BASE::InternalArray::Head;
 
     std::vector<Monster> m_allmonster;
+
+    // qDebug() << "实体数量：" << map_entity_count;
+
     for(int i = 0; i < map_entity_count; i++){
         // 节省遍历时间
         quint64 cur_entity_address = entity_head + i * 8;
         quint64 entity = readLong(cur_entity_address);
+
+        // qDebug() << "Entity：" << QString::number(entity,16).toUpper();
 
         // 找到End标记位
         QString name = GameStruct::readEntityName(entity);
@@ -1979,6 +1987,7 @@ void MainWindow::on_pushButton_print_monsters_list_clicked()
         // 判断怪物是否存在
         bool exists = readByte(readLong(entity + BASE::MODEntity::RigidbodyComponent) + BASE::RigidbodyComponent::exists);
         if(!exists){
+            // qDebug() << "不存在";
             continue;
         }
 
@@ -1990,6 +1999,7 @@ void MainWindow::on_pushButton_print_monsters_list_clicked()
                                   + BASE::Foothold::ID);
         int line_id = RoomMap::getFootPlatform(foothold_id, Gplayer.curmapinfo.platform_list);
         if(line_id == -1){
+            // qDebug() << "平台id不存在";
             continue;
         }
 
@@ -2001,6 +2011,7 @@ void MainWindow::on_pushButton_print_monsters_list_clicked()
         qDebug() << QString::number(entity,16).toUpper() << modelid << "坐标:" << monster_x << monster_y;
 
         if(monster_x == 0 && monster_y == 0){
+            // qDebug() << "怪物坐标为0";
             continue;
         }
 

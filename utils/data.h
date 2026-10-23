@@ -17,6 +17,9 @@ public:
     // 获取UI entity
     static quint64 uiEntity();
 
+    // 更新全局数据
+    static void updateGlobalData();
+
     // 打印物品
     static void roomMapItems();
 

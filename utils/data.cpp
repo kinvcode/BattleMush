@@ -48,6 +48,7 @@ quint64 Data::Game::mapEntity()
 {
     quint64 p_gamecontext = gamecontext();
     quint64 p_mapsentity = readPointer(p_gamecontext, BASE::GameContext::MapsEntity);
+    Gplayer.p_mapsentity = p_mapsentity;
     return p_mapsentity;
 }
 
@@ -55,7 +56,66 @@ quint64 Data::Game::uiEntity()
 {
     quint64 p_gamecontext = gamecontext();
     quint64 p_uientity = readPointer(p_gamecontext, BASE::GameContext::UIEntity);
+    Gplayer.p_uientity = p_uientity;
     return p_uientity;
+}
+
+void Data::Game::updateGlobalData()
+{
+    // 更新GameContext
+    gamecontext();
+    if(Gplayer.p_gamecontext == 0){
+        return;
+    }
+
+    // 服务列表
+    Gplayer.p_allServices = Mem::readPointer(Gplayer.p_gamecontext, BASE::GameContext::allServices);
+    DebugOutput::out("allServices:" + QString::number(Gplayer.p_allServices, 16).toUpper());
+
+    // 碰撞服务
+    Gplayer.p_collisionservice = Helper::findService(Gplayer.p_allServices,"CollisionService");
+    DebugOutput::out("collisionservice:" + QString::number(Gplayer.p_collisionservice, 16).toUpper());
+
+    // 角色服务
+    Gplayer.p_userservice = Helper::findService(Gplayer.p_allServices, "UserService");
+    DebugOutput::out("UserService:" + QString::number(Gplayer.p_collisionservice, 16).toUpper());
+
+    // 更新map和ui
+    mapEntity();
+
+    uiEntity();
+
+    // 更新当前地图
+    Gplayer.p_curmapentity = readPointer(Gplayer.p_mapsentity,
+                                        BASE::MODEntity::children,
+                                        BASE::List::InternalArray,
+                                        BASE::InternalArray::Head + 0 * 8);
+
+    // 判断当前是登录界面还是游戏中
+    Gplayer.curmapinfo.id = GameStruct::readEntityID(Gplayer.p_curmapentity);
+    Gplayer.curmapinfo.name = GameStruct::readEntityName(Gplayer.p_curmapentity);
+    if(Gplayer.curmapinfo.id == "e5a83e46-390a-4ecf-a069-4e786ccf22c4"){
+        DebugOutput::out("当前是登录页面");
+        return;
+    }
+
+    // 找到localPlayer
+    Gplayer.p_localplayer = readLong(Gplayer.p_userservice + BASE::UserService::localPlayer);
+
+    // 还需要更新当前地图
+
+    // 寻找LocalUserGroup
+    quint64 localusergroup = Helper::findChild(Gplayer.p_uientity,"LocalUserGroup");
+    quint64 localuseroffgroup = Helper::findChild(Gplayer.p_uientity,"LocalUserOffGroup");
+    // 寻找StatusPanel
+    quint64 statuspanel = Helper::findChild(localuseroffgroup,"StatusPanel");
+    if( statuspanel == 0){
+        statuspanel = Helper::findChild(localusergroup,"StatusPanel");
+        if( statuspanel == 0){
+            DebugOutput::out("找不到statuspanel模块，确保打开过能力值面板。即将尝试打开能力值面板");
+            return;
+        }
+    }
 }
 
 void Data::Game::roomMapItems()
