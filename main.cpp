@@ -118,8 +118,9 @@ void loadDriver()
             return;
         }
     }
+
     // 保护自身
-    PeaceDriver::protectPid((ULONG64)GetCurrentProcessId());
+    // PeaceDriver::protectPid((ULONG64)GetCurrentProcessId());
 
 // 伪装进程
 #ifdef PROTECT

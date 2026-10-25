@@ -1,6 +1,7 @@
 #include "exception.h"
 
 #include "driver/msdk/msdkDriver.h"
+#include <QDebug>
 
 
 LONG WINAPI BattleCrashHandler(EXCEPTION_POINTERS* pException)
@@ -10,7 +11,9 @@ LONG WINAPI BattleCrashHandler(EXCEPTION_POINTERS* pException)
 
     // 可选：生成转储文件
 
-    QString dumpPath = QCoreApplication::applicationDirPath() + "/output/dump/";
+    QString dumpPath = "D:\\data\\dump\\output\\dump";
+    // QString dumpPath = QCoreApplication::applicationDirPath() + "/output/dump/";
+    qDebug() << "dump路径：" << dumpPath;
     QDateTime logDateTime = QDateTime::currentDateTime();
     QString logTimeString = logDateTime.toString("yyyy-MM-dd-hh-mm-ss");
     QString dumpSavePath = QString("%1/thread_crash_%2.dmp").arg(dumpPath).arg(logTimeString);
@@ -41,6 +44,7 @@ LONG WINAPI BattleCrashHandler(EXCEPTION_POINTERS* pException)
             );
         if (!success) {
             DWORD err = GetLastError();
+            qDebug() << "MiniDumpWriteDump failed, GetLastError:" << err;
         }
 
         CloseHandle(hFile);

@@ -23,6 +23,9 @@ public:
     //
 signals:
     void sendControleStatus(bool status);
+
+private:
+    void test();
 };
 
 #endif // NATIVEEVENTFILTER_H

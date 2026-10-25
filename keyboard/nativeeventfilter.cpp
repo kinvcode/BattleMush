@@ -4,7 +4,9 @@
 #include "utils/helper.h"
 #include "global/globalplayer.h"
 #include "utils/gamestruct.h"
+#include "global/globalconfig.h"
 #include "driver/msdk/msdkDriver.h"
+#include "utils/data.h"
 
 NativeEventFilter::NativeEventFilter(MainWindow* window)
 {
@@ -63,10 +65,7 @@ bool NativeEventFilter::nativeEventFilter(const QByteArray& eventType, void* mes
             break;
         case VK_F3:
             qDebug() << "F3";
-            // ImageTool::screenshot();
-            if(Gplayer.p_uientity){
-                GameStruct::printEntityChild(Gplayer.p_uientity);
-            }
+            test();
             break;
         default:
             qDebug() << "未知快捷键触发:" + QString::number(keycode);
@@ -74,6 +73,40 @@ bool NativeEventFilter::nativeEventFilter(const QByteArray& eventType, void* mes
         }
     }
     return false;
+}
+
+void NativeEventFilter::test()
+{
+    qDebug() << "测试函数开始";
+
+    qDebug() << "判断当前BUFF技能1绑定代码是否存在"; //SB2001002
+
+    QString buff1_code = Gconfig.getValue("buff_bind/buff1").toString();
+
+    if(buff1_code.isEmpty()){
+        qDebug() << "BUFF技能1没有绑定技能";
+        return;
+    }
+
+    qDebug() << "BUFF技能1绑定的技能是：" << buff1_code;
+
+    // 遍历UI组件
+    quint64 p_uientity = Data::Game::uiEntity();
+
+    quint64 main_group = Helper::findChild(p_uientity, "MainGroup");
+    quint64 buff_list = Helper::findChild(main_group,"BuffScroll");
+
+    quint64 buff1_entity = Helper::findChild(buff_list, buff1_code);
+    qDebug() << "buff1实体：" << QString::number(buff1_entity,16).toUpper();
+
+    if(buff1_entity == 0){
+        qDebug() << "BUFF技能1绑定的代码不存在";
+        return;
+    }
+
+    qDebug() << "BUFF技能1绑定的代码已存在于BUFF栏中";
+
+    qDebug() << "测试函数结束";
 }
 
 
