@@ -96,6 +96,8 @@ void NativeEventFilter::test()
     quint64 main_group = Helper::findChild(p_uientity, "MainGroup");
     quint64 buff_list = Helper::findChild(main_group,"BuffScroll");
 
+    qDebug() << "BUFF LIST:" << QString::number(buff_list,16).toUpper();
+
     quint64 buff1_entity = Helper::findChild(buff_list, buff1_code);
     qDebug() << "buff1实体：" << QString::number(buff1_entity,16).toUpper();
 

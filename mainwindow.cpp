@@ -44,7 +44,8 @@ struct BuffOption {
 
 static const BuffOption kBuffList[] = {
     {"SB2001002", "魔心防禦"},
-    {"SB9920003", "魔力護盾"},
+    {"SB2001003", "魔力護盾"},
+    {"SB9920003", "精神强化"},
 };
 
 MainWindow::MainWindow(QWidget *parent)
@@ -2198,5 +2199,35 @@ void MainWindow::on_comboBox_buff5_bind_activated(int index)
 
     Gconfig.setValue("buff_bind/buff5", code);
     showNotice(QString("BUFF技能5已绑定：%1").arg(name));
+}
+
+
+void MainWindow::on_pushButton_print_allservice_2_clicked()
+{
+    // 遍历UI组件
+    quint64 p_uientity = Data::Game::uiEntity();
+
+    quint64 main_group = Helper::findChild(p_uientity, "MainGroup");
+    quint64 buff_list = Helper::findChild(main_group,"BuffScroll");
+
+    quint64 list = Mem::readLong(buff_list + BASE::MODEntity::children);
+    int list_num = Mem::readLong(list + BASE::List::size);
+    if(list_num == 0){
+        Helper::console("不存在BUFF");
+        return;
+    }
+
+    quint64 list_head = Mem::readLong(list + BASE::List::InternalArray);
+    int max = Mem::readInt(list_head + BASE::InternalArray::max_size);
+    list_head = list_head + BASE::InternalArray::Head;
+    for(int i = 0; i < max; i++,list_head += 0x8){
+        quint64 cur_entity = Mem::readLong(list_head);
+        if(cur_entity == 0){
+            break;
+        }
+
+        QString entity_name = readString(readLong(cur_entity + BASE::MODEntity::name) + BASE::String::text, 100);
+        Helper::console("BUFF代码：" + entity_name);
+    }
 }
 

@@ -564,133 +564,62 @@ void KillMonster::reciveItem(const Item &target_item)
 
 void KillMonster::skillRecast()
 {
-    int now_time = m_timer.elapsed() / 1000;
-
-    // qDebug() << "现在时间:" << now_time;
-    // qDebug() << "上次释放时间" << m_recast_buff1_lasttime;
-    // qDebug() << "释放频率" << m_recast_buff1_time;
-    // qDebug() << "释放技能已过去" << (now_time - m_recast_buff1_lasttime);
-
-    int compare_time = 999999;
-    if(m_recast_buff1_enable){
-        now_time = m_timer.elapsed() / 1000;
-        if (m_recast_buff1_time > 0 && m_recast_buff1_max_time > m_recast_buff1_time) {
-            compare_time = QRandomGenerator::global()->bounded(m_recast_buff1_time, m_recast_buff1_max_time + 1);
-        }
-        if((now_time - m_recast_buff1_lasttime) > compare_time || m_recast_buff1_lasttime == 0){
-
-            DebugOutput::out("BUFF1已到释放时间，自动释放BUFF1");
-            Helper::console("BUFF1已到释放时间，自动释放BUFF1");
-
-            while(isAttaking()){
-                ProcessHelper::programDelay(50);
-                QApplication::processEvents();
-            }
-
-            MSDK::keyPress(m_recast_buff1_keycode, 1);
-            Helper::console("BUFF1已按");
-
-            m_recast_buff1_lasttime = m_timer.elapsed() / 1000;
-            ProcessHelper::programDelay(1000);
-            QApplication::processEvents();
-        }
+    if(!m_running || m_paused || !Gplayer.p_uientity){
+        return;
     }
 
-    if(m_recast_buff2_enable){
-        now_time = m_timer.elapsed() / 1000;
-        if (m_recast_buff2_time > 0 && m_recast_buff2_max_time > m_recast_buff2_time) {
-            compare_time = QRandomGenerator::global()->bounded(m_recast_buff2_time, m_recast_buff2_max_time + 1);
-        }
-        if((now_time - m_recast_buff2_lasttime) > compare_time || m_recast_buff2_lasttime == 0){
-
-            DebugOutput::out("BUFF2已到释放时间，自动释放BUFF2");
-            Helper::console("BUFF2已到释放时间，自动释放BUFF2");
-
-            while(isAttaking()){
-                ProcessHelper::programDelay(50);
-                QApplication::processEvents();
-            }
-
-            MSDK::keyPress(m_recast_buff2_keycode, 1);
-            Helper::console("BUFF1已按");
-
-            m_recast_buff2_lasttime = m_timer.elapsed() / 1000;
-            ProcessHelper::programDelay(1000);
-            QApplication::processEvents();
-        }
+    quint64 main_group = Helper::findChild(Gplayer.p_uientity, "MainGroup");
+    if(main_group == 0){
+        return;
     }
 
-    if(m_recast_buff3_enable){
-        now_time = m_timer.elapsed() / 1000;
-        if (m_recast_buff3_time > 0 && m_recast_buff3_max_time > m_recast_buff3_time) {
-            compare_time = QRandomGenerator::global()->bounded(m_recast_buff3_time, m_recast_buff3_max_time + 1);
-        }
-        if((now_time - m_recast_buff3_lasttime) > compare_time || m_recast_buff3_lasttime == 0){
-
-            DebugOutput::out("BUFF3已到释放时间，自动释放BUFF3");
-            Helper::console("BUFF3已到释放时间，自动释放BUFF3");
-
-            while(isAttaking()){
-                ProcessHelper::programDelay(50);
-                QApplication::processEvents();
-            }
-
-            MSDK::keyPress(m_recast_buff3_keycode, 1);
-            Helper::console("BUFF1已按");
-
-            m_recast_buff3_lasttime = m_timer.elapsed() / 1000;
-            ProcessHelper::programDelay(1000);
-            QApplication::processEvents();
-        }
+    quint64 buff_list = Helper::findChild(main_group, "BuffScroll");
+    if(buff_list == 0){
+        return;
     }
 
-    if(m_recast_buff4_enable){
-        now_time = m_timer.elapsed() / 1000;
-        if (m_recast_buff4_time > 0 && m_recast_buff4_max_time > m_recast_buff4_time) {
-            compare_time = QRandomGenerator::global()->bounded(m_recast_buff4_time, m_recast_buff4_max_time + 1);
+    // BUFF栏里没有对应图标时才补放。某个技能未绑定或仍在持续时，不影响后面的技能。
+    auto recastBuff = [&](bool enable, const char* configKey, int keycode, const QString& name) -> bool {
+        if(!m_running || m_paused){
+            return false;
         }
-        if((now_time - m_recast_buff4_lasttime) > compare_time || m_recast_buff4_lasttime == 0){
+        if(!enable || keycode == 0){
+            return true;
+        }
 
-            DebugOutput::out("BUFF4已到释放时间，自动释放BUFF4");
-            Helper::console("BUFF4已到释放时间，自动释放BUFF4");
+        const QString code = Gconfig.getValue(configKey).toString();
+        if(code.isEmpty()){
+            return true;
+        }
 
-            while(isAttaking()){
-                ProcessHelper::programDelay(50);
-                QApplication::processEvents();
+        if(Helper::findChild(buff_list, code) != 0){
+            return true;
+        }
+
+        const int waitStart = m_timer.elapsed();
+        while(isAttaking()){
+            if(!m_running || m_paused){
+                return false;
             }
-
-            MSDK::keyPress(m_recast_buff4_keycode, 1);
-            Helper::console("BUFF4已按");
-
-            m_recast_buff4_lasttime = m_timer.elapsed() / 1000;
-            ProcessHelper::programDelay(1000);
+            if(m_timer.elapsed() - waitStart > 3000){
+                return true;
+            }
+            ProcessHelper::programDelay(50);
             QApplication::processEvents();
         }
-    }
 
-    if(m_recast_buff5_enable){
-        now_time = m_timer.elapsed() / 1000;
-        if (m_recast_buff5_time > 0 && m_recast_buff5_max_time > m_recast_buff5_time) {
-            compare_time = QRandomGenerator::global()->bounded(m_recast_buff5_time, m_recast_buff5_max_time + 1);
-        }
-        if((now_time - m_recast_buff5_lasttime) > compare_time || m_recast_buff5_lasttime == 0){
+        MSDK::keyPress(keycode, 1);
+        Helper::console(name + "已按");
+        ProcessHelper::programDelay(200);
+        QApplication::processEvents();
+        return m_running && !m_paused;
+    };
 
-            DebugOutput::out("BUFF5已到释放时间，自动释放BUFF5");
-            Helper::console("BUFF5已到释放时间，自动释放BUFF5");
-
-            while(isAttaking()){
-                ProcessHelper::programDelay(50);
-                QApplication::processEvents();
-            }
-
-            MSDK::keyPress(m_recast_buff5_keycode, 1);
-            Helper::console("BUFF1已按");
-
-            m_recast_buff5_lasttime = m_timer.elapsed() / 1000;
-            ProcessHelper::programDelay(1000);
-            QApplication::processEvents();
-        }
-    }
+    if(!recastBuff(m_recast_buff1_enable, "buff_bind/buff1", m_recast_buff1_keycode, "BUFF1")) return;
+    if(!recastBuff(m_recast_buff2_enable, "buff_bind/buff2", m_recast_buff2_keycode, "BUFF2")) return;
+    if(!recastBuff(m_recast_buff3_enable, "buff_bind/buff3", m_recast_buff3_keycode, "BUFF3")) return;
+    if(!recastBuff(m_recast_buff4_enable, "buff_bind/buff4", m_recast_buff4_keycode, "BUFF4")) return;
+    recastBuff(m_recast_buff5_enable, "buff_bind/buff5", m_recast_buff5_keycode, "BUFF5");
 }
 
 bool KillMonster::isAttaking()

@@ -221,6 +221,8 @@ private slots:
 
     void on_comboBox_buff5_bind_activated(int index);
 
+    void on_pushButton_print_allservice_2_clicked();
+
 public slots:
     void console(QString msg);
     void warning(QString msg);
