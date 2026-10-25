@@ -12,7 +12,8 @@ Login::Login(QWidget *parent)
     , ui(new Ui::Login)
 {
     ui->setupUi(this);
-    loadLoginParam();
+
+    // loadLoginParam();
 }
 
 Login::~Login()
@@ -262,7 +263,8 @@ void Login::on_pushButton_renewal_btn_clicked()
 
 void Login::showEvent(QShowEvent *event)
 {
-    QTimer::singleShot(100,this,SLOT(checkUpdate()));
+    // QTimer::singleShot(100,this,SLOT(checkUpdate()));
+    emit processingFinished();
 }
 
 void Login::checkUpdate()

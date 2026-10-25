@@ -1,85 +1,105 @@
 #include "hardware.h"
+#include "vmp/VMProtectSDK.h"
 
-QString Hardware::getHardwareInfo(const QString &cmd)
+namespace {
+
+// wmic 默认第一行是列名，后面才是取值。输出为空、失败或只有表头时返回空串，避免越界。
+__declspec(noinline) QString firstHardwareValue(const QString &output)
 {
+    VMProtectBegin(__FUNCSIG__);
+    QString result;
+    const QStringList lines = output.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    for (int i = 1; i < lines.size(); ++i) {
+        const QString value = lines.at(i).trimmed();
+        if (!value.isEmpty()) {
+            result = value;
+            break;
+        }
+    }
+    VMProtectEnd();
+    return result;
+}
+
+} // namespace
+
+__declspec(noinline) QString Hardware::getHardwareInfo(const QString &cmd)
+{
+    VMProtectBegin(__FUNCSIG__);
     QProcess process;
     process.start("cmd", QStringList() << "/c" << cmd);
     process.waitForFinished();
 
     QString result = process.readAllStandardOutput().trimmed();
+    VMProtectEnd();
     return result;
 }
 
-QString Hardware::motherboard()
+__declspec(noinline) QString Hardware::motherboard()
 {
-    // return getHardwareInfo("wmic baseboard get serialnumber").split("\n").at(1).trimmed();
-    QString default_motherboard = "88888888";
-    QString output = getHardwareInfo("wmic baseboard get serialnumber");
-
-    // 1. 检查是否为空
-    if (output.isEmpty()) {
-        return default_motherboard;
-    }
-
-    QStringList lines = output.split("\n", Qt::SkipEmptyParts); // Qt 5.14+ 可用，跳过空行
-
-    // 2. 检查行数是否足够 (通常第一行是标题"SerialNumber"，第二行是数据)
-    if (lines.size() < 2) {
-        return default_motherboard;
-    }
-
-    // 3. 取第二行（索引1）并去除前后空白
-    QString serial = lines.at(1).trimmed();
-
-    // 4. 如果序列号为空，记录日志并返回默认值
-    if (serial.isEmpty()) {
-        return default_motherboard;
-    }
-
-    return serial;
+    VMProtectBegin(__FUNCSIG__);
+    const QString value = firstHardwareValue(getHardwareInfo("wmic baseboard get serialnumber"));
+    VMProtectEnd();
+    return value;
 }
 
-QString Hardware::cpu()
+__declspec(noinline) QString Hardware::cpu()
 {
-    QString default_cpu = "666666";
-    // return getHardwareInfo("wmic cpu get processorid").split("\n").at(1).trimmed();
-    QString output = getHardwareInfo("wmic cpu get processorid");
-
-    // 1. 检查是否为空
-    if (output.isEmpty()) {
-        return default_cpu;
-    }
-
-    QStringList lines = output.split("\n", Qt::SkipEmptyParts); // Qt 5.14+ 可用，跳过空行
-
-    // 2. 检查行数是否足够 (通常第一行是标题"SerialNumber"，第二行是数据)
-    if (lines.size() < 2) {
-        return default_cpu;
-    }
-
-    // 3. 取第二行（索引1）并去除前后空白
-    QString serial = lines.at(1).trimmed();
-
-    // 4. 如果序列号为空，记录日志并返回默认值
-    if (serial.isEmpty()) {
-        return default_cpu;
-    }
-
-    return serial;
+    VMProtectBegin(__FUNCSIG__);
+    const QString value = firstHardwareValue(getHardwareInfo("wmic cpu get processorid"));
+    VMProtectEnd();
+    return value;
 }
 
-QString Hardware::sha256(const QString &input)
+__declspec(noinline) QString Hardware::disk()
 {
+    VMProtectBegin(__FUNCSIG__);
+    const QString value = firstHardwareValue(getHardwareInfo("wmic diskdrive get serialnumber"));
+    VMProtectEnd();
+    return value;
+}
+
+__declspec(noinline) QString Hardware::sha256(const QString &input)
+{
+    VMProtectBegin(__FUNCSIG__);
     QByteArray byteArray = input.toUtf8();
     QByteArray hash = QCryptographicHash::hash(byteArray, QCryptographicHash::Sha256);
-    return hash.toHex();
+    const QString hex = hash.toHex();
+    VMProtectEnd();
+    return hex;
 }
 
-QString Hardware::generateMachineCode()
-{
-    // 拼接序列号
-    QString combined = cpu() + motherboard();
+namespace {
 
-    // 计算哈希值
-    return sha256(combined);
+struct DeviceIdentity
+{
+    QString cpu;
+    QString motherboard;
+    QString disk;
+    QString machineCode;
+};
+
+__declspec(noinline) DeviceIdentity readDeviceIdentity()
+{
+    VMProtectBegin(__FUNCSIG__);
+    DeviceIdentity id;
+    id.motherboard = Hardware::motherboard();
+    id.cpu = Hardware::cpu();
+    id.disk = Hardware::disk();
+
+    QString uuid = id.motherboard + QStringLiteral("LOL") + id.cpu + QStringLiteral("LOL") + id.disk;
+    if (uuid.isEmpty())
+        uuid = QStringLiteral("123456");
+    id.machineCode = Hardware::sha256(uuid);
+    VMProtectEnd();
+    return id;
+}
+
+} // namespace
+
+__declspec(noinline) QString Hardware::generateMachineCode()
+{
+    VMProtectBegin(__FUNCSIG__);
+    const QString code = readDeviceIdentity().machineCode;
+    VMProtectEnd();
+    return code;
 }

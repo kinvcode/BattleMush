@@ -36,6 +36,17 @@
 
 using namespace Mem;
 
+// BUFF代碼, buff名稱。后续在此追加成员即可。
+struct BuffOption {
+    const char* code;
+    const char* name;
+};
+
+static const BuffOption kBuffList[] = {
+    {"SB2001002", "魔心防禦"},
+    {"SB9920003", "魔力護盾"},
+};
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -184,6 +195,23 @@ void MainWindow::initCompomentUI()
 
     ui->comboBox_potion_hp_buy_type->blockSignals(false);
     ui->comboBox_potion_mp_buy_type->blockSignals(false);
+
+    // BUFF绑定
+    QComboBox* buffCombos[] = {
+        ui->comboBox_buff1_bind,
+        ui->comboBox_buff2_bind,
+        ui->comboBox_buff3_bind,
+        ui->comboBox_buff4_bind,
+        ui->comboBox_buff5_bind,
+    };
+    for (QComboBox* combo : buffCombos) {
+        combo->blockSignals(true);
+        combo->clear();
+        for (const BuffOption& buff : kBuffList) {
+            combo->addItem(QString(buff.name), QString(buff.code));
+        }
+        combo->blockSignals(false);
+    }
 
     // 禁用的组件
     ui->checkBox_atk_switch_skill2->setDisabled(true);
@@ -395,6 +423,28 @@ void MainWindow::initConfig()
     ui->checkBox_pickup_forceatk->setChecked(Gconfig.getValue("pickup/forceatk").toBool());
     ui->checkBox_pickup_onlymyplat->blockSignals(false);
     ui->checkBox_pickup_forceatk->blockSignals(false);
+
+    // BUFF绑定
+    QComboBox* buffCombos[] = {
+        ui->comboBox_buff1_bind,
+        ui->comboBox_buff2_bind,
+        ui->comboBox_buff3_bind,
+        ui->comboBox_buff4_bind,
+        ui->comboBox_buff5_bind,
+    };
+    const char* buffKeys[] = {
+        "buff_bind/buff1",
+        "buff_bind/buff2",
+        "buff_bind/buff3",
+        "buff_bind/buff4",
+        "buff_bind/buff5",
+    };
+    for (int i = 0; i < 5; ++i) {
+        buffCombos[i]->blockSignals(true);
+        const QString code = Gconfig.getValue(buffKeys[i]).toString();
+        buffCombos[i]->setCurrentIndex(buffCombos[i]->findData(code));
+        buffCombos[i]->blockSignals(false);
+    }
 }
 
 void MainWindow::initDir()
@@ -2049,5 +2099,90 @@ void MainWindow::on_checkBox_pickup_forceatk_stateChanged(int arg1)
         showNotice("拾取强制攻击已关闭");
         Gconfig.setValue("pickup/forceatk", false);
     }
+}
+
+
+void MainWindow::on_comboBox_buff1_bind_activated(int index)
+{
+    if (index < 0 || index >= ui->comboBox_buff1_bind->count()) {
+        return;
+    }
+
+    const QString code = ui->comboBox_buff1_bind->itemData(index).toString();
+    const QString name = ui->comboBox_buff1_bind->itemText(index);
+    if (code.isEmpty()) {
+        return;
+    }
+
+    Gconfig.setValue("buff_bind/buff1", code);
+    showNotice(QString("BUFF技能1已绑定：%1").arg(name));
+}
+
+
+void MainWindow::on_comboBox_buff2_bind_activated(int index)
+{
+    if (index < 0 || index >= ui->comboBox_buff2_bind->count()) {
+        return;
+    }
+
+    const QString code = ui->comboBox_buff2_bind->itemData(index).toString();
+    const QString name = ui->comboBox_buff2_bind->itemText(index);
+    if (code.isEmpty()) {
+        return;
+    }
+
+    Gconfig.setValue("buff_bind/buff2", code);
+    showNotice(QString("BUFF技能2已绑定：%1").arg(name));
+}
+
+
+void MainWindow::on_comboBox_buff3_bind_activated(int index)
+{
+    if (index < 0 || index >= ui->comboBox_buff3_bind->count()) {
+        return;
+    }
+
+    const QString code = ui->comboBox_buff3_bind->itemData(index).toString();
+    const QString name = ui->comboBox_buff3_bind->itemText(index);
+    if (code.isEmpty()) {
+        return;
+    }
+
+    Gconfig.setValue("buff_bind/buff3", code);
+    showNotice(QString("BUFF技能3已绑定：%1").arg(name));
+}
+
+
+void MainWindow::on_comboBox_buff4_bind_activated(int index)
+{
+    if (index < 0 || index >= ui->comboBox_buff4_bind->count()) {
+        return;
+    }
+
+    const QString code = ui->comboBox_buff4_bind->itemData(index).toString();
+    const QString name = ui->comboBox_buff4_bind->itemText(index);
+    if (code.isEmpty()) {
+        return;
+    }
+
+    Gconfig.setValue("buff_bind/buff4", code);
+    showNotice(QString("BUFF技能4已绑定：%1").arg(name));
+}
+
+
+void MainWindow::on_comboBox_buff5_bind_activated(int index)
+{
+    if (index < 0 || index >= ui->comboBox_buff5_bind->count()) {
+        return;
+    }
+
+    const QString code = ui->comboBox_buff5_bind->itemData(index).toString();
+    const QString name = ui->comboBox_buff5_bind->itemText(index);
+    if (code.isEmpty()) {
+        return;
+    }
+
+    Gconfig.setValue("buff_bind/buff5", code);
+    showNotice(QString("BUFF技能5已绑定：%1").arg(name));
 }
 

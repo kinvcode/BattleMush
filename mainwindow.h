@@ -210,6 +210,16 @@ private slots:
 
     void on_checkBox_pickup_forceatk_stateChanged(int arg1);
 
+    void on_comboBox_buff1_bind_activated(int index);
+
+    void on_comboBox_buff2_bind_activated(int index);
+
+    void on_comboBox_buff3_bind_activated(int index);
+
+    void on_comboBox_buff4_bind_activated(int index);
+
+    void on_comboBox_buff5_bind_activated(int index);
+
 public slots:
     void console(QString msg);
     void warning(QString msg);

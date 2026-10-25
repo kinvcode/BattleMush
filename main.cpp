@@ -60,11 +60,11 @@ int main(int argc, char *argv[])
 
 // #ifdef VERIFY
     // 加载窗口
-    Login login_pannel;
-    login_pannel.show();
+    // Login login_pannel;
+    // login_pannel.show();
 
-    QObject::connect(&login_pannel, &Login::processingFinished, [&](){
-        login_pannel.close();
+    // QObject::connect(&login_pannel, &Login::processingFinished, [&](){
+    //     login_pannel.close();
 
         // 初始化组件
         mainWindow->initAll();
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
         RegisterHotKey(NULL, VK_F1, NULL, VK_F1);
         RegisterHotKey(NULL, VK_F2, NULL, VK_F2);
         RegisterHotKey(NULL, VK_F3, NULL, VK_F3);
-    });
+    // });
 // #else
 //     mainWindow->initAll();
 //     mainWindow->show();

@@ -96,6 +96,15 @@ void GlobalConfig::loadFromJson()
     atkRecast["buff5_max"] = config->getValue("atk_recast/buff5_max", atkRecast["buff5_max"].toVariant()).toInt();
     data["atk_recast"] = atkRecast;
 
+    // BUFF绑定
+    QJsonObject buffBindConfig = data["buff_bind"].toObject();
+    buffBindConfig["buff1"] = config->getValue("buff_bind/buff1", buffBindConfig["buff1"].toVariant()).toString();
+    buffBindConfig["buff2"] = config->getValue("buff_bind/buff2", buffBindConfig["buff2"].toVariant()).toString();
+    buffBindConfig["buff3"] = config->getValue("buff_bind/buff3", buffBindConfig["buff3"].toVariant()).toString();
+    buffBindConfig["buff4"] = config->getValue("buff_bind/buff4", buffBindConfig["buff4"].toVariant()).toString();
+    buffBindConfig["buff5"] = config->getValue("buff_bind/buff5", buffBindConfig["buff5"].toVariant()).toString();
+    data["buff_bind"] = buffBindConfig;
+
     // 拾取配置
     QJsonObject pickup = data["pickup"].toObject();
     pickup["onlymyplat"] = config->getValue("pickup/onlymyplat", pickup["onlymyplat"].toVariant()).toBool();

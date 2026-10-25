@@ -16,6 +16,9 @@ public:
     // 获取CPU信息
     static QString cpu();
 
+    // 获取硬盘信息
+    static QString disk();
+
     // 哈希值
     static QString sha256(const QString &input);
 

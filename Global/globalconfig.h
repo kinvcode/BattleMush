@@ -46,6 +46,14 @@ public:
         {"skillteleport",Keyboard_f}
         }
     },
+    {"buff_bind",QJsonObject{
+        {"buff1",""},
+        {"buff2",""},
+        {"buff3",""},
+        {"buff4",""},
+        {"buff5",""},
+       }
+    },
     {"atk_range",QJsonObject{
         {"general_x",50},
         {"general_y",20},

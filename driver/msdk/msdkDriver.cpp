@@ -129,16 +129,37 @@ bool usePeaceDriver()
     return !Controller::m_msdk_installed;
 }
 
+// 易键鼠静态库在 x64 下会把设备路径指针截成 32 位再交给 strstr。
+// 堆地址一旦超过 4GB（部分机器 ASLR 下很常见），启动就会 AV。
+// 这两个包装函数里不能有 C++ 对象，否则不能使用 __try。
+HANDLE openMsdkPortSEH(int pid)
+{
+    __try {
+        return Ap5isNXMcaWr(pid);
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        return INVALID_HANDLE_VALUE;
+    }
+}
+
+HANDLE openMsdkPortByVidPidSEH(int vid, int pid)
+{
+    __try {
+        return i4dUMV3JPnm1(vid, pid);
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        return INVALID_HANDLE_VALUE;
+    }
+}
+
 }
 
 HANDLE MSDK::Open(int pid)
 {
-    return Ap5isNXMcaWr(pid);
+    return openMsdkPortSEH(pid);
 }
 
 HANDLE MSDK::Open2(int vid,int pid)
 {
-    return i4dUMV3JPnm1(vid,pid);
+    return openMsdkPortByVidPidSEH(vid, pid);
 }
 
 int MSDK::ResolutionUsed(int x, int y)
