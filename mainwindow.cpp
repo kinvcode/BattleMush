@@ -103,10 +103,21 @@ void MainWindow::initAll()
 #endif
 }
 
+namespace {
+MainWindow* g_mainWindow = nullptr;
+}
+
 MainWindow *MainWindow::getInstance()
 {
-    static MainWindow instance;
-    return &instance;
+    if (!g_mainWindow)
+        g_mainWindow = new MainWindow();
+    return g_mainWindow;
+}
+
+void MainWindow::destroyInstance()
+{
+    delete g_mainWindow;
+    g_mainWindow = nullptr;
 }
 
 void MainWindow::on_listWidget_clicked(const QModelIndex &index)
@@ -714,6 +725,9 @@ void MainWindow::warning(QString msg)
 void MainWindow::onApplicationQuit()
 {
     DebugOutput::out("安全关闭程序中... ...");
+
+    if (m_threadManager)
+        m_threadManager->shutdown();
 
     PeaceDriverLoad drv;
     if (drv.driverIsLoaded()) {

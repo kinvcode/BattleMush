@@ -94,7 +94,9 @@ int main(int argc, char *argv[])
     // 启动驱动
     loadDriver();
 
-    return a.exec();
+    const int ret = a.exec();
+    MainWindow::destroyInstance();
+    return ret;
 }
 
 void setStyle(const QString &style) {

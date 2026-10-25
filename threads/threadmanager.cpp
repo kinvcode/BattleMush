@@ -154,6 +154,25 @@ void ThreadManager::stopAll()
     }
 }
 
+void ThreadManager::shutdown()
+{
+    QList<int> ids;
+    {
+        QMutexLocker locker(&m_mutex);
+        ids = m_threads.keys();
+    }
+
+    for (int id : ids)
+        stopThread(id);
+
+    QMutexLocker locker(&m_mutex);
+    for (int id : ids) {
+        if (m_threads.contains(id))
+            cleanupThread(id);
+    }
+    m_threads.clear();
+}
+
 void ThreadManager::pauseAll()
 {
     QMutexLocker locker(&m_mutex);

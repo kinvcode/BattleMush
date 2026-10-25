@@ -11,8 +11,8 @@ private:
     GlobalPlayer() = default;
 public:
     static GlobalPlayer* instance() {
-        static GlobalPlayer instance;
-        return &instance;
+        static GlobalPlayer* object = new GlobalPlayer();
+        return object;
     }
 
     // 警报

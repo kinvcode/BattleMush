@@ -34,6 +34,8 @@ public:
 
     // 停止所有线程
     void stopAll();
+    // 退出前停止并等待工作线程结束
+    void shutdown();
 
     // 暂停所有线程
     void pauseAll();

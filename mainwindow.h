@@ -27,6 +27,7 @@ public:
     ThreadManager* m_threadManager;
     QPointer<AlertWindow> m_alert;  // 警报组件指针
     static MainWindow* getInstance();  // 单例模式
+    static void destroyInstance();
 private:
     Ui::MainWindow *ui;
     LogViewer* logger = nullptr;

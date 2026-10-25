@@ -15,8 +15,8 @@ private:
     Controller() = default;
 public:
     static Controller* instance() {
-        static Controller instance;
-        return &instance;
+        static Controller* object = new Controller();
+        return object;
     }
 
 // ====== 成员属性 ======

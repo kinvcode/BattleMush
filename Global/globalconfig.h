@@ -94,8 +94,8 @@ public:
     GlobalConfig();
 
     static GlobalConfig* instance() {
-        static GlobalConfig instance;
-        return &instance;
+        static GlobalConfig* object = new GlobalConfig();
+        return object;
     }
 public:
     void loadFromJson();
