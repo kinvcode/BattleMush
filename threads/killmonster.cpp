@@ -586,8 +586,9 @@ bool KillMonster::showRealtimeMap()
     cv::Mat copy = src.clone();
     QImage view(copy.data, copy.cols, copy.rows, static_cast<int>(copy.step), QImage::Format_RGB888);
     const QImage image = view.copy();
-    QMetaObject::invokeMethod(MainWindow::getInstance(), [image]() {
-        MainWindow::getInstance()->showRealtimeMap(image);
+    const cv::Point pos = userPos();
+    QMetaObject::invokeMethod(MainWindow::getInstance(), [image, pos]() {
+        MainWindow::getInstance()->showRealtimeMap(image, pos.x, pos.y);
     }, Qt::QueuedConnection);
     return true;
 }

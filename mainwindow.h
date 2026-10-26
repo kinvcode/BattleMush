@@ -235,13 +235,12 @@ signals:
 public:
     void updateTaskMonitor(const TaskInfo &task);
     void clearRealtimeMap();
-    void showRealtimeMap(const QImage& image);
+    void showRealtimeMap(const QImage& image, int mapX, int mapY);
     void updateRealtimeMapUser(int mapX, int mapY);
 private:
-    QPixmap m_realtimeMapBase;
-    double m_realtimeMapScale = 1.0;
-    int m_realtimeMapOffsetX = 0;
-    int m_realtimeMapOffsetY = 0;
+    void renderRealtimeMapView(int mapX, int mapY);
+
+    QImage m_realtimeMapImage;
 
     void refreshTable();
     void deletePlanRow(int row);
