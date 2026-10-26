@@ -10,6 +10,9 @@
 #include "global/globalconfig.h"
 #include "global/controller.h"
 #include "driver/msdk/msdkDriver.h"
+#include "mainwindow.h"
+#include <QAtomicInt>
+#include <QMetaObject>
 
 using namespace Mem;
 
@@ -68,6 +71,7 @@ bool WalkBase::run()
     MSDK::KeyDown(direction_x);
 
     while(true){
+        paintUser();
 
         if (begin_timer.elapsed() > m_walk_timeout) {
             DebugOutput::out("寻路超时~");
@@ -160,6 +164,7 @@ bool WalkBase::runY()
     MSDK::KeyDown(direction_y);
 
     while(true){
+        paintUser();
 
         if (begin_timer.elapsed() > m_walk_timeout) {
             DebugOutput::out("寻路超时~");
@@ -257,6 +262,7 @@ void WalkBase::clearMonster(const Monster &monster)
     }
 
     while(true){
+        paintUser();
 
         int cur_time = begin_timer.elapsed();
         if (cur_time > m_walk_timeout) {
@@ -401,6 +407,7 @@ bool WalkBase::moveToItem()
     }
 
     while(true){
+        paintUser();
 
         if(Gplayer.mousecheck_exists){
             DebugOutput::out("出现滑鼠验证，退出寻路");
@@ -576,6 +583,7 @@ bool WalkBase::moveToArea(cv::Point range, bool self_climb)
     }
 
     while(true){
+        paintUser();
         // qDebug() << "坐标：" << user_pos;
         if(Gplayer.mousecheck_exists){
             DebugOutput::out("出现滑鼠验证，退出寻路");
@@ -789,6 +797,7 @@ bool WalkBase::moveToPlatform(int platform,cv::Point range, bool self_climb)
     }
 
     while(true){
+        paintUser();
 
         if(Gplayer.mousecheck_exists){
             DebugOutput::out("出现滑鼠验证，退出寻路");
@@ -957,6 +966,38 @@ cv::Point WalkBase::getUserPos()
     pos.x = RoomMap::toMapPosX(user_x,Gplayer.curmapinfo.map_bounding.x_offset);
     pos.y = RoomMap::toMapPosY(user_y,Gplayer.curmapinfo.map_bounding.y_offset, Gplayer.curmapinfo.map_bounding.height);
     return pos;
+}
+
+void WalkBase::paintUser()
+{
+    static QElapsedTimer frameTimer;
+    static bool frameTimerStarted = false;
+    static QAtomicInt framePending(0);
+
+    if(!frameTimerStarted){
+        frameTimer.start();
+        frameTimerStarted = true;
+    }
+    if(frameTimer.elapsed() < 33 || framePending.loadAcquire() != 0){
+        return;
+    }
+    if(!Gplayer.m_map_loaded || Gplayer.curmapinfo.map_mat.empty()){
+        return;
+    }
+
+    const cv::Point pos = getUserPos();
+    if(pos.x < 0 || pos.y < 0){
+        return;
+    }
+
+    frameTimer.restart();
+    framePending.storeRelease(1);
+    const int mapX = pos.x;
+    const int mapY = pos.y;
+    QMetaObject::invokeMethod(MainWindow::getInstance(), [mapX, mapY]() {
+        MainWindow::getInstance()->updateRealtimeMapUser(mapX, mapY);
+        framePending.storeRelease(0);
+    }, Qt::QueuedConnection);
 }
 
 void WalkBase::clearXkey()

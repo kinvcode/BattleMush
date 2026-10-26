@@ -49,6 +49,8 @@ private:
 
     void clearYkey();
 
+    void paintUser();
+
     bool isAttaking();
 
     bool isFaceLeft();

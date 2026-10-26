@@ -23,6 +23,7 @@
 #include "widgets/alertwindow.h"
 #include <QGraphicsScene>
 #include <QPainter>
+#include <QFont>
 #include "widgets/taskeditdialog.h"
 #include "utils/data.h"
 #include "utils/mousetrack.h"
@@ -807,6 +808,10 @@ void MainWindow::updateCompoment(bool status)
 
 void MainWindow::clearRealtimeMap()
 {
+    m_realtimeMapBase = QPixmap();
+    m_realtimeMapScale = 1.0;
+    m_realtimeMapOffsetX = 0;
+    m_realtimeMapOffsetY = 0;
     QPixmap canvas(ui->label_realtime_map->size());
     canvas.fill(Qt::black);
     ui->label_realtime_map->setPixmap(canvas);
@@ -814,18 +819,41 @@ void MainWindow::clearRealtimeMap()
 
 void MainWindow::showRealtimeMap(const QImage& image)
 {
-    if(image.isNull() || ui->label_realtime_map->size().isEmpty()){
+    if(image.isNull() || ui->label_realtime_map->size().isEmpty() || image.width() <= 0 || image.height() <= 0){
         return;
     }
 
-    QPixmap canvas(ui->label_realtime_map->size());
+    const QSize labelSize = ui->label_realtime_map->size();
+    m_realtimeMapScale = qMin(double(labelSize.width()) / image.width(),
+                              double(labelSize.height()) / image.height());
+    const int mapWidth = qMax(1, int(image.width() * m_realtimeMapScale));
+    const int mapHeight = qMax(1, int(image.height() * m_realtimeMapScale));
+    m_realtimeMapOffsetX = (labelSize.width() - mapWidth) / 2;
+    m_realtimeMapOffsetY = (labelSize.height() - mapHeight) / 2;
+
+    QPixmap canvas(labelSize);
     canvas.fill(Qt::black);
     const QPixmap map = QPixmap::fromImage(image).scaled(
-        canvas.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        mapWidth, mapHeight, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     QPainter painter(&canvas);
-    painter.drawPixmap((canvas.width() - map.width()) / 2,
-                       (canvas.height() - map.height()) / 2,
-                       map);
+    painter.drawPixmap(m_realtimeMapOffsetX, m_realtimeMapOffsetY, map);
+    m_realtimeMapBase = canvas;
+    ui->label_realtime_map->setPixmap(canvas);
+}
+
+void MainWindow::updateRealtimeMapUser(int mapX, int mapY)
+{
+    if(m_realtimeMapBase.isNull()){
+        return;
+    }
+
+    QPixmap canvas = m_realtimeMapBase;
+    const int x = m_realtimeMapOffsetX + int(mapX * m_realtimeMapScale);
+    const int y = m_realtimeMapOffsetY + int(mapY * m_realtimeMapScale);
+    QPainter painter(&canvas);
+    QFont font(QStringLiteral("Segoe UI Emoji"), 14);
+    painter.setFont(font);
+    painter.drawText(QRect(x - 14, y - 22, 28, 28), Qt::AlignCenter, QStringLiteral("🧙"));
     ui->label_realtime_map->setPixmap(canvas);
 }
 

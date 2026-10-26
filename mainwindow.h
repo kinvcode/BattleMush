@@ -236,7 +236,13 @@ public:
     void updateTaskMonitor(const TaskInfo &task);
     void clearRealtimeMap();
     void showRealtimeMap(const QImage& image);
+    void updateRealtimeMapUser(int mapX, int mapY);
 private:
+    QPixmap m_realtimeMapBase;
+    double m_realtimeMapScale = 1.0;
+    int m_realtimeMapOffsetX = 0;
+    int m_realtimeMapOffsetY = 0;
+
     void refreshTable();
     void deletePlanRow(int row);
     void editPlanRow(int row);
