@@ -318,31 +318,19 @@ bool MovePlatform::walkRight(cv::Point range, int platform)
 
 bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool self_climb)
 {
-    int jump_key = Gplayer.m_bindkey.jump;
-
     WalkBase walk_to_platform(0);
     if(!is_climb && range.y - range.x > 15){
         range.y = range.x + 15;
     }
-    bool arrived = walk_to_platform.moveToArea(range, self_climb); // 走到范围
+    const AreaAction action = is_climb ? AreaAction::JumpLeftClimb : AreaAction::JumpLeft;
+    bool arrived = walk_to_platform.moveToArea(range, self_climb, action);
     if(!arrived) {
         qDebug() << "到达区域失败，取消向左跳跃";
         return false;
     }
 
-    qDebug() << "延迟后向左跳跃";
-    ProcessHelper::programDelay(250);
-    ProcessHelper::programDelay(1500);
-    QApplication::processEvents();
-
-    // 这时候读人物的坐标
     if(is_climb){
         qDebug() << "向左跳跃到攀爬物体";
-        // 到达地点之后进行跳跃操作
-        MSDK::KeyDown(Keyboard_LeftArrow);
-        MSDK::keyPress(jump_key,1);
-        MSDK::KeyDown(Keyboard_UpArrow);
-
         quint64 foothold_p = getUserFootholdP();
         quint64 climb_p = getUserClimbP();
         QElapsedTimer check_time;
@@ -368,10 +356,6 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
         qDebug() << "没到达指定攀爬物";
     }else{
         qDebug() << "向左跳跃到地板";
-        // 到达地点之后进行跳跃操作
-        MSDK::KeyDown(Keyboard_LeftArrow);
-        MSDK::keyPress(jump_key,1);
-
         quint64 foothold_p = getUserFootholdP();
         QElapsedTimer check_time;
         check_time.start();
@@ -399,28 +383,15 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
 
 bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool self_climb)
 {
-    int jump_key = Gplayer.m_bindkey.jump;
-
     WalkBase walk_to_platform(0);
-    // qDebug() << "移动到范围:" << range.x << "," << range.y;
     if(!is_climb && range.y - range.x > 15){
         range.x = range.y - 15;
     }
-    bool arrived = walk_to_platform.moveToArea(range, self_climb); // 走到范围
+    const AreaAction action = is_climb ? AreaAction::JumpRightClimb : AreaAction::JumpRight;
+    bool arrived = walk_to_platform.moveToArea(range, self_climb, action);
     if(!arrived) return false;
 
-    qDebug() << "延迟后向右跳跃";
-    ProcessHelper::programDelay(250);
-    QApplication::processEvents();
-
-    // 这时候读人物的坐标
     if(is_climb){
-        // 到达地点之后进行跳跃操作
-        // qDebug() << "向右跳跃";
-        MSDK::KeyDown(Keyboard_RightArrow);
-        MSDK::KeyDown(Keyboard_UpArrow);
-        MSDK::keyPress(jump_key,1);
-
         quint64 foothold_p = getUserFootholdP();
         quint64 climb_p = getUserClimbP();
         QElapsedTimer check_time;
@@ -444,10 +415,6 @@ bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool 
             return true;
         }
     }else{
-        // 到达地点之后进行跳跃操作
-        MSDK::KeyDown(Keyboard_RightArrow);
-        MSDK::keyPress(jump_key,1);
-
         quint64 foothold_p = getUserFootholdP();
         QElapsedTimer check_time;
         check_time.start();
@@ -473,21 +440,12 @@ bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool 
 
 bool MovePlatform::jumpUP(cv::Point range, int platform, bool is_climb)
 {
-    int jump_key = Gplayer.m_bindkey.jump;
-
     WalkBase walk_to_platform(0);
-    bool arrived = walk_to_platform.moveToArea(range); // 走到范围
+    const AreaAction action = is_climb ? AreaAction::JumpClimb : AreaAction::Jump;
+    bool arrived = walk_to_platform.moveToArea(range, false, action);
     if(!arrived) return false;
-    // 这时候读人物的坐标
+
     if(is_climb){
-        qDebug() << "延迟后跳跃";
-        ProcessHelper::programDelay(250);
-        QApplication::processEvents();
-
-        // 到达地点之后进行跳跃操作
-        MSDK::KeyDown(Keyboard_UpArrow);
-        MSDK::keyPress(jump_key,1);
-
         quint64 foothold_p = getUserFootholdP();
         quint64 climb_p = getUserClimbP();
         QElapsedTimer check_time;
@@ -510,12 +468,6 @@ bool MovePlatform::jumpUP(cv::Point range, int platform, bool is_climb)
             return true;
         }
     }else{
-        ProcessHelper::programDelay(250);
-        QApplication::processEvents();
-
-        // 到达地点之后进行跳跃操作
-        MSDK::keyPress(jump_key,1);
-
         quint64 foothold_p = getUserFootholdP();
         QElapsedTimer check_time;
         check_time.start();
@@ -539,19 +491,9 @@ bool MovePlatform::jumpUP(cv::Point range, int platform, bool is_climb)
 
 bool MovePlatform::jumpDown(cv::Point range, int platform)
 {
-    int jump_key = Gplayer.m_bindkey.jump;
-
     WalkBase walk_to_platform(0);
-    bool arrived = walk_to_platform.moveToArea(range); // 走到范围
+    bool arrived = walk_to_platform.moveToArea(range, false, AreaAction::JumpDown);
     if(!arrived) return false;
-
-    ProcessHelper::programDelay(250);
-    QApplication::processEvents();
-
-    // 到达地点之后进行跳跃操作
-    MSDK::KeyDown(Keyboard_DownArrow);
-    MSDK::keyPress(jump_key,1);
-    MSDK::KeyUp(Keyboard_DownArrow);
 
     quint64 foothold_p = getUserFootholdP();
     QElapsedTimer check_time;
@@ -606,15 +548,8 @@ bool MovePlatform::up(cv::Point range, int platform, bool self_climb)
 
     }else{
         WalkBase walk_to_platform(0);
-        bool arrived = walk_to_platform.moveToArea(range, self_climb); // 走到范围
+        bool arrived = walk_to_platform.moveToArea(range, self_climb, AreaAction::Up);
         if(!arrived) return false;
-
-        qDebug() << "延迟后向上攀爬";
-        ProcessHelper::programDelay(250);
-        QApplication::processEvents();
-
-        // 到达地点之后按上键
-        MSDK::keyPress(Keyboard_UpArrow,1);
 
         ProcessHelper::programDelay(100);
         quint64 climb_p = getUserClimbP();
@@ -665,11 +600,8 @@ bool MovePlatform::down(cv::Point range, int platform, bool self_climb)
         }
     }else{
         WalkBase walk_to_platform(0);
-        bool arrived = walk_to_platform.moveToArea(range, self_climb); // 走到范围
+        bool arrived = walk_to_platform.moveToArea(range, self_climb, AreaAction::Down);
         if(!arrived) return false;
-
-        // 到达地点之后按下方向键
-        MSDK::keyPress(Keyboard_DownArrow,1);
 
         ProcessHelper::programDelay(100);
         quint64 climb_p = getUserClimbP();
@@ -694,11 +626,8 @@ bool MovePlatform::down(cv::Point range, int platform, bool self_climb)
 bool MovePlatform::teleport(cv::Point range, int platform)
 {
     WalkBase walk_to_platform(0);
-    bool arrived = walk_to_platform.moveToArea(range); // 走到范围
+    bool arrived = walk_to_platform.moveToArea(range, false, AreaAction::Teleport);
     if(!arrived) return false;
-
-    // 到达地点之后按向上方向键
-    MSDK::keyPress(Keyboard_UpArrow,1);
 
     ProcessHelper::programDelay(100);
 

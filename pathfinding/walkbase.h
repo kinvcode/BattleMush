@@ -3,6 +3,21 @@
 
 #include "global/struct.h"
 
+// 走进范围的同一时刻执行。None 只表示走到范围。
+enum class AreaAction {
+    None,
+    Jump,
+    JumpClimb,
+    JumpLeft,
+    JumpLeftClimb,
+    JumpRight,
+    JumpRightClimb,
+    JumpDown,
+    Up,
+    Down,
+    Teleport
+};
+
 class WalkBase
 {
 public:
@@ -26,7 +41,8 @@ public:
 
     bool moveToItem();
 
-    bool moveToArea(cv::Point range, bool self_climb = false);
+    // action 不为 None 时，坐标进入范围后立刻按键，中间不再等待。
+    bool moveToArea(cv::Point range, bool self_climb = false, AreaAction action = AreaAction::None);
 
     bool moveToPlatform(int platform,cv::Point range, bool self_climb = false);
 
@@ -51,6 +67,8 @@ private:
     void clearXkey();
 
     void clearYkey();
+
+    void performAreaAction(AreaAction action);
 
     bool isAttaking();
 

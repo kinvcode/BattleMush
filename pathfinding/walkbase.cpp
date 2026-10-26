@@ -496,7 +496,62 @@ bool WalkBase::moveToItem()
     return false;
 }
 
-bool WalkBase::moveToArea(cv::Point range, bool self_climb)
+void WalkBase::performAreaAction(AreaAction action)
+{
+    const int jumpKey = Gplayer.m_bindkey.jump;
+    switch(action){
+    case AreaAction::None:
+        break;
+    case AreaAction::Jump:
+        clearXkey();
+        MSDK::keyPress(jumpKey, 1);
+        break;
+    case AreaAction::JumpClimb:
+        clearXkey();
+        MSDK::KeyDown(Keyboard_UpArrow);
+        MSDK::keyPress(jumpKey, 1);
+        break;
+    case AreaAction::JumpLeft:
+        MSDK::KeyUp(Keyboard_RightArrow);
+        MSDK::KeyDown(Keyboard_LeftArrow);
+        MSDK::keyPress(jumpKey, 1);
+        break;
+    case AreaAction::JumpLeftClimb:
+        MSDK::KeyUp(Keyboard_RightArrow);
+        MSDK::KeyDown(Keyboard_LeftArrow);
+        MSDK::keyPress(jumpKey, 1);
+        MSDK::KeyDown(Keyboard_UpArrow);
+        break;
+    case AreaAction::JumpRight:
+        MSDK::KeyUp(Keyboard_LeftArrow);
+        MSDK::KeyDown(Keyboard_RightArrow);
+        MSDK::keyPress(jumpKey, 1);
+        break;
+    case AreaAction::JumpRightClimb:
+        MSDK::KeyUp(Keyboard_LeftArrow);
+        MSDK::KeyDown(Keyboard_RightArrow);
+        MSDK::KeyDown(Keyboard_UpArrow);
+        MSDK::keyPress(jumpKey, 1);
+        break;
+    case AreaAction::JumpDown:
+        clearXkey();
+        MSDK::KeyDown(Keyboard_DownArrow);
+        MSDK::keyPress(jumpKey, 1);
+        MSDK::KeyUp(Keyboard_DownArrow);
+        break;
+    case AreaAction::Up:
+    case AreaAction::Teleport:
+        clearXkey();
+        MSDK::keyPress(Keyboard_UpArrow, 1);
+        break;
+    case AreaAction::Down:
+        clearXkey();
+        MSDK::keyPress(Keyboard_DownArrow, 1);
+        break;
+    }
+}
+
+bool WalkBase::moveToArea(cv::Point range, bool self_climb, AreaAction action)
 {
     m_transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
     Controller::updateAttackInfo();
@@ -514,7 +569,9 @@ bool WalkBase::moveToArea(cv::Point range, bool self_climb)
 
     if(user_pos >= range.x && user_pos <= range.y)
     {
-        // qDebug() << "已在平台连接点范围，无需移动平台连接点~";
+        if(action != AreaAction::None){
+            performAreaAction(action);
+        }
         return true;
     }
 
@@ -615,6 +672,9 @@ bool WalkBase::moveToArea(cv::Point range, bool self_climb)
             if(climb_p == 0){
                 clearYkey();
                 qDebug() << "已经脱离攀爬物体~";
+                if(action != AreaAction::None){
+                    performAreaAction(action);
+                }
                 return true;
             }
         }
@@ -688,6 +748,11 @@ bool WalkBase::moveToArea(cv::Point range, bool self_climb)
         }
 
         if(user_pos >= range.x && user_pos <= range.y) {
+            if(action != AreaAction::None){
+                performAreaAction(action);
+                qDebug() << "已到达指定范围，立即执行动作：" << user_pos;
+                return true;
+            }
             if(self_climb){
                 qDebug() << "到达指定攀爬范围:" << user_pos;
                 clearYkey();
@@ -727,7 +792,6 @@ bool WalkBase::moveToPlatform(int platform,cv::Point range, bool self_climb)
 
     if(user_pos >= range.x && user_pos <= range.y)
     {
-        // qDebug() << "已在平台连接点范围，无需移动平台连接点~";
         return true;
     }
 
