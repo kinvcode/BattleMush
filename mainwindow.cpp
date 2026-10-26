@@ -78,6 +78,7 @@ static const BuffOption kBuffList[] = {
     {"SB9920002", "極速詠唱"},
     {"SB2001002", "魔心防禦"},
     {"SB9920001", "魔法反射"},
+    {"SB9920008", "魔力激發"},
     {"SB9910003", "赤紅鼻子"},
     {"SB1211008", "雷鳴之棍"},
     {"SB1221004", "聖靈之棍"},
@@ -188,6 +189,11 @@ void MainWindow::initCompomentUI()
 
     // 隐藏的组件
     ui->groupBox_7->hide();
+
+    // 实时地图默认黑底
+    ui->label_realtime_map->setText("");
+    ui->label_realtime_map->setAutoFillBackground(true);
+    ui->label_realtime_map->setStyleSheet("background-color: black;");
 
     // 菜单
     ui->listWidget->setProperty("class","leftMenu");

@@ -478,29 +478,9 @@ void MSDK::KeyInputUnicode(QString str)
     if (str.isEmpty())
         return;
 
-    if (usePeaceDriver()) {
-        const std::wstring text = str.toStdWString();
-        PeaceDriver::sendUnicodeStr(text.c_str());
-        return;
-    }
+    const std::wstring text = str.toStdWString();
+    PeaceDriver::sendUnicodeStr(text.c_str());
 
-    QVector<ushort> utf16Vector;
-    utf16Vector.reserve(str.length() + 1);
-
-    const ushort* src = str.utf16();
-    for (int i = 0; i <= str.length(); i++)
-        utf16Vector.append(src[i]);
-
-    int byteLen = utf16Vector.size() * 2;
-    if (byteLen > 512) {
-        int maxChars = 512 / 2;
-        utf16Vector.resize(maxChars);
-        utf16Vector[maxChars - 1] = 0;
-        byteLen = utf16Vector.size() * 2;
-    }
-
-    char* word = reinterpret_cast<char*>(utf16Vector.data());
-    PQn5pR2iK(Controller::m_msdk_handle, word, byteLen);
 }
 
 

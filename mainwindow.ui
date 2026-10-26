@@ -51,7 +51,7 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tab_main">
          <attribute name="title">
@@ -91,7 +91,7 @@
              <x>0</x>
              <y>0</y>
              <width>635</width>
-             <height>399</height>
+             <height>622</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -108,7 +108,7 @@
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>50</height>
+                  <height>80</height>
                  </size>
                 </property>
                 <property name="maximumSize">
@@ -151,7 +151,39 @@
                </widget>
               </item>
               <item>
+               <widget class="QGroupBox" name="groupBox_realtime_map">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>260</height>
+                 </size>
+                </property>
+                <property name="title">
+                 <string>地图监控</string>
+                </property>
+                <widget class="QLabel" name="label_realtime_map">
+                 <property name="geometry">
+                  <rect>
+                   <x>32</x>
+                   <y>54</y>
+                   <width>560</width>
+                   <height>190</height>
+                  </rect>
+                 </property>
+                 <property name="text">
+                  <string>实时地图</string>
+                 </property>
+                </widget>
+               </widget>
+              </item>
+              <item>
                <widget class="QGroupBox" name="groupBox_6">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>250</height>
+                 </size>
+                </property>
                 <property name="title">
                  <string>计划任务监控</string>
                 </property>
@@ -350,7 +382,7 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-771</y>
+             <y>0</y>
              <width>635</width>
              <height>1704</height>
             </rect>
