@@ -190,7 +190,7 @@ void MainWindow::initCompomentUI()
     // ui->pushButton_2->setProperty("class","danger");
 
     // 隐藏的组件
-    ui->groupBox_7->hide();
+    // ui->groupBox_7->hide();
 
     // 实时地图默认黑底
     ui->label_realtime_map->setText("");
