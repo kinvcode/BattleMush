@@ -184,6 +184,8 @@ void KillMonster::process()
             m_currentmap = 0;
             m_allmonster.clear();
             m_realtime_map_shown = false;
+            Gplayer.m_realtime_monsters.clear();
+            Gplayer.m_realtime_items.clear();
             clearRealtimeMap();
             DebugOutput::out("切换了地图");
             DebugOutput::out("首次访问的地图需要计算地图路径，请耐心等待~");
@@ -401,6 +403,14 @@ Item KillMonster::findDropItem()
         target_item.line_id = line_id;
         m_allItem.push_back(target_item);
     }
+
+    Gplayer.m_realtime_items.clear();
+    Gplayer.m_realtime_items.reserve(m_allItem.size());
+    for(const auto& item : m_allItem){
+        Gplayer.m_realtime_items.push_back(item.pos);
+    }
+    WalkBase::paintUser();
+
     // qDebug() << "====== 刷新物品 ======";
 
     if(m_allItem.empty()){
@@ -512,6 +522,13 @@ void KillMonster::updateAllMonsters()
         Monster cur_monster = {entity, foothold_id, line_id, {monster_x, monster_y}};
         m_allmonster.push_back(cur_monster);
     }
+
+    Gplayer.m_realtime_monsters.clear();
+    Gplayer.m_realtime_monsters.reserve(m_allmonster.size());
+    for(const auto& monster : m_allmonster){
+        Gplayer.m_realtime_monsters.push_back(monster.pos);
+    }
+    WalkBase::paintUser();
 }
 
 std::vector<Monster> KillMonster::getLineMonsters(int user_line)

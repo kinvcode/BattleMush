@@ -13,6 +13,8 @@
 #include "mainwindow.h"
 #include <QAtomicInt>
 #include <QMetaObject>
+#include <QVector>
+#include <QPoint>
 
 using namespace Mem;
 
@@ -985,17 +987,29 @@ void WalkBase::paintUser()
         return;
     }
 
-    const cv::Point pos = getUserPos();
-    if(pos.x < 0 || pos.y < 0){
+    quint64 transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
+    const float user_x = readFloat(transform + BASE::TransformComponent::PositionX);
+    const float user_y = readFloat(transform + BASE::TransformComponent::PositionY);
+    const int mapX = RoomMap::toMapPosX(user_x, Gplayer.curmapinfo.map_bounding.x_offset);
+    const int mapY = RoomMap::toMapPosY(user_y, Gplayer.curmapinfo.map_bounding.y_offset, Gplayer.curmapinfo.map_bounding.height);
+    if(mapX < 0 || mapY < 0){
         return;
     }
 
     frameTimer.restart();
     framePending.storeRelease(1);
-    const int mapX = pos.x;
-    const int mapY = pos.y;
-    QMetaObject::invokeMethod(MainWindow::getInstance(), [mapX, mapY]() {
-        MainWindow::getInstance()->updateRealtimeMapUser(mapX, mapY);
+    QVector<QPoint> monsters;
+    QVector<QPoint> items;
+    monsters.reserve(static_cast<int>(Gplayer.m_realtime_monsters.size()));
+    items.reserve(static_cast<int>(Gplayer.m_realtime_items.size()));
+    for(const cv::Point& monster : Gplayer.m_realtime_monsters){
+        monsters.append(QPoint(monster.x, monster.y));
+    }
+    for(const cv::Point& item : Gplayer.m_realtime_items){
+        items.append(QPoint(item.x, item.y));
+    }
+    QMetaObject::invokeMethod(MainWindow::getInstance(), [mapX, mapY, monsters, items]() {
+        MainWindow::getInstance()->updateRealtimeMapUser(mapX, mapY, monsters, items);
         framePending.storeRelease(0);
     }, Qt::QueuedConnection);
 }

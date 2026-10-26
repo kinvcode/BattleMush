@@ -236,9 +236,9 @@ public:
     void updateTaskMonitor(const TaskInfo &task);
     void clearRealtimeMap();
     void showRealtimeMap(const QImage& image, int mapX, int mapY);
-    void updateRealtimeMapUser(int mapX, int mapY);
+    void updateRealtimeMapUser(int mapX, int mapY, const QVector<QPoint>& monsters, const QVector<QPoint>& items);
 private:
-    void renderRealtimeMapView(int mapX, int mapY);
+    void renderRealtimeMapView(int mapX, int mapY, const QVector<QPoint>& monsters, const QVector<QPoint>& items);
 
     QImage m_realtimeMapImage;
 

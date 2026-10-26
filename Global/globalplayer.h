@@ -112,6 +112,10 @@ public:
     // 一些测试数据
     std::vector<std::pair<float, float>> move_pos_list;
 
+    // 实时地图上的怪物和物品坐标
+    std::vector<cv::Point> m_realtime_monsters;
+    std::vector<cv::Point> m_realtime_items;
+
     // 相机属性
     float camera_width = 1296.0f;
     float camera_height = 759.0f;

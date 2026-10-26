@@ -817,15 +817,15 @@ void MainWindow::clearRealtimeMap()
 void MainWindow::showRealtimeMap(const QImage& image, int mapX, int mapY)
 {
     m_realtimeMapImage = image;
-    renderRealtimeMapView(mapX, mapY);
+    renderRealtimeMapView(mapX, mapY, {}, {});
 }
 
-void MainWindow::updateRealtimeMapUser(int mapX, int mapY)
+void MainWindow::updateRealtimeMapUser(int mapX, int mapY, const QVector<QPoint>& monsters, const QVector<QPoint>& items)
 {
-    renderRealtimeMapView(mapX, mapY);
+    renderRealtimeMapView(mapX, mapY, monsters, items);
 }
 
-void MainWindow::renderRealtimeMapView(int mapX, int mapY)
+void MainWindow::renderRealtimeMapView(int mapX, int mapY, const QVector<QPoint>& monsters, const QVector<QPoint>& items)
 {
     const QSize labelSize = ui->label_realtime_map->size();
     if(m_realtimeMapImage.isNull() || labelSize.isEmpty()){
@@ -850,8 +850,21 @@ void MainWindow::renderRealtimeMapView(int mapX, int mapY)
     QPainter painter(&canvas);
     QFont font(QStringLiteral("Segoe UI Emoji"), 14);
     painter.setFont(font);
-    painter.drawText(QRect(viewW / 2 - 14, viewH / 2 - 22, 28, 28),
-                     Qt::AlignCenter, QStringLiteral("🧙"));
+    auto drawMark = [&](int markerX, int markerY, const QString& mark) {
+        const int x = markerX - source.x();
+        const int y = markerY - source.y();
+        if(x < -14 || y < -22 || x > viewW + 14 || y > viewH + 22){
+            return;
+        }
+        painter.drawText(QRect(x - 14, y - 22, 28, 28), Qt::AlignCenter, mark);
+    };
+    for(const QPoint& item : items){
+        drawMark(item.x(), item.y(), QStringLiteral("🎲"));
+    }
+    for(const QPoint& monster : monsters){
+        drawMark(monster.x(), monster.y(), QStringLiteral("👿"));
+    }
+    drawMark(mapX, mapY, QStringLiteral("🧙"));
     ui->label_realtime_map->setPixmap(QPixmap::fromImage(canvas));
 }
 

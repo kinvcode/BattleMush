@@ -32,6 +32,9 @@ public:
 
     bool moveToPortal(cv::Point range);
 
+    // 按30帧把人物、怪物、物品画到实时地图
+    static void paintUser();
+
 private:
     quint64 getUserFootholdP();
 
@@ -48,8 +51,6 @@ private:
     void clearXkey();
 
     void clearYkey();
-
-    void paintUser();
 
     bool isAttaking();
 
