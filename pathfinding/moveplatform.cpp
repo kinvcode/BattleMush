@@ -266,6 +266,7 @@ bool MovePlatform::walkLeft(cv::Point range, int platform)
     QElapsedTimer check_time;
     check_time.start();
     while(foothold_p == 0){
+        WalkBase::paintUser();
         ProcessHelper::programDelay(50);
         QApplication::processEvents();
         foothold_p = getUserFootholdP();
@@ -295,6 +296,7 @@ bool MovePlatform::walkRight(cv::Point range, int platform)
     QElapsedTimer check_time;
     check_time.start();
     while(foothold_p == 0){
+        WalkBase::paintUser();
         ProcessHelper::programDelay(50);
         QApplication::processEvents();
         foothold_p = getUserFootholdP();
@@ -346,6 +348,7 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
         QElapsedTimer check_time;
         check_time.start();
         while(climb_p == 0 && foothold_p == 0){
+            WalkBase::paintUser();
             ProcessHelper::programDelay(10);
             QApplication::processEvents();
             climb_p = getUserClimbP();
@@ -373,6 +376,7 @@ bool MovePlatform::jumpLeft(cv::Point range, int platform, bool is_climb, bool s
         QElapsedTimer check_time;
         check_time.start();
         while(foothold_p == 0){
+            WalkBase::paintUser();
             ProcessHelper::programDelay(50);
             QApplication::processEvents();
             foothold_p = getUserFootholdP();
@@ -422,6 +426,7 @@ bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool 
         QElapsedTimer check_time;
         check_time.start();
         while(climb_p == 0 && foothold_p == 0){
+            WalkBase::paintUser();
             ProcessHelper::programDelay(10);
             QApplication::processEvents();
             climb_p = getUserClimbP();
@@ -447,6 +452,7 @@ bool MovePlatform::jumpRight(cv::Point range, int platform, bool is_climb, bool 
         QElapsedTimer check_time;
         check_time.start();
         while(foothold_p == 0){
+            WalkBase::paintUser();
             ProcessHelper::programDelay(50);
             QApplication::processEvents();
             foothold_p = getUserFootholdP();
@@ -487,6 +493,7 @@ bool MovePlatform::jumpUP(cv::Point range, int platform, bool is_climb)
         QElapsedTimer check_time;
         check_time.start();
         while(climb_p == 0 && foothold_p == 0){
+            WalkBase::paintUser();
             ProcessHelper::programDelay(10);
             QApplication::processEvents();
             climb_p = getUserClimbP();
@@ -513,6 +520,7 @@ bool MovePlatform::jumpUP(cv::Point range, int platform, bool is_climb)
         QElapsedTimer check_time;
         check_time.start();
         while(foothold_p == 0){
+            WalkBase::paintUser();
             ProcessHelper::programDelay(50);
             QApplication::processEvents();
             foothold_p = getUserFootholdP();
@@ -549,6 +557,7 @@ bool MovePlatform::jumpDown(cv::Point range, int platform)
     QElapsedTimer check_time;
     check_time.start();
     while(foothold_p == 0){
+        WalkBase::paintUser();
         if(getUserClimbP() != 0){
             break;
         }
@@ -579,6 +588,7 @@ bool MovePlatform::up(cv::Point range, int platform, bool self_climb)
         QElapsedTimer check_time;
         check_time.start();
         while(foothold_p == 0 && climb_p != 0){
+            WalkBase::paintUser();
             ProcessHelper::programDelay(50);
             QApplication::processEvents();
             climb_p = getUserClimbP();
@@ -638,6 +648,7 @@ bool MovePlatform::down(cv::Point range, int platform, bool self_climb)
         QElapsedTimer check_time;
         check_time.start();
         while(foothold_p == 0 && climb_p != 0){
+            WalkBase::paintUser();
             ProcessHelper::programDelay(50);
             QApplication::processEvents();
             climb_p = getUserClimbP();
@@ -695,6 +706,7 @@ bool MovePlatform::teleport(cv::Point range, int platform)
     QElapsedTimer check_time;
     check_time.start();
     while(foothold_p == 0){
+        WalkBase::paintUser();
         if(getUserClimbP() != 0){
             break;
         }

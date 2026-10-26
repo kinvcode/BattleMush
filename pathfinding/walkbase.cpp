@@ -1184,6 +1184,7 @@ void WalkBase::attackMonster(cv::Point user_pos, const Monster &monster)
     // qDebug() << "怪物在攻击范围内，调整方向后攻击";
     // qDebug() << "人物:" << user_pos.x << "," << user_pos.y << " 怪物:" << monster_pos.x << "," << monster_pos.y;
     while(isAttaking()){
+        paintUser();
         ProcessHelper::programDelay(50);
         QApplication::processEvents();
     }
@@ -1214,6 +1215,7 @@ void WalkBase::attackMonster(cv::Point user_pos, const Monster &monster)
 
     // 给一个延迟，防止放空技能
     while(isAttaking()){
+        paintUser();
         ProcessHelper::programDelay(50);
         QApplication::processEvents();
     }
