@@ -72,6 +72,11 @@ private:
     int m_recast_buff3_keycode;
     int m_recast_buff4_keycode;
     int m_recast_buff5_keycode;
+    int m_recast_buff1_comparetime = 0;
+    int m_recast_buff2_comparetime = 0;
+    int m_recast_buff3_comparetime = 0;
+    int m_recast_buff4_comparetime = 0;
+    int m_recast_buff5_comparetime = 0;
 
     // 拾取
     bool m_pickup_onlymyplat = false;

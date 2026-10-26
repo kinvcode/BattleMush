@@ -626,8 +626,24 @@ void KillMonster::skillRecast()
         return;
     }
 
-    // BUFF栏里没有对应图标时才补放。某个技能未绑定或仍在持续时，不影响后面的技能。
-    auto recastBuff = [&](bool enable, const char* configKey, int keycode, const QString& name) -> bool {
+    // BUFF栏里没有对应图标时才补放。到达各自的随机间隔，或还没放过时，跳过图标检测强制补放。
+    auto randomInterval = [](int minTime, int maxTime) -> int {
+        if(maxTime < minTime){
+            const int swap = minTime;
+            minTime = maxTime;
+            maxTime = swap;
+        }
+        if(minTime < 0){
+            minTime = 0;
+        }
+        if(maxTime < minTime){
+            maxTime = minTime;
+        }
+        return QRandomGenerator::global()->bounded(minTime, maxTime + 1);
+    };
+
+    auto recastBuff = [&](bool enable, const char* configKey, int keycode, const QString& name,
+                          int& lastTime, int& compareTime, int minTime, int maxTime) -> bool {
         if(!m_running || m_paused){
             return false;
         }
@@ -640,7 +656,15 @@ void KillMonster::skillRecast()
             return true;
         }
 
-        if(Helper::findChild(buff_list, code) != 0){
+        const int nowTime = m_timer.elapsed() / 1000;
+        // 如果没有设置比较时间，先随机一次
+        if(compareTime <= 0){
+            compareTime = randomInterval(minTime, maxTime);
+        }
+
+        // 还没放过，或距离上次释放已经超过本次随机间隔，强制补放。
+        const bool forceRecast = lastTime == 0 || (nowTime - lastTime) > compareTime;
+        if(!forceRecast && Helper::findChild(buff_list, code) != 0){
             return true;
         }
 
@@ -658,16 +682,24 @@ void KillMonster::skillRecast()
 
         MSDK::keyPress(keycode, 1);
         Helper::console(name + "已按");
+        lastTime = nowTime;
+        compareTime = randomInterval(minTime, maxTime);
+
         ProcessHelper::programDelay(200);
         QApplication::processEvents();
         return m_running && !m_paused;
     };
 
-    if(!recastBuff(m_recast_buff1_enable, "buff_bind/buff1", m_recast_buff1_keycode, "BUFF1")) return;
-    if(!recastBuff(m_recast_buff2_enable, "buff_bind/buff2", m_recast_buff2_keycode, "BUFF2")) return;
-    if(!recastBuff(m_recast_buff3_enable, "buff_bind/buff3", m_recast_buff3_keycode, "BUFF3")) return;
-    if(!recastBuff(m_recast_buff4_enable, "buff_bind/buff4", m_recast_buff4_keycode, "BUFF4")) return;
-    recastBuff(m_recast_buff5_enable, "buff_bind/buff5", m_recast_buff5_keycode, "BUFF5");
+    if(!recastBuff(m_recast_buff1_enable, "buff_bind/buff1", m_recast_buff1_keycode, "BUFF1",
+                   m_recast_buff1_lasttime, m_recast_buff1_comparetime, m_recast_buff1_time, m_recast_buff1_max_time)) return;
+    if(!recastBuff(m_recast_buff2_enable, "buff_bind/buff2", m_recast_buff2_keycode, "BUFF2",
+                   m_recast_buff2_lasttime, m_recast_buff2_comparetime, m_recast_buff2_time, m_recast_buff2_max_time)) return;
+    if(!recastBuff(m_recast_buff3_enable, "buff_bind/buff3", m_recast_buff3_keycode, "BUFF3",
+                   m_recast_buff3_lasttime, m_recast_buff3_comparetime, m_recast_buff3_time, m_recast_buff3_max_time)) return;
+    if(!recastBuff(m_recast_buff4_enable, "buff_bind/buff4", m_recast_buff4_keycode, "BUFF4",
+                   m_recast_buff4_lasttime, m_recast_buff4_comparetime, m_recast_buff4_time, m_recast_buff4_max_time)) return;
+    recastBuff(m_recast_buff5_enable, "buff_bind/buff5", m_recast_buff5_keycode, "BUFF5",
+               m_recast_buff5_lasttime, m_recast_buff5_comparetime, m_recast_buff5_time, m_recast_buff5_max_time);
 }
 
 bool KillMonster::isAttaking()
