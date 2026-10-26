@@ -970,6 +970,90 @@ cv::Point WalkBase::getUserPos()
     return pos;
 }
 
+namespace {
+// 绘制前现读怪物和物品坐标。攻击循环不会回到 findDropItem / updateAllMonsters，缓存坐标会停住。
+void refreshRealtimeActors()
+{
+    if(!Gplayer.p_curmapentity){
+        return;
+    }
+
+    const quint64 children = readLong(Gplayer.p_curmapentity + BASE::MODEntity::children);
+    if(!children){
+        return;
+    }
+    const quint64 count = readInt(children + BASE::List::size);
+    const quint64 array = readLong(children + BASE::List::InternalArray);
+    if(!array){
+        return;
+    }
+    const quint64 head = array + BASE::InternalArray::Head;
+    const auto& bounding = Gplayer.curmapinfo.map_bounding;
+
+    std::vector<cv::Point> monsters;
+    std::vector<cv::Point> items;
+    monsters.reserve(32);
+    items.reserve(16);
+
+    for(quint64 i = 0; i < count; ++i){
+        const quint64 entity = readLong(head + i * 8);
+        if(!entity){
+            continue;
+        }
+
+        const QString name = GameStruct::readEntityName(entity);
+        if(name == "Monster"){
+            const quint64 rigid = readLong(entity + BASE::MODEntity::RigidbodyComponent);
+            if(!rigid || !readByte(rigid + BASE::RigidbodyComponent::exists)){
+                continue;
+            }
+
+            const quint64 state = readLong(entity + BASE::MODEntity::StateComponent);
+            const quint64 stateName = state ? readLong(state + BASE::StateComponent::_CurrentStateName) : 0;
+            if(stateName && readString(stateName + BASE::String::text, 10) == "DEAD"){
+                continue;
+            }
+
+            const float floatX = readFloat(rigid + BASE::RigidbodyComponent::airPos);
+            const float floatY = readFloat(rigid + BASE::RigidbodyComponent::airPos + 4);
+            const int monsterX = RoomMap::toMapPosX(floatX, bounding.x_offset);
+            const int monsterY = RoomMap::toMapPosY(floatY, bounding.y_offset, bounding.height);
+            if(monsterX == 0 && monsterY == 0){
+                continue;
+            }
+            monsters.push_back({monsterX, monsterY});
+        }else if(name == "PoolObject"){
+            if(Gplayer.m_black_item_pro.find(entity) != Gplayer.m_black_item_pro.end()){
+                continue;
+            }
+
+            const quint64 sprite = readLong(entity + BASE::MODEntity::SpriteRendererComponent);
+            const quint64 spriteId = sprite ? readLong(sprite + BASE::SpriteRendererComponent::_SpriteRUID) : 0;
+            if(!spriteId || readString(spriteId + BASE::String::text, 100) == "7eba29245d2f4e7fb157a9dbe160a241"){
+                continue;
+            }
+
+            const quint64 transform = readLong(entity + BASE::MODEntity::TransformComponent);
+            if(!transform){
+                continue;
+            }
+            const float itemX = readFloat(transform + BASE::TransformComponent::PositionX);
+            const float itemY = readFloat(transform + BASE::TransformComponent::PositionY);
+            const int x = RoomMap::toMapPosX(itemX, bounding.x_offset);
+            const int y = RoomMap::toMapPosY(itemY, bounding.y_offset, bounding.height);
+            const cv::Point itemPos = RoomMap::getItemLinePos(Gplayer.curmapinfo.map_mat, {x, y});
+            if(itemPos.x == -1){
+                continue;
+            }
+            items.push_back(itemPos);
+        }
+    }
+
+    Gplayer.m_realtime_monsters.swap(monsters);
+    Gplayer.m_realtime_items.swap(items);
+}
+}
+
 void WalkBase::paintUser()
 {
     static QElapsedTimer frameTimer;
@@ -987,6 +1071,9 @@ void WalkBase::paintUser()
         return;
     }
 
+    frameTimer.restart();
+    refreshRealtimeActors();
+
     quint64 transform = readLong(Gplayer.p_localplayer + BASE::MODEntity::TransformComponent);
     const float user_x = readFloat(transform + BASE::TransformComponent::PositionX);
     const float user_y = readFloat(transform + BASE::TransformComponent::PositionY);
@@ -996,7 +1083,6 @@ void WalkBase::paintUser()
         return;
     }
 
-    frameTimer.restart();
     framePending.storeRelease(1);
     QVector<QPoint> monsters;
     QVector<QPoint> items;
