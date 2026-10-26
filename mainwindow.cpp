@@ -22,6 +22,7 @@
 #include "utils/gamestruct.h"
 #include "widgets/alertwindow.h"
 #include <QGraphicsScene>
+#include <QPainter>
 #include "widgets/taskeditdialog.h"
 #include "utils/data.h"
 #include "utils/mousetrack.h"
@@ -802,6 +803,30 @@ void MainWindow::updateCompoment(bool status)
         ui->pushButton_start_play->setProperty("class","start-play-btn");
     }
     ui->pushButton_start_play->style()->polish(ui->pushButton_start_play);
+}
+
+void MainWindow::clearRealtimeMap()
+{
+    QPixmap canvas(ui->label_realtime_map->size());
+    canvas.fill(Qt::black);
+    ui->label_realtime_map->setPixmap(canvas);
+}
+
+void MainWindow::showRealtimeMap(const QImage& image)
+{
+    if(image.isNull() || ui->label_realtime_map->size().isEmpty()){
+        return;
+    }
+
+    QPixmap canvas(ui->label_realtime_map->size());
+    canvas.fill(Qt::black);
+    const QPixmap map = QPixmap::fromImage(image).scaled(
+        canvas.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QPainter painter(&canvas);
+    painter.drawPixmap((canvas.width() - map.width()) / 2,
+                       (canvas.height() - map.height()) / 2,
+                       map);
+    ui->label_realtime_map->setPixmap(canvas);
 }
 
 void MainWindow::updateTaskMonitor(const TaskInfo &task)

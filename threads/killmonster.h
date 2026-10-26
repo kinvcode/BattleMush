@@ -151,6 +151,11 @@ private:
     // 定时释放的技能。目前支持的有：个人BUFF
     void skillRecast();
 
+    // 实时地图
+    bool m_realtime_map_shown = false;
+    void clearRealtimeMap();
+    bool showRealtimeMap();
+
     // 解除符文
     void solveRune();
 

@@ -11,6 +11,7 @@
 #include "pathfinding/moveplatform.h"
 #include "global/controller.h"
 #include "mainwindow.h"
+#include <QImage>
 #include "utils/matchtemp.h"
 #include "utils/mousetrack.h"
 #include "driver/msdk/msdkDriver.h"
@@ -182,6 +183,8 @@ void KillMonster::process()
             m_map_start = 0;
             m_currentmap = 0;
             m_allmonster.clear();
+            m_realtime_map_shown = false;
+            clearRealtimeMap();
             DebugOutput::out("切换了地图");
             DebugOutput::out("首次访问的地图需要计算地图路径，请耐心等待~");
             Helper::console("切换了地图\r\n首次访问的地图需要计算地图路径，请耐心等待~");
@@ -200,6 +203,10 @@ void KillMonster::process()
             ProcessHelper::programDelay(1000);
             QApplication::processEvents();
             continue;
+        }
+
+        if(!m_realtime_map_shown && showRealtimeMap()){
+            m_realtime_map_shown = true;
         }
 
         // 检查键盘
@@ -560,6 +567,29 @@ void KillMonster::reciveItem(const Item &target_item)
         m_black_item_pro[target_item.entity] = m_timer.elapsed();
         Gplayer.m_black_item_pro = m_black_item_pro;
     }
+}
+
+void KillMonster::clearRealtimeMap()
+{
+    QMetaObject::invokeMethod(MainWindow::getInstance(), []() {
+        MainWindow::getInstance()->clearRealtimeMap();
+    }, Qt::QueuedConnection);
+}
+
+bool KillMonster::showRealtimeMap()
+{
+    const cv::Mat& src = Gplayer.curmapinfo.map_mat;
+    if(src.empty() || src.type() != CV_8UC3){
+        return false;
+    }
+
+    cv::Mat copy = src.clone();
+    QImage view(copy.data, copy.cols, copy.rows, static_cast<int>(copy.step), QImage::Format_RGB888);
+    const QImage image = view.copy();
+    QMetaObject::invokeMethod(MainWindow::getInstance(), [image]() {
+        MainWindow::getInstance()->showRealtimeMap(image);
+    }, Qt::QueuedConnection);
+    return true;
 }
 
 void KillMonster::skillRecast()

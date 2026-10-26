@@ -234,6 +234,8 @@ signals:
     // 普通函数
 public:
     void updateTaskMonitor(const TaskInfo &task);
+    void clearRealtimeMap();
+    void showRealtimeMap(const QImage& image);
 private:
     void refreshTable();
     void deletePlanRow(int row);
